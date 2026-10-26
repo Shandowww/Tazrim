@@ -1,0 +1,241 @@
+title: Infrastructure and Updates
+views:
+  - title: Status
+    path: overview
+    icon: mdi:server-network
+    cards:
+      - type: markdown
+        content: >-
+          ## Infrastructure status
+          Green = checked and working · amber = needs attention · unavailable = no current data.
+          Last server observation: **{{ states('sensor.infra_snapshot') }}**
+      - type: entities
+        title: Services
+        entities:
+          - entity: sensor.infra_budgit_health
+            name: Budgit
+          - entity: sensor.infra_parking_health
+            name: Parking
+          - entity: binary_sensor.infra_server_data_fresh
+            name: Server data is fresh
+          - entity: binary_sensor.infra_budgit_unavailable
+            name: Budgit unavailable
+          - entity: binary_sensor.infra_parking_unavailable
+            name: Parking unavailable
+          - entity: binary_sensor.infra_scan_attention
+            name: Security scans need attention
+          - entity: input_boolean.infra_scan_monitor_enabled
+            name: GitHub scan monitoring enabled
+          - entity: binary_sensor.infra_parking_backup_stale
+            name: Parking backup is stale
+          - entity: binary_sensor.infra_parking_recovery_stale
+            name: Parking recovery test is stale
+          - entity: binary_sensor.infra_budgit_backup_attention
+            name: Budgit backup needs attention
+          - entity: binary_sensor.infra_reboot_required
+            name: Server reboot required
+          - entity: binary_sensor.infra_container_problem
+            name: Container is not running
+          - entity: binary_sensor.infra_host_job_failed
+            name: Server job failed
+          - entity: binary_sensor.infra_certificate_attention
+            name: HTTPS certificate needs attention
+      - type: entities
+        title: Current resource use
+        entities:
+          - sensor.infra_host_cpu_peak
+          - sensor.infra_host_cpu_mean
+          - sensor.infra_host_memory_available
+          - sensor.infra_host_disk_free
+          - binary_sensor.infra_host_cpu_high
+          - binary_sensor.infra_host_memory_low
+          - binary_sensor.infra_host_disk_low
+      - type: markdown
+        content: >-
+          {% set scans = [('Budgit','sensor.infra_budgit_scan'),
+                          ('Parking','sensor.infra_parking_scan'),
+                          ('Plant Care','sensor.infra_plant_scan')] %}
+          ### Latest scheduled scans
+          {% for name, entity in scans %}
+          - **{{ name }}:** {{ states(entity) }} · {{ state_attr(entity, 'updated_at') or 'no run time available' }}
+            {% set url = state_attr(entity, 'html_url') %}{% if url %}[Open run]({{ url }}){% endif %}
+          {% endfor %}
+
+  - title: Resources
+    path: resources
+    icon: mdi:chart-line
+    cards:
+      - type: statistics-graph
+        title: Server CPU — peak and average, 7 days
+        chart_type: line
+        period: hour
+        days_to_show: 7
+        stat_types:
+          - max
+          - mean
+        entities:
+          - sensor.infra_host_cpu_peak
+      - type: history-graph
+        title: Server memory available, 24 hours
+        hours_to_show: 24
+        entities:
+          - sensor.infra_host_memory_available
+      - type: statistics-graph
+        title: Server disk space free, 7 days
+        chart_type: line
+        period: hour
+        days_to_show: 7
+        stat_types:
+          - min
+        entities:
+          - sensor.infra_host_disk_free
+      - type: history-graph
+        title: App memory use, 24 hours
+        hours_to_show: 24
+        entities:
+          - sensor.infra_budgit_memory
+          - sensor.infra_parking_memory
+          - sensor.infra_proxy_memory
+      - type: history-graph
+        title: App CPU use, 24 hours
+        hours_to_show: 24
+        entities:
+          - sensor.infra_budgit_cpu
+          - sensor.infra_parking_cpu
+      - type: statistics-graph
+        title: Network traffic — peaks, 7 days
+        chart_type: line
+        period: hour
+        days_to_show: 7
+        stat_types:
+          - max
+        entities:
+          - sensor.infra_host_network_receive_peak
+          - sensor.infra_host_network_send_peak
+      - type: statistics-graph
+        title: Disk throughput — peaks, 7 days
+        chart_type: line
+        period: hour
+        days_to_show: 7
+        stat_types:
+          - max
+        entities:
+          - sensor.infra_host_disk_read_peak
+          - sensor.infra_host_disk_write_peak
+      - type: markdown
+        content: >-
+          {% set h = state_attr('sensor.infra_snapshot', 'host') or {} %}
+          ### Latest sample
+          Peak CPU: **{{ h.cpuPeakPercent | default('unknown') }}%**
+          at {{ h.cpuPeakAt | default('unknown') }}.
+          Lowest available memory in the sample: {{ h.memoryAvailableMinMiB | default('unknown') }} MiB.
+          Collection began at installation; earlier resource peaks are unavailable.
+
+  - title: Maintenance
+    path: maintenance
+    icon: mdi:shield-check
+    cards:
+      - type: entities
+        title: Security scans
+        entities:
+          - input_boolean.infra_scan_monitor_enabled
+          - sensor.infra_budgit_scan
+          - sensor.infra_parking_scan
+          - sensor.infra_plant_scan
+          - binary_sensor.infra_scan_attention
+      - type: markdown
+        content: >-
+          {% set b = state_attr('sensor.infra_snapshot', 'backups') or {} %}
+          {% set p = b.parking or {} %}
+          {% set r = b.parkingRecovery or {} %}
+          {% set u = b.budgit or {} %}
+          ### Backups and recovery
+          - Parking — verified remote copy: **{{ p.verifiedAt | default('unknown') }}**
+          - Parking — recovery test: **{{ r.state | default('unknown') }}**, {{ r.at | default('') }}
+          - Budgit — enabled connections: **{{ u.enabled | default('unknown') }}**;
+            last success: {{ u.lastSuccessMs | default('unknown') }} (Unix milliseconds)
+          - Home Assistant backups: Settings → System → Backups.
+          A successful upload does not prove a restore will work.
+      - type: markdown
+        content: >-
+          {% set i = state_attr('sensor.infra_snapshot', 'inventory') or {} %}
+          {% set h = i.host or {} %}
+          {% set d = i.deployments or {} %}
+          ### Installed versions
+          Last inventory: **{{ i.at | default('unknown') }}**
+          - Kernel: {{ h.kernel | default('unknown') }}
+          - Budgit: {{ (d.budgit or {}).runtime | default('unknown') }}
+          - Parking: {{ (d.parking or {}).runtime | default('unknown') }}
+          - Proxy: {{ (d.proxy or {}).runtime | default('unknown') }}
+          An installed version is not necessarily the latest version tested in CI.
+      - type: markdown
+        content: >-
+          {% set c = state_attr('sensor.infra_snapshot', 'certificates') or {} %}
+          ### HTTPS certificates
+          {% for name in ['budgit.duckdns.org', 'park80.duckdns.org'] %}
+          - **{{ name }}:** {{ (c.get(name) or {}).expiresAt | default('unknown') }}
+          {% endfor %}
+          Last checked: {{ c.checkedAt | default('unknown') }}.
+
+  - title: Home Assistant
+    path: home-assistant
+    icon: mdi:home-assistant
+    cards:
+      - type: entities
+        title: Installed and available updates
+        entities:
+          - entity: update.home_assistant_operating_system_update
+            name: Home Assistant OS
+          - entity: update.home_assistant_core_update
+            name: Home Assistant Core
+          - entity: update.home_assistant_supervisor_update
+            name: Supervisor
+          - entity: update.plant_care_dashboard_update
+            name: Plant Care
+          - entity: update.ssh_web_terminal_update
+            name: SSH Terminal
+      - type: entities
+        title: Raspberry Pi
+        entities:
+          - entity: sensor.system_monitor_processor_use
+            name: CPU use
+          - entity: sensor.system_monitor_memory_usage
+            name: Memory use
+          - entity: sensor.system_monitor_disk_free
+            name: Disk space free
+          - entity: sensor.system_monitor_last_boot
+            name: Last boot
+          - entity: sensor.system_monitor_processor_temperature
+            name: CPU temperature
+      - type: entities
+        title: Home Assistant backups
+        entities:
+          - entity: sensor.backup_backup_manager_state
+            name: Backup manager state
+          - entity: sensor.backup_last_attempted_automatic_backup
+            name: Last attempted automatic backup
+          - entity: sensor.backup_last_successful_automatic_backup
+            name: Last successful automatic backup
+          - entity: sensor.backup_next_scheduled_automatic_backup
+            name: Next scheduled automatic backup
+          - entity: event.backup_automatic_backup
+            name: Latest backup result
+      - type: history-graph
+        title: Raspberry Pi CPU and memory, 7 days
+        hours_to_show: 168
+        entities:
+          - sensor.system_monitor_processor_use
+          - sensor.system_monitor_memory_usage
+      - type: history-graph
+        title: Raspberry Pi temperature, 7 days
+        hours_to_show: 168
+        entities:
+          - sensor.system_monitor_processor_temperature
+      - type: markdown
+        content: >-
+          {% set plant = 'update.plant_care_dashboard_update' %}
+          ## Plant Care
+          Installed: **{{ state_attr(plant, 'installed_version') or 'unknown' }}**;
+          available: **{{ state_attr(plant, 'latest_version') or 'unknown' }}**.
+          Install updates from Home Assistant's update interface.
+          Home Assistant backups are under Settings → System → Backups.

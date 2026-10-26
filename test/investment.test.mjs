@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {investmentProjection} from '../src/investment-model.js';
+const input={initial:10000,monthly:1000,years:2,annualReturn:0,annualIncrease:0};
+const near=(a,b)=>assert.ok(Math.abs(a-b)<.0001,`${a} != ${b}`);
+test('Zero return separates total contributions without inventing growth',()=>{const p=investmentProjection(input);assert.equal(p.balance,34000);assert.equal(p.contributed,34000);assert.equal(p.growth,0);assert.equal(p.rows.length,3);assert.deepEqual(input,{initial:10000,monthly:1000,years:2,annualReturn:0,annualIncrease:0});});
+test('Effective annual return compounds exactly, with month-end deposits',()=>{near(investmentProjection({...input,monthly:0,annualReturn:10}).balance,12100);const annual=12.68250301319698;const p=investmentProjection({...input,initial:0,years:1,annualReturn:annual});near(p.balance,1000*((1.01**12-1)/.01));near(p.contributed,12000);});
+test('Annual contribution growth starts in year two, once per year',()=>{const p=investmentProjection({...input,initial:0,years:3,annualIncrease:10});near(p.rows[1].contributed,12000);near(p.rows[2].contributed,25200);near(p.contributed,39720);near(p.monthlyDeposit,1210);assert.equal(p.growth,0);});
+test('Negative returns show losses and valid zero balances remain usable',()=>{const p=investmentProjection({...input,monthly:0,annualReturn:-10});near(p.balance,8100);near(p.growth,-1900);assert.ok(p.growth<0);assert.equal(investmentProjection({...input,initial:0,monthly:0}).balance,0);});
+test('Rejects invalid inputs and keeps long scenarios finite',()=>{for(const bad of [{years:0},{years:1.5},{years:51},{annualReturn:-100},{annualIncrease:-1},{monthly:Infinity},{initial:NaN},{initial:-1}])assert.throws(()=>investmentProjection({...input,...bad}));assert.ok(Number.isFinite(investmentProjection({...input,years:50,annualReturn:50,annualIncrease:20}).balance));});

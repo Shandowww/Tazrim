@@ -1,29 +1,58 @@
-node_modules/
-.next/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Secrets — keep every env file out; commit a sanitized .env.example if one is ever needed
-.env
-.env.*
-!.env.example
+# dependencies
+/node_modules
+/frontend/node_modules/
+/frontend/dist/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Personal financial data: the database and any bank / card exports
-prisma/*.db
-prisma/*.db-journal
-prisma/*.backup.db
-*.db-wal
-*.db-shm
-*.sqlite-journal
-*.sqlite
-*.xls
-*.xlsx
-*.csv
+# testing
+/coverage
 
-# Local tooling state
-.vercel/
-.worktrees/
-.claude/worktrees/
-.claude/settings.local.json
-.superpowers/
-.sync-dry-run/
-*.tsbuildinfo
+# next.js
+/.next/
+/.vinext/
+/out/
+
+# misc
 .DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+next-env.d.ts
+/dist/
+/.wrangler/
+# Checkout-local execution profile and tool state; never publish them.
+/.sites-runtime/
+/.agents/
+/.codex/
+/outputs/
+/work/
+
+# Standalone financial runtime records and snapshots
+/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Encrypted disaster-recovery archives and incomplete transfers
+*.backup
+*.backup.partial

@@ -1,0 +1,11 @@
+[
+  {
+    "package": "xlsx", "version": "0.20.3",
+    "files": ["tools/bank-csv/vendor/xlsx-mini.cjs", "tools/bank-csv/vendor/xlsx-full.cjs"],
+    "exceptions": [
+      {"id":"GHSA-4r6h-8v6p-xvw6","modified":"2025-09-19T15:23:40Z","reviewBefore":"2026-11-24","reason":"Official CDN 0.20.3 is newer than the 0.19.3 fix. The npm package range cannot represent later CDN-only releases.","source":"https://github.com/advisories/GHSA-4r6h-8v6p-xvw6"},
+      {"id":"GHSA-5pgg-2g8v-p4x9","modified":"2026-09-10T03:49:18.872216794Z","reviewBefore":"2026-11-24","reason":"Official CDN 0.20.3 is newer than the 0.20.2 fix. The npm package range cannot represent later CDN-only releases.","source":"https://github.com/advisories/GHSA-5pgg-2g8v-p4x9"}
+    ]
+  },
+  {"package":"pdfjs-dist","version":"6.4.299","files":["tools/bank-csv/vendor/pdfjs/pdf.mjs","tools/bank-csv/vendor/pdfjs/pdf.worker.mjs"],"exceptions":[]}
+]

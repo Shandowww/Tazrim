@@ -1,0 +1,13 @@
+[Unit]
+Description=Publish sanitized infrastructure status for Home Assistant
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/infra-monitor/collector.py
+TimeoutStartSec=90
+UMask=0022
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/infra-monitor/status /opt/infra-monitor/history

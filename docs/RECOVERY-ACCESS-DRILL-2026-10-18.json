@@ -1,0 +1,30 @@
+{
+  "format": "budgit-recovery-drill-v1",
+  "completedAt": "2026-10-17T22:55:01.801Z",
+  "elapsedMs": 250,
+  "archiveSha256": "64dfe366c78f502bf96855ddea34a8fb5d5ed9f9ac39aee10a0482882eca801f",
+  "checks": {
+    "authenticatedDecryption": true,
+    "snapshotChecksum": true,
+    "sqliteIntegrity": true,
+    "foreignKeys": true,
+    "currentVersionMigration": true,
+    "budgetAndRevisionPreservation": true,
+    "transactionIdentityAndSignedCents": true,
+    "repeatedStartup": true,
+    "applicationRequests": true,
+    "syntheticOAuthCallback": true,
+    "anonymousAndForgedIdentityDenied": true,
+    "personalIsolation": true,
+    "restoredBudgetsDeniedToOutsiders": true,
+    "sharedMembershipRevocation": true,
+    "accountAccessRevocation": true,
+    "revisionConflict": true,
+    "logoutRevocation": true
+  },
+  "limitations": [
+    "Does not verify Google Drive delivery or backup freshness.",
+    "Uses in-process application requests and synthetic OAuth identities; does not verify real Google login, browser rendering, encrypted-budget unlocking or full host reconstruction."
+  ],
+  "temporaryDatabaseRemoved": true
+}

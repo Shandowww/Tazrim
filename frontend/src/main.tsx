@@ -1,0 +1,157 @@
+import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { createPortal } from 'react-dom'
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { RefreshCw } from 'lucide-react'
+import { Sidebar } from './tazrim/components/layout/sidebar'
+import { BottomNav } from './tazrim/components/layout/bottom-nav'
+import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
+import { DashboardSummaryCards } from './tazrim/components/dashboard/summary-cards'
+import { PeriodPicker } from './tazrim/components/layout/period-picker'
+import type { Period } from './tazrim/lib/period'
+import { AppearanceContext } from './app/appearance'
+import { buildNavSections } from './tazrim/lib/nav/state'
+import { demoAccounts, demoSummary, demoBankSummary, demoCardSummary } from './app/demo-fixture'
+import { budgetDashboard, budgetNavigation } from './app/budget-adapter'
+import { AccountsPage } from './app/accounts-page'
+import { useBudget, type BudgetResponse } from './app/use-budget'
+import './tazrim/globals.css'
+import './app.css'
+
+const CombinedChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/combined-chart')).CombinedChart }))
+const CCMonthlyChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/cc-monthly-chart')).CCMonthlyChart }))
+
+function useFixtureMode() {
+  const { search } = useLocation()
+  return import.meta.env.DEV && new URLSearchParams(search).get('demo') === '1'
+}
+
+function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
+  const { pathname, search } = useLocation()
+  const navigate = useNavigate()
+  const params = new URLSearchParams(search)
+  const year = /^20\d{2}$/.test(params.get('year') || '') ? Number(params.get('year')) : Number(jerusalemMonth().slice(0, 4))
+  const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(params.get('month') || '') ? Number(params.get('month')) : undefined
+  function selectPeriod(next: Period) {
+    if (next.year < 1900 || next.year > 2999) return
+    const query = new URLSearchParams(search)
+    query.set('year', String(next.year))
+    if (next.month) query.set('month', String(next.month))
+    else query.delete('month')
+    navigate(pathname + `?${query}`)
+  }
+  function selectBudget(id: string) {
+    const next = new URLSearchParams(search)
+    if (id === 'personal') next.delete('budget')
+    else next.set('budget', id)
+    navigate(pathname + (next.size ? `?${next}` : ''))
+  }
+  return (
+    <header className="sticky top-0 z-30 grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b bar-glass px-4 py-2.5">
+      <div className="min-w-0 text-xs font-semibold text-muted-foreground">{budget.status === 'ready' ? <label className="flex min-w-0 items-center gap-2"><span className="sr-only">מרחב תקציב</span><select className="min-w-0 max-w-full truncate rounded-lg bg-transparent p-1" value={budget.budgetId} onChange={event => selectBudget(event.target.value)}>{budget.spaces.map(space => <option key={space.id} value={space.id}>{space.name}{space.role === 'viewer' ? ' · צפייה בלבד' : ''}</option>)}</select></label> : 'Budgit'}</div>
+      <PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod} />
+      <div className="flex items-center justify-end gap-2">
+        <button type="button" className="rounded-lg p-2 text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={budget.refresh}><RefreshCw className="h-5 w-5" /></button>
+      </div>
+    </header>
+  )
+}
+
+function jerusalemMonth() {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit' }).formatToParts(new Date())
+  return `${parts.find(part => part.type === 'year')?.value}-${parts.find(part => part.type === 'month')?.value}`
+}
+
+function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<typeof useBudget> }) {
+  if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען נתונים…</section>
+  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <a className="text-primary underline" href="/">פתיחת הממשק הקיים</a></section>
+  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <a className="text-primary underline" href="/">הגדרת תקציב</a></section>
+  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <a className="text-primary underline" href="/">פתיחה מאובטחת בממשק הקיים</a></section>
+  if (!fixture && budget.status === 'ready') {
+    const search = new URLSearchParams(window.location.search)
+    const year = /^20\d{2}$/.test(search.get('year') || '') ? search.get('year')! : jerusalemMonth().slice(0, 4)
+    const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(search.get('month') || '') ? String(Number(search.get('month'))).padStart(2, '0') : ''
+    let view: ReturnType<typeof budgetDashboard>
+    try { view = budgetDashboard(budget.value.plan, { year, month, asOf: jerusalemMonth() }) }
+    catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. <a className="text-primary underline" href="/">פתיחת הממשק הקיים</a></section> }
+    const accountCount = budgetNavigation(budget.value.plan).filter(account => account.kind === 'BANK').length
+    return <div className="mx-auto max-w-7xl space-y-6">
+      <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>
+      <p className="text-sm text-muted-foreground">{view.partial ? 'דיווח חלקי · ' : ''}{view.reportedMonths} חודשים מדווחים{budget.value.budget?.role === 'viewer' ? ' · צפייה בלבד' : ''} · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>
+      {view.hasReports ? <>
+        <DashboardSummaryCards {...view.cards} query={search.toString()} bankHint={accountCount ? `${accountCount} חשבונות` : 'ללא חשבון מוגדר'} cardHint="כרטיסי אשראי" monthHasData={view.reportedMonths > 0} />
+        <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={view.bankSummary} maxSummary={view.cardSummary} cardsName="כרטיס" selectedMonth={month ? Number(month) : undefined} /></Suspense>
+        <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={view.cardSummary} selectedMonth={month ? Number(month) : undefined} /></Suspense></div>
+      </> : <section className="surface rounded-xl p-6">אין נתוני אמת לתקופה זו. תחזיות וסכומי ברירת מחדל אינם מוצגים כדיווח.</section>}
+      <section className="surface rounded-xl p-6 text-sm text-muted-foreground">תצוגה לקריאה בלבד. <a className="text-primary underline" href="/">עריכה בממשק הקיים</a></section>
+    </div>
+  }
+  return (
+    <div className="mx-auto max-w-7xl space-y-6">
+      <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>
+      <DashboardSummaryCards {...demoSummary} query="" bankHint="2 חשבונות" cardHint="כרטיס ראשי" />
+      <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={demoBankSummary} maxSummary={demoCardSummary} cardsName="כרטיס" /></Suspense>
+      <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={demoCardSummary} /></Suspense></div>
+      <section className="surface rounded-xl p-6"><h2 className="font-semibold">דוגמת תצוגה</h2><p className="mt-2 text-sm text-muted-foreground">הסכומים בדוגמה בלבד. בתצוגת החשבון מוצגים נתוני הדיווח השמורים ב-Budgit.</p></section>
+    </div>
+  )
+}
+
+function PendingPage({ title }: { title: string }) {
+  const fixture = useFixtureMode()
+  return <div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">{title}</h1><section className="surface rounded-xl p-6 text-muted-foreground">{fixture ? 'מסך פיתוח עם נתוני דוגמה. חיבור Budgit עדיין בעבודה.' : 'ממתין לחיבור לנתוני Budgit.'}</section></div>
+}
+
+function App() {
+  const fixture = useFixtureMode()
+  const { search } = useLocation()
+  const budgetId = new URLSearchParams(search).get('budget') || 'personal'
+  const budget = useBudget(budgetId, !fixture)
+  const [theme, setTheme] = useState(() => { try { return localStorage.getItem('budgit-react-appearance') || 'system' } catch { return 'system' } })
+  const [systemDark, setSystemDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches)
+  useEffect(() => {
+    const media = matchMedia('(prefers-color-scheme: dark)')
+    const update = () => setSystemDark(media.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+  const dark = theme === 'dark' || (theme === 'system' && systemDark)
+  useEffect(() => { document.documentElement.classList.toggle('dark', dark) }, [dark])
+  const actualPlan: BudgetResponse['plan'] = budget.status === 'ready' ? budget.value.plan : null
+  const sections = buildNavSections(fixture ? demoAccounts : actualPlan && actualPlan.format !== 'monthly-flow-encrypted-v1' ? budgetNavigation(actualPlan) : [])
+  return (
+    <AppearanceContext.Provider value={dark}><NavSectionsProvider sections={sections}>
+      <div className="flex min-h-screen font-sans">
+        <Sidebar initialCollapsed={false} initialClosed={[]} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Header budget={budget} />
+          <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
+            <Routes>
+              <Route path="/" element={<Dashboard fixture={fixture} budget={budget} />} />
+              <Route path="/banks" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
+              <Route path="/banks/:id" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
+              <Route path="/cards" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
+              <Route path="/cards/:id" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
+              <Route path="/recurring" element={<PendingPage title="חיובים קבועים" />} />
+              <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />
+              <Route path="/categories" element={<PendingPage title="קטגוריות" />} />
+              <Route path="/settings" element={<div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label></div>} />
+              <Route path="/about" element={<PendingPage title="אודות" />} />
+              <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
+      <BottomNav />
+      {(budget.status === 'error' || budget.status === 'ready' && budget.refreshError) && createPortal(
+        <div role="alert" className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[100] mx-auto flex max-w-lg items-center gap-3 rounded-xl bg-foreground p-4 text-background shadow-2xl">
+          <span className="min-w-0 flex-1">{budget.status === 'error' ? budget.message : `${budget.refreshError} הנתונים האחרונים נשארו מוצגים.`}</span>
+          <button type="button" className="shrink-0 rounded-lg border border-background/40 px-2 py-1" onClick={budget.refresh}>ניסיון חוזר</button>
+          {budget.status === 'ready' && <button type="button" className="shrink-0 rounded-lg px-2 py-1" aria-label="סגירת הודעה" onClick={budget.dismissRefreshError}>סגירה</button>}
+        </div>, document.body
+      )}
+    </NavSectionsProvider></AppearanceContext.Provider>
+  )
+}
+
+createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter basename="/next"><App /></BrowserRouter></StrictMode>)

@@ -1,0 +1,6 @@
+# Append to the existing Caddyfile after backup and caddy validate.
+# Keep the existing parking block and its upstream unchanged.
+budgit.duckdns.org {
+    encode zstd gzip
+    reverse_proxy budgit:3001
+}

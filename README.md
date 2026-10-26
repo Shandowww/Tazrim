@@ -1,378 +1,296 @@
-# תזרים
+# Budgit adaptation of Tazrim — development branch
 
-[![CI](https://github.com/JordanYefet/Tazrim/actions/workflows/ci.yml/badge.svg)](https://github.com/JordanYefet/Tazrim/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/JordanYefet/Tazrim)](https://github.com/JordanYefet/Tazrim/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+This branch mirrors the completed React development checkpoint from `Shandowww/monthly-flow-budget`, commit `182de01e9a5b6fc2e39b9fc2cf702f0a266188f3`. It uses Budgit’s existing backend and financial rules with Tazrim’s React presentation. It is an incomplete read-only preview, not a published release. The original Tazrim application remains on this fork’s `main` branch.
 
-**Tazrim** is a self-hosted personal finance dashboard for Israeli households. It reads the transaction exports of Israeli banks and credit-card companies and turns them into a clear monthly cash-flow picture: income, expenses, categories, recurring charges and unusual transactions. The interface is in Hebrew, everything runs on your own machine and your data never leaves it. Free and open source under the MIT license.
+See [the implementation checkpoint](docs/tazrim-migration/checkpoint.md) and [source synchronization record](docs/tazrim-migration/fork-sync.json). Tazrim’s MIT license and Heebo’s license are retained.
 
-**Live demo** (read-only, made-up data): <https://tazrim-demo.vercel.app> · **Docker image:** `ghcr.io/jordanyefet/tazrim`
+# Monthly Flow
 
-אפליקציה אישית למעקב אחרי התזרים החודשי: מעלים קבצי תנועות מהבנק ופירוטי חיובים מחברות האשראי, ומקבלים תמונה ברורה של הכנסות, הוצאות, קטגוריות, חיובים קבועים ותנועות חריגות.
+## Active publication destination — 2026-10-18
 
-הכול רץ מקומית על המחשב שלכם. הנתונים נשמרים בקובץ SQLite אחד על המחשב שלכם ולא נשלחים לשום שירות חיצוני.
+Tal explicitly approved publishing this canonical checkout to `https://budgit.duckdns.org` on the existing server and backing up the same commit to GitHub. Leave Sites unchanged. This overrides older Sites publication instructions below; retain the historical Site identity for build validation only. Use a fresh verified SQLite backup, an isolated financial preflight and rollback image before updating the service; verify runtime build hash, health and unauthenticated access afterward. No hosting/resource upgrade is authorized.
 
-> **רוצים לנסות בלי להתקין?** ב[דמו החי](https://tazrim-demo.vercel.app) יש שנה של נתונים מומצאים בשלושה חשבונות בנק ושלושה כרטיסי אשראי. הוא לקריאה בלבד: אפשר ללחוץ על הכול, ושום שינוי לא נשמר.
 
-> כל צילומי המסך כאן צולמו על נתוני דמו מומצאים (`npm run db:demo`).
+## One current source — 2026-10-11
 
-![לוח בקרה](docs/screenshots/dashboard.png)
+The canonical checkout is `/Users/talshandor/Documents/personal-projects/monthly-flow`. `/Users/talshandor/Documents/ChatGPT/Monthly Flow Budget` now contains only a relocation notice, with no independent source checkout. Open the canonical project in Codex for all future work. Always work here, retain the Site ID in SOURCE-OF-TRUTH.json, and publish the same commit to Sites and the GitHub backup. Build refuses a different Site identity. The app menu displays a content-derived build identifier; refresh an already-open app to load published changes. HTML and budget responses use no-store.
 
----
+The former personal-projects checkout is preserved at `/Users/talshandor/Documents/personal-projects/monthly-flow-legacy-2026-10-11`. It includes unpublished Apple Pay integration work and the wife's old Site identity. It is an archive, not a source to edit or deploy. Do not merge its hosting identity or copy its source over this checkout. Reconcile any needed feature individually with tests.
 
-## תוכן עניינים
 
-- [התקנה והפעלה](#התקנה-והפעלה) (Docker, בלי ידע בתכנות)
-- [פתיחה מהטלפון](#פתיחה-מהטלפון)
-- [איך משתמשים](#איך-משתמשים)
-- [פיתוח](#פיתוח)
-- [רישיון ופרטיות](#רישיון-ופרטיות)
+A private monthly cash-flow planner, with monthly card totals rather than individual transactions.
 
----
+- Use **Budget setup** to set opening cash, a cash buffer and recurring monthly estimates.
+- Use **Monthly** to replace estimates with actual monthly totals.
+- Use **Planned** for extra expenses, gifts and installment commitments.
+- Use **ניסוי** to compare several purchases/events together. Adjust each cost, start month and 1–60 payment slider; balances and monthly comparisons update live. Find the shortest split that keeps the entire scenario above your cash buffer, holding other items fixed.
+- Press **Save budget** to store changes. Export and import JSON backups in Budget setup.
 
+The forecast shows month-end cash. It excludes inaccessible savings and investments from opening cash and subtracts new saving/investment contributions. Other spending must exclude card spending already entered elsewhere. The checkbox for included card payments prevents double-counting planned card items.
 
-## התקנה והפעלה
+The payment calculator uses a single final transaction price and payment count, with no separate fees input. Existing saved items with fees show their combined total; editing their price replaces that total without charging fees twice. Forecasts are estimates, and do not model intramonth overdrafts, bank feeds or automatic APR calculations.
 
-הדרך המומלצת היא Docker. לא צריך לדעת לתכנת, ולא צריך Git, Node.js או את הקוד עצמו: מתקינים תוכנה אחת (Docker Desktop), מורידים קובץ הגדרות אחד ומריצים פקודה אחת. בפעם הראשונה זה לוקח בערך רבע שעה.
+## Incoming transfers to the shared account
 
-האפליקציה מגיעה כאימג' מוכן (`ghcr.io/jordanyefet/tazrim`) שמתאים למחשבי Windows ו-Mac (גם Intel וגם Apple Silicon) ולמחשבי Linux. הנתונים נשמרים על המחשב שלכם בלבד.
+Report review offers **העברה נכנסת** for money moved into the receiving account, including contributions from either spouse’s private account to the shared account. The optional monthly `incomingTransfers` amount increases cash flow and the receiving account’s balance, but is separate from salary, additional income, spending, savings deposits and income achievements. Confirm the classification; transfer descriptions are suggestions only, and learned rules retain the account and direction.
 
-> מתכנתים שרוצים להריץ מהקוד או לשנות אותו: [הרצה מהקוד](#הרצה-מהקוד).
+Reported transfers do not automatically recur in later months. A recurring amount can still be set explicitly in forecast defaults, and a specific month can be edited manually. Existing imported records are not reclassified. Duplicate detection, balance anchors, partial-report guards, revision-aware saving and undo remain in place. Older budgets and backups without the new field remain valid.
 
-### שלב 1: התקנת Docker Desktop
+Report review also offers **העברה יוצאת פנימית** for money leaving one of your accounts for another of your accounts. Optional monthly `outgoingTransfers` reduces cash flow and the paying account’s balance, separately from consumption, savings and investment deposits. Ordinary outgoing payments retain the existing **העברות יוצאות** expense classification. Recorded internal transfers do not recur without an explicit recurring estimate. Existing entries are unchanged unless reviewed; the existing internal-transfer correction now preserves the cash outflow while removing it from expenses. Fees remain expenses, and no receiving leg or cross-space match is created automatically.
 
-Docker Desktop הוא התוכנה שמריצה את האפליקציה. מתקינים אותו פעם אחת. אין צורך בחשבון Docker: כשמוצע להתחבר, אפשר לדלג.
+## Development
 
-**ב-Mac:**
+The everyday experience prioritizes simple report import and optional categorization. Unknown card merchants can be categorized later in Expenses; archive choices are removed from the normal UI. Status shows account cards, a compact spending chart, and a separate savings tile beneath it with compact goal progress, configured deposit counts and deadline pace status. Goal rows open the exact goal; progress is actual saved allocations and reported deposits, without simulated deposits or estimated returns. Expense and investment month charts share native swipeable six-month slides with the wallet’s circular arrows and position dots. Swiping browses periods; tapping a month selects its data, retaining all edit guards. A separate **הפקדות להשקעות** tile below savings shows a selectable bar chart for the last 12 calendar months and cumulative reported investment deposits, excluding estimates, future months, returns and withdrawals. Confirmed combined months count once; otherwise confirmed individual accounts contribute without requiring other accounts to be complete. **עדכון הפקדות** opens the selected month’s deposit fields with existing edit guards. Its month buttons open the corresponding Expenses breakdown with a return button and browser-history navigation. Expenses uses the same chart as an in-place month selector instead of a dropdown; categories and card snapshots follow the selected month. Selecting a card opens a read-only popup of its original imported report rows (purchase date, original merchant name, charged amount), preserving refunds and showing a clear empty state when only a card total was saved. See `docs/SIMPLE-EXPERIENCE.md` for the user flow and continuing design rules.
 
-1. בודקים איזה מעבד יש במחשב: תפריט Apple () ← **אודות Mac זה**. אם כתוב **Chip** עם Apple M1/M2/M3/M4, זה Apple Silicon. אם כתוב **Processor** עם Intel, זה Intel.
-2. נכנסים ל-[docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) ומורידים את הגרסה המתאימה (**Download for Mac – Apple Silicon** או **– Intel Chip**).
-3. פותחים את הקובץ שירד (`Docker.dmg`) וגוררים את Docker לתיקייה **Applications**.
-4. פותחים את Docker מתיקיית Applications. בפתיחה הראשונה מאשרים את תנאי השימוש, ואם מתבקשים, מקלידים את סיסמת המחשב.
-5. מחכים שבתחתית חלון Docker יופיע **Engine running**, ושבסרגל העליון של המסך יופיע אייקון הלווייתן.
+The primary data-entry path is downloading bank/card statements and uploading them through **מרכז הדוחות**, available in Settings and first in the app menu. It also resumes stored unfinished reports. Manual entry remains for corrections and missing values. Gmail is an optional secondary Settings page under **חיבורים וייבוא → חיבורים נוספים → הגדרות Gmail**; account-login links in email are not report attachments. Apple Pay retains its existing Connections entry. See `docs/REPORT-CENTER-PRIMARY-2026-10-19.md` and `docs/GMAIL-SETUP-EN.md`.
 
-**ב-Windows:**
+`node build.mjs` builds a dependency-free Cloudflare Worker. `node verify.mjs` checks cash-flow math, installments, database storage, user isolation and revision conflicts. `node preview.mjs` serves a loopback-only local preview on port 5173 with a separate SQLite database under ignored `.sites-runtime/`.
 
-1. נכנסים ל-[docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) ומורידים את **Download for Windows**.
-2. מריצים את הקובץ שירד (`Docker Desktop Installer.exe`), ומשאירים מסומנת את האפשרות **Use WSL 2**.
-3. בסוף ההתקנה מפעילים מחדש את המחשב, אם מתבקשים.
-4. פותחים את **Docker Desktop** מתפריט התחל ומאשרים את תנאי השימוש. אם מופיעה הודעה שצריך להתקין או לעדכן את WSL, מאשרים אותה.
-5. מחכים שבתחתית חלון Docker יופיע **Engine running**.
+The local preview injects a test identity only in that local server. Production requires platform-injected authenticated user headers. Every budget is stored under its authenticated user ID in the declared D1 database. SQL migrations are generated with Drizzle and retained under `drizzle/`.
 
-אם מופיעה שגיאה על וירטואליזציה (Virtualization), צריך להפעיל אותה בהגדרות המחשב (BIOS). ההסבר נמצא ב[מדריך התקלות של Docker](https://docs.docker.com/desktop/troubleshoot-and-support/troubleshoot/topics/), בחלק על Virtualization.
+## Personal progress
 
-**ב-Linux:** מתקינים את Docker Engine עם התוסף Compose לפי [המדריך הרשמי](https://docs.docker.com/engine/install/) להפצה שלכם.
+The default Hebrew progress screen tracks monthly savings and investment contributions, an expense ceiling and an income target. Set goals independently of budget estimates. Only months marked actual, on or before the current Jerusalem month, count toward achievements and calendar-year totals. Annual contribution targets equal monthly targets × 12; balances and market returns are not tracked. Each signed-in account has a private budget, goals and optional display name. Existing budget backups remain compatible.
 
-**כדאי לסמן:** בהגדרות של Docker Desktop (גלגל השיניים ← **General**) את **Start Docker Desktop when you sign in to your computer**. כך Docker, והאפליקציה איתו, עולים לבד אחרי הפעלה מחדש של המחשב.
+Refresh using the top-bar refresh button, or pull down from the top on a touch device. Finish item edits or clear/apply the trial scenario before refreshing. For unsaved budget changes, refresh offers either keeping the local draft or loading saved data (including updates from another device). Loading saved data first retains an encrypted device draft for comparison and never saves the old plan to the server. Identical recovered plans do not count as unsaved edits. Refresh reloads the full app to retrieve UI updates and then the saved budget. It preserves the selected screen/month when browser session storage is available, and checks connectivity before navigating. A failed connectivity check keeps the current screen usable.
 
-### שלב 2: פתיחת טרמינל
+## Appearance update
 
-את שני השלבים הבאים עושים בטרמינל, חלון שבו מקלידים פקודות. מעתיקים כל פקודה מכאן, מדביקים בטרמינל ולוחצים Enter.
+Settings offers System / Light / Dark plus lavender, blue, mint, peach and rose accents, saved immediately per device independently of budget records. Under Settings → חשבונות הבנק, select an account and its color, then save changes. Account colors persist in the budget by stable account ID, including through renaming and backup export/import; bank tiles, linked credit cards and account indicators share the color. Automatic keeps the existing ID-based bank color. Color does not change account/card links or money. System follows device changes. Theme applies before first paint and updates browser chrome; unavailable browser storage is reported. The visual style uses cream, lilac, mint and peach surfaces, an original decorative neighborhood and the existing actual-only goal progress. Spent is a design reference, not a source of copied assets or additional transaction-tracking features.
 
-- **Mac:** לוחצים <kbd>⌘</kbd>+<kbd>רווח</kbd>, מקלידים `Terminal` ולוחצים Enter.
-- **Windows:** קליק ימני על כפתור התחל ← **Terminal** (או מחפשים בתפריט התחל `PowerShell`).
+## GitHub source backup
 
-בודקים ש-Docker מוכן:
+The private source repository is https://github.com/Shandowww/monthly-flow-budget. Sites remains the production host. The GitHub copy contains source and development instructions; live budgets, local preview records, credentials and generated output are excluded. After source changes, publish through the existing Sites workflow and push the same commit to the `github` remote. This is a source backup, not a budget backup.
 
-```bash
-docker compose version
-```
+## Editing and combined scenarios
 
-אם מופיע מספר גרסה, אפשר להמשיך. אם מופיעה שגיאה, בודקים ש-Docker Desktop פתוח ושכתוב בו **Engine running**.
+Text and number inputs start empty with the current value as a placeholder. An untouched field retains its existing value; type 0 to zero a number. Date selectors and sliders retain their selected values. Trial scenarios remain temporary until applied to the plan and explicitly saved. Use **בדיקה בתרחיש** on an existing expense to replace it in the simulation without double-counting. Uncheck an existing item to simulate removing it. New trial items are additional expenses; fees are manual, and scenarios do not model intramonth cash shortages.
 
-### שלב 3: הורדת קובץ ההגדרות
+Run `node --test test/*.test.mjs` for refresh guards and combined-scenario calculations alongside `node verify.mjs`.
 
-יוצרים תיקייה בשם `tazrim` בתיקיית הבית ומורידים אליה את הקובץ `docker-compose.yml`. מדביקים בטרמינל:
+## Home-screen appearance
 
-**Mac / Linux:**
+The app includes a Hebrew standalone web manifest, an original lilac/mint/peach icon, an Apple touch icon and a matching favicon. Artwork source is scripts/draw-icon.py (Pillow is a development-only rendering dependency); PNG files are committed and builds need only Node. The Worker serves all icon assets. Offline use is not implemented. Existing iPhone shortcuts may need to be removed and added again from Safari to pick up the new icon.
 
-```bash
-mkdir ~/tazrim
-cd ~/tazrim
-curl -O https://raw.githubusercontent.com/JordanYefet/Tazrim/main/docker-compose.yml
-```
+## Cheques and optional expense breakdowns
 
-**Windows (PowerShell):**
+Monthly → צ׳קים ופירוט הוצאות opens a cheque register and optional category analytics. Settings → פירוט הוצאות enables charts and category caps for this budget. Cheques remain available when details are disabled. Each detail belongs to a payment method and billing month; a card detail of 6,000 under a 10,000 monthly total leaves cash flow at 10,000 and shows 4,000 without details. Transfers and cash/other payments use the same explanation model.
 
-```powershell
-mkdir $HOME\tazrim
-cd $HOME\tazrim
-curl.exe -O https://raw.githubusercontent.com/JordanYefet/Tazrim/main/docker-compose.yml
-```
+The new monthly `checks` total defaults to zero for older records and backups. Cheques include a number, payee/description, category, exact due date and pending/cleared/cancelled status. An included cheque explains the checks total without adding to it. An explicitly separate cheque adds once in its due month; clearing does not charge it again and cancellation removes only the separate payment. Cancelling or deleting an included cheque does not alter the manually entered monthly total. Do not also enter a separate cheque as a planned item.
 
-(ב-Windows כותבים `curl.exe` ולא `curl`. בלי זה, הפקודה לא עובדת ב-PowerShell.)
+The optional `details`, `showDetails` and `categoryGoals` fields stay in each account's budget JSON; no database migration or runtime dependency is needed. Editing, adding and setting a category cap retain explicit Save budget. Uncommitted detail and cap drafts block refresh/navigation and warn before leaving the page. Older exported budgets remain valid.
 
-אפשר גם להוריד את [`docker-compose.yml`](https://raw.githubusercontent.com/JordanYefet/Tazrim/main/docker-compose.yml) בדפדפן (קליק ימני ← שמירה בשם) לתוך התיקייה `tazrim`. במקרה כזה בודקים שהשם הוא בדיוק `docker-compose.yml`: דפדפנים מוסיפים לפעמים `.txt` בסוף, ואז צריך למחוק אותו.
+Charts show the category breakdown, amounts without details and up to six months of recorded amounts, with category selection and month-over-month changes. Missing months are gaps rather than zero spending. Additional planned expenses without category linkage remain in the unclassified amount. Category goals are monthly spending caps based on detail records, with partial-data warnings; forecasts, demo budgets and future months never confirm goal achievements. Details exceeding their payment-method total show a reconciliation warning without modifying that total.
 
-### שלב 4: הפעלה
+Source: `src/details.js` and `src/details.css`; calculation/validation helpers remain in `src/budget.js`. Verify with `node build.mjs`, `node verify.mjs` and `node --test test/*.test.mjs`. Tests cover inclusion versus separate cheques, cents, due months, cancellation, old budgets, validation, incomplete category data, saved data isolation and conflict protection. Local preview records use the existing separate test identity.
 
-בטרמינל, באותה תיקייה:
+## Private and shared budgets
 
-```bash
-docker compose up -d
-```
+The space selector is visible above every main screen. Joining a shared space offers shared-only use or adding a personal account; personal setup can also be opened later from space settings. Existing personal records are reused, never reset or copied into the shared budget. A viewer in the shared space still owns their separate personal space. Shared-only mode hides only a personal space with no saved record; saved or encrypted personal budgets remain discoverable. Selection preferences are stored per signed-in identity on each device, without financial amounts. Report intake labels its destination and privacy before files are selected.
 
-בפעם הראשונה Docker מוריד את האפליקציה, וזה לוקח דקה או שתיים. כשהפקודה מסתיימת, פותחים בדפדפן את **<http://localhost:3000>**.
+**הכול · תמונה כוללת** opens a read-only overview of accessible spaces, with separate account balances and goals. Balances retain their reporting dates; missing data is unknown, and locked spaces contain no financial values. Refresh preserves explicitly stale summaries on ordinary failures and removes revoked data. Opening a space or its goals returns to the original budget and save protections. This view does not sum money across spaces or store decrypted summaries on the device.
 
-בפעם הראשונה האפליקציה ריקה: מוסיפים חשבון בנק או כרטיס אשראי ומעלים קבצים מדף **העלאת קבצים** ([איך משתמשים](#איך-משתמשים)). מכאן והלאה האפליקציה עולה לבד בכל פעם ש-Docker Desktop פועל, ונשארת זמינה בכתובת הזו. אפשר להוסיף אותה לסימניות, או [להתקין כאפליקציה](#התקנה-כאפליקציה).
+Goals can optionally link to one or more funding bank accounts in their own space. Existing goals remain unassigned until explicitly edited. These links describe intended funding only: they do not move money, alter savings allocations or duplicate goal progress. The overview shows the links and opens the calculator in the selected source space; its existing paying-account and card checks continue to apply.
 
-**עצירה והפעלה:** בחלון של Docker Desktop, בלשונית **Containers**, יש כפתורי עצירה והפעלה ליד `tazrim`, בלי טרמינל. בטרמינל, מתוך התיקייה `tazrim`: `docker compose stop` ו-`docker compose start`.
+The overview’s **מטרות** view and **כל המטרות שלי** on Goals browse all permitted goals, with separate space and funding-account filters plus an unassigned option. A goal linked to several accounts appears once. Locked spaces expose no goals; failed refreshes label retained data, and revoked access removes it. Opening a goal reloads its source budget and selects that exact goal under the existing save and viewer protections.
 
-### עדכון לגרסה חדשה
+**התאמות העברה** in the overview explicitly links an observed outgoing internal bank transfer to an equal incoming transfer in another permitted space. The match is private to the signed-in user, including for shared viewers, and never changes either budget or transfers money. Both source versions and access are rechecked; changed, removed or revoked sources invalidate the match without revealing their references. Dates, partial-report warnings and fees remain separate. Private matching records are encrypted at rest and included in the existing server recovery checks, separately from budget JSON. Encrypted spaces can be opened temporarily for matching using a password or recovery key, without switching the active budget. Match references are encrypted in the browser under every encrypted source’s vault-derived key; passwords, raw keys and decrypted transaction references are not sent to the server. Both encrypted sources must be opened before a dual-vault match can be verified. Closing the overview clears its temporary keys and decrypted references. Key/context/version changes or lost access invalidate the match; unresolved matches must be opened or removed before another match is created.
 
-הגרסה המותקנת מופיעה בדף **אודות** באפליקציה, ומה השתנה בכל גרסה מופיע ב-[Releases](https://github.com/JordanYefet/Tazrim/releases). כדי לעדכן, פותחים טרמינל, נכנסים לתיקייה (`cd ~/tazrim`, או ב-Windows `cd $HOME\tazrim`), [מגבים](#גיבוי-ושחזור), ומריצים:
+The overview offers **סקירת מעבר חשבון**, a read-only account migration review for two saved plaintext spaces where the current user can edit both. Select a source account to inspect stable dependencies, target audience, retained private documents/history/connections, ID collisions, unassigned amounts and monthly component comparisons. These comparisons are review arithmetic, not replacement budgets. No records are moved or saved, and stale/failed/denied reviews are cleared. Encrypted migration, atomic application and guarded undo remain unavailable until their dedicated implementation.
 
-```bash
-docker compose pull
-docker compose up -d
-```
+These are implementation milestones of `docs/PRIVATE-SHARED-SPACES-PLAN-2026-10-24.md`. Combined financial totals, migration application and final release acceptance remain pending; existing balances and goals are unchanged. See `docs/PRIVATE-SHARED-SPACES-CHECKPOINT-2026-10-26.md` for validation and release status.
 
-הנתונים נשמרים, ומבנה בסיס הנתונים מתעדכן לבד כשהאפליקציה עולה.
+A single ChatGPT identity has its original private budget plus any number of separate owned/shared budgets (up to 20 newly owned budgets). The budget picker is always visible. Switching blocks unsaved budget, detail, scenario, item or encryption drafts. New users and newly created budgets start empty; existing private records remain in the original `plans` table. Additional budget records and memberships live in the new D1 tables. No existing data is copied into another user's budget.
 
-### גיבוי ושחזור
+Settings → התקציבים שלי creates and names additional budgets. Owners create a seven-day invitation bound to a specific email, then copy the link and send it themselves. The invitation is single-use and only its SHA-256 digest is stored. Participants must also have access to this private Site through Sites sharing; an app invitation does not bypass that platform boundary. Invitations are created without sending email. Owners can inspect participants, cancel pending invitations and remove access. Participants can read/write the same budget, with revision conflicts enforced on every save. Removal blocks subsequent reads/writes but cannot erase a participant's previously opened or exported copy.
 
-כל הנתונים נמצאים בקובץ אחד בתוך Docker. כדאי לגבות לפני כל עדכון, ומדי פעם גם סתם. בטרמינל, מתוך התיקייה `tazrim`:
+To populate a new shared budget from an existing one, export the original, switch to the shared budget, import and save. Review the data before sharing. A new unrelated user does not need an import and starts from zero. Source files contain no live budgets.
 
-```bash
-docker compose cp tazrim:/data/tazrim.db ./tazrim-backup.db
-```
+## Optional encryption and device unlock
 
-הגיבוי נשמר כקובץ `tazrim-backup.db` בתיקייה `tazrim`. אפשר להעתיק אותו לדיסק חיצוני או לענן.
+Settings → פרטיות ופתיחת התקציב enables encryption explicitly, per budget and only by its owner. Choose a password of at least 12 characters, download/store the recovery key and confirm before the encrypted budget is saved. Existing data is not automatically converted. Encryption uses browser Web Crypto: a random AES-256-GCM budget key, PBKDF2-SHA-256 with 600,000 iterations and a random 16-byte salt for the password wrapper, and a separate random 256-bit recovery wrapping key. Each encryption uses a fresh 12-byte IV and authenticates its purpose, stable budget context and key identifier. Passwords, recovery secrets and raw budget keys are never sent to the server. Decrypted financial validation runs in the browser; the server validates the bounded encrypted envelope, context, membership and revision.
 
-שחזור מגיבוי (מחליף את כל הנתונים הנוכחיים בנתונים שבגיבוי):
+Budget names, participant emails, ownership and invitation metadata remain visible to the service. Encryption does not erase previous plaintext backups/provider history, protect against malicious code running in the unlocked page, or erase a participant's copies. Keep the password and recovery key safe: losing both means losing access. There is no server-side password reset or plaintext downgrade. For changing a compromised shared secret, create a fresh encrypted budget and invite the remaining participants; previously downloaded ciphertext remains decryptable with the old secrets.
 
-```bash
-docker compose stop
-docker compose cp ./tazrim-backup.db tazrim:/data/tazrim.db
-docker compose start
-```
+Supported browsers/authenticators can use WebAuthn's PRF extension to wrap the budget key in a device-local record. The record stores only a passkey credential ID, random PRF input and encrypted key wrapper; user verification is required to obtain the PRF output. This unlocks already authorized encrypted data and does not replace ChatGPT sign-in. The OS may use Face ID, Touch ID, a device PIN or another method; the app cannot force Face ID. Unsupported PRF, blocked embedded-browser permissions and cancelled prompts preserve password/recovery access. Configure it after unlocking, preferably in a full Safari/browser window. Real iPhone Face ID is a device verification step, not something desktop tests prove. Device records can be removed in app settings; the passkey itself is managed by the OS.
 
-אותו קובץ מתאים גם ל[הרצה מהקוד](#הרצה-מהקוד): אפשר להעתיק אותו ל-`prisma/tazrim.db`, וגם להפך.
+Encrypted budgets lock when leaving/reloading the page, explicitly locking or switching. Keys and decrypted data are not saved in browser storage. Export encrypted backups from security settings; ordinary exports require an explicit plaintext warning. Importing an encrypted backup requires its password/recovery key and then an explicit save into the active budget. Backups are downloadable even while locked. Export every budget and retain recovery keys separately before any hosting migration or subscription change; deployment survival after subscription cancellation is a platform policy question, not a guarantee implemented by this app. Sites remains the host; no Hetzner resources, public access or new paid services were configured.
 
-> `docker compose down` משאיר את הנתונים. `docker compose down -v` **מוחק את כל הנתונים**.
+Migration `0001_fair_agent_zero.sql` is schema-only. Local preview applies migrations to its separate SQLite database and uses only `local-preview`. Verify storage/auth, crypto/tamper/recovery, shared revisions/revocation and refresh guards with `node build.mjs`, `node verify.mjs`, and `node --test test/*.test.mjs`. Forecast charts now label months and shekel amounts and explain their right-to-left time direction.
 
-### הגדרות נוספות
+## Isolated full demonstration
 
-**פורט אחר:** אם הכתובת `localhost:3000` כבר תפוסה במחשב, יוצרים בתיקייה `tazrim` קובץ בשם `.env` עם השורה `TAZRIM_PORT=3005`, ומריצים שוב `docker compose up -d`. האפליקציה תהיה ב-<http://localhost:3005>. באותו קובץ אפשר לקבוע גם `TAZRIM_VERSION=1.0.0`, כדי להישאר על גרסה מסוימת במקום האחרונה.
+Open `/?demo=1` or the visible **צפייה בדוגמה מלאה** link to explore synthetic figures across all screens. Seven recorded example months end in the current Jerusalem month; later months use estimates in a 24-month forecast. The example includes every monthly category, goals, cheques, category breakdowns, planned installments and a combined purchase scenario. Demo progress is explicitly illustrative and never grants achievements. Saving is blocked and this mode makes no budget API calls, preserving private/shared/encrypted data. Refresh resets the synthetic example. The regular app still loads only the signed-in user's chosen saved budget.
 
-**אזור זמן:** התאריכים והחודשים מחושבים לפי שעון ישראל (`Asia/Jerusalem`), כמו בהרצה מקומית על מחשב בישראל, כך שבסיס נתונים שעובר בין השניים נשאר באותם חודשים. מי שנמצא באזור זמן אחר קובע `TAZRIM_TZ` בקובץ `.env` (למשל `TAZRIM_TZ=Europe/London`), ורצוי שיהיה זהה לאזור הזמן שבו הנתונים נוצרו.
+## Free savings
 
-**נתוני דמו:** כדי לראות את האפליקציה עם שנה של תנועות מומצאות לפני שמעלים נתונים אמיתיים, מוסיפים לקובץ `.env` את השורה `TAZRIM_DEMO=1` לפני ההפעלה הראשונה. הנתונים המומצאים נכנסים רק לבסיס נתונים ריק. כדי לעבור מהדמו לנתונים אמיתיים, מוחקים את השורה מ-`.env` ומתחילים מבסיס נתונים ריק:
+Home shows a compact **כסף פנוי לחלוקה** card only for a positive unassigned balance. Goal artwork adapts to phone height so actual progress and amounts stay visible; recurring deposit editing is available below the goal and in Settings. **חלוקת הכסף הפנוי** distributes any part of that existing balance across several goals and saves with the current revision. **העברה בין המטרות** moves existing allocations between actual goals. A successfully saved actual deposit offers a one-time celebration on the next home visit; forecasts and repeated reports do not.
 
-```bash
-docker compose down -v
-docker compose up -d
-```
+## Planned saving deposits
 
----
+Use **עריכת ההפקדות החודשיות** on Home or Settings, or **עריכת ההפקדות המתוכננות** on Monthly. Enter personal-account and shared-account amounts separately and choose an effective month. For the current personal budget, the shared amount is only your own contribution, excluding Linoy’s deposit. A future joint household budget should record both spouses’ combined contributions. Savings balances and goals remain combined. Existing actual reports remain intact; estimates from that month change. Leave an amount blank to retain it or enter 0 to stop it. Update the plan, then explicitly Save budget. For an actual transfer, edit Monthly and save actual data instead. Planned rates do not fund goals or confirm achievements.
 
-## פתיחה מהטלפון
+## Simple payment calendar — 2026-10-11
 
-אפשר לפתוח את האפליקציה גם מהטלפון, כשהוא מחובר לאותה רשת Wi-Fi כמו המחשב שעליו היא רצה:
+The calculator leads with price and 1–60 payments, updating an RTL monthly calendar immediately. Each tile shows its exact installment and forecast month-end cash, with negative/below-buffer states distinguished in words and colour. Up to 12 months appear per page within the same panel. Start month (current by default), payment source, optional name and scenario inclusion are advanced controls. Detailed forecasts remain collapsed; simulations require explicit application and budget saving.
 
-1. מוצאים את כתובת ה-IP של המחשב. ב-Mac: **הגדרות המערכת ← Wi-Fi ← פרטים** (או בטרמינל `ipconfig getifaddr en0`). ב-Windows: בטרמינל `ipconfig`, בשורה **IPv4 Address**.
-2. פותחים בטלפון את `http://<כתובת-ה-IP>:3000` (או את הפורט שבחרתם).
+## Estimated savings growth — Hetzner
 
-אם המחשב שואל אם לאפשר חיבורים נכנסים, מאשרים.
+Settings → **צמיחה משוערת בחסכונות** opts each savings account into an estimated annual return based on Bank of Israel policy rates; default is off. Confirm the choice, then explicitly save. Home shows estimated value and growth separately from reported money; goals have a collapsed growth projection. Neither estimate funds allocations or achievements. Daily compounding uses historical effective rates and leap-year day counts; forward projections use the latest known rate. This is an effective annual return assumption, before tax, not the actual fund return. Confirmed monthly pooled deposits start growing next month, weighted by reported bank balances (equal weights when all are zero). An optional bank-balance update resets the growth anchor to the report date and covers already confirmed current-month deposits. Ordinary monthly reporting requires deposits only.
 
-במסך צר התפריט הצדדי מתחלף בסרגל ניווט צף בצורת גלולה, עם אייקונים בלבד: בנקים, כרטיסים, לוח הבקרה (במרכז), חיובים קבועים, ו"עוד". הסרגל שקוף למחצה, כך שהתוכן נראה דרכו בזמן הגלילה. "עוד" פותח חלון קטן עם העלאת קבצים, קטגוריות והגדרות.
+The standalone server retrieves the official daily `MNT_RIB_BOI_D` CSV from Bank of Israel every six hours, validates series/units/dates/continuity, compresses effective changes and caches them in SQLite. No budget or identity data are sent to the source. Rate outages retain the last usable reference with a stale notice; without reference history no growth is invented. The authenticated reference endpoint is `/api/reference/interest`. This feature is deployed on Hetzner; the older Sites host is not republished.
 
-<p align="center">
-  <img src="docs/screenshots/mobile-dashboard.png" width="260" alt="לוח בקרה בטלפון">
-  <img src="docs/screenshots/mobile-more.png" width="260" alt="התפריט 'עוד' בטלפון">
-</p>
+## Optional goal deadlines
 
-גם חלונות האישור (למשל לפני מחיקה) עולים מלמטה בטלפון, ובמסך רחב מופיעים במרכז:
+Add/remove an optional exact **תאריך יעד** in goal editing (Settings), new-goal creation, or initial setup. Home shows a prominent warning if the selected goal's confirmed allocation plus its planned monthly deposits cannot reach the target by that date. It shows the minimum required monthly amount in exact cents and opens the pace editor directly. A sufficient simulated pace clears the warning immediately but is marked unsaved until **שמירת התכנון** succeeds. Lowering it brings the warning back. Calculation conservatively excludes estimated growth, assumes deposits at month end starting next month, and excludes deposits after an exact mid-month deadline. Past/current-month deadlines and already-funded goals have distinct messages. Financial data and allocations are unchanged by setting a date.
 
-<p align="center">
-  <img src="docs/screenshots/mobile-confirm.png" width="260" alt="חלון אישור מחיקה בטלפון">
-</p>
+## Apple Pay capture — Hetzner
 
-### התקנה כאפליקציה
+Settings → **חיבורים וייבוא** manages card/budget-bound, append-only import tokens. Apple Wallet/Transaction automations in iOS Shortcuts POST to `/api/imports/apple-pay` with a Bearer token and stable eventId. The receiver requires a valid unrevoked token, an approved owner and current budget access on every request. No Google session is needed at this one endpoint; other routes retain authenticated sessions and origin protections. Raw tokens are shown once and only hashes are stored. Shared-budget participants can review shared records; each user manages their own connection tokens. Imported data are separately stored plaintext in private SQLite, including for encrypted budgets, with explicit consent when connecting. No financial records are sent to an AI/provider.
 
-אפשר להתקין את תזרים כאפליקציה, עם אייקון משלה ובחלון נפרד בלי סרגל הדפדפן:
+The review inbox never updates the plan automatically. Retry IDs deduplicate exactly, suspected near-duplicate purchases are quarantined, foreign currency cannot be included in shekel summaries, refunds are explicit, and revision conflicts prevent stale review overwrites. Billing month is initially purchase month and needs checking; installments may be full purchase prices and must be excluded/reconciled. An approved shekel total can replace a card amount in a guarded monthly draft, never add to it, with normal monthly confirmation/save. CSV/bank/open-banking sync and reliable offline queuing are not implemented. Read **APPLE-PAY-MORNING.md** for actual iPhone steps, limitations and bank-automation options. Live iPhone triggering requires owner verification; server/browser tests alone do not prove it.
 
-- **Chrome / Edge במחשב:** לוחצים על אייקון ההתקנה בצד שורת הכתובת ("התקנת האפליקציה"). האפליקציה נפתחת בחלון משלה ומופיעה ב-Dock או בשורת המשימות.
-- **iPhone (Safari):** כפתור השיתוף ← "הוספה למסך הבית". האפליקציה נפתחת במסך מלא.
-- **Android (Chrome):** מאשרים את הצעת ההתקנה, או מתפריט הדפדפן ← "התקנת האפליקציה".
+## Loan repayments and pending bank saving transfers
 
-Chrome ו-Edge מתקינים כאפליקציה רק בחיבור מאובטח: `http://localhost` נחשב מאובטח, אבל בכתובת IP ברשת המקומית (`http://192.168...`) ב-Android מתקבל רק קיצור דרך שנפתח בדפדפן. ב-iPhone ההוספה למסך הבית עובדת גם בכתובת כזו.
+Monthly reports have a separate loanRepayment total (zero for older budgets). Future expenses offers loan plans with a monthly repayment, next-payment month and 1–120 remaining months inside the planning period. Forecasts stop the scheduled repayment at its end; actual monthly reports retain their bank-reported amount. Repayments must not also be included in other spending or planned expenses. Remaining months and payment totals are estimates, not proof of paid installments or bank principal.
 
----
+The home saving choice now creates a pending bank-action request. Forecast cash reserves the amount; actual saving balances and achievements do not increase. Home offers performed, remind later and cancel. Remind later hides the request during the current visit; reload or returning from the background shows it again. Performed posts the additional saving once and retains revision-aware save/retry behavior. If the deposit is already included in the actual monthly report, select that option to reconcile the request without adding again. Bank balance anchors exclude pending actions, so a new balance reading does not silently mark a planned transfer performed. No bank transaction is executed by the app.
 
-## איך משתמשים
+## Bank statement import and restart
 
-### 1. העלאת קבצים
+Home → העלאת דוח מהבנק and Settings → דוחות מהבנק accept Hapoalim and One Zero CSV/XLSX/XLS. Initial setup includes a bank-first entry. Settings → התחלה מחדש מדוח בנק offers a backup and an explicit replacement acknowledgment; the original saved budget remains untouched until a reviewed import is saved. A clean temporary budget is prepared from the report start month. Opening cash is an explicit input, not guessed from ambiguous row order. Existing saving balances and goals can be configured afterward using a snapshot that avoids counting historical deposits again.
 
-![העלאת קבצים](docs/screenshots/upload.png)
+Review source dates, transaction destinations, monthly replacements and included planned payments before saving. Clear rules and remembered account rules are suggested automatically; ambiguous transfers and unidentified cards require review. Tal-specific saving/investment rules require choosing the personal-account option, remembered per imported account. Full-period fields replace existing monthly totals; absent fields remain unchanged. Partial months are marked incomplete and cannot overwrite actual full reports; later partial statements accumulate registered transactions without overlap. Partial history does not become the next month's recurring estimate. Imported bank readings anchor cash at their displayed date, not an assumed month end. Separate cheque records and unmatched planned items require reconciliation in the review.
 
-1. בדף **העלאת קבצים** בוחרים לאיזה חשבון הקובץ שייך. אפשר להוסיף כאן חשבון בנק או כרטיס אשראי חדש.
-2. בוחרים קובץ (`.xlsx`, `.xls` או `.csv`). אפשר לבחור כמה קבצים של אותו חשבון בבת אחת.
-3. בודקים את התצוגה המקדימה ומאשרים את הייבוא.
+File contents stay in browser memory. The saved budget contains reviewed totals, account rules, hashed transaction identities/fingerprints, amounts/destinations and bounded import history for duplicate detection/last-import undo. The existing authenticated budget storage, optional encryption, revision checks and backups cover these fields. Undo refuses to replace months/saving data or account rules edited since the import. Reset discards original manual records after explicit acknowledgment; preserve the offered backup to recover them. Registry budget is currently bounded to 1,500 imported rows and 30 batches and the existing request-size limit; large histories stop with an error rather than silently dropping identity records. No new database or service is introduced. Cal/Isracard statement adapters remain separate future work.
 
-**איזה קבצים?** כל ייצוא טבלאי של בנק או חברת אשראי (`.xlsx`, `.xls`, `.csv`, כולל דפי ה-HTML ש"לאומי" שומר בשם `.xls`). האפליקציה מזהה לבד את שורת הכותרת ואת העמודות לפי השמות שלהן (תאריך, תיאור, חובה, זכות, סכום חיוב, תאריך חיוב…), גם כשבקובץ יש עמודות נוספות או בסדר אחר. בפעם הראשונה בודקים את ההתאמה בתצוגה חיה ומתקנים אם צריך, והמיפוי נשמר לחשבון לפעמים הבאות. אפשר לערוך אותו בכל רגע מחלון עריכת החשבון.
+Bank import amounts use integer cents in parser records/duplicate registry and shekels in monthly values, bank anchors and currency display. Text amounts default to automatic separator detection (`1,000.00` / `1.000,00`); grouping is validated and signs retained. A single separator followed by three digits means thousands grouping; the inspection lab offers explicit decimal modes. Typed Excel numbers use strict dot decimals regardless of display locale and reject genuine fractions of a cent. The review table converts cents at the display boundary, exactly like the monthly preview. No stored records are rescaled or migrated.
 
-תנועות שכבר יובאו לא נכפלות, כך שאפשר להעלות קבצים חופפים בלי חשש. היסטוריית ההעלאות מופיעה בתחתית הדף, ואפשר למחוק ממנה העלאה עם כל התנועות שלה.
+For a genuinely incorrect saved import, export a backup and compare the original report first. If the last import is still unchanged, use last-import undo and save, then reimport the verified source once. Undo removes that batch's identity entries with its monthly changes, preventing duplicate charges. If later edits/imports exist, automatic undo refuses; reconcile the affected monthly fields against the report using revision-aware save, leaving the registry intact. Do not divide all records by 100 or clear duplicate identities to force a reimport. A parser mismatch for an existing reference is blocked as a conflict for review.
 
-### 2. לוח בקרה
+Import review defaults to groups by exact normalized bank action and beneficiary, separately for debits/credits. Different amounts, dates, references, details and purposes stay in the same group; every original row/identity and monthly amount remains separate. Each group shows its count, signed total/range and dates, offers a destination for pending rows and a bulk approve button, and expands to individually editable rows (50 per page). Previously reviewed exceptions keep their destinations. Mixed pending destinations require choosing a common target; changing the target clears approval, and bulk approval clears the monthly confirmation. Group approval undo is available before saving. Duplicate/conflicting/invalid rows are kept outside group approvals; the all-rows view remains available. No new schema or automatic persistence is introduced.
 
-לוח הבקרה מרכז את השנה: מאזן נטו, הכנסות, הוצאות, חיובי כרטיסים, שינויים בהוצאות לפי קטגוריה, חיובים קבועים ותנועות חריגות.
+Eligible months are selected for import by default after file/period/account loading: full coverage selects full replacement; partial coverage selects partial import only when no actual full report exists. Old/future months and months without new identities remain skipped. Users can explicitly choose skip, and group/row approval preserves that choice. The final explicit import/save button confirms the displayed period and monthly replacements; pending/invalid/conflicting rows still block selected months. Normal statements default to complete coverage of their displayed period; a collapsed two-option control can identify a filtered/partial statement, which never becomes an actual full report. Changing restart's first month recomputes eligibility and clears monthly confirmation. No saved budget changes merely by loading or approving rows.
 
-- **בחירת תקופה:** במרכז הסרגל העליון. החצים עוברים לחודש הקודם או הבא (או לשנה, כשמוצגת שנה שלמה), ולחיצה על התקופה עצמה פותחת את כל החודשים של השנה, עם "כל השנה".
-- **לחיצה על עמודה בגרף** מסננת את כל הדף לאותו חודש. לחיצה נוספת מבטלת את הסינון.
+The bank review now uses a single final import/save action rather than repeated coverage/month checkboxes. Month comparison and optional intake/skip alternatives are collapsed by default. Only when a selected month has existing scheduled direct income/expenses does it ask a mandatory decision: all of that existing planning is already included in the statement (do not add it again), or it remains additional to the statement (keep it in the forecast). Radio alternatives list the actual planned items and use one as a concrete example. Neither option is silently assumed; server/model import validation requires a boolean choice for these applicable months. Card-only plans, future direct items and a clean bank-first base do not show that decision. Separate cheque notice appears only when an actual additional cheque exists. No automatic bank transaction or budget save occurs on load/review.
 
-![לוח בקרה מסונן לחודש אחד](docs/screenshots/dashboard-month.png)
 
-> **חיובי כרטיס כבר כלולים בהוצאות הבנק.** החיוב החודשי של חברת האשראי יורד מחשבון הבנק, ולכן סכום חיובי הכרטיס מוצג כפירוט של ההוצאה ולא נוסף עליה שוב.
+## Bank accounts and savings workflow — 2026-10-13
 
-### 3. בנקים וכרטיסי אשראי
+Bank reports can be imported separately for up to ten accounts. Choose the bank and a stable account identity; imports from another account add its reviewed amounts to the monthly bank totals, while overlapping imports from the same account retain the existing deduplication/conflict guards. Account balances are summed only when every source reports the same exact date. Otherwise the importer explicitly requests a combined current-account reading instead of using an old single-account balance as the total. Internal transfers between owned accounts must be excluded in both reports; the app does not infer ownership from beneficiary text. Import undo restores the prior month only while unchanged.
 
-לכל חשבון יש דף משלו עם סיכומים, גרף חודשי ורשימת התנועות. בדף הבנק מופיע גם גרף יתרה לאורך זמן.
+One Zero XLS support maps the user-supplied screenshot columns: תאריך תנועה, תאריך ערך, סוג פעולה, תיאור, סכום פעולה, מטבע, חיוב/זיכוי, יתרה, אסמכתא. Explicit debit/credit direction takes priority over the generic operation-type column and signs are preserved. The schema and legacy BIFF8, HTML table and numeric/text amount paths use synthetic tests. The actual One Zero workbook has not yet been supplied; screenshots cannot verify its binary container or all header variants. XLS parsing lazily loads the pinned full SheetJS build locally; XLSX retains the mini build. No runtime CDN or new server is required.
 
-![דף חשבון בנק](docs/screenshots/banks.png)
+Successful bank saving closes the review and returns to Home only after persistence succeeds. Errors appear and receive scroll attention next to the save/retry action. Retry uses the already applied draft without duplicate intake. Savings transfers from current-account statements are already captured as deposits; they cannot establish a total savings balance without an opening balance or separate savings report. Home distinguishes an unreported balance from zero and explains which deposit data were imported. Initial reported current balances cover already recorded monthly deposits so reconfirming them does not add them twice.
 
-בדף כרטיס אשראי רואים את החיובים לפי קטגוריה ולפי חודש, ובטבלה אפשר לשנות קטגוריה לעסקה או להסתיר אותה.
+Savings setup removes the full-demo link, permits additional goals, and puts validated save buttons at the bottom of its forms/dialogs. A visible form footer replaces the global floating save dock. Private/shared account sections each contain savings and investments using the existing financial keys and values. Existing combined savings balances/goals are retained; no balance allocation is inferred and deployment does not migrate financial records.
 
-**רשימת קטגוריות התחלתית:** התקנה חדשה מתחילה עם רשימת קטגוריות מוכנה (בשמות של מקס, ועוד כמה לתנועות בנק), כדי שגם לכרטיסים שהקבצים שלהם בלי קטגוריות, כמו כאל וישראכרט, יהיה ממה לבחור. אפשר לשנות שם, למחוק ולהוסיף כמו בכל קטגוריה.
 
-**קטגוריות מחברות האשראי:** כשקובץ מגיע עם קטגוריות משלו (כמו מקס), כל קטגוריה שעוד לא מוכרת מוצגת אחרי ההעלאה: אפשר להוסיף אותה לרשימה, או לשייך אותה לקטגוריה שכבר יש לך. השיוך נשמר לכל הכרטיסים של אותה חברה, חל גם על העסקאות שכבר הועלו וגם על הקבצים הבאים, ואפשר לשנות אותו בדף **קטגוריות**. כך שתי חברות שקוראות לאותו דבר בשמות שונים מגיעות לאותה קטגוריה. קטגוריה ששונתה ידנית לעסקה או לבית עסק נשארת כמו שהיא.
+## Separate current-account planning — 2026-10-13
 
-![דף כרטיס אשראי](docs/screenshots/card.png)
+Home and Monthly now show one RTL tab per current account. Savings balances and goal allocations remain pooled. Each current-account tab contains only its monthly amounts, assigned cards, loan/expense planning and forecast; Home warns about a negative month in any bank even when its tab is closed. Settings → חשבונות הבנק names accounts, sets an optional dated opening balance and per-account buffer, and explicitly assigns cards and legacy commitments. An untouched balance input does not invent a zero anchor. Raw forms are keyed by account/month and guard tab changes, navigation and refresh; their footer saves through the existing validation/revision/encryption flow.
 
-**ניתוח לפי קטגוריה** מציג את ההוצאות של כל קטגוריה לאורך השנה, עם טבלת פירוט לפי חודש וממוצע:
+The optional `cashPlanning` object contains bounded accounts, account-specific monthly reports, card mappings and planned inter-account transfers. Existing imported entries/batch source snapshots reconstruct their originating account without a database migration or changes to existing financial values. Aggregate manual amounts remain untouched and visible as unassigned discrepancies until explicitly assigned; assignment preserves combined monthly totals. Editing an account report applies only its difference to the aggregate monthly totals and leaves every other account intact. Missing balances, partial source history, unassigned commitments or aggregate discrepancies are displayed as incomplete data and block a safe-installment recommendation.
 
-![ניתוח לפי קטגוריה](docs/screenshots/categories.png)
+Each calculator purchase chooses its paying account and optionally a mapped card. Preview and shortest-payment search evaluate every account independently, using its own balance, buffer, finite loans, card/direct inclusion flags, additional cheques and pending saving commitments. Positive combined cash cannot certify a negative individual bank balance. Monthly forecasts do not model intramonth overdrafts. Inter-account transfers affect source and destination once, never aggregate income/spending or savings goals; choose planned versus already included in both bank readings explicitly. No money is moved by this feature.
 
-### 4. חיובים קבועים
+Reviewed imports preserve unimported manual fields and manually edited totals of other accounts; their own account's mapped fields are replaced by the reviewed statement. Account/month snapshots are covered by last-import undo and later-edit guards. Dates remain independent for account forecasts; combining bank balances still requires the same date. New financial metadata is validated in both browser and server; existing backups remain compatible. Deployments do not rescale/migrate saved budgets or infer a bank from its/card's display name.
 
-האפליקציה מזהה לבד חיובים שחוזרים בסכום דומה (שכר דירה, מנויים, ביטוחים…) ומציגה את העלות החודשית והשנתית שלהם. לכל חיוב אפשר:
+One Zero full-statement headers shown by the user (תאריך תנועה, תאריך ערך, פרטי הפעולה, חיובים, זיכויים, יתרה) also map in CSV/Excel with split signed amounts. The image/PDF is useful for independently checking opening/closing balances and debit/credit totals, but a PDF reader is not implemented. Without a reference the existing stable signature uses account/date/signed amount/operation context; identical matches within a file or against earlier intake are ambiguous and block the selected month instead of silently deleting a potentially legitimate repeated payment. Skip that month until reconciled; no invented reference or automatic balance-based identity is claimed.
 
-- ✓ לאשר שהוא אכן קבוע
-- להסתיר אותו אם הזיהוי שגוי
-- ✎ לשנות לו שם
 
-חיוב שהתייקר מסומן, ומוצג לצד הסכום הקודם.
+## One Zero full-statement PDF intake — 2026-10-13
 
-![חיובים קבועים](docs/screenshots/recurring.png)
+The integrated importer now accepts original text-based One Zero full-statement PDFs (up to 5MB/20 pages), alongside CSV/XLS/XLSX. PDF.js 6.4.299 legacy builds are pinned, integrity-verified, vendored and loaded only when needed by the local import worker. Text extraction stays on the device; no bank document is uploaded and no OCR/network parsing service is added. The isolated CSV lab remains CSV/Excel-only.
 
-### 5. חיפוש
+The adapter detects the six-column Hebrew layout geometrically, retains wrapped descriptions/value dates, rejects rotated/scanned/ambiguous layouts and matches signed debit/credit column totals, opening/closing arithmetic and every successive running balance to the document. Failed reconciliation blocks intake. Stated date coverage is retained rather than inferred only from active days; dates outside the stated range extend the preview and trigger a visible discrepancy notice. Verified PDF coverage cannot be manually expanded beyond the document. Verified document row order identifies the final balance even when several readings share one date; CSV/Excel balance ambiguity guards remain unchanged.
 
-חיפוש בכל החשבונות ובכל השנים לפי שם בית עסק, תיאור, הערה או סכום. מקלידים `120` לסכום מדויק, או `100-200` לטווח. כפתור **סינון** פותח סינון לפי תאריכים, קטגוריה וחשבונות. קיצור מקלדת לפתיחת החיפוש: <kbd>⌘K</kbd> (או <kbd>Ctrl</kbd>+<kbd>K</kbd>).
+Negative debit rows are explicitly marked cancellations and require review. Mapping them to the original expense/saving field subtracts the refund rather than adding income or a second expense. Registered amounts retain signs and subsequent account-source reconstruction uses net signed field amounts. An excess cancellation that would make a monthly field negative blocks intake for reconciliation. Other source formats retain the strict nonnegative split-column rule. Reference-free overlaps with earlier intake remain ambiguous; overlapping PDF versus spreadsheet exports are explicitly blocked even if descriptions differ, avoiding double counting across incompatible source representations. Skip overlapping months or use unchanged-last-import undo with backup before replacing the source; no fuzzy auto-merge or invented references.
 
-![חיפוש](docs/screenshots/search.png)
+A read-only audit of the user-provided real document verified its eleven rows, one debit cancellation, all running balances and independent Decimal totals. It also found stated coverage ending one day before two transaction dates; the review explains that discrepancy and retains every row. The real document, its personal identity data, transaction text and rendered pages are not committed. Synthetic binary/geometry fixtures cover extraction, multi-page/wrapped rows, malformed dates/totals, refunds, signed storage, header coverage, same-date balances and cross-format overlap protection. No real budget was imported or changed by the agent.
 
-<p align="center">
-  <img src="docs/screenshots/mobile-search.png" width="300" alt="חיפוש עם סינון בטלפון">
-</p>
 
-### 6. הגדרות
+## Visible bank classification targets — 2026-10-13
 
-- **ערכת נושא:** בהירה, כהה, או לפי הגדרות המערכת.
-- **ניהול חשבונות:** הוספה, שינוי שם, העברה לארכיון ומחיקה.
-- **מיפויי ייבוא:** מיפויי עמודות שנשמרו, עם אפשרות לשנות שם ולמחוק.
-- **אזור מסוכן:** מחיקת כל הנתונים (חשבונות, תנועות, העלאות, קטגוריות, כללים, מיפויים והחלטות) והתחלה מחדש כמו בהתקנה חדשה. צריך להקליד `מחק הכל` כדי לאשר, ואפשר לעשות את זה רק מהמחשב שעליו האפליקציה רצה (גם דרך port-forward ל-localhost), לא דרך מנהרה או מכשיר אחר ברשת. כדאי [לגבות](#גיבוי-ושחזור) קודם. ב-Docker הבקשות מגיעות לקונטיינר דרך הרשת של Docker ולא נחשבות מקומיות, ולכן שם מוחקים עם `docker compose down -v`.
+The integrated review lists every monthly destination for both debit and credit rows. Income destinations are visible but disabled for debit rows with an explanatory label. Credits can explicitly select a card/expense/saving/loan-payment field as a refund, with labels explaining that it reduces that month's charges/deposits; it is not treated as new income. Model review requires an explicit refund choice for ordinary positive rows, while verified PDF debit cancellations retain their existing reversal flag. Automatic suggestions do not silently reinterpret credits as refunds; changing a target returns it to pending approval. Negative resulting monthly amounts block reconciliation instead of being converted to income. Loan funding and withdrawals of existing savings remain separate balance-reconciliation cases, explained next to the credit selector.
 
-![הגדרות](docs/screenshots/settings.png)
+Approved group cards now display their approved destination (or mixed status) and the explicit edit/reapproval action. Bulk pending approvals still preserve reviewed exceptions. These changes affect only review/UI and newly confirmed intake, without migrating existing amounts or changing the standalone lab classifier.
 
-![לוח בקרה בערכה כהה](docs/screenshots/dashboard-dark.png)
 
----
+## Headerless One Zero PDF continuation — 2026-10-14
 
-## פיתוח
+Fixed false column-crossing failures when subsequent pages continue the transaction table without repeating its column headings. The prior fallback treated all text below the top page margin as table text, including page chrome/identity and signature text. Headerless continuation now bounds its table vertically using its first/last dated row centres and neighbouring row spacing, while retaining the previous page's column mapping. Real in-table column crossings still reject; financial column totals, opening/closing and every running-balance check remain mandatory. Synthetic tests cover headerless pages with broad outside text, a one-row continuation, all retained rows and genuine in-table crossings. Read-only audit of the user's two-page report extracted all 21 rows (17+4), and an independent pdfplumber/Decimal audit agreed with every amount and balance. Private PDF/text/images remain outside Git; no production budget is imported or changed by deployment. Build, 15 verify checks and 284 tests passed.
 
-### הרצה מהקוד
+## Card report reminders
 
-למי שרוצה לשנות את הקוד או לתרום. לשימוש רגיל עדיף [Docker](#התקנה-והפעלה).
+Status shows **תזכורת להעלאת דוח** from each card's billing day (Israel date), linking straight to Report Center with that card selected. It follows the latest charged cycle and remains after the due day, including across a month boundary, until a report is successfully imported or a closed month is confirmed **ללא עסקאות**. A manual total, bank debit, staged upload or failed save does not resolve it. If confirming a no-transactions month needs a payer, a persistent direct link opens account settings with that card’s field expanded and focused; existing unique source payer evidence is reused. Changing the billing day is still available in card management; short months use their final day. Older missing cycles remain in annual coverage in Expenses.
 
-**דרישות:**
+Advance card push is retired. The server no longer schedules or sends it, including for existing subscriptions; old enable/test/schedule calls return a disabled response. On app load the client unsubscribes and unregisters this app's former notification-only worker without requesting permission. Existing metadata is retained for compatibility and backups; no offline caching is added. Financial calculations and report import remain unchanged.
 
-- [Node.js](https://nodejs.org/) גרסה 20 ומעלה (כולל npm)
-- Git
-- ‏`sqlite3` (שורת פקודה): נדרש רק להרצת הבדיקות. ב-macOS הוא מותקן מראש.
+### Ready-to-install Apple Pay shortcut
 
-```bash
-# 1. הורדת הקוד
-git clone https://github.com/JordanYefet/Tazrim.git
-cd Tazrim
+Settings → חיבורים וייבוא → הפעלה באייפון offers a signed `.shortcut` download, using the same file-install flow as Parking. The public template contains only the Budgit endpoint and sender actions; paste the personal connection token in the installation question. In the iPhone Wallet automation, map a dictionary with `merchant`, `amount` and the actual ISO `currency` code, then pass it to Run Shortcut. Missing fields stop before HTTP; server validation and review remain unchanged. The template generates one random event ID per run; it has no offline queue or automatic retries. Receipt time is explicitly approximate. Device installation/Wallet fields and a real purchase still require owner verification. See APPLE-PAY-MORNING.md for instructions and template regeneration/signing.
 
-# 2. התקנת תלויות
-npm install
+For iOS27, Settings also offers a combined automation file (`budgit-apple-pay-ios27.shortcut`). Native Wallet TriggerOutput directly binds Merchant/Amount; the card picker and enablement remain on the user's iPhone. Currency is an explicit installation setting, blank by default, and must match every transaction on that card; multi-currency cards require the manual sender with actual per-event currency. Disable old automation before enabling the new one, keep old shortcut until actual receipt is verified, then remove it. No production token is required to download or install the public template.
 
-# 3. יצירת Prisma Client ובסיס הנתונים (prisma/tazrim.db)
-npx prisma generate
-npx prisma migrate deploy
+### Merchant category suggestions
 
-# 4. הרצה
-npm run dev
-```
+Settings → חיבורים וייבוא → קטגוריות בתי עסק exports all distinct Apple Pay merchant names across this budget's received months, existing assignments, and AI instructions in a single JSON file. No amounts, dates, cards, account IDs or keys are exported. `location` remains blank because current capture does not store merchant locations; never infer or fabricate it. User may independently share the file with an AI agent. The instructions require filling only `recommendedCategory` with an exact known budget category, preserving identities/names/locations, treating merchant text as data, and leaving uncertain entries blank.
 
-פותחים בדפדפן את <http://localhost:3000>. בפעם הראשונה בסיס הנתונים ריק, ומעלים קבצים מדף **העלאת קבצים**.
+Import validates a bounded JSON return against the current authenticated merchant list and displays changed recommendations, initially unchecked. Explicit selection/approval stores exact merchant rules in the same budget's separate Wallet storage, with revision/CAS checks and atomic validation. Saved rules label existing and future Wallet records without approving purchases, adding expense details, or modifying card/monthly totals. No AI provider call, subscription or external transmission is performed. Category rules share the existing plaintext Wallet storage boundary even for encrypted plans; exported merchants include current rules for independent backup/review. Existing monthly export now includes rule-derived category labels. Locations and fuzzy/AI categorization of new merchants remain future capabilities.
 
-`npm run dev` מתאים לפיתוח. כדי להריץ מהקוד לשימוש יומיומי, עדיף לבנות פעם אחת ולהריץ את הגרסה הבנויה: `npm run build` ואז `npm start`.
 
-**נתוני דמו:** `npm run db:demo` בונה בסיס נתונים נפרד (`prisma/demo.db`) עם שנה של תנועות מומצאות בשלושה חשבונות בנק ושלושה כרטיסי אשראי, ו-`npm run dev:demo` מריץ את האפליקציה עליו. בסיס הנתונים האמיתי (`prisma/tazrim.db`) לא משתנה, ואפשר להריץ את `db:demo` שוב בכל רגע כדי להתחיל מחדש.
+Cal XLS/XLSX cycle reports now have a local detailed-import preview. The printed charge date and ILS total are reconciled against each row's charged installment, with original purchase amounts kept separately for reconciliation. Known exact merchant categories are reused from existing details and scoped Apple Pay merchant rules; unknown/conflicting categories require a selection grouped by merchant. Saving adds included category detail and replaces the same card/date total together, through normal budget revision/encryption guards. Deterministic row keys plus occurrence counts make repeated/reordered imports idempotent without collapsing legitimate repeated purchases. Potential existing manual detail requires an explicit same/additional choice; a changed statement that would remove prior imported rows is blocked for review. Credits retain their sign; category displays show net refunds. Apple Pay remains a separate inbox and cannot replace an imported statement cycle's total; exact matches are informational only, without deleting source events or creating another expense. Other card file formats retain total-only behavior until a tested adapter exists. Current detail/size limits remain enforced before any mutation.
 
-**גיבוי:** כל הנתונים נמצאים בקובץ אחד, ומספיק להעתיק אותו:
+## Credit-card category groups and multiple statements — 2026-10-15
 
-```bash
-cp prisma/tazrim.db ~/Backups/tazrim-$(date +%Y%m%d).db
-```
+Card statement category choices are grouped under ten parent categories with more specific choices (for example מזון / סופר ומכולת). Existing parent and custom category strings remain unchanged. Charts sum child categories under their parent with child detail initially collapsed; parent trends and spending caps include child amounts, in exact cents. There is no stored-record migration or forecast change.
 
-**עדכון:** הענף `release` מצביע תמיד על הגרסה האחרונה שפורסמה, ו-`main` על הפיתוח השוטף. כדי להישאר על גרסאות שפורסמו, עוברים פעם אחת ל-`release` (`git checkout release`), ומעדכנים כך (אחרי גיבוי):
+The card-update dialog accepts up to ten CSV/XLS/XLSX files at once (5MB per file, 20MB total). Each file has an explicit card, paying account, due date and total for review. Cal files retain detailed categories and their printed due date; generic files retain total-only support with a manually reviewed date. More than one file for the same card and billing month is blocked; use the latest complete statement. Every file must parse and all categories/ambiguous duplicate choices must be resolved before one revision-protected budget save. Invalid batches do not partially change the plan. Exact detailed-statement reimports retain existing rows; a total-only file cannot overwrite a cycle with imported detail. Existing detail/payload limits still apply.
 
-```bash
-git pull
-npm install
-npx prisma generate
-npx prisma migrate deploy   # מעדכן את מבנה בסיס הנתונים, הנתונים נשמרים
-```
+Within a multi-file card import, category assignment is shared by exact normalized merchant name across all selected statements/cards/cycles. A merchant appears once with its combined new charge count/amount and source-file/card/date labels; differing amounts do not split the group. Saved statement rows are excluded and retain their categories. Conflicting known categories require an explicit choice. Card reassignment rebuilds candidate matches and merchant groups while retaining current category choices; duplicate decisions remain per transaction.
 
-> בסיס הנתונים וקבצי האקסל/CSV מוחרגים מ-Git (`.gitignore`), כדי שנתונים פיננסיים אישיים לא יגיעו למאגר בטעות.
+## Annual missing credit-card statements — 2026-10-16
 
-**בניית האימג' מהקוד:** כדי לנסות שינויים בקוד ב-Docker, בונים את האימג' בתיקיית הקוד ומריצים אותו:
+Expenses includes an annual statement coverage panel, per card, with a year picker defaulting to the current Jerusalem year. Missing months appear explicitly; per-month states are collapsed. Coverage includes only months from the budget tracking start through the current month and before a card's removedFrom month. Future months are omitted entirely, even if a future-cycle file is already present. Previous years include all eligible months. Uploaded file reports (including a zero total) and retained Cal statement provenance count as received; manual totals, bank debits and estimates do not pretend to be credit-card statements. The expanded month list distinguishes manual/bank amounts from a genuinely received file. The existing upload dialog completes gaps. Coverage is read-only and does not change cash flow, historical records or forecasts.
 
-```bash
-docker build -t ghcr.io/jordanyefet/tazrim:latest .
-docker compose up -d
-```
+## Unified report inbox — 2026-10-16
 
-`docker compose pull` מחליף אחר כך את האימג' הזה בגרסה שפורסמה.
+Expenses → העלאת דוחות, missing-statement upload and regular bank-upload entry points open מרכז הדוחות. Drag/drop or select up to ten mixed CSV/XLS/XLSX/supported One Zero PDF files (5MB/file,20MB/batch). All parsing stays in browser workers/local memory. Cal is recognized by reconciled statement structure; bank balance schemas/PDF are recognized automatically. Ambiguous signed tables and multi-sheet workbooks require one type/sheet choice. Generic card tables support total-only import with an explicit billing date; detailed Cal retains categories. Scanned PDFs and other card PDFs remain unsupported. No mail access, bank credentials, background file watching, OCR or external AI service is added.
 
-### פקודות
+Targets use saved hashed source identities, an exact unique card alias or a unique bank provider. Ambiguous/mismatching targets require a choice; user may add accounts/cards in the same review. A blank unconfigured budget adopts the earliest uploaded period; populated budgets retain their start. Uncertain bank groups, manual-detail matches, overlapping reports and existing direct planning remain explicit decisions. Known merchant categories are reused and new merchants are classified once across files. Recognized file summaries and known merchants start collapsed. One final revision-protected/encrypted budget save commits all selected reports; build errors do not partially mutate live data, failed saves retry the same draft. Existing historical/manual totals are replaced only via existing bank/month reconciliation logic, never blanket added or rescaled.
 
-| פקודה | מה היא עושה |
-| --- | --- |
-| `npm run dev` | שרת פיתוח על פורט 3000 |
-| `npm run dev:demo` | שרת פיתוח על בסיס נתוני הדמו |
-| `npm run db:demo` | בונה מחדש את `prisma/demo.db` עם נתונים מומצאים |
-| `npm test` | הרצת הבדיקות (Vitest) |
-| `npm run build` | בנייה לסביבת ייצור |
-| `npm run db:studio` | עיון בבסיס הנתונים דרך Prisma Studio |
+Optional reportInbox metadata in each budget contains bounded SHA256 source bindings and SHA256 file receipts, with target IDs and import/cycle references. No raw file or account number is stored there. Exact-file skip requires a still-existing bank batch or card amount/statement-row proof; undo invalidates bank skips. Same-byte files in the batch skip, exact detailed reimports skip, conflicting/same-period overlapping files stop for review. Different-format bank overlap without references remains ambiguous and cannot be silently merged. Existing formats/backups remain valid without metadata. Latest statement coverage still excludes future months and refreshes only after successful save.
 
-**CI וגרסאות:** כל Pull Request ל-`main` עובר ב-GitHub Actions בדיקת טיפוסים, את כל הבדיקות ובנייה (`.github/workflows/ci.yml`). גרסה חדשה מפרסמים ידנית: **Actions ← Release ← Run workflow**, בלי למלא כלום. מספר הגרסה מחושב לבד מהכותרות של ה-PRs שמוזגו ל-`main` מאז הגרסה האחרונה, לפי הקידומת שלהן: `fix:` (וגם `docs:`, `chore:`, `refactor:` וכדומה) מעלה patch ‏(1.4.2 ← 1.4.3), `feat:` מעלה minor ‏(1.4.2 ← 1.5.0), וכל `<type>!:` (למשל `feat!:`) מעלה major ‏(1.4.2 ← 2.0.0). השינוי הגדול ביותר קובע, וכותרת בלי קידומת נחשבת minor. סיכום ההרצה מראה איזו גרסה יצאה ואילו PRs קבעו אותה (`.github/scripts/release-bump.sh`), ובכל PR בודקת `pr-title.yml` את הקידומת ומזהירה כשאין (בלי לחסום). התהליך מעדכן את הענף `release` (עם commit של מספר הגרסה), בונה ומפרסם את האימג' ב-GHCR, ויוצר את התג ואת ה-Release ב-GitHub. Vercel בונה מהענף `release` את הדמו החי, שמתעדכן גם פעם בשבוע (`demo.yml`) כדי שנתוני הדמו יגיעו עד השבוע הנוכחי.
+## Direct menu navigation — 2026-10-16
 
-**מצב קריאה בלבד:** עם `TAZRIM_READ_ONLY=1` השרת דוחה כל שינוי בנתונים, והממשק מסביר את זה כשמנסים לשמור. כך רץ הדמו החי.
+The compact menu budget picker selects the active budget. Activity, money management, and account/app groups open their destination directly, without an intermediate settings accordion. Cards open the existing card manager. App settings contain appearance and card notifications; privacy/backups, sharing, profile, savings, bank accounts and report history have their own menu entries. Refresh retains the selected destination. Draft guards, explicit saves, encryption and budget switching remain unchanged. The full-demo link was removed from the menu; the isolated demo URL remains available for testing.
 
-**טכנולוגיות:** Next.js 15 (App Router), React 19, TypeScript, Prisma עם SQLite, Tailwind CSS, Recharts.
+## Queryable financial data and offsite recovery — 2026-10-16
 
-**מבנה עיקרי:**
+An additive SQLite financial read model provides indexed transactions, typed entities/views, monthly values and revision-linked change hashes. Original snapshots remain authoritative and are atomically saved with projections; encrypted budgets are never indexed in plaintext. New bank imports retain source fields, existing transaction identities remain intact, and bounded history limits have increased. Read `docs/DATA-AND-RECOVERY.md` for filtering, accounting semantics, legacy source gaps, preflight and recovery. `server/offsite-backup.mjs` creates authenticated encrypted full-server archives using a public key; `scripts/pull-offsite-backup.mjs` copies them to an explicitly configured external destination. Cloud destination, credentials and recurring transfer must be activated separately; local server backups alone are not offsite protection.
 
-```
-app/          דפים ונתיבי API
-components/   רכיבי ממשק לפי אזור (dashboard, cards, bank, search, upload…)
-lib/          לוגיקה: parsers לקבצים, db לשאילתות, insights לזיהוי חיובים קבועים וחריגים
-prisma/       סכמה ומיגרציות (בסיס הנתונים עצמו לא נשמר ב-Git)
-scripts/      סקריפט נתוני הדמו
-.github/      תהליכי GitHub Actions: CI, Release, Demo
-docs/         מסמכי תכנון וצילומי מסך
-```
+## Graph expense popup
 
----
+Data → graph comparison: tap/click a monthly point to see up to three largest available itemized expenses for that billing month, with names, categories and monthly installment amounts. Keyboard Enter/Space and the month inspector button open the same compact dialog; Escape, close and backdrop dismiss it and restore focus. Planned-expense points restrict the list to that metric's additional planned items/cheques. Refunds and cancelled cheques do not rank as expenses, and included plans are not added again. Monthly aggregates are never invented as individual transactions; missing detail and reconciliation differences are explicit. The list describes that month's largest expenses, not a causal month-over-month attribution. No records are changed or saved.
 
-## רישיון ופרטיות
+## Category data exploration
 
-**רישיון:** הקוד פתוח ומופץ בחינם תחת [רישיון MIT](LICENSE). מותר להשתמש בו, להעתיק, לשנות ולהפיץ אותו, גם לשימוש מסחרי, בתנאי שמשאירים את הודעת זכויות היוצרים והרישיון.
+Data now offers Comparison and Categories over time, alongside the existing cash forecast. Category history has 6/12/24-month windows, billing-month end selection and percentage comparisons with the adjacent previous/next calendar month. Values are itemized net amounts, with explicit missing/partial/future data and safe zero/refund comparisons. The compact point popup shows top three individual expenses and top three parent categories; category totals use all available detail after refunds, and tap through to that category history. A shared deterministic palette keeps category colors identical across expense bars/donut, popup and history, independent of ranking.
 
-**הבהרה:** תזרים הוא כלי עזר אישי ולא ייעוץ פיננסי. התוכנה מסופקת כמו שהיא (AS IS), בלי אחריות מכל סוג. החישובים תלויים בקבצים שמעלים ובאופן שבו הם מפוענחים, ולכן כדאי תמיד להשוות את המספרים מול הבנק וחברות האשראי לפני שמקבלים החלטות.
+Children and babies has dedicated food/formula, medicine/health, nursery, nappies/care, clothing, toys/equipment, activities and miscellaneous choices. Existing saved classifications, including the older family/children label and adult pharmacy category, are unchanged. These are display/default-choice additions, with no automatic reclassification or financial data changes.
 
-**פרטיות:** כל הנתונים נשמרים רק על המחשב שלכם: ב-Docker בתוך ה-volume שלו, ובהרצה מהקוד בקובץ `prisma/tazrim.db`. האפליקציה לא שולחת את הנתונים שלכם לשום מקום: אין שרת מרוחק, אין חשבון משתמש ואין איסוף נתונים או אנליטיקה. גם הגופן (Heebo) מוגש מהאפליקציה עצמה, כך שהדפדפן לא פונה לשום שרת חיצוני.
+## Compact expense overview and current-month default
+
+Expenses combines the monthly-picture title and a touch-friendly compact month selector, with tighter chart/category spacing and a smaller overview donut. General report upload lives in the menu's Report center; manual financial entry is grouped under הזנה ועריכה ידנית, linking to the existing monthly, cheque, savings, account and planning forms. Contextual missing-statement actions remain below the financial overview.
+
+Initial loading, budget switching, unlocking and backup import select the current Jerusalem month (or the budget start if it begins in the future). Explicit month selections survive normal navigation/refresh and recovered drafts; expense/editor month options extend through the current/selected month without changing the saved horizon or dates. Financial amounts and save conventions are unchanged.
+
+The app header now uses the active screen title and its matching icon, with no repeated brand/title block below it. The menu prioritizes Report center and groups manual entry into income/expenses, cheques/planned payments, savings/investments, and accounts/budget setup. Expense overview cards show financial data and history; their manual-edit shortcuts live in the hub. Existing edit forms, explicit save behavior and draft guards are reused.
+
+
+## Isracard PDFs and consistent expense periods —2026-10-18
+
+The report inbox now recognizes the Isracard/One Zero card PDF layout validated against a user-supplied original report. It reads the printed cycle date, last-four hint, dated merchant rows and billed ILS column, then requires the rows to equal the printed cycle total. Foreign original amounts/currencies remain provenance only; no exchange rate calculation or extra fee charge is applied. The source PDF is not uploaded or stored. Unsupported/scanned/ambiguous/partial layouts fail closed; this does not claim support for every issuer PDF layout. Existing Cal and One Zero bank parsing remain separate. Isracard rows have issuer-specific stable identities, deduplication, source-page/foreign metadata and normal category review/revision-protected saving.
+
+Entering Expenses selects the most recent nonfuture month with saved expense evidence; actual zero reports count, forecast defaults do not. Explicit month changes stay selected during the view and refresh. The same month drives both category data and My cards, including card history bounded before that month. Status now labels its section as card charges by account and shows the full reported card-cycle total; included versus separately pending charges and unconfirmed estimates remain distinct. Missing data is not shown as zero. These are read-only presentation summaries and do not change cash flow.

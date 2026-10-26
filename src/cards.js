@@ -1,0 +1,25 @@
+// Wallet connections bind each Shortcut token to a saved card and budget.
+let cardDraftOpen=false;
+function openCardManager(){
+ document.getElementById('cards-dialog')?.remove();
+ const d=document.createElement('dialog');d.id='cards-dialog';d.className='cards-dialog';
+ d.innerHTML=`<div class="section-heading"><h2>כרטיסי האשראי שלי</h2><button class="btn" type="button" data-card-close>סגירה</button></div><p class="help">שמות הכרטיסים וסך החיוב החודשי. מחיקה מפסיקה הערכות מהחודש הנבחר; דיווחי עבר נשמרים.</p><div class="cards-list">${activeCards(plan,selectedMonth).map(c=>`<div class="item"><strong>${esc(c.name)}</strong><div class="actions"><button class="btn" type="button" data-card-edit="${esc(c.id)}">עריכה</button><button class="btn danger" type="button" data-card-delete="${esc(c.id)}">מחיקה</button></div></div>`).join('')}</div><div class="warning-note" data-card-confirm hidden></div><form id="card-config-form"><h3>הוספת כרטיס</h3><input type="hidden" name="id" value=""><label class="field">שם הכרטיס<input name="name" maxlength="60" required dir="auto" placeholder="למשל: הכרטיס האישי"></label><label class="field">יום החיוב בחודש<input name="billingDay" type="number" min="1" max="31" value="15" required></label><label class="field">מזהה Apple Pay (רשות)<input name="alias" maxlength="80" dir="ltr" placeholder="personal-card"></label><p class="help">כינוי לזיהוי הכרטיס בקיצור הדרך, ללא מספר כרטיס מלא. אפשר ליצור חיבור לכרטיס בתפריט ← חיבורים וייבוא. בחרו את אותו כרטיס באוטומציה באייפון.</p><div class="error-box" id="card-config-error" hidden role="alert"></div><button class="btn primary" type="submit">הוספת כרטיס</button></form><p class="help">לאחר שינוי כרטיסים יש לשמור את התקציב.</p>`;
+ app.append(d);d.showModal();cardDraftOpen=false;
+ const form=d.querySelector('form'),error=d.querySelector('#card-config-error'),confirmation=d.querySelector('[data-card-confirm]');
+ const report=message=>{error.hidden=false;error.textContent=message;};
+ const close=()=>{cardDraftOpen=false;d.close();d.remove();};
+ const ask=(message,label,accept)=>{confirmation.hidden=false;confirmation.innerHTML=`<p>${esc(message)}</p><div class="actions"><button class="btn" type="button" data-card-no>ביטול</button><button class="btn danger" type="button" data-card-yes>${esc(label)}</button></div>`;confirmation.querySelector('[data-card-no]').onclick=()=>confirmation.hidden=true;confirmation.querySelector('[data-card-yes]').onclick=()=>{confirmation.hidden=true;accept();};confirmation.querySelector('[data-card-no]').focus();};
+ const requestClose=()=>cardDraftOpen?ask('לבטל את פרטי הכרטיס שלא נשמרו?','ביטול העריכה וסגירה',close):close();
+ form.oninput=()=>cardDraftOpen=true;
+ d.oncancel=e=>{e.preventDefault();requestClose();};
+ d.querySelector('[data-card-close]').onclick=requestClose;
+ d.onclick=e=>{
+  const edit=e.target.dataset.cardEdit,remove=e.target.dataset.cardDelete;
+  if(edit){const selectCard=()=>{const c=creditCards(plan).find(c=>c.id===edit);form.elements.id.value=c.id;form.elements.name.value=c.name;form.elements.alias.value=c.alias;form.elements.billingDay.value=c.billingDay??15;form.querySelector('h3').textContent='עריכת כרטיס';form.querySelector('[type=submit]').textContent='עדכון כרטיס';error.hidden=true;cardDraftOpen=false;form.elements.name.focus();};if(cardDraftOpen)ask('לבטל את העריכה הנוכחית ולעבור לכרטיס אחר?','מעבר לכרטיס',selectCard);else selectCard();}
+  if(remove){if(cardDraftOpen){report('יש לשמור או לבטל את העריכה תחילה.');return;}ask('למחוק את הכרטיס מהערכות החודש הנבחר והלאה? דיווחים בפועל ופירוט ההוצאות שלו נשמרים.','מחיקת הכרטיס',()=>{const next=clone(plan);next.creditCards=clone(creditCards(plan));next.creditCards.find(c=>c.id===remove).removedFrom=selectedMonth;for(const [m,r] of Object.entries(next.months))if(m>=selectedMonth&&!r.actual)r.values[remove]=0;next.defaults[remove]=0;close();if(mutate(next,'הכרטיס הוסר מההערכות. יש לשמור את התקציב.'))openCardManager();});}
+ };
+ form.onsubmit=e=>{e.preventDefault();const data=new FormData(form),next=clone(plan),id=data.get('id')||'card_'+crypto.randomUUID();next.creditCards=clone(creditCards(plan));const card={id,name:data.get('name').trim(),alias:data.get('alias').trim(),billingDay:Number(data.get('billingDay'))},index=next.creditCards.findIndex(c=>c.id===id);if(index<0)next.creditCards.push(card);else next.creditCards[index]={...next.creditCards[index],...card};next.defaults[id]??=0;if(!cardsValid(next)){report('יש להזין שם ומזהה ייחודי; אין להזין מספר כרטיס מלא. ניתן לנהל עד 30 כרטיסים.');return;}close();mutate(next,'פרטי הכרטיס עודכנו. יש לשמור את התקציב.');openCardManager();};
+}
+window.addEventListener('beforeunload',e=>{if(cardDraftOpen){e.preventDefault();e.returnValue='';}});
+
+app.addEventListener('click',event=>{const action=event.target.closest('[data-action]')?.dataset.action;if(!['cards-scroll-right','cards-scroll-left'].includes(action))return;const track=document.querySelector('.monthly-cards-track');if(track)track.scrollBy({left:(action==='cards-scroll-right'?1:-1)*track.clientWidth*.8,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});});

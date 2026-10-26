@@ -1,0 +1,386 @@
+# Include as a Home Assistant package. Keep credentials in secrets.yaml.
+input_boolean:
+  infra_scan_monitor_enabled:
+    name: Infra Scan Monitor Enabled
+    icon: mdi:shield-search
+
+rest:
+  - resource: https://budgit.duckdns.org/infra-monitor/status.json
+    authentication: basic
+    username: infra_monitor
+    password: !secret infra_monitor_password
+    scan_interval: 60
+    timeout: 8
+    sensor:
+      - name: Infra Snapshot
+        unique_id: infra_snapshot_v1
+        value_template: "{{ value_json.observedAt | default('unknown') }}"
+        json_attributes:
+          - host
+          - containers
+          - containerUsage
+          - jobs
+          - inventory
+          - backups
+          - certificates
+
+  - resource: https://budgit.duckdns.org/api/health
+    scan_interval: 60
+    timeout: 8
+    sensor:
+      - name: Infra Budgit Health
+        unique_id: infra_budgit_health_v1
+        value_template: "{{ 'ok' if value_json.ok == true else 'failed' }}"
+
+  - resource: https://park80.duckdns.org/api/health
+    scan_interval: 60
+    timeout: 8
+    sensor:
+      - name: Infra Parking Health
+        unique_id: infra_parking_health_v1
+        value_template: "{{ 'ok' if value_json.ok == true else 'failed' }}"
+
+  - resource: https://api.github.com/repos/Shandowww/monthly-flow-budget/actions/workflows/security.yml/runs?event=schedule&per_page=1
+    scan_interval: 1800
+    timeout: 10
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: !secret infra_github_auth_header
+    sensor:
+      - name: Infra Budgit Scan
+        unique_id: infra_budgit_scan_v1
+        value_template: "{{ value_json.workflow_runs[0].conclusion | default('unknown', true) if value_json.workflow_runs | default([]) | count else 'unknown' }}"
+        json_attributes_path: "$.workflow_runs[0]"
+        json_attributes:
+          - html_url
+          - created_at
+          - updated_at
+          - head_sha
+          - status
+          - conclusion
+
+  - resource: https://api.github.com/repos/Shandowww/parking-between-neighbors/actions/workflows/checks.yml/runs?event=schedule&per_page=1
+    scan_interval: 1800
+    timeout: 10
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: !secret infra_github_auth_header
+    sensor:
+      - name: Infra Parking Scan
+        unique_id: infra_parking_scan_v1
+        value_template: "{{ value_json.workflow_runs[0].conclusion | default('unknown', true) if value_json.workflow_runs | default([]) | count else 'unknown' }}"
+        json_attributes_path: "$.workflow_runs[0]"
+        json_attributes:
+          - html_url
+          - created_at
+          - updated_at
+          - head_sha
+          - status
+          - conclusion
+
+  - resource: https://api.github.com/repos/Shandowww/plant-care/actions/workflows/ci.yml/runs?event=schedule&per_page=1
+    scan_interval: 1800
+    timeout: 10
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: !secret infra_github_auth_header
+    sensor:
+      - name: Infra Plant Scan
+        unique_id: infra_plant_scan_v1
+        value_template: "{{ value_json.workflow_runs[0].conclusion | default('unknown', true) if value_json.workflow_runs | default([]) | count else 'unknown' }}"
+        json_attributes_path: "$.workflow_runs[0]"
+        json_attributes:
+          - html_url
+          - created_at
+          - updated_at
+          - head_sha
+          - status
+          - conclusion
+
+template:
+  - binary_sensor:
+      - name: Infra Server Data Fresh
+        unique_id: infra_server_data_fresh_v1
+        state: "{{ as_timestamp(states('sensor.infra_snapshot'), 0) > as_timestamp(now()) - 300 }}"
+      - name: Infra Reboot Required
+        unique_id: infra_reboot_required_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ state_attr('sensor.infra_snapshot', 'host').rebootRequired | default(false) }}"
+      - name: Infra Budgit Unavailable
+        unique_id: infra_budgit_unavailable_v1
+        state: "{{ not is_state('sensor.infra_budgit_health', 'ok') }}"
+      - name: Infra Parking Unavailable
+        unique_id: infra_parking_unavailable_v1
+        state: "{{ not is_state('sensor.infra_parking_health', 'ok') }}"
+      - name: Infra Parking Backup Stale
+        unique_id: infra_parking_backup_stale_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set backups = state_attr('sensor.infra_snapshot', 'backups') or {} %}
+          {% set parking = backups.parking or {} %}
+          {{ as_timestamp(parking.verifiedAt | default(none), 0) < as_timestamp(now()) - 36 * 3600 }}
+      - name: Infra Parking Recovery Stale
+        unique_id: infra_parking_recovery_stale_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set backups = state_attr('sensor.infra_snapshot', 'backups') or {} %}
+          {% set recovery = backups.parkingRecovery or {} %}
+          {{ recovery.state != 'restored_and_verified' or
+             as_timestamp(recovery.at | default(none), 0) < as_timestamp(now()) - 40 * 86400 }}
+      - name: Infra Budgit Backup Attention
+        unique_id: infra_budgit_backup_attention_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set backups = state_attr('sensor.infra_snapshot', 'backups') or {} %}
+          {% set b = backups.budgit or {} %}
+          {{ b.available != true or (b.enabled | int(0)) == 0 or (b.connectionsWithError | int(0)) > 0 }}
+      - name: Infra Host CPU High
+        unique_id: infra_host_cpu_high_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'host') or {}).cpuMeanPercent | float(0)) > 90 }}"
+      - name: Infra Host Memory Low
+        unique_id: infra_host_memory_low_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (((state_attr('sensor.infra_snapshot', 'host') or {}).memory or {}).availablePercent | float(100)) < 10 }}"
+      - name: Infra Host Disk Low
+        unique_id: infra_host_disk_low_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set disk = (state_attr('sensor.infra_snapshot', 'host') or {}).disk or {} %}
+          {{ (disk.freePercent | float(100)) < 15 or (disk.freeGiB | float(100)) < 2 }}
+      - name: Infra Container Problem
+        unique_id: infra_container_problem_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set containers = state_attr('sensor.infra_snapshot', 'containers') or {} %}
+          {% set ns = namespace(problem=false) %}
+          {% for name in ['budgit', 'parking', 'proxy'] %}
+            {% set container = containers.get(name) or {} %}
+            {% if container.state != 'running' %}{% set ns.problem = true %}{% endif %}
+          {% endfor %}
+          {{ ns.problem }}
+      - name: Infra Host Job Failed
+        unique_id: infra_host_job_failed_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set jobs = state_attr('sensor.infra_snapshot', 'jobs') or {} %}
+          {% set ns = namespace(failed=false) %}
+          {% for job in jobs.values() %}
+            {% if job.available != true or job.result not in ['success', ''] or job.exitCode not in ['0', ''] %}
+              {% set ns.failed = true %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.failed }}
+      - name: Infra Certificate Attention
+        unique_id: infra_certificate_attention_v1
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: >-
+          {% set certs = state_attr('sensor.infra_snapshot', 'certificates') or {} %}
+          {% set ns = namespace(bad=false) %}
+          {% for name in ['budgit.duckdns.org', 'park80.duckdns.org'] %}
+            {% set cert = certs.get(name) or {} %}
+            {% if cert.valid != true or as_timestamp(cert.expiresAt | default(none), 0) < as_timestamp(now()) + 14 * 86400 %}
+              {% set ns.bad = true %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.bad }}
+      - name: Infra Scan Attention
+        unique_id: infra_scan_attention_v1
+        availability: "{{ is_state('input_boolean.infra_scan_monitor_enabled', 'on') }}"
+        state: >-
+          {% set items = ['sensor.infra_budgit_scan', 'sensor.infra_parking_scan', 'sensor.infra_plant_scan'] %}
+          {% set ns = namespace(bad=false) %}
+          {% for entity in items %}
+            {% if not has_value(entity) or states(entity) != 'success' or as_timestamp(state_attr(entity, 'updated_at'), 0) < as_timestamp(now()) - 48 * 3600 %}
+              {% set ns.bad = true %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.bad }}
+    sensor:
+      - name: Infra Host CPU Peak
+        unique_id: infra_host_cpu_peak_v1
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (state_attr('sensor.infra_snapshot', 'host') or {}).cpuPeakPercent | default(none) }}"
+      - name: Infra Host CPU Mean
+        unique_id: infra_host_cpu_mean_v1
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (state_attr('sensor.infra_snapshot', 'host') or {}).cpuMeanPercent | default(none) }}"
+      - name: Infra Host Memory Available
+        unique_id: infra_host_memory_available_v1
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'host') or {}).memory or {}).availablePercent | default(none) }}"
+      - name: Infra Host Disk Free
+        unique_id: infra_host_disk_free_v1
+        unit_of_measurement: GiB
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'host') or {}).disk or {}).freeGiB | default(none) }}"
+      - name: Infra Host Network Receive Peak
+        unique_id: infra_host_network_receive_peak_v1
+        unit_of_measurement: KiB/s
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (state_attr('sensor.infra_snapshot', 'host') or {}).networkRxPeakKiBps | default(none) }}"
+      - name: Infra Host Network Send Peak
+        unique_id: infra_host_network_send_peak_v1
+        unit_of_measurement: KiB/s
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (state_attr('sensor.infra_snapshot', 'host') or {}).networkTxPeakKiBps | default(none) }}"
+      - name: Infra Host Disk Read Peak
+        unique_id: infra_host_disk_read_peak_v1
+        unit_of_measurement: MiB/s
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (state_attr('sensor.infra_snapshot', 'host') or {}).diskReadPeakMiBps | default(none) }}"
+      - name: Infra Host Disk Write Peak
+        unique_id: infra_host_disk_write_peak_v1
+        unit_of_measurement: MiB/s
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ (state_attr('sensor.infra_snapshot', 'host') or {}).diskWritePeakMiBps | default(none) }}"
+      - name: Infra Budgit Memory
+        unique_id: infra_budgit_memory_v1
+        unit_of_measurement: MiB
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'containerUsage') or {}).budgit or {}).memoryMiB | default(none) }}"
+      - name: Infra Parking Memory
+        unique_id: infra_parking_memory_v1
+        unit_of_measurement: MiB
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'containerUsage') or {}).parking or {}).memoryMiB | default(none) }}"
+      - name: Infra Proxy Memory
+        unique_id: infra_proxy_memory_v1
+        unit_of_measurement: MiB
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'containerUsage') or {}).proxy or {}).memoryMiB | default(none) }}"
+      - name: Infra Budgit CPU
+        unique_id: infra_budgit_cpu_v1
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'containerUsage') or {}).budgit or {}).cpuPercentOneCore | default(none) }}"
+      - name: Infra Parking CPU
+        unique_id: infra_parking_cpu_v1
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ is_state('binary_sensor.infra_server_data_fresh', 'on') }}"
+        state: "{{ ((state_attr('sensor.infra_snapshot', 'containerUsage') or {}).parking or {}).cpuPercentOneCore | default(none) }}"
+
+automation:
+  - id: infra_monitor_app_health
+    alias: Infrastructure app health notice
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.infra_budgit_unavailable
+        to: "on"
+        for: "00:03:00"
+      - trigger: state
+        entity_id: binary_sensor.infra_parking_unavailable
+        to: "on"
+        for: "00:03:00"
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: "Infrastructure: service needs attention"
+          message: "{{ trigger.to_state.name }} has failed for 3 minutes. Check the infrastructure cards in My-Dev-Apps."
+          notification_id: infra_app_health
+  - id: infra_monitor_source_stale
+    alias: Infrastructure source stale notice
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.infra_server_data_fresh
+        to: "off"
+        for: "00:05:00"
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: "Infrastructure: server data is stale"
+          message: "The latest server sample is more than 5 minutes old. Check the collector and connection."
+          notification_id: infra_source_stale
+  - id: infra_monitor_scan_attention
+    alias: Infrastructure scan attention notice
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.infra_scan_attention
+        to: "on"
+        for: "00:10:00"
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: "Infrastructure: security scan needs attention"
+          message: "A scan failed, did not finish on time, or cannot be read. Open the exact run from My-Dev-Apps."
+          notification_id: infra_scan_attention
+  - id: infra_monitor_ha_backup_failed
+    alias: Infrastructure HA backup failed notice
+    mode: single
+    triggers:
+      - trigger: event.received
+        target:
+          entity_id: event.backup_automatic_backup
+        options:
+          event_type:
+            - failed
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: "Infrastructure: Home Assistant backup failed"
+          message: >-
+            Check the Home Assistant Backups page. Reason:
+            {{ state_attr('event.backup_automatic_backup', 'failed_reason') or 'unknown' }}.
+          notification_id: infra_ha_backup_failed
+  - id: infra_monitor_host_pressure
+    alias: Infrastructure host resource notice
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.infra_host_cpu_high
+        to: "on"
+        for: "00:10:00"
+      - trigger: state
+        entity_id: binary_sensor.infra_host_memory_low
+        to: "on"
+        for: "00:05:00"
+      - trigger: state
+        entity_id: binary_sensor.infra_host_disk_low
+        to: "on"
+        for: "00:05:00"
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: "Infrastructure: high load or low free space"
+          message: "{{ trigger.to_state.name }} needs attention. Check the graphs and sample time in My-Dev-Apps."
+          notification_id: infra_host_pressure
+  - id: infra_monitor_maintenance
+    alias: Infrastructure maintenance notice
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id:
+          - binary_sensor.infra_parking_backup_stale
+          - binary_sensor.infra_parking_recovery_stale
+          - binary_sensor.infra_budgit_backup_attention
+          - binary_sensor.infra_reboot_required
+          - binary_sensor.infra_host_job_failed
+          - binary_sensor.infra_container_problem
+          - binary_sensor.infra_certificate_attention
+        to: "on"
+        for: "00:05:00"
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: "Infrastructure: maintenance needed"
+          message: "{{ trigger.to_state.name }} needs attention in My-Dev-Apps."
+          notification_id: "infra_{{ trigger.entity_id.split('.')[-1] }}"

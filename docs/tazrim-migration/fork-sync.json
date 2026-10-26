@@ -1,0 +1,15 @@
+{
+  "sourceRepository": "Shandowww/monthly-flow-budget",
+  "sourceBranch": "codex/tazrim-react-frontend",
+  "sourceCommit": "182de01e9a5b6fc2e39b9fc2cf702f0a266188f3",
+  "forkRepository": "Shandowww/Tazrim",
+  "forkBranch": "codex/budgit-react-frontend",
+  "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
+  "status": "Incomplete read-only development checkpoint; editing workflows and visual acceptance pending; not deployed",
+  "validation": {
+    "build": "passed",
+    "coreChecks": 15,
+    "focusedFrontendTests": 14
+  },
+  "history": "Tracked source snapshot; Budgit private Git history is not imported."
+}

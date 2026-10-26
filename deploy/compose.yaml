@@ -1,0 +1,30 @@
+services:
+  budgit:
+    build: ..
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 384m
+    cpus: 0.5
+    pids_limit: 128
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+    env_file: ../.env.production
+    volumes: [../data:/app/data]
+    expose: ["3001"]
+    networks:
+      parking_proxy:
+        aliases: [budgit]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "3"}
+networks:
+  parking_proxy:
+    external: true
+    name: park80_default

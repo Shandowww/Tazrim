@@ -1,0 +1,12 @@
+[Unit]
+Description=Sample infrastructure for Home Assistant every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=10s
+Persistent=true
+Unit=infra-monitor.service
+
+[Install]
+WantedBy=timers.target

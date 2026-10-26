@@ -1,0 +1,21 @@
+{
+  "format": "budgit-recovery-drill-v1",
+  "completedAt": "2026-10-17T22:51:26.385Z",
+  "elapsedMs": 111,
+  "archiveSha256": "64dfe366c78f502bf96855ddea34a8fb5d5ed9f9ac39aee10a0482882eca801f",
+  "checks": {
+    "authenticatedDecryption": true,
+    "snapshotChecksum": true,
+    "sqliteIntegrity": true,
+    "foreignKeys": true,
+    "currentVersionMigration": true,
+    "budgetAndRevisionPreservation": true,
+    "transactionIdentityAndSignedCents": true,
+    "repeatedStartup": true
+  },
+  "limitations": [
+    "Does not verify Google Drive delivery or backup freshness.",
+    "Does not start the app, test login/access permissions or unlock encrypted budgets."
+  ],
+  "temporaryDatabaseRemoved": true
+}

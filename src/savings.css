@@ -1,0 +1,284 @@
+
+#savings-home{--c-bg:light-dark(#f8f6f0,#1b1e2a);--c-panel:light-dark(#fff,#292e3d);--c-text:light-dark(#2b2d39,#f2f2f7);--c-muted:light-dark(#5c6170,#c0c5d2);--c-mint:light-dark(#95c9ac,#84bd9f);--c-purple:light-dark(#b79ad9,#b39ad9);--c-peach:light-dark(#eeb39a,#d29a80);--c-sun:light-dark(#efd07b,#e7c977);--c-gray:light-dark(#dcdde2,#515968);--c-action:light-dark(#68488f,#ddc7f5);--c-action-text:light-dark(#fff,#30223e);--c-green:light-dark(#1d7249,#a1e0bb);--c-red:light-dark(#a73543,#ffb5bc);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--c-text);padding:16px 0}
+#savings-home *{box-sizing:border-box}
+#savings-home .c-app{max-width:480px;margin:auto;background:var(--c-bg);padding:22px;border-radius:28px;font-size:17px;line-height:1.55}
+#savings-home header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+#savings-home .c-muted{font-size:15px;color:var(--c-muted)}
+#savings-home h2{font-size:28px;margin:8px 0 18px;line-height:1.3;font-weight:600;color:var(--c-text)}
+#savings-home h3{font-size:23px;margin:0 0 6px;line-height:1.4;font-weight:600}
+#savings-home p{margin:8px 0}
+#savings-home button{font:inherit;min-height:46px;border:0;border-radius:14px;padding:11px 15px;background:var(--c-panel);color:var(--c-text)}
+#savings-home .c-primary,#savings-home button[aria-pressed=true]{background:var(--c-action);color:var(--c-action-text)}
+#savings-home .c-primary{width:100%}
+#savings-home .c-goal{background:var(--c-panel);border-radius:24px;padding:22px;margin:16px 0;touch-action:pan-y}
+#savings-home .c-row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#savings-home .c-counter{font-size:35px;font-weight:600;line-height:1.3;margin-top:18px}
+#savings-home .c-count-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:18px}
+#savings-home .c-count-row .c-counter{margin:0;font-size:42px}
+#savings-home .c-month-impact{margin:0;font-size:17px;color:var(--c-green);line-height:1.4}
+#savings-home .c-month-impact.more{color:var(--c-red)}
+#savings-home .c-future{margin-top:24px;padding-top:10px;border-top:1px solid var(--c-gray)}
+#savings-home .c-illustration{width:min(100%,320px);aspect-ratio:1;position:relative;margin:16px auto;color:var(--c-gray)}
+#savings-home .c-illustration>div{position:absolute;inset:0;display:grid;place-items:center}
+#savings-home .c-illustration svg{width:100%;height:100%;stroke-width:1.15;fill:color-mix(in srgb,var(--c-gray) 45%,transparent)}
+#savings-home .c-colored{color:var(--c-purple);clip-path:inset(100% 0 0 0)}
+#savings-home .c-colored svg{fill:color-mix(in srgb,var(--c-purple) 70%,var(--c-panel));stroke:var(--c-action)}
+#savings-home .c-colored svg>*:nth-child(3n+1){fill:var(--c-mint);stroke:var(--c-green)}
+#savings-home .c-colored svg>*:nth-child(3n+2){fill:var(--c-sun);stroke:var(--c-action)}
+#savings-home .c-colored svg>*:nth-child(3n+3){fill:var(--c-peach);stroke:var(--c-action)}
+#savings-home .c-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0}
+#savings-home .c-gallery button{background:var(--c-bg);font-size:15px;padding:14px 4px;display:grid;justify-items:center;gap:8px}
+#savings-home .c-gallery svg{width:52px;height:52px;stroke-width:1.3;fill:color-mix(in srgb,var(--c-purple) 35%,transparent)}
+#savings-home .c-gallery button[aria-pressed=true]{background:var(--c-action);color:var(--c-action-text)}
+#savings-home .c-art{--art-mint:var(--c-mint);--art-purple:var(--c-purple);--art-peach:var(--c-peach);--art-sun:var(--c-sun);--art-blue:light-dark(#93bdd8,#83abc8);position:relative;width:100%;height:100%;}
+#savings-home [data-gray-icon] .c-art{--art-mint:var(--c-gray);--art-purple:var(--c-gray);--art-peach:var(--c-gray);--art-sun:var(--c-gray);--art-blue:var(--c-gray)}
+#savings-home .c-art>span{position:absolute;display:block}
+#savings-home .c-gallery .c-art{width:100%;height:auto;aspect-ratio:1;max-width:150px}
+#savings-home .art-roof{left:15%;top:7%;width:74%;height:39%;background:var(--art-purple);clip-path:polygon(50% 0,100% 76%,94% 89%,50% 24%,6% 89%,0 76%)}
+#savings-home .art-chimney{left:73%;top:16%;width:8%;height:25%;border-radius:12% 12% 0 0;background:var(--art-peach)}
+#savings-home .art-wall{left:24%;top:42%;width:58%;height:40%;border-radius:6%;background:var(--art-mint)}
+#savings-home .art-window-a,#savings-home .art-window-b{top:49%;width:11%;height:11%;border-radius:20%;background:var(--art-sun)}
+#savings-home .art-window-a{left:32%}#savings-home .art-window-b{left:63%}
+#savings-home .art-door{left:46%;top:62%;width:15%;height:20%;border-radius:15% 15% 0 0;background:var(--art-peach)}
+#savings-home .art-tree{left:9%;top:61%;width:17%;height:17%;border-radius:50%;background:var(--art-mint)}
+#savings-home .art-trunk{left:16%;top:73%;width:3%;height:10%;background:var(--art-peach)}
+#savings-home .art-plane-body{left:10%;top:38%;width:80%;height:23%;border-radius:15% 55% 55% 15%;background:var(--art-mint)}
+#savings-home .art-wing-top{left:40%;top:15%;width:34%;height:37%;background:var(--art-purple);clip-path:polygon(0 0,31% 0,100% 100%,5% 100%)}
+#savings-home .art-wing-bottom{left:40%;top:51%;width:34%;height:34%;background:var(--art-purple);clip-path:polygon(5% 0,100% 0,31% 100%,0 100%)}
+#savings-home .art-tail{left:11%;top:19%;width:19%;height:30%;background:var(--art-peach);clip-path:polygon(0 0,35% 0,100% 100%,15% 100%)}
+#savings-home .art-cockpit{left:76%;top:43%;width:10%;height:8%;border-radius:40%;background:var(--art-blue)}
+#savings-home .art-plane-window-a,#savings-home .art-plane-window-b,#savings-home .art-plane-window-c{top:44%;width:5%;height:7%;border-radius:25%;background:var(--art-sun)}
+#savings-home .art-plane-window-a{left:29%}#savings-home .art-plane-window-b{left:40%}#savings-home .art-plane-window-c{left:51%}
+#savings-home .art-chair-back{left:23%;top:16%;width:54%;height:56%;border-radius:18%;background:var(--art-purple)}
+#savings-home .art-chair-cushion{left:31%;top:28%;width:38%;height:28%;border-radius:15%;background:var(--art-mint)}
+#savings-home .art-chair-leg-a,#savings-home .art-chair-leg-b{top:73%;width:8%;height:13%;border-radius:0 0 20% 20%;background:var(--art-peach)}
+#savings-home .art-chair-leg-a{left:25%}#savings-home .art-chair-leg-b{left:67%}
+#savings-home .art-chair-seat{left:22%;top:57%;width:56%;height:18%;border-radius:20%;background:var(--art-sun)}
+#savings-home .art-chair-arm-a,#savings-home .art-chair-arm-b{top:45%;width:16%;height:31%;border-radius:25%;background:var(--art-peach)}
+#savings-home .art-chair-arm-a{left:14%}#savings-home .art-chair-arm-b{left:70%}
+#savings-home .art-stroller-canopy{left:40%;top:14%;width:40%;height:40%;border-radius:100% 0 0 0;background:var(--art-purple)}
+#savings-home .art-stroller-basket{left:22%;top:49%;width:58%;height:23%;border-radius:0 0 50% 50%;background:var(--art-mint)}
+#savings-home .art-stroller-handle{left:14%;top:29%;width:25%;height:24%;border-top:5px solid var(--art-peach);border-left:5px solid var(--art-peach);border-radius:30% 0 0 0}
+#savings-home .art-wheel-a,#savings-home .art-wheel-b{top:72%;width:15%;height:15%;border-radius:50%;background:var(--art-sun)}
+#savings-home .art-wheel-a{left:26%}#savings-home .art-wheel-b{left:61%}
+#savings-home .art-trophy-handle-a,#savings-home .art-trophy-handle-b{top:23%;width:27%;height:30%;border:8px solid var(--art-peach);border-radius:50%;background:transparent}
+#savings-home .art-trophy-handle-a{left:12%}#savings-home .art-trophy-handle-b{left:61%}
+#savings-home .art-trophy-stem{left:45%;top:51%;width:10%;height:24%;background:var(--art-purple)}
+#savings-home .art-trophy-bowl{left:28%;top:15%;width:44%;height:44%;border-radius:0 0 50% 50%;background:var(--art-sun)}
+#savings-home .art-trophy-star{left:42%;top:25%;width:16%;height:16%;background:var(--art-peach);clip-path:polygon(50% 0,63% 33%,100% 38%,73% 62%,81% 100%,50% 80%,19% 100%,27% 62%,0 38%,37% 33%)}
+#savings-home .art-trophy-base{left:30%;top:72%;width:40%;height:13%;border-radius:15%;background:var(--art-mint)}
+#savings-home .art-cone{left:16%;top:40%;width:55%;height:45%;background:var(--art-purple);clip-path:polygon(0 100%,30% 0,100% 70%)}
+#savings-home .art-cone-stripe{left:24%;top:54%;width:32%;height:23%;background:var(--art-peach);clip-path:polygon(0 66%,30% 0,100% 70%,50% 100%)}
+#savings-home .art-confetti-a,#savings-home .art-confetti-b,#savings-home .art-confetti-c,#savings-home .art-confetti-d{width:9%;height:12%;border-radius:12%;transform:rotate(25deg)}
+#savings-home .art-confetti-a{left:26%;top:16%;background:var(--art-sun)}#savings-home .art-confetti-b{left:66%;top:22%;background:var(--art-mint);transform:rotate(-20deg)}#savings-home .art-confetti-c{left:76%;top:51%;background:var(--art-peach);transform:rotate(60deg)}#savings-home .art-confetti-d{left:47%;top:33%;background:var(--art-blue);transform:rotate(-35deg)}
+#savings-home .art-confetti-dot{left:52%;top:12%;width:8%;height:8%;border-radius:50%;background:var(--art-peach)}
+#savings-home .c-field-space{display:block;margin:4px 0 14px;color:var(--c-muted);font-size:14px}
+#savings-home .c-ring{width:140px;height:140px;border-radius:50%;margin:16px auto;display:grid;place-items:center;background:conic-gradient(var(--c-mint) 0% 60%,var(--c-gray) 60% 100%);position:relative}
+#savings-home .c-ring:before{content:'';position:absolute;inset:18px;border-radius:50%;background:var(--c-panel)}
+#savings-home .c-ring span{position:relative;font-size:29px;font-weight:600}
+#savings-home .c-track{height:9px;background:var(--c-gray);border-radius:8px;overflow:hidden;margin:12px 0}
+#savings-home .c-track span{display:block;height:100%;background:var(--c-mint)}
+/* The right arrow advances the goal index, so the dots advance to the right too. */
+#savings-home .c-switcher{display:flex;direction:ltr;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+#savings-home .c-switcher button{min-width:44px;min-height:44px;padding:12px;background:transparent;display:grid;place-items:center}
+#savings-home .c-switcher button span{width:9px;height:9px;border-radius:50%;background:var(--c-gray)}
+#savings-home .c-switcher button[aria-pressed=true] span{background:var(--c-action);width:22px;border-radius:5px}
+#savings-home .c-controls{margin-top:24px}
+#savings-home label{display:block;margin:14px 0 6px}
+#savings-home input{font:inherit;font-size:18px;min-height:46px;width:100%;background:var(--c-bg);color:var(--c-text);border:1px solid color-mix(in srgb,var(--c-muted) 35%,transparent);border-radius:12px;padding:12px}
+#savings-home input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--c-action);direction:rtl;touch-action:pan-y}
+#savings-home summary{min-height:44px;padding:10px 0}
+#savings-home .c-delta{min-height:55px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--c-gray) 15%,var(--c-panel));margin:14px 0;font-size:19px;font-weight:500}
+#savings-home .c-delta.less{color:var(--c-green);background:color-mix(in srgb,var(--c-mint) 18%,var(--c-panel))}
+#savings-home .c-delta.more{color:var(--c-red);background:color-mix(in srgb,var(--c-red) 9%,var(--c-panel))}
+#savings-home bdi{white-space:nowrap;font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+#savings-home [hidden]{display:none!important}
+#savings-home .c-notice{padding:14px;background:var(--c-panel);border-radius:14px;margin-top:16px}
+#savings-home .c-group{border-top:1px solid var(--c-gray);margin-top:24px;padding-top:18px}
+#savings-home h4{font-size:19px;font-weight:600;margin:0 0 12px}
+#savings-home .c-effect{margin:0 0 10px;padding:12px;background:var(--c-bg);border-radius:14px}
+#savings-home .c-effect .c-delta{margin:0;padding:0;background:transparent;min-height:0}
+#savings-home .c-effect .c-delta.less{background:transparent}
+#savings-home .c-effect .c-delta.more{background:transparent}
+#savings-home .c-overview{text-align:center}
+#savings-home .c-overview .c-count-row{justify-content:center;margin:16px 0}
+#savings-home .c-overview .c-row{justify-content:center;gap:6px}
+@media(max-width:350px){#savings-home .c-app{padding:14px}#savings-home .c-goal{padding:16px}#savings-home .c-counter{font-size:30px}}
+
+#savings-home .c-app{max-width:680px;padding:0;background:transparent}
+#savings-home .c-goal{padding:26px}
+#savings-home .sg-error{color:var(--c-red);padding:12px}
+#savings-home .sg-form{display:grid;gap:10px}
+#savings-home .sg-form label{margin:0}
+#savings-home .sg-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#savings-home .sg-actions button{flex:1}
+#savings-home .c-illustration{width:min(100%,320px)}
+#savings-home .c-colored{transition:clip-path .2s ease-out}
+@media(prefers-reduced-motion:reduce){#savings-home .c-colored{transition:none}}
+@media(max-width:400px){#savings-home .c-goal{padding:18px}}
+
+#savings-home .sg-scene{position:relative}
+#savings-home .sg-scene .sg-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:44px;height:48px;min-height:48px;padding:0;display:grid;place-items:center;border-radius:50%;background:var(--glass);color:var(--c-action);border:1px solid var(--hairline);font-size:36px;line-height:1}
+#savings-home .sg-arrow-right{right:-14px}
+#savings-home .sg-arrow-left{left:-14px}
+#savings-home .c-switcher button[aria-pressed=true]{background:transparent}
+#savings-home .c-switcher + .c-muted{text-align:center;margin-top:0}
+
+/* Keep the home heading, goal selector and artwork together. */
+.app-shell[data-page="progress"] .page-heading{margin:16px 0 0}
+#savings-home{padding-top:0}
+#savings-home .c-switcher{margin:0}
+#savings-home .c-switcher + .c-muted{margin:0 0 6px;font-size:14px}
+#savings-home .c-goal{margin-top:8px}
+#savings-home .c-illustration{margin:8px auto}
+#savings-home .sg-arrow svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
+
+/* Allocation sheet uses the existing full-colour goal artwork. */
+#savings-home .st-open{margin-top:12px}
+#savings-home .sg-transfer-dialog{position:fixed;inset:auto 0 0;margin:0 auto;width:min(460px,100%);max-width:100%;max-height:calc(100dvh - 12px);overflow:auto;border:0;border-radius:26px 26px 0 0;padding:12px 14px max(12px,env(safe-area-inset-bottom));background:var(--c-bg);color:var(--c-text)}
+#savings-home .sg-transfer-dialog::backdrop{background:#00000050;backdrop-filter:blur(4px)}
+#savings-home .st-handle{width:36px;height:4px;border-radius:4px;background:var(--c-gray);margin:0 auto 5px}
+#savings-home .st-heading{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#savings-home .st-heading h2{font-size:20px;margin:0}
+#savings-home .st-heading button{min-width:44px;padding:0;background:transparent;font-size:26px}
+#savings-home .st-pool{display:flex;align-items:center;gap:5px;font-size:13px;margin:0 0 8px}
+#savings-home .st-pool>span:last-child{margin-inline-start:auto;color:var(--c-muted)}
+#savings-home .st-card{background:var(--c-panel);border-radius:18px;padding:10px;touch-action:pan-y}
+#savings-home .st-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#savings-home .st-title h3{font-size:16px;margin:0;min-width:0;overflow-wrap:anywhere}
+#savings-home .st-title h3 bdi{white-space:normal;direction:inherit}
+#savings-home .st-title>span{font-size:12px;color:var(--c-muted);flex-shrink:0}
+#savings-home .st-scene{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:0}
+#savings-home .st-arrow{width:44px;min-height:44px;padding:0;border-radius:50%;background:var(--c-bg);display:grid;place-items:center}
+#savings-home .st-arrow svg{width:22px;height:22px;fill:none;stroke:var(--c-action);stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
+#savings-home .st-body{display:flex;justify-content:center;align-items:center;gap:8px;min-width:0}
+#savings-home .st-body .c-illustration{width:90px;height:80px;margin:0;flex-shrink:0}
+#savings-home .st-free{width:90px;text-align:center;color:var(--c-muted);font-size:13px}
+#savings-home .st-values{text-align:center;min-width:0;font-size:12px;line-height:1.35}
+#savings-home .st-values>strong{display:block;font-size:20px;line-height:1.2;font-weight:600}
+#savings-home .st-before{display:block;color:var(--c-muted)}
+#savings-home .st-count{font-size:23px;line-height:1.1;margin-top:3px;font-weight:600}
+#savings-home .st-change{margin-top:2px;min-height:16px}
+#savings-home .st-change.more{color:var(--c-red)}
+#savings-home .st-change.less{color:var(--c-green)}
+#savings-home .st-dots{display:flex;direction:ltr;flex-wrap:wrap;justify-content:center;gap:6px;margin:5px 0}
+#savings-home .st-dots span{width:6px;height:6px;border-radius:50%;background:var(--c-gray)}
+#savings-home .st-dots span.active{width:18px;border-radius:4px;background:var(--c-action)}
+#savings-home .st-card .c-track{height:5px;margin:4px 0 0}
+#savings-home .st-bridge{padding:8px 4px}
+#savings-home .st-bridge>div{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#savings-home .st-bridge label{font-size:15px;margin:0}
+#savings-home .st-bridge [data-st-amount]{font-size:20px;font-weight:600}
+#savings-home .st-bridge input{min-height:44px;margin:0}
+#savings-home .st-actions{display:flex;gap:8px;margin-top:8px}
+#savings-home .st-actions .c-primary{flex:1;width:auto}
+#savings-home .st-error:empty{display:none}
+#savings-home .st-error{font-size:13px;color:var(--c-red);margin:6px 0}
+@media(max-width:360px){#savings-home .st-body .c-illustration{width:62px;height:65px}#savings-home .st-body{gap:4px}#savings-home .st-values>strong{font-size:18px}}
+/* Keep both cards and actions visible on short phone screens. */
+#savings-home .st-actions button{font-size:15px;min-height:44px;padding:9px 12px}
+#savings-home .st-actions .c-primary{white-space:nowrap}
+#savings-home .st-bridge>div{line-height:1.2}
+@media(max-height:700px){#savings-home .sg-transfer-dialog{padding-top:8px;padding-bottom:max(8px,env(safe-area-inset-bottom))}#savings-home .st-card{padding:8px}#savings-home .st-before{display:none}#savings-home .st-body .c-illustration{width:60px;height:64px}#savings-home .st-bridge{padding:4px}#savings-home .st-values>strong{font-size:18px}#savings-home .st-count{font-size:21px}#savings-home .st-title h3{font-size:15px}}
+@media(max-width:360px){#savings-home .st-body .c-illustration{width:50px;height:60px}#savings-home .st-values>strong{font-size:16px}#savings-home .st-values{font-size:11px}#savings-home .st-title>span{font-size:11px}#savings-home .st-title h3{font-size:14px}#savings-home .st-body{gap:2px}#savings-home .st-pool{font-size:12px}}
+/* One goal, one progress bar, one optional forecast. */
+#savings-home .c-goal{margin:4px 0;padding:18px 22px}
+#savings-home .c-goal>.c-row h3{margin:0}
+#savings-home .c-goal>.c-row>.c-muted{font-size:13px}
+#savings-home .c-progress{position:relative;height:28px;margin:4px 0 10px;border-radius:14px;display:grid;place-items:center}
+#savings-home .c-progress>span{position:absolute;inset-block:0;inset-inline-start:0}
+#savings-home .c-progress>bdi{position:relative;font-weight:650;font-size:14px;color:light-dark(#253d32,#182f24);background:#ffffffb8;border-radius:10px;padding:0 6px;line-height:20px}
+#savings-home .c-overview>.c-row{font-size:16px}
+#savings-home .c-overview>.c-row .c-muted{font-size:13px}
+#savings-home .sg-projection{border-top:1px solid var(--c-gray);margin-top:14px;padding-top:4px}
+#savings-home .sg-projection>summary{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;cursor:pointer;list-style:none}
+#savings-home .sg-projection>summary>span:after{content:'⌄';margin-inline-start:8px}
+#savings-home .sg-projection[open]>summary>span:after{content:'⌃'}
+#savings-home .sg-projection>summary strong{font-size:15px;color:var(--c-action)}
+#savings-home .sg-projection .c-row{font-size:14px}
+#savings-home .sg-projection .c-row label{margin:6px 0}
+#savings-home .sg-projection .c-delta{min-height:0;font-size:14px;margin:0;padding:8px}
+#savings-home .sg-projection .c-muted{font-size:13px}
+#savings-home .sg-error:empty{display:none}
+.app-shell[data-page=progress] .budget-context{font-size:12px;padding-block:4px;margin-top:4px}
+.app-shell[data-page=progress] .budget-context .btn{padding:4px 8px;font-size:12px;min-height:36px}
+
+@media(max-width:400px){#savings-home .c-goal{padding:16px}#savings-home .c-illustration{width:min(100%,285px)}}
+#savings-home .sg-home-actions{display:flex;justify-content:flex-end;margin:0 0 4px}
+#savings-home .sg-add-goal{background:transparent;color:var(--c-action);font-size:15px;padding:6px 12px;min-height:44px}
+#savings-home .sg-add-goal span{font-size:22px;vertical-align:middle}
+#savings-home .sg-new-dialog{color:var(--c-text);background:var(--c-panel);border:1px solid var(--c-gray);border-radius:26px;padding:20px;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;margin:auto;direction:rtl}
+#savings-home .sg-new-dialog::backdrop{background:#10131b99;backdrop-filter:blur(5px)}
+#savings-home .sg-new-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#savings-home .sg-new-heading h2{margin:0;font-size:25px}
+#savings-home .sg-new-heading button{font-size:26px;background:var(--c-bg);width:44px;padding:0}
+#savings-home .sg-new-dialog .sg-form{gap:12px;margin:14px 0 0}
+#savings-home .sg-art-picker{border:0;padding:0;margin:0;min-width:0}
+#savings-home .sg-new-dialog .c-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
+#savings-home .sg-new-dialog .c-gallery button{padding:8px 4px;gap:2px;border:2px solid transparent;background:var(--c-bg)}
+#savings-home .sg-new-dialog .c-gallery button[aria-pressed=true]{border-color:var(--c-action);background:var(--c-bg);color:var(--c-text)}
+#savings-home .sg-new-dialog .c-gallery .c-art{width:70px;max-width:100%}
+#savings-home .sg-new-dialog .c-muted{font-size:13px;line-height:1.5}
+#savings-home .sg-new-actions{display:flex;gap:8px;align-items:center}
+#savings-home .sg-new-actions .c-primary{flex:1}
+/* Goal gallery: car, emergency reserve and business, using the same palette. */
+#savings-home .art-car-cabin{left:26%;top:26%;width:50%;height:34%;background:var(--art-purple);clip-path:polygon(22% 0,76% 0,100% 100%,0 100%);border-radius:12%}
+#savings-home .art-car-glass-a{left:33%;top:32%;width:17%;height:20%;background:var(--art-blue);clip-path:polygon(27% 0,100% 0,100% 100%,0 100%)}
+#savings-home .art-car-glass-b{left:54%;top:32%;width:17%;height:20%;background:var(--art-blue);clip-path:polygon(0 0,70% 0,100% 100%,0 100%)}
+#savings-home .art-car-body{left:10%;top:51%;width:80%;height:24%;border-radius:24% 28% 14% 14%;background:var(--art-mint)}
+#savings-home .art-car-light-a,#savings-home .art-car-light-b{top:56%;width:8%;height:7%;border-radius:28%;background:var(--art-sun)}
+#savings-home .art-car-light-a{left:12%}#savings-home .art-car-light-b{left:81%;background:var(--art-peach)}
+#savings-home .art-car-wheel-a,#savings-home .art-car-wheel-b{top:66%;width:16%;height:16%;border-radius:50%;background:var(--art-purple)}
+#savings-home .art-car-wheel-a{left:24%}#savings-home .art-car-wheel-b{left:64%}
+#savings-home .art-car-hub-a,#savings-home .art-car-hub-b{top:71%;width:6%;height:6%;border-radius:50%;background:var(--art-sun)}
+#savings-home .art-car-hub-a{left:29%}#savings-home .art-car-hub-b{left:69%}
+#savings-home .art-safety-shield{left:18%;top:12%;width:64%;height:76%;background:var(--art-purple);clip-path:polygon(50% 0,100% 16%,94% 61%,78% 83%,50% 100%,22% 83%,6% 61%,0 16%)}
+#savings-home .art-safety-inner{left:26%;top:22%;width:48%;height:55%;background:var(--art-mint);clip-path:polygon(50% 0,100% 14%,92% 61%,75% 83%,50% 100%,25% 83%,8% 61%,0 14%)}
+#savings-home .art-safety-coin{left:35%;top:33%;width:30%;height:30%;border-radius:50%;background:var(--art-sun)}
+#savings-home .art-safety-check{left:42%;top:40%;width:17%;height:15%;background:var(--art-peach);clip-path:polygon(0 47%,20% 28%,42% 51%,82% 0,100% 18%,44% 100%)}
+#savings-home .art-shop-wall{left:20%;top:36%;width:60%;height:46%;border-radius:5%;background:var(--art-mint)}
+#savings-home .art-shop-sign{left:30%;top:14%;width:40%;height:16%;border-radius:14%;background:var(--art-purple)}
+#savings-home .art-shop-sign-line{left:38%;top:20%;width:24%;height:4%;border-radius:30%;background:var(--art-sun)}
+#savings-home .art-shop-window{left:28%;top:52%;width:23%;height:20%;border-radius:8%;background:var(--art-blue)}
+#savings-home .art-shop-door{left:59%;top:50%;width:14%;height:32%;border-radius:12% 12% 0 0;background:var(--art-peach)}
+#savings-home .art-shop-awning{left:14%;top:31%;width:72%;height:15%;background:var(--art-sun);clip-path:polygon(9% 0,91% 0,100% 72%,100% 100%,0 100%,0 72%);border-radius:0 0 12% 12%}
+#savings-home .art-shop-stripe-a,#savings-home .art-shop-stripe-b,#savings-home .art-shop-stripe-c{top:31%;width:10%;height:15%;background:var(--art-peach);border-radius:0 0 20% 20%}
+#savings-home .art-shop-stripe-a{left:29%}#savings-home .art-shop-stripe-b{left:45%}#savings-home .art-shop-stripe-c{left:61%}
+#savings-home .art-shop-step{left:16%;top:80%;width:68%;height:4%;border-radius:30%;background:var(--art-purple)}
+
+/* Free funds are a compact invitation; goal progress stays the focus. */
+#savings-home .sg-free-pool{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--hairline);border-radius:18px;background:color-mix(in srgb,var(--c-mint) 18%,var(--c-bg));margin:0 0 8px}
+#savings-home .sg-free-pool>div{min-width:0}
+#savings-home .sg-free-pool h2{font-size:14px;margin:0 0 3px;color:var(--c-muted);font-weight:500}
+#savings-home .sg-free-pool strong{font-size:22px;line-height:1.25;display:block}
+#savings-home .sg-free-pool .c-primary{width:auto;flex-shrink:0;font-size:14px;min-height:44px;padding:10px 14px}
+.sg-free-dialog,.sg-celebration{direction:rtl;width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid var(--line);border-radius:26px;background:var(--surface);color:var(--ink);padding:22px}
+.sg-free-dialog::backdrop,.sg-celebration::backdrop{background:#10131b99;backdrop-filter:blur(4px)}
+#savings-home .sg-free-dialog small{display:block;color:var(--c-muted);margin-top:6px;font-size:13px}
+.sg-celebration{text-align:center}.sg-celebration strong{display:block;font-size:32px;margin:16px 0}.sg-celebration button{width:100%;margin-top:10px}
+.sg-celebration-mark{display:inline-grid;place-items:center;width:72px;height:72px;border-radius:50%;background:var(--mint);color:var(--teal);font-size:42px;animation:achievement-pop .7s ease-out}
+@media(prefers-reduced-motion:reduce){.sg-celebration-mark{animation:none}}
+
+
+
+.app-shell[data-page="progress"] .page-heading{margin:16px 0 12px}
+#savings-home .sg-home-actions{justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px}
+@media(max-width:760px){
+ #savings-home .c-goal[data-sg-swipe]{padding:14px 18px}
+ #savings-home [data-sg-swipe] .c-illustration{width:min(100%,clamp(128px,calc(100svh - 490px),260px));margin:4px auto}
+ #savings-home.has-free-funds [data-sg-swipe] .c-illustration{width:min(100%,clamp(128px,calc(100svh - 580px),240px))}
+ #savings-home [data-sg-swipe] .st-open{margin-top:8px;font-size:14px;min-height:44px;padding:8px 12px}
+ #savings-home [data-sg-swipe] .sg-projection{margin-top:8px;padding-top:0}
+ #savings-home .sg-home-actions .sg-add-goal{font-size:13px;padding-inline:6px}
+}
+
+.saving-account-row{display:grid;gap:12px;padding:16px 0;border-bottom:1px solid var(--hairline)}.saving-account-row>.btn{justify-self:start}.sg-form input[type="range"],.setup-panel input[type="range"]{padding:0;width:100%;min-height:44px;accent-color:var(--accent)}
+
+#savings-home .sg-growth{display:grid;gap:10px;margin-bottom:12px}#savings-home .sg-growth-total{font-size:1.6rem;font-variant-numeric:tabular-nums}#savings-home .sg-growth p{margin:0}.sg-growth summary{min-height:44px;display:flex;align-items:center}
+
+.sg-deadline-warning{border:1px solid var(--red);border-inline-start:4px solid var(--red);border-radius:16px;padding:14px 16px;margin:12px 0;background:var(--surface)}.sg-deadline-warning strong{color:var(--red)}.sg-deadline-warning p{margin:8px 0}.sg-deadline-warning button{min-height:44px}.sg-deadline-ok{margin:10px 0;color:var(--muted)}
+
+/* Reserve the tallest deadline message across goals without clipping readable text. */
+#savings-home .sg-deadline-slot{display:grid;align-items:start}#savings-home .sg-deadline-slot>div{grid-area:1 / 1;min-width:0}#savings-home .sg-deadline-reserve{visibility:hidden;pointer-events:none;user-select:none}
+
+.sg-funding{margin:12px 0;border:1px solid var(--line);border-radius:16px;padding:14px}.sg-funding summary{cursor:pointer;line-height:1.5;min-height:44px;align-content:center}.sg-funding-fields{margin:12px 0;min-width:0;border:1px solid var(--line);border-radius:12px;padding:12px}.sg-funding-fields legend{padding:0 6px}#savings-home .sg-funding-fields .sg-funding-option,.sg-funding-fields .sg-funding-option{display:flex;flex-direction:row;align-items:center;gap:10px;min-height:44px;margin:8px 0;cursor:pointer}#savings-home .sg-funding-option input[type=checkbox],.sg-funding-option input[type=checkbox]{width:22px;height:22px;min-height:22px;margin:0;padding:0;flex-shrink:0}.sg-funding-option span{overflow-wrap:anywhere}
