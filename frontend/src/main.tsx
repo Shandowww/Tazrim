@@ -13,11 +13,12 @@ import { AppearanceContext } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoSummary, demoBankSummary, demoCardSummary } from './app/demo-fixture'
 import { budgetDashboard, budgetNavigation } from './app/budget-adapter'
-import { AccountsPage } from './app/accounts-page'
+import { legacyBudgetHref } from './app/navigation-query'
 import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
 import './app.css'
 
+const AccountsPage = lazy(async () => ({ default: (await import('./app/accounts-page')).AccountsPage }))
 const CombinedChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/combined-chart')).CombinedChart }))
 const CCMonthlyChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/cc-monthly-chart')).CCMonthlyChart }))
 
@@ -63,17 +64,19 @@ function jerusalemMonth() {
 }
 
 function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<typeof useBudget> }) {
+  const { search: locationSearch } = useLocation()
+  const editorHref = legacyBudgetHref(locationSearch)
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען נתונים…</section>
-  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <a className="text-primary underline" href="/">פתיחת הממשק הקיים</a></section>
-  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <a className="text-primary underline" href="/">הגדרת תקציב</a></section>
-  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <a className="text-primary underline" href="/">פתיחה מאובטחת בממשק הקיים</a></section>
+  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <a className="text-primary underline" href={editorHref}>פתיחת הממשק הקיים</a></section>
+  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <a className="text-primary underline" href={editorHref}>הגדרת תקציב</a></section>
+  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <a className="text-primary underline" href={editorHref}>פתיחה מאובטחת בממשק הקיים</a></section>
   if (!fixture && budget.status === 'ready') {
     const search = new URLSearchParams(window.location.search)
     const year = /^20\d{2}$/.test(search.get('year') || '') ? search.get('year')! : jerusalemMonth().slice(0, 4)
     const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(search.get('month') || '') ? String(Number(search.get('month'))).padStart(2, '0') : ''
     let view: ReturnType<typeof budgetDashboard>
     try { view = budgetDashboard(budget.value.plan, { year, month, asOf: jerusalemMonth() }) }
-    catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. <a className="text-primary underline" href="/">פתיחת הממשק הקיים</a></section> }
+    catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. <a className="text-primary underline" href={editorHref}>פתיחת הממשק הקיים</a></section> }
     const accountCount = budgetNavigation(budget.value.plan).filter(account => account.kind === 'BANK').length
     return <div className="mx-auto max-w-7xl space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>
@@ -83,13 +86,13 @@ function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<t
         <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={view.bankSummary} maxSummary={view.cardSummary} cardsName="כרטיס" selectedMonth={month ? Number(month) : undefined} /></Suspense>
         <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={view.cardSummary} selectedMonth={month ? Number(month) : undefined} /></Suspense></div>
       </> : <section className="surface rounded-xl p-6">אין נתוני אמת לתקופה זו. תחזיות וסכומי ברירת מחדל אינם מוצגים כדיווח.</section>}
-      <section className="surface rounded-xl p-6 text-sm text-muted-foreground">תצוגה לקריאה בלבד. <a className="text-primary underline" href="/">עריכה בממשק הקיים</a></section>
+      <section className="surface rounded-xl p-6 text-sm text-muted-foreground">תצוגה לקריאה בלבד. <a className="text-primary underline" href={editorHref}>עריכה בממשק הקיים</a></section>
     </div>
   }
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>
-      <DashboardSummaryCards {...demoSummary} query="" bankHint="2 חשבונות" cardHint="כרטיס ראשי" />
+      <DashboardSummaryCards {...demoSummary} query={new URLSearchParams(locationSearch).toString()} bankHint="2 חשבונות" cardHint="כרטיס ראשי" />
       <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={demoBankSummary} maxSummary={demoCardSummary} cardsName="כרטיס" /></Suspense>
       <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={demoCardSummary} /></Suspense></div>
       <section className="surface rounded-xl p-6"><h2 className="font-semibold">דוגמת תצוגה</h2><p className="mt-2 text-sm text-muted-foreground">הסכומים בדוגמה בלבד. בתצוגת החשבון מוצגים נתוני הדיווח השמורים ב-Budgit.</p></section>
@@ -126,6 +129,7 @@ function App() {
         <div className="flex min-w-0 flex-1 flex-col">
           <Header budget={budget} />
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
+            <Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
             <Routes>
               <Route path="/" element={<Dashboard fixture={fixture} budget={budget} />} />
               <Route path="/banks" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
@@ -139,6 +143,7 @@ function App() {
               <Route path="/about" element={<PendingPage title="אודות" />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
             </Routes>
+            </Suspense>
           </main>
         </div>
       </div>

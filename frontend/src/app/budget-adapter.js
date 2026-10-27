@@ -10,7 +10,7 @@ export function budgetNavigation(plan) {
   }))
   const cards = creditCards(plan).filter(card => !card.removedFrom).map(card => ({
     id: card.id, kind: 'CREDIT_CARD', displayName: card.name,
-    cardLastFour: card.lastFour || null, provider: card.provider || '',
+    cardLastFour: /^\d{4}$/.test(card.lastFour || '') ? card.lastFour : /^\d{4}$/.test(card.alias || '') ? card.alias : null, provider: card.provider || '',
     cardNetwork: card.network || null, color: card.color || null,
   }))
   return [...banks, ...cards]

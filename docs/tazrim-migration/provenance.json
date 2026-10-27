@@ -34,7 +34,22 @@
     "lib/insights/account-overview.ts -> frontend/src/tazrim/lib/insights/account-overview.ts",
     "lib/utils/cn.ts -> frontend/src/tazrim/lib/utils/cn.ts",
     "lib/utils/currency.ts -> frontend/src/tazrim/lib/utils/currency.ts",
-    "lib/motion.ts -> frontend/src/tazrim/lib/motion.ts"
+    "lib/motion.ts -> frontend/src/tazrim/lib/motion.ts",
+    "lib/background/read-setting.ts -> frontend/src/tazrim/lib/background/read-setting.ts",
+    "lib/background/ribbons.ts -> frontend/src/tazrim/lib/background/ribbons.ts",
+    "lib/background/lines-tile.data.ts -> frontend/src/tazrim/lib/background/lines-tile.data.ts",
+    "lib/background/lines.ts -> frontend/src/tazrim/lib/background/lines.ts",
+    "lib/background/setting.ts -> frontend/src/tazrim/lib/background/setting.ts",
+    "lib/background/paint.ts -> frontend/src/tazrim/lib/background/paint.ts",
+    "lib/cards/wallet-motion.ts -> frontend/src/tazrim/lib/cards/wallet-motion.ts",
+    "lib/glass/geometry.ts -> frontend/src/tazrim/lib/glass/geometry.ts",
+    "lib/glass/policy.ts -> frontend/src/tazrim/lib/glass/policy.ts",
+    "lib/glass/under.ts -> frontend/src/tazrim/lib/glass/under.ts",
+    "lib/glass/bake.ts -> frontend/src/tazrim/lib/glass/bake.ts",
+    "components/layout/period-context.tsx -> frontend/src/tazrim/components/layout/period-context.tsx",
+    "components/cards/card-wallet.tsx -> frontend/src/tazrim/components/cards/card-wallet.tsx",
+    "components/glass/glass-surface.tsx -> frontend/src/tazrim/components/glass/glass-surface.tsx",
+    "components/glass/glass-bakery.ts -> frontend/src/tazrim/components/glass/glass-bakery.ts"
   ],
   "localPresentationAssets": [
     "frontend/public/fonts/heebo-hebrew-wght-normal.woff2",
@@ -50,8 +65,12 @@
     "Pinned Tazrim period picker and Recharts displays use Budgit actual values, preserve missing versus reported zero, and load as separate browser chunks",
     "System, Light and Dark appearance is stored per device and follows system changes; charts use the same appearance context",
     "Read-only refresh keeps the last usable snapshot on transient failure and shows a top-layer retry notice; access failures clear it",
-    "Bank and card overview rows reuse Tazrim account faces and summary rows; account details show the original large face, while unknown balances and card charges remain missing. The animated wallet and baked glass renderer are still pending",
-    "frontend/src/tazrim/components/glass/glass-surface.tsx supplies the source CSS's static glass layer until the pinned baked renderer is ported",
-    "Navigation retains the selected Budgit space when moving between React routes"
+    "Navigation retains the selected Budgit space when moving between React routes",
+    "Pinned animated bank/card wallet and baked glass renderer use explicit React Router links without Next prefetch; every wallet link retains the selected space/period and development fixture mode",
+    "Bank hero uses only an actual reported dated balance; card hero and stack totals are omitted when unknown, never replaced by forecast/default amounts",
+    "Existing-editor bridges explicitly name the selected budget, including personal; sample links retain development fixture mode",
+    "Vite development base matches /next/ router while production assets remain /ui-assets/; sidebar bundles the existing Budgit icon through Vite",
+    "Reported financial figures and missing states are explicit in account-row accessible names; an unavailable bank pocket total is neither summed nor announced as zero",
+    "Pinned wallet and baked glass renderers load in a separate account-route chunk; Budgit icon and pocket branding remain original"
   ]
 }

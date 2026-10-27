@@ -4,6 +4,7 @@ import { AccountMini } from './account-element'
 import Link from '../../../app/link'
 import { cardLabel } from '@/lib/accounts/brands'
 import { cn } from '@/lib/utils/cn'
+import { formatCurrency } from '@/lib/utils/currency'
 
 /** One account's row in the list beside the wallet: its face, name, figure, a detail line and its share. */
 function SummaryRow({
@@ -95,7 +96,7 @@ export function BankSummaryRow({ href, name, provider, color, colorChoice, expen
   return (
     <SummaryRow
       href={href}
-      ariaLabel={`${name}: לפירוט החשבון`}
+      ariaLabel={`${name}: ${balance === undefined ? 'אין יתרה מדווחת' : 'יתרה מדווחת ' + formatCurrency(balance)}; ${expense === null ? 'אין הוצאות מדווחות' : 'הוצאות מדווחות ' + formatCurrency(expense)}. לפירוט החשבון`}
       face={<AccountMini kind="BANK" provider={provider} color={color} colorChoice={colorChoice} className="w-12" />}
       name={name}
       color={color}
@@ -146,7 +147,7 @@ export function CardSummaryRow({
   return (
     <SummaryRow
       href={href}
-      ariaLabel={`${cardLabel({ provider, name, lastFour, network })}: לפירוט הכרטיס`}
+      ariaLabel={`${cardLabel({ provider, name, lastFour, network })}: ${total === null ? 'אין חיוב מדווח לתקופה' : 'חיובים מדווחים ' + formatCurrency(total)}. לפירוט הכרטיס`}
       face={
         // The card's face, its last four right under it (a fixed slot, so rows stay aligned without them)
         <>

@@ -9,3 +9,9 @@ export function withViewQuery(href, search, development = false) {
   if (development && !next.has('demo') && current.get('demo') === '1') next.set('demo', '1')
   return `${path}${next.size ? `?${next}` : ''}`
 }
+
+/** Existing editor bridge keeps the explicitly selected space, never a prior device selection. */
+export function legacyBudgetHref(search) {
+  const budget = new URLSearchParams(search).get('budget') || 'personal'
+  return '/?' + new URLSearchParams({ budget })
+}

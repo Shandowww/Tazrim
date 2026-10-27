@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import budgitIcon from '../../../../../public/icons/app-icon-192-v1.png'
 import { useLocation } from 'react-router-dom'
 import Link from '../../../app/link'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -262,7 +263,7 @@ export function Sidebar({
             )}
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary">
-              <img src="/icons/app-icon-192-v1.png" className="h-7 w-7 rounded-lg" alt="" />
+              <img src={budgitIcon} className="h-7 w-7 rounded-lg" alt="" />
             </span>
             <span className="whitespace-nowrap text-lg font-bold tracking-tight">Budgit</span>
           </Link>
