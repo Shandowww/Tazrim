@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "59533a642d536250722a135d9629a2799d261f2c",
+  "sourceCommit": "389fcb7effb7ab4aa6d832e7b257b6aacdab6f1b",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; committed canonical backend reconciled and guarded manual account reporting, planned items, loan lifecycle savings-goal metadata editing, scoped journal/export, recurring evidence review and confirmed planned-item removal added; scenario command foundation started (calculator UI still pending). Remaining imported-source/workflow/full visual/release acceptance pending; not deployed",
+  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo implemented. Report/deposit/vault/migration/full device/release parity still pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 783,
-    "browser": "Manual account reports, planned-item phone layouts/installment preview, expected income, loan creation/confirmed-removal/retry/viewer, goal metadata/ledger invariance, journal pagination/access/failed refresh and recurring decision/retry/viewer and planned-item removal/guard/retry/viewer checks passed on synthetic data. Iframe download completion and unlocated observer error remain acceptance limitations; full visual/device acceptance pending."
+    "regressionTests": 810,
+    "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, and history review/undo/retry checks passed. Prior iframe/download and complete device acceptance limitations remain documented."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

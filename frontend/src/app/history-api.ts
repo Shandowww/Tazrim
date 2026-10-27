@@ -28,3 +28,35 @@ export async function loadBudgetExport(budgetId:string,base:BudgetResponse,signa
  if(!plan||plan.format||!validatePlan(plan))throw Error('גיבוי התקציב הזה זמין בממשק הקיים בלבד.')
  return JSON.stringify({format:'monthly-flow-v1',plan},null,2)
 }
+export interface HistorySnapshot{id:string;revision:number;before:Record<string,unknown>|null;after:Record<string,unknown>;canUndo:boolean;undoIdentityBound:boolean}
+function normalizeHistory(value:any):any{return value&&typeof value==='object'?Array.isArray(value)?value.map(normalizeHistory):Object.fromEntries(Object.keys(value).filter(k=>value[k]!==undefined).sort().map(k=>[k,normalizeHistory(value[k])])):value}
+const canonical=(value:any)=>JSON.stringify(normalizeHistory(value))
+export async function loadHistorySnapshot(budgetId:string,base:BudgetResponse,entry:HistoryEntry,signal:AbortSignal,fetcher:typeof fetch=fetch):Promise<HistorySnapshot>{
+ if(!/^[a-zA-Z0-9-]{1,100}$/.test(entry.id)||!entry.snapshot||base.plan?.format)throw Error('בדיקת הגרסה הזו זמינה בממשק הקיים בלבד.')
+ await check(budgetId,base,signal,fetcher)
+ const response=await fetcher('/api/plan-history?budget='+encodeURIComponent(budgetId)+'&id='+encodeURIComponent(entry.id),{credentials:'same-origin',cache:'no-store',signal,headers:{'x-budget-account-id':base.accountId}})
+ if([401,403,404].includes(response.status))throw new AccessError('העותק ההיסטורי אינו זמין לחשבון או למרחב הזה.')
+ if(!response.ok)throw Error('העותק ההיסטורי לא נטען. התקציב לא שונה; אפשר לנסות שוב.')
+ const value=await response.json();await check(budgetId,base,signal,fetcher)
+ if(value?.revision!==entry.revision||typeof value.canUndo!=='boolean'||value.before!==null&&!validatePlan(value.before)||!validatePlan(value.after)||value.before?.format||value.after?.format)throw Error('העותק אינו תקציב גלוי שניתן לאמת. יש להשתמש בממשק הקיים.')
+ return{id:entry.id,revision:value.revision,before:value.before,after:value.after,canUndo:value.canUndo,undoIdentityBound:value.undoIdentityBound===true}
+}
+export async function undoHistorySnapshot(budgetId:string,base:BudgetResponse,snapshot:HistorySnapshot,fetcher:typeof fetch=fetch){
+ if(!snapshot.canUndo||!snapshot.before||!validatePlan(snapshot.before)||snapshot.revision!==base.revision||snapshot.undoIdentityBound!==true)throw Error('ניתן לבטל רק שמירה אחרונה שנבדקה, עם עותק קודם ותמיכת השרת.')
+ const fresh=await loadBudgetSnapshot(budgetId,new AbortController().signal,fetcher)
+ if(fresh.value.accountId!==base.accountId||fresh.value.accountEmail!==base.accountEmail)throw new AccessError('החשבון השתנה. יש לפתוח מחדש את היומן.')
+ if(fresh.spaces.find(s=>s.id===budgetId)?.role==='viewer')throw Error('המרחב פתוח לצפייה בלבד. הביטול לא נשלח.')
+ if(fresh.value.revision===base.revision+1&&canonical(fresh.value.plan)===canonical(snapshot.before)){const journal=await loadHistory(budgetId,fresh.value,0,new AbortController().signal,fetcher);if(journal.entries[0]?.kind==='undo'&&journal.entries[0]?.actor===base.accountEmail)return{...fresh,recovered:true}}
+ sameActor(base,fresh.value)
+ // Re-read the authoritative snapshot; restored values are never supplied by the client.
+ const verified=await loadHistorySnapshot(budgetId,base,{id:snapshot.id,revision:snapshot.revision,snapshot:true} as HistoryEntry,new AbortController().signal,fetcher)
+ if(!verified.canUndo||!verified.undoIdentityBound||canonical(verified.before)!==canonical(snapshot.before)||canonical(fresh.value.plan)!==canonical(verified.after))throw Error('הגרסה או הרשאת הביטול השתנו. יש לרענן ולבדוק שוב.')
+ let response:Response;try{response=await fetcher('/api/plan-history?budget='+encodeURIComponent(budgetId),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-budget-account-id':base.accountId},body:JSON.stringify({action:'undo',id:snapshot.id,revision:base.revision})})}catch{throw Error('לא ניתן לאשר אם הביטול נשמר. ניסיון חוזר יבדוק את המצב השמור לפני שליחה.')}
+ if([401,403,404].includes(response.status))throw new AccessError('החשבון או הגישה השתנו. יש לפתוח מחדש את היומן.')
+ if(!response.ok)throw Error(response.status>=500?'לא ניתן לאשר את תוצאת הביטול. ניסיון חוזר יבדוק קודם את המצב השמור.':'הביטול לא אושר. יש לרענן ולבדוק אם שמירה אחרת או מקור דיווח מונעים ביטול.')
+ let result:any;try{result=await response.json()}catch{throw Error('לא ניתן לקרוא את אישור הביטול. ניסיון חוזר יבדוק את המצב השמור.')}if(result.revision!==base.revision+1)throw Error('תוצאת הביטול אינה תואמת. יש לבדוק את המצב השמור לפני פעולה נוספת.')
+ const saved=await loadBudgetSnapshot(budgetId,new AbortController().signal,fetcher)
+ if(saved.value.accountId!==base.accountId||saved.value.accountEmail!==base.accountEmail)throw new AccessError('החשבון השתנה בזמן הביטול. יש להיכנס מחדש.')
+ if(saved.value.revision!==result.revision||canonical(saved.value.plan)!==canonical(verified.before))throw Error('התקציב השתנה אחרי הביטול. יש לרענן ולבדוק את המצב העדכני.')
+ return{...saved,recovered:false}
+}

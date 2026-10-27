@@ -14,5 +14,5 @@ function normalize(plan:any,rows:ScenarioRow[]){
  })
 }
 /** Stable IDs make an explicit uncertain-save retry acknowledge the same prepared scenario. */
-export function prepareScenario(plan:any,rows:ScenarioRow[]){const drafts=normalize(plan,rows),result=previewScenario(plan,drafts);result.plan.expenses=result.plan.expenses.map((item:any)=>({...clone(plan.expenses.find((old:any)=>old.id===item.id)??{}),...item}));if(!validatePlan(result.plan))throw Error('לא ניתן לאמת את התרחיש.');return result}
+export function prepareScenario(plan:any,rows:ScenarioRow[]){const drafts=normalize(plan,rows),result=previewScenario(plan,drafts);result.plan.expenses=result.plan.expenses.map((item:any)=>{if(!rows.some(row=>row.originalId===item.id))return item;const old=clone(plan.expenses.find((saved:any)=>saved.id===item.id)??{});delete old.cardId;delete old.cashAccountId;return{...old,...item}});if(!validatePlan(result.plan))throw Error('לא ניתן לאמת את התרחיש.');return result}
 export function shortestScenarioSplit(plan:any,rows:ScenarioRow[],id:string,asOf:string){const drafts=normalize(plan,rows);if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(asOf))throw Error('יש לבחור חודש בדיקה תקין.');return shortestScenarioPayments(plan,drafts,id,asOf)}

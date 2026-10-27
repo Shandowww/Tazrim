@@ -10,6 +10,7 @@ export async function handleSpaces(request,env){
  const url=new URL(request.url),path=url.pathname;
  if(!path.startsWith('/api/budgets')&&!(path==='/api/plan'&&url.searchParams.has('budget')&&url.searchParams.get('budget')!=='personal'))return null;
  const user=request.headers.get('oai-authenticated-user-id'),email=normalizeEmail(request.headers.get('oai-authenticated-user-email'));
+ const boundActor=request.headers.get('x-budget-account-id');if(boundActor!==null&&boundActor!==user)return reply({error:'החשבון השתנה. יש לפתוח מחדש את ניהול המרחבים.'},403);
  if(!user||!email)return reply({error:'יש להיכנס כדי לגשת לתקציבים.'},401);
  if(!['GET','HEAD'].includes(request.method)&&request.headers.get('origin')&&request.headers.get('origin')!==url.origin)return reply({error:'מקור הבקשה אינו תקין.'},403);
  const DB=env.DB;try{
@@ -17,7 +18,7 @@ export async function handleSpaces(request,env){
  if(path==='/api/budgets'&&request.method==='GET'){
   const result=await DB.prepare('SELECT b.id,b.name,b.revision, CASE WHEN b.owner_id=? THEN \'owner\' ELSE COALESCE((SELECT r.role FROM budget_member_roles r WHERE r.budget_id=b.id AND r.user_id=(SELECT m.user_id FROM budget_members m WHERE m.budget_id=b.id AND m.user_id=?)),\'editor\') END AS role FROM budgets b WHERE b.owner_id=? OR EXISTS (SELECT 1 FROM budget_members m WHERE m.budget_id=b.id AND m.user_id=?) ORDER BY b.name,b.id LIMIT 100').bind(user,user,user,user).all();
   const personal=await DB.prepare('SELECT revision FROM plans WHERE user_id=?').bind(user).first();
-  return reply({budgets:[{id:'personal',name:'האישי שלי',role:'owner',revision:personal?.revision??0,hasData:!!personal},...result.results].map(space=>({...space,scope:budgetSpaceScope(user,space.id)})),accountEmail:email,accountId:user});
+  return reply({budgets:[{id:'personal',name:'האישי שלי',role:'owner',revision:personal?.revision??0,hasData:!!personal},...result.results].map(space=>({...space,scope:budgetSpaceScope(user,space.id)})),accountEmail:email,accountId:user,spaceIdentityBound:true});
  }
  if(path==='/api/budgets'&&request.method==='POST'){
   if(!nameOK(body?.name))return reply({error:'יש להזין שם תקציב, עד 40 תווים.'},400);
@@ -58,16 +59,17 @@ export async function handleSpaces(request,env){
  if(row.owner_id!==user)return reply({error:'רק בעל התקציב יכול לנהל את המשתתפים ואת השם.'},403);
  if(parts.length===4&&request.method==='PATCH'){
   if(!nameOK(body?.name))return reply({error:'יש להזין שם תקציב, עד 40 תווים.'},400);
-  await DB.prepare('UPDATE budgets SET name=? WHERE id=? AND owner_id=?').bind(body.name.trim(),id,user).run();return reply({name:body.name.trim()});
+  if(body.expectedName!==undefined&&typeof body.expectedName!=='string')return reply({error:'שם הבסיס אינו תקין.'},400);const result=await DB.prepare('UPDATE budgets SET name=? WHERE id=? AND owner_id=? AND name=?').bind(body.name.trim(),id,user,body.expectedName??row.name).run();return result.meta.changes?reply({name:body.name.trim()}):reply({error:'שם המרחב השתנה. יש לרענן לפני עריכה.'},409);
  }
  if(parts[4]==='members'&&request.method==='GET'){
   const members=await DB.prepare('SELECT m.user_id AS id,m.email,COALESCE(r.role,\'editor\') AS role FROM budget_members m LEFT JOIN budget_member_roles r ON r.budget_id=m.budget_id AND r.user_id=m.user_id WHERE m.budget_id=? ORDER BY m.email').bind(id).all();
-  const invites=await DB.prepare('SELECT hash AS id,email,expires_at AS expiresAt FROM budget_invitations WHERE budget_id=? AND accepted_user IS NULL AND expires_at>? ORDER BY email').bind(id,new Date().toISOString()).all();
+  const invites=await DB.prepare('SELECT hash AS id,email,expires_at AS expiresAt,COALESCE((SELECT role FROM budget_invitation_roles WHERE hash=budget_invitations.hash),\'editor\') AS role FROM budget_invitations WHERE budget_id=? AND accepted_user IS NULL AND expires_at>? ORDER BY email').bind(id,new Date().toISOString()).all();
   return reply({members:members.results,invitations:invites.results});
  }
  if(parts[4]==='members'&&parts[5]&&request.method==='PATCH'){
   if(!['viewer','editor'].includes(body?.role))return reply({error:'יש לבחור הרשאה תקינה.'},400);
   const memberId=decodeURIComponent(parts[5]);if(!await DB.prepare('SELECT user_id FROM budget_members WHERE budget_id=? AND user_id=?').bind(id,memberId).first())return reply({error:'המשתתף אינו זמין.'},404);
+  if(body.expectedRole!==undefined){if(!['viewer','editor'].includes(body.expectedRole))return reply({error:'הרשאת הבסיס אינה תקינה.'},400);const result=await DB.prepare("INSERT INTO budget_member_roles(budget_id,user_id,role) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM budget_members WHERE budget_id=? AND user_id=?) AND COALESCE((SELECT role FROM budget_member_roles WHERE budget_id=? AND user_id=?),'editor')=? ON CONFLICT(budget_id,user_id) DO UPDATE SET role=excluded.role WHERE budget_member_roles.role=?").bind(id,memberId,body.role,id,memberId,id,memberId,body.expectedRole,body.expectedRole).run();return result.meta.changes?reply({role:body.role}):reply({error:'הרשאת המשתתף השתנתה. יש לרענן לפני עריכה.'},409);}
   await DB.prepare('INSERT INTO budget_member_roles VALUES(?,?,?) ON CONFLICT(budget_id,user_id) DO UPDATE SET role=excluded.role').bind(id,memberId,body.role).run();return reply({role:body.role});
  }
  if(parts[4]==='members'&&parts[5]&&request.method==='DELETE'){
