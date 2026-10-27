@@ -64,6 +64,7 @@ export const MAIN_NAV: NavItem[] = [
   { type: 'link', href: '/', label: 'לוח בקרה', icon: LayoutDashboard },
   SECTION_ITEMS.banks,
   SECTION_ITEMS.cards,
+  { type: 'link', href: '/savings', label: 'חיסכון ומטרות', icon: Tag },
   { type: 'link', href: '/plans', label: 'פריטים מתוכננים', icon: Tag },
   { type: 'link', href: '/monthly', label: 'דיווח חודשי', icon: Tag },
   { type: 'link', href: '/search', label: 'חיפוש בפירוט', icon: Search },
