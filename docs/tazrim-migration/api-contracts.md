@@ -31,3 +31,7 @@ The first React write route `/next/monthly` supports saved plaintext manual budg
 ## Local monthly draft file recovery
 
 No API is called while creating/reading the recovery data. Metadata includes version, actor, budget, month, baseline revision, normalized snapshot SHA-256 and the raw typed monthly draft. Only the matching clean form can load it; newer data requires manual review. A standard plan payload in the same file is never used as a replacement plan by this loader. Ordinary explicit save still rechecks access/identity/capability/revision and validates the prepared monthly plan.
+
+## Shared guarded plan writer and manual account setup
+
+`savePreparedPlan` now owns the existing identity/capability/access/snapshot/revision preflight and actor-bound PUT, with exact successor recovery after an uncertain receipt. Monthly report preparation and manual account preparation call it with a validated next plan. Manual account creation/editing uses the existing `saveCashAccount` pure command; creation is blocked if sole-account fallback assignment would change an existing dependency. It never infers an imported account's source mapping or changes aggregate money. No new server contract was added.

@@ -50,7 +50,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
     color: navRows.find(row => row.id === account.id)!.color, colorChoice: account.color, archived: false }))
   return <CardWallet key={kind + budget.budgetId} kind={kind} cards={walletCards}>
     <div className="wallet-shell__head">
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         {id && <Link href={periodHref(`/${kind}`)} className="mb-2 inline-block text-sm text-primary underline">חזרה אל {title}</Link>}
         <h1 className="text-2xl font-semibold tracking-tight">{selected?.displayName || title}</h1>
@@ -75,6 +75,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       </ul>
     </section>}
     {selected && <p className="text-sm text-muted-foreground">{kind === 'banks' && 'balance' in selected && selected.balance ? `יתרה מדווחת לתאריך ${selected.balance.date} · ` : ''}הסכומים מוצגים לתקופה שנבחרה בכותרת.</p>}
+    {kind === 'banks' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref(selected?'/accounts/'+encodeURIComponent(selected.id)+'/edit':'/accounts/new')}>{selected?'עריכת חשבון ידני':'הוספת חשבון ידני'}</Link></p>}
     {selected && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/categories?' + new URLSearchParams(kind === 'cards' ? { card: fixture ? 'card1' : selected.id } : { account: selected.id }))}>פתיחת הפירוט השמור {kind === 'cards' ? 'של הכרטיס' : 'של החשבון'}</Link></p>}
     </div>
     <section className="wallet-shell__rest surface rounded-xl p-5 text-sm text-muted-foreground">{fixture ? 'נתוני דוגמה בלבד. אין עריכה או שמירה של נתונים בדוגמה.' : <>תצוגה לקריאה בלבד. <a href={editorHref} className="text-primary underline">עריכה ופרטים נוספים בממשק הקיים</a></>}</section>

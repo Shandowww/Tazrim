@@ -54,3 +54,7 @@ The development frontend now includes pinned bank/card wallets and category/sear
 ## First write pattern — 2026-10-27
 
 Manual plaintext monthly reporting now has an explicit load/edit/save/reload path with shared navigation/refresh guards, conflicts, uncertain-response recovery and downloadable draft backup. Account/import reconciliation, vault writes and other financial editors remain pending. This does not complete all rows in the inventory. See checkpoint for the restricted eligibility and browser acceptance limits.
+
+## Manual bank account setup slice — 2026-10-27
+
+Manual account name/color/buffer/optional opening balance now has a guarded explicit write route. Existing aggregate money and payer identities remain unchanged; source/import account editing, card setup, deletion and account monthly reconciliation remain pending. New UI browser acceptance is blocked by Work settings and is not claimed.
