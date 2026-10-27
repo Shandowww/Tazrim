@@ -1,31 +1,36 @@
 import {useRef,useState} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
 import {budgetFields} from '../../../src/budget.js'
-import {initialMonthlyDraft,manualMonthEligibility,monthlyDraftFingerprint,prepareMonthlyReport,saveMonthlyReport,SaveConflict,type MonthlyDraft} from './monthly-report'
+import {initialMonthlyDraft,manualMonthEligibility,monthlyDraftFingerprint,saveMonthlyReport,SaveConflict,type MonthlyDraft} from './monthly-report'
+import {createMonthlyRecovery,readMonthlyRecovery} from './monthly-recovery'
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
 import {useDraftGuard,useFinancialDraft} from './draft-guard'
 import {legacyBudgetHref} from './navigation-query'
 function todayMonth(){const p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).formatToParts(new Date());return p.find(v=>v.type==='year')!.value+'-'+p.find(v=>v.type==='month')!.value}
-function exportDraft(base:BudgetResponse,budgetId:string,month:string,draft:MonthlyDraft,asOf:string){
- let payload:unknown
- try{payload={format:'monthly-flow-v1',plan:prepareMonthlyReport(base.plan,month,draft,asOf)}}catch{payload={format:'monthly-flow-monthly-draft-v1',accountId:base.accountId,budgetId,month,baseRevision:base.revision,draft}}
+async function exportDraft(base:BudgetResponse,budgetId:string,month:string,draft:MonthlyDraft,asOf:string){
+ const payload=await createMonthlyRecovery(base,budgetId,month,draft,asOf)
  const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-monthly-draft-'+month+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
 function MonthlyEditor({base,budget,month,asOf,onSaved}:{base:BudgetResponse;budget:BudgetState;month:string;asOf:string;onSaved:(message:string)=>void}){
- const [baseline]=useState(()=>initialMonthlyDraft(base.plan,month)),[draft,setDraft]=useState<MonthlyDraft>(baseline),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[blocked,setBlocked]=useState(false),flight=useRef(false),guard=useDraftGuard()
+ const [baseline]=useState(()=>initialMonthlyDraft(base.plan,month)),[draft,setDraft]=useState<MonthlyDraft>(baseline),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[blocked,setBlocked]=useState(false),flight=useRef(false),fileRef=useRef<HTMLInputElement>(null),[recoveryBusy,setRecoveryBusy]=useState(false),guard=useDraftGuard()
  const dirty=monthlyDraftFingerprint(draft)!==monthlyDraftFingerprint(baseline)
  const discard=()=>{setDraft(baseline);setError(null);setBlocked(false)}
  const save=async()=>{
-  if(flight.current||!dirty||blocked)return false
+  if(flight.current||recoveryBusy||!dirty||blocked)return false
   flight.current=true;setBusy(true);setError(null)
   try{const result=await saveMonthlyReport({budgetId:budget.budgetId,base,month,draft,asOf});budget.accept(result);onSaved(result.recovered?'השמירה אושרה מול התקציב השמור.':'הדיווח נשמר בתקציב.');return true}
   catch(e){const message=e instanceof Error?e.message:'הדיווח לא נשמר.';if(e instanceof AccessError){budget.invalidate(message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(message);return false}
   finally{flight.current=false;setBusy(false)}
  }
- useFinancialDraft({kind:'monthly',dirty,busy,discard,save:blocked?undefined:save})
+ const restore=async(file:File)=>{
+  if(file.size>12000000){setError('קובץ הטיוטה גדול מדי.');return}
+  setRecoveryBusy(true);setError(null)
+  try{const recovered=await readMonthlyRecovery(await file.text(),base,budget.budgetId,month);setDraft(recovered);onSaved('הטיוטה נטענה במכשיר בלבד. יש לבדוק ולשמור במפורש כדי לעדכן את התקציב.')}catch(e){setError(e instanceof Error?e.message:'לא ניתן לטעון את הטיוטה.')}finally{setRecoveryBusy(false)}
+ }
+ useFinancialDraft({kind:'monthly',dirty,busy:busy||recoveryBusy,discard,save:blocked?undefined:save})
  return <form className="space-y-5" onChange={()=>onSaved('')} onSubmit={event=>{event.preventDefault();void save()}}>
-  <fieldset disabled={busy} className="space-y-5">
+  <fieldset disabled={busy||recoveryBusy} className="space-y-5">
    <section className="surface rounded-xl p-4 sm:p-6"><h2 className="font-semibold">סכומי החודש · ₪</h2><p className="mt-1 text-sm text-muted-foreground">דיווח ידני לכל התקציב, ללא חשבונות בנק מוגדרים. שדה סכום ריק יישמר כאפס. עריכת שדות אינה שומרת אוטומטית. שינוי שכר יעדכן גם דיווחי הערכה עתידיים שמורים.</p>
     <p className="mt-2 text-sm text-muted-foreground">{budget.budgetId==='personal'?'בדיווח האישי, חיסכון משותף הוא רק ההפקדה שלך שיוצאת מהחשבון האישי, ללא הפקדת בן או בת הזוג.':'בדיווח משותף, חיסכון משותף הוא סך ההפקדות המשותפות המדווחות, כולל תרומות המשתתפים. אין להוסיף אותן שוב בדיווח אישי.'}</p>
     <div className="mt-4 grid gap-4 sm:grid-cols-2">{budgetFields(base.plan).map(([key,label])=><label key={key} className="min-w-0 text-sm">{label}<input name={'monthly-'+key} inputMode="decimal" dir="ltr" type="text" value={draft.values[key]} autoComplete="off" maxLength={32} className="mt-1 h-11 w-full rounded-xl border bg-card px-3 tabular-nums" onChange={event=>{setDraft({...draft,values:{...draft.values,[key]:event.target.value}});setError(null)}} /></label>)}</div>
@@ -38,7 +43,8 @@ function MonthlyEditor({base,budget,month,asOf,onSaved}:{base:BudgetResponse;bud
    </section>
   </fieldset>
   {error&&<p className="rounded-xl border border-destructive p-4 text-sm text-destructive" role="alert">{error}</p>}
-  <div className="surface flex flex-wrap items-center gap-3 rounded-xl p-4"><p className="min-w-0 flex-1 text-sm" role="status">{busy?'שומרים את הדיווח…':dirty?'יש שינויים שעדיין לא נשמרו':'אין שינויים לשמירה'}</p><button className="h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50" type="submit" disabled={!dirty||busy||blocked}>שמירת הדיווח</button><button className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50" type="button" disabled={!dirty||busy} onClick={()=>exportDraft(base,budget.budgetId,month,draft,asOf)}>הורדת גיבוי לטיוטה</button>{blocked&&<button className="h-11 rounded-xl border px-4 text-sm" type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)}>טעינת הגרסה השמורה</button>}</div>
+  <section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">שחזור טיוטת דיווח</h2><p className="text-sm text-muted-foreground">אפשר לטעון קובץ טיוטה שהורדת מהתצוגה הזו לאותו חשבון, מרחב, חודש וגרסה שמורה. הטעינה מקומית בלבד ואינה שומרת נתונים. טיוטה מגרסה קודמת נשארת בקובץ לבדיקה ידנית.</p><input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" aria-label="קובץ טיוטת דיווח" disabled={busy||recoveryBusy} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(file)void restore(file)}} /><button type="button" className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50" disabled={busy||recoveryBusy||dirty} onClick={()=>fileRef.current?.click()}>{recoveryBusy?'מכינים או טוענים טיוטה…':'טעינת טיוטה מקובץ'}</button>{dirty&&<p className="text-sm text-muted-foreground">יש לשמור או לצאת ללא שמירה לפני טעינת טיוטה אחרת.</p>}</section>
+  <div className="surface flex flex-wrap items-center gap-3 rounded-xl p-4"><p className="min-w-0 flex-1 text-sm" role="status">{recoveryBusy?'מכינים או טוענים טיוטה…':busy?'שומרים את הדיווח…':dirty?'יש שינויים שעדיין לא נשמרו':'אין שינויים לשמירה'}</p><button className="h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50" type="submit" disabled={!dirty||busy||recoveryBusy||blocked}>שמירת הדיווח</button><button className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50" type="button" disabled={!dirty||busy||recoveryBusy} onClick={()=>{setRecoveryBusy(true);void exportDraft(base,budget.budgetId,month,draft,asOf).catch(e=>setError(e.message||'לא ניתן להכין גיבוי.')).finally(()=>setRecoveryBusy(false))}}>הורדת גיבוי לטיוטה</button>{blocked&&<button className="h-11 rounded-xl border px-4 text-sm" type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)}>טעינת הגרסה השמורה</button>}</div>
  </form>
 }
 export function MonthlyPage({fixture,budget}:{fixture:boolean;budget:BudgetState}){
