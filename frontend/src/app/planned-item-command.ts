@@ -37,3 +37,5 @@ export function preparePlannedItem(plan:any,id:string,draft:PlannedItemDraft,cre
  return next
 }
 export function plannedItemSchedule(item:any){return Array.from({length:item.payments},(_,i)=>({month:monthAt(item.firstMonth,i),amount:paymentFor(item,monthAt(item.firstMonth,i))}))}
+
+export function preparePlannedItemRemoval(plan:any,id:string){const reason=plannedItemEligibility(plan,id);if(reason)throw Error(reason);const next=clone(plan);next.expenses=next.expenses.filter((item:any)=>item.id!==id);if(!validatePlan(next))throw Error('לא ניתן להסיר את הפריט מהתכנון.');return next}

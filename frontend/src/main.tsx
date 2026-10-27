@@ -170,6 +170,7 @@ function App() {
               <Route path="/plans" element={<PlannedItemsPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
               <Route path="/plans/new" element={<PlannedItemsPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
               <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
+              <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />

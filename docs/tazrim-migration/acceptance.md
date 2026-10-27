@@ -1,12 +1,12 @@
 # Development acceptance — 2026-10-27
 
-**Incomplete preview; not released.** Tested application checkpoint: `264953ff97095a44b36fbde9c3e72a153707d35f`. Canonical backend baseline: `eb507d9`, with isolated loan-removal fix `04eb8c0`. Tests use synthetic identities and in-memory databases only. No live records, production service or Sites changed.
+**Incomplete preview; not released.** Tested application checkpoint: `264953ff97095a44b36fbde9c3e72a153707d35f` plus the subsequent planned-item-removal stage recorded in the checkpoint. Canonical backend baseline: `eb507d9`, with isolated loan-removal fix `04eb8c0`. Tests use synthetic identities and in-memory databases only. No live records, production service or Sites changed.
 
 ## Verification
 
 - `node build.mjs`: passed frontend TypeScript/Vite plus backend/model packaging.
 - `node verify.mjs`: 15 checks passed.
-- `node --test test/*.test.mjs`: 776 passed, zero failed/skipped.
+- `node --test test/*.test.mjs`: 780 passed, zero failed/skipped.
 - GitHub frontend checkpoint and fork export preserve separate source histories. Exact fork provenance lives in `fork-sync.json`; reconciliation inventory lives in `backend-reconciliation.json`.
 
 ## Scoped browser evidence
@@ -26,6 +26,8 @@ One unlocated MutationObserver error appeared in goal/recurring iframe QA during
 
 ## Explicitly incomplete
 
-Report upload/parser/review/classification/duplicate/apply/undo/resume; source-backed monthly/account/import editing; account/card lifecycle/payer changes; calculator/scenarios and planned-item deletion; savings assets/balance/deposits/rates/allocations/removal; space membership/invitations/transfers/migration UI; vault/security/recovery and snapshot preview/undo; remaining settings/help and inventory parity. Existing-interface links remain temporary bridges.
+Report upload/parser/review/classification/duplicate/apply/undo/resume; source-backed monthly/account/import editing; account/card lifecycle/payer changes; calculator/scenarios; savings assets/balance/deposits/rates/allocations/removal; space membership/invitations/transfers/migration UI; vault/security/recovery and snapshot preview/undo; remaining settings/help and inventory parity. Existing-interface links remain temporary bridges.
 
 Full 320/390/430/768/1440 comparison, long-label/empty/loading/error matrix, light/dark/System/reduced-motion/keyboard, actual iPhone and complete cross-workflow navigation/download acceptance remain open. Reconcile the actual running release and unrelated canonical work before constructing a candidate. Release requires verified fresh SQLite backup, isolated financial/access/HTTP preflight, rollback source/image, exact Git backup, runtime hash/health/deep-route/unauthenticated verification and unchanged parking service. No release readiness claim is made.
+
+Planned-item removal follow-up: desktop ordinary-page confirmation, dirty-navigation/stay, lost receipt/retry/list return and shared viewer restriction passed; one write only, other private/shared revisions unchanged, no captured errors. Screenshot: `work/react-item-removal-recovered.jpg`. Four additional tests bring the suite to 780. Removal preserves saved reports/details and explains its effect on past forecasts; loan/item uncertain-save status wording is now accurate.

@@ -70,3 +70,5 @@ The committed canonical backend is reconciled through `eb507d9`; both test famil
 ## Current bounded workflow coverage — 2026-10-27
 
 Loan lifecycle, savings-goal metadata, recurring evidence decisions and scoped journal/plaintext saved-budget export are now implemented in the React preview. Their financial ledgers remain governed by the existing models and shared actor/revision save boundary. This supersedes the corresponding older pending notes only for these slices. Savings assets/deposits/allocations, source-aware reports, scenarios/removal, space/security management and full release acceptance remain incomplete. See `acceptance.md` and the detailed checkpoint for exact tests, browser evidence and remaining limitations.
+
+Planned-item removal is now implemented with explicit confirmation, pre-removal backup, preserved reports/details and guarded acknowledgment/retry. This supersedes its older pending status; calculator/scenarios and the other release limits remain open.
