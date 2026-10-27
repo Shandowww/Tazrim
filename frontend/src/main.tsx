@@ -21,6 +21,7 @@ import './tazrim/globals.css'
 import './app.css'
 import Link from './app/link'
 
+const ReportLibraryPage = lazy(async () => ({ default: (await import('./app/report-library-page')).ReportLibraryPage }))
 const SpacesPage = lazy(async () => ({ default: (await import('./app/spaces-page')).SpacesPage }))
 const SavingsBalancePage = lazy(async () => ({ default: (await import('./app/savings-balance-page')).SavingsBalancePage }))
 const ScenarioPage = lazy(async () => ({ default: (await import('./app/scenario-page')).ScenarioPage }))
@@ -166,6 +167,7 @@ function App() {
               <Route path="/savings/returns" element={<SavingsBalancePage key={budgetId + pathname + search} mode="returns" fixture={fixture} budget={budget} />} />
               <Route path="/savings/accounts" element={<SavingsBalancePage key={budgetId + pathname + search} mode="accounts" fixture={fixture} budget={budget} />} />
               <Route path="/savings/allocation" element={<SavingsBalancePage key={budgetId + pathname + search} mode="allocation" fixture={fixture} budget={budget} />} />
+              <Route path="/savings/:id/deposit" element={<SavingsBalancePage key={budgetId + pathname + search} mode="deposit" fixture={fixture} budget={budget} />} />
               <Route path="/savings/:id/remove" element={<SavingsBalancePage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/savings" element={<SavingsGoalsPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
               <Route path="/savings/new" element={<SavingsGoalsPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
@@ -180,7 +182,7 @@ function App() {
               <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
-              <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />
+              <Route path="/upload" element={<ReportLibraryPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />
               <Route path="/search" element={<ExpenseDetailsPage key={budgetId + search} mode="search" fixture={fixture} budget={budget} />} />
               <Route path="/details/:id" element={<ExpenseDetailsPage key={budgetId + search} mode="source" fixture={fixture} budget={budget} />} />
