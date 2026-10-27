@@ -1,6 +1,8 @@
 import {useRef,useState} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
-import {budgetFields} from '../../../src/budget.js'
+import Link from './link'
+import {withViewQuery} from './navigation-query'
+import {budgetFields,cashAccountList} from '../../../src/budget.js'
 import {initialMonthlyDraft,manualMonthEligibility,monthlyDraftFingerprint,saveMonthlyReport,SaveConflict,type MonthlyDraft} from './monthly-report'
 import {createMonthlyRecovery,readMonthlyRecovery} from './monthly-recovery'
 import {AccessError,type BudgetResponse} from './budget-api'
@@ -57,6 +59,6 @@ export function MonthlyPage({fixture,budget}:{fixture:boolean;budget:BudgetState
  const role=budget.spaces.find(space=>space.id===budget.budgetId)?.role,reason=role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת עדיין אינה זמינה בשרת הזה.':manualMonthEligibility(budget.value.plan,month)
  return <div className="mx-auto max-w-5xl space-y-5"><h1 className="text-2xl font-semibold">דיווח חודשי</h1><p className="text-sm text-muted-foreground"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><label className="flex flex-wrap items-center gap-3 text-sm">חודש הדיווח<input type="month" aria-label="חודש הדיווח" value={month} min={(budget.value.plan?.startMonth as string)||undefined} className="h-11 rounded-xl border bg-card px-3" onChange={event=>{const [y,m]=event.target.value.split('-');if(!y||!m)return;const next=new URLSearchParams(search);next.set('year',y);next.set('month',String(Number(m)));navigate('/monthly?'+next)}} /></label>
   {notice&&<p role="status" className="surface rounded-xl p-4 text-sm">{notice}</p>}
-  {reason?<section className="surface rounded-xl p-6"><p>{reason}</p><a href={editorHref} className="mt-3 inline-block text-primary underline">פתיחה בממשק הקיים</a></section>:<MonthlyEditor key={budget.budgetId+'/'+month+'/'+budget.value.revision} base={budget.value} budget={budget} month={month} asOf={asOf} onSaved={setNotice} />}
+  {reason?<section className="surface rounded-xl p-6"><p>{reason}</p>{budget.value.plan&&!budget.value.plan.format&&cashAccountList(budget.value.plan).map(account=><p key={account.id} className="mt-3"><Link className="text-primary underline" href={withViewQuery('/accounts/'+encodeURIComponent(account.id)+'/monthly',search)}>דיווח חודשי · {account.label}</Link></p>)}<a href={editorHref} className="mt-3 inline-block text-primary underline">פתיחה בממשק הקיים</a></section>:<MonthlyEditor key={budget.budgetId+'/'+month+'/'+budget.value.revision} base={budget.value} budget={budget} month={month} asOf={asOf} onSaved={setNotice} />}
  </div>
 }

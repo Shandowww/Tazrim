@@ -1,3 +1,4 @@
+import {createSpaceMigrations} from './space-migrations.mjs';
 import {createPlanHistory} from './plan-history.mjs';
 import {createGmailImport} from './gmail-import.mjs';
 import {createReportStore} from './report-store.mjs';
@@ -35,6 +36,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const reportStore=createReportStore(db,{...reportOptions,DB,origin:base.origin,isAllowed,now,savePlan:(user,budget,plan,revision,storage)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(storage,user,budget,'report-import')})});
  const history=createPlanHistory(db,{isAllowed,secret:reportStore.secret,now,savePlan:(user,budget,plan,revision,kind)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(DB,user,budget,kind)})});
  const gmail=createGmailImport(db,{origin:base.origin,clientId,clientSecret,isAllowed,reportStore,now,...(gmailOAuthFactory?{oauthFactory:gmailOAuthFactory}:{})});
+ const migrations=createSpaceMigrations(db,{isAllowed,secret:reportStore.secret,now});
  const migrationReview=createSpaceMigrationReview(db,{isAllowed});
  const transferMatches=createTransferMatches(db,{isAllowed,secret:reportStore.secret,now});
  const actions=createActions(db,{isAllowed,now,reports:reportStore.list});
@@ -96,6 +98,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  if(path==='/api/card-push'||path==='/api/card-push/schedule'||path==='/api/card-push/test'){if(!push)return json({error:'התראות אינן זמינות כרגע.'},503);return push.handle(request,user);}
  if(path==='/api/plan-history')return history.handle(request,user);
  if(path==='/api/reports')return reportStore.handle(request,user);
+ if(path==='/api/space-migrations')return migrations(request,user);
  if(path==='/api/space-migration-review')return migrationReview(request,user);
  if(path==='/api/transfer-matches')return transferMatches(request,user);
  if(path==='/api/actions')return actions(request,user);

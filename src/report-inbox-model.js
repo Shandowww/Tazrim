@@ -14,6 +14,7 @@ export function inboxTarget(p,item){
 export async function inboxCardProof(p,target,dueDate){const r=p.cardBilling?.reports.find(r=>r.cardId===target&&r.dueDate===dueDate);if(!r)return '';const ids=(p.details??[]).filter(e=>e.method===target&&e.statement?.dueDate===dueDate).map(e=>e.id).sort();return inboxHash(JSON.stringify([r.amount,ids]));}
 export async function inboxReceiptPresent(p,receipt){if(receipt.kind==='bank')return (p.bankImport?.batches??[]).some(b=>b.id===receipt.reference&&b.accountId===receipt.target);return !!receipt.proof&&receipt.proof===await inboxCardProof(p,receipt.target,receipt.reference);}
 export async function applyReportInbox(p,bankEntries,cardEntries,receipts,bindings,asOf){
+ if(receipts.some(r=>p.importMigrationGuards?.receipts.includes(r.hash)))throw Error('הדוח סומן במעבר חשבון ואינו ניתן לקליטה חוזרת במרחב זה.');
  let next=clone(p);
  for(const entry of bankEntries)next=applyBankImport(next,entry.records,entry.options);
  if(cardEntries.length)next=applyBillingBatch(next,cardEntries,asOf);

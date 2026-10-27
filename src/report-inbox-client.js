@@ -3,6 +3,7 @@ function reportInboxHasDraft(){return !!reportInbox&&!reportInbox.saving;}
 async function inboxReadFile(file){
  if(file.size>5*1024*1024||!/\.(csv|xlsx|xls|pdf)$/i.test(file.name))throw Error('בחרו CSV, XLS, XLSX או PDF נתמך עד 5MB לקובץ.');
  const bytes=new Uint8Array(await file.arrayBuffer()),hash=await inboxHash(bytes),receipt=plan.reportInbox?.receipts.find(r=>r.hash===hash);
+ if(plan.importMigrationGuards?.receipts.includes(hash))return {hash,skip:true,kind:'bank',reason:'מקור שסומן במעבר חשבון; לא נקלט שוב במרחב זה'};
  if(receipt&&await inboxReceiptPresent(plan,receipt))return {hash,skip:true,kind:receipt.kind,target:receipt.target,reason:'הדוח הזה כבר נקלט'};
  const reader=await import('/bank-import/intake-reader.mjs');let parsed;
  if(/\.csv$/i.test(file.name)){const parser=await import('/bank-import/parser.mjs');parsed=reader.inspectIntake([parser.inspectCSV(parser.decodeCSV(bytes).text)]);}
@@ -54,6 +55,7 @@ async function inboxBuild(ui){
    }
    const options={id:item.id,accountId:item.target,label:account.label,bankName:(account.bankName??item.provider)||undefined,personal:stored?.personal===true,rules,from:item.from,to:item.to,fileName:item.name,choices,modes:{},reportScope:item.bankOptions.scope,directIncluded:item.directIncluded,asOf:todayMonth(),coverageConfirmed:true,monthsConfirmed:true};
    let preview=bankPreview(working,records,options);
+   if(preview.rows.some(r=>r.state==='migrated'))item.warning='בדוח יש מקור שסומן במעבר חשבון. קליטתו מחדש חסומה גם אם נבחר חשבון אחר; יש לבדוק את המקור לפני קליטה.';
    for(const row of preview.rows.filter(r=>r.state==='conflict')){
     const decision=item.decisions[row.line],previous=working.bankImport?.entries.find(e=>e.key===row.key);
     if(decision==='same'&&previous?.fingerprint===row.fingerprint)records=records.map(r=>r.line===row.line?{...r,missingReference:false}:r);

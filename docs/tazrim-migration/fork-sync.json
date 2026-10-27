@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "603da5450b7bc968618f3381a1b3c44acd389014",
+  "sourceCommit": "10d5f9a48614a3a672a9291c91c55d893f8dfcbf",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; active monthly recovery input guard fixed and scoped recovery browser cases accepted; remaining workflow/backend/full visual parity pending; not deployed",
+  "status": "Incomplete development preview; committed canonical backend reconciled and guarded manual account monthly reporting added. Remaining imported-source/workflow/full visual/release acceptance pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 672,
-    "browser": "Passed dirty recovery controls, unfinished-input download/restore and invalid-save refusal, wrong-month/account/space and stale-version refusal. Earlier setup/navigation/identity/viewer checks passed. Full visual/device/reduced-motion and remaining workflow acceptance pending."
+    "regressionTests": 747,
+    "browser": "Manual account monthly fields/save/reload/other-account invariance/guarded navigation/lost-receipt retry/viewer checks passed on synthetic data. Full visual/device acceptance pending."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

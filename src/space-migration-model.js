@@ -1,3 +1,4 @@
+import {reviewSavingsOwnership} from './space-savings-model.js';
 import {cashAccountList,cashSourceRecords,cashCardAccount,creditCards,monthlyValues,cents,budgetFields,validatePlan} from './budget.js';
 import {budgetSpaceScope,spaceEntityKey} from './space-model.js';
 
@@ -68,12 +69,61 @@ export function reviewAccountMigration(source,target,{user,sourceId,targetId,acc
  add('period-mismatch','למרחבים יש תחילת תקציב או אופק שונים; יש לסקור חודשים לפני שינוי.',source.startMonth!==target.startMonth||source.horizon!==target.horizon?1:0);
  add('aggregate-remainder','הפרדת רכיב החשבון משאירה ערכים שליליים בסיכום המקור; אין להחיל לפני בירור.',months.filter(m=>m.fields.some(f=>f.sourceRemainderCents<0)).length);
  add('account-capacity','היעד כבר כולל עשרה חשבונות בנק.',cashAccountList(target).length>=10?1:0);
- add('atomic-move-pending','שלב זה הוא סקירה בלבד. שמירה אטומית של שני המרחבים וביטול מוגן עדיין אינם זמינים.');
- const known=new Set(['startMonth','opening','buffer','horizon','defaults','months','expenses','demo','setupCompleted','cashPlanning','creditCards','bankImport','details','loans','savingTransfers','savingsGoals','reportInbox','cardBilling','sourceAllocations','bankDetailLinks','savingSchedules','goals','displayName','accountColors']);
+ add('atomic-move-pending','סקירת התלות אינה תוכנית ביצוע. נדרשות בדיקת זכאות נפרדת ותוכנית מדויקת לפני אישור מעבר.');
+ const known=new Set(['startMonth','opening','buffer','horizon','defaults','months','expenses','demo','setupCompleted','cashPlanning','creditCards','bankImport','details','loans','savingTransfers','savingsGoals','reportInbox','cardBilling','sourceAllocations','bankDetailLinks','savingSchedules','goals','displayName','accountColors','importMigrationGuards','retainedImportHistory','retainedSavingsHistory','savingsBaselineHistory','savingsMigrationGuards','cardMigrationGuards']);
  const otherFields=Object.keys(source).filter(k=>!known.has(k));
  add('other-budget-data','קיימים סוגי נתונים נוספים בתקציב; יש לסקור את קשריהם לפני מעבר.',otherFields.length);
  return {sourceScope:scope,targetScope:destination,sourceRevision,targetRevision,account:{id:account.id,name:account.label,openingCents:account.opening===undefined?null:cents(account.opening),openingMonth:account.openingMonth??source.startMonth},groups,months,collisions,issues,
+  imports:reviewImportProvenance(source,target,{scope,destination,accountId}),
+  savings:reviewSavingsOwnership(source,target,{user,sourceId,targetId,accountId,sourceRevision,targetRevision}),
   applyAvailable:false,financialChange:false,
   privacy:{labels:cards.map(c=>c.name).slice(0,10),descriptions:entries.filter(e=>e.source).slice(0,5).map(e=>[e.source.description,e.source.beneficiary].filter(Boolean).join(' · ').slice(0,240)),originalDocuments:'stay-private',history:'stay-private',connections:'stay-at-source',drafts:'stay-on-device'},
   retention:{importBatches:batches.length,allSavingsGoals:source.savingsGoals?.items.length??0,otherBudgetSections:otherFields.length}};
+}
+
+// A complete identity/privacy inventory, never a replacement budget or permission
+// to skip a duplicate. In particular, batch snapshots must not enter this result.
+function reviewImportProvenance(source,target,{scope,destination,accountId}){
+ const bank=source.bankImport,other=target.bankImport,selected=(bank?.entries??[]).filter(e=>e.accountId===accountId);
+ const batches=(bank?.batches??[]).filter(b=>b.accountId===accountId),batchMap=new Map((bank?.batches??[]).map(b=>[b.id,b]));
+ const targetKeys=new Map((other?.entries??[]).map(e=>[e.key,e])),fingerprints=new Map(),sourceFingerprintCounts=new Map();
+ for(const e of selected)sourceFingerprintCounts.set(e.fingerprint,(sourceFingerprintCounts.get(e.fingerprint)??0)+1);
+ for(const e of other?.entries??[]){if(!fingerprints.has(e.fingerprint))fingerprints.set(e.fingerprint,[]);fingerprints.get(e.fingerprint).push(e);}
+ const sourceFields=['line','parserVersion','date','valueDate','description','details','beneficiary','purpose','reference','currency','balanceCents'];
+ const sourceView=e=>e.source?Object.fromEntries(sourceFields.map(k=>[k,e.source[k]??null])):null;
+ const identity=e=>JSON.stringify([e.accountId,e.fingerprint,e.month,e.field,e.cents,e.bankCategoryId??null,sourceView(e)]);
+ const movements=selected.map(e=>{
+  const exact=targetKeys.get(e.key),overlap=fingerprints.get(e.fingerprint)??[],batch=batchMap.get(e.batchId),source=sourceView(e);
+  const provenanceValid=!!source&&source.date.slice(0,7)===e.month&&batch?.accountId===accountId&&source.date>=batch.from&&source.date<=batch.to&&batch.months.some(h=>h.month===e.month);
+  const state=exact?(identity(e)===identity(exact)?'same-source':'identity-conflict'):overlap.length?'possible-overlap':'not-found';
+  return {key:e.key,fingerprint:e.fingerprint,sourceRef:spaceEntityKey(scope,'bank-movement',e.key),proposedTargetRef:spaceEntityKey(destination,'bank-movement',e.key),
+   month:e.month,field:e.field,amountCents:e.cents,batchId:e.batchId,source,state,provenanceValid,referenceMissing:!source?.reference?.trim(),categoryMappingRequired:e.bankCategoryId!==undefined,
+   sourceFingerprintCount:sourceFingerprintCounts.get(e.fingerprint),targetMatchCount:exact?1:overlap.length,targetExamples:(exact?[exact]:overlap).slice(0,5).map(t=>spaceEntityKey(destination,'bank-movement',t.key))};
+ });
+ const sourceReceipts=(source.reportInbox?.receipts??[]).filter(r=>r.kind==='bank'&&r.target===accountId),targetReceipts=target.reportInbox?.receipts??[],byHash=new Map(targetReceipts.map(r=>[r.hash,r]));
+ const receipts=sourceReceipts.map(r=>{
+  const prior=byHash.get(r.hash),batch=batchMap.get(r.reference),present=batch?.accountId===accountId;
+  return {hash:r.hash,batchId:r.reference,sourceRef:spaceEntityKey(scope,'receipt',r.hash),proposedTargetRef:spaceEntityKey(destination,'receipt',r.hash),sourcePresent:present,
+   state:prior?(prior.kind===r.kind&&prior.target===r.target&&prior.reference===r.reference?'same-receipt':'receipt-conflict'):targetReceipts.some(t=>t.kind==='bank'&&t.target===accountId&&t.reference===r.reference)?'possible-overlap':'not-found'};
+ });
+ const blockers=[],add=(code,message,count)=>{if(count)blockers.push({code,message,count});};
+ const entryFields=new Set(['key','fingerprint','month','field','cents','batchId','accountId','source','bankCategoryId']);
+ add('unreviewed-metadata','קיימים שדות מקור או קבלה נוספים שאינם כלולים בסקירה זו; אין להעתיק אותם ללא בירור.',selected.filter(e=>Object.keys(e).some(k=>!entryFields.has(k))||Object.keys(e.source??{}).some(k=>!sourceFields.includes(k))).length+sourceReceipts.filter(r=>Object.keys(r).some(k=>!['hash','kind','target','reference','proof'].includes(k))).length);
+ add('movement-identity','מזהה תנועה קיים ביעד. אין לדלג, למזג או להחליף תנועה בלי פתרון מפורש.',movements.filter(e=>['same-source','identity-conflict'].includes(e.state)).length);
+ add('movement-overlap','נמצאו טביעות מקור דומות עם מזהים אחרים. דמיון אינו הוכחת כפילות או שיוך לחשבון.',movements.filter(e=>e.state==='possible-overlap').length);
+ add('source-overlap','יש תנועות נפרדות במקור עם אותה טביעת פרטים. אין לאחד אותן לפי תיאור או סכום.',movements.filter(e=>e.sourceFingerprintCount>1).length);
+ add('source-unverified','חסרים פרטי מקור או שהקשר בין תנועה, חודש ודוח אינו תואם.',movements.filter(e=>!e.provenanceValid).length);
+ add('weak-reference','תנועות ללא אסמכתה דורשות בירור נוסף, לרבות חפיפה בין פורמטי דוחות.',movements.filter(e=>e.referenceMissing).length);
+ add('category-mapping','קטגוריות בנק הן מזהים מקומיים למרחב ודורשות מיפוי מפורש.',movements.filter(e=>e.categoryMappingRequired).length);
+ add('receipt-identity','קבלה או אסמכתת דוח כבר קיימת ביעד. יש לשמר את מניעת הקליטה הכפולה בלי לדרוס קבלה.',receipts.filter(r=>r.state!=='not-found').length);
+ add('receipt-unverified','קבלת קליטה אינה מצביעה על דוח קיים של החשבון הנבחר.',receipts.filter(r=>!r.sourcePresent).length);
+ const batchReviews=batches.map(b=>({id:b.id,from:b.from,to:b.to,sourceRef:spaceEntityKey(scope,'import-batch',b.id),
+  movementCount:selected.filter(e=>e.batchId===b.id).length,receiptCount:sourceReceipts.filter(r=>r.reference===b.id).length,
+  targetIdPresent:(other?.batches??[]).some(t=>t.id===b.id),originalSnapshot:'stay-at-source'}));
+ add('batch-identity','מזהה דוח קיים גם ביעד; נדרשת מפת זהות שאינה משכפלת את המקור.',batchReviews.filter(b=>b.targetIdPresent).length);
+ add('unreceipted-batch','לדוח אין קבלת קליטה שמורה. אין לטעון שקיימת הגנה מלאה מייבוא חוזר של הקובץ.',batchReviews.filter(b=>!b.receiptCount).length);
+ const count=movements.length+receipts.length+batches.length;
+ add('import-atomic-pending','מעבר מיובא עדיין חסום: נדרשים רישומי זהות מצומצמים והגנה מייבוא חוזר בשני המרחבים, יחד עם שמירה אטומית. אין להעתיק את צילומי התקציב שבדוחות.',count?1:0);
+ return {version:1,applyAvailable:false,movements,receipts,batches:batchReviews,blockers,
+  retention:{originalSnapshots:'stay-at-source',originalDocuments:'stay-private',classificationRules:'stay-at-source',bindings:'stay-at-source',sourceReimportProtection:'required-before-apply',destinationReimportProtection:'required-before-apply'}};
 }

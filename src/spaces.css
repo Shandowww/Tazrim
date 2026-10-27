@@ -17,3 +17,17 @@
 .space-transfer-unlock-form .check{min-height:44px;align-items:center}
 
 .space-migration-dialog fieldset{border:0;padding:0;min-width:0}.space-migration-dialog .field{margin:16px 0}.space-migration-dialog select{min-height:44px;width:100%;max-width:100%;min-width:0}.space-migration-dialog li,.space-migration-dialog p{overflow-wrap:anywhere}.space-migration-dialog th,.space-migration-dialog td{min-width:105px}.space-migration-dialog th:first-child{min-width:150px}
+
+.space-migration-dialog .check{min-height:44px;align-items:center}
+
+.space-migration-dialog .migration-term-date{white-space:nowrap}
+
+.space-migration-dialog [aria-labelledby="migration-import-title"]{overflow-wrap:anywhere;min-width:0}.space-migration-dialog [aria-labelledby="migration-import-title"] dd{margin-inline-start:16px}
+
+.space-migration-dialog [aria-labelledby="migration-import-baseline-title"]{overflow-wrap:anywhere;min-width:0}
+
+.migration-savings-ownership{overflow-wrap:anywhere;min-width:0}.savings-ownership-row{margin-block:14px;padding:14px;min-width:0;border:1px solid var(--line);border-radius:16px}.savings-ownership-row legend{max-width:100%;overflow-wrap:anywhere}.savings-ownership-row input{width:100%;min-width:0;min-height:44px;font-variant-numeric:tabular-nums}.migration-savings-ownership small{display:block}.migration-savings-ownership .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:420px){.migration-savings-ownership .form-grid{grid-template-columns:1fr}}
+
+.savings-ownership-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.savings-ownership-totals h5{margin:0 0 10px}.savings-ownership-totals dl{margin:0}.savings-ownership-totals dl>div{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}.savings-ownership-totals dd{margin:0}@media(max-width:700px){.savings-ownership-totals{grid-template-columns:1fr}}
+
+.migration-card-review{overflow-wrap:anywhere;min-width:0}

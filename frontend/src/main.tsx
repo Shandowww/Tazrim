@@ -21,6 +21,7 @@ import './tazrim/globals.css'
 import './app.css'
 
 const CardPage = lazy(async () => ({ default: (await import('./app/card-page')).CardPage }))
+const CashMonthlyPage = lazy(async () => ({ default: (await import('./app/cash-monthly-page')).CashMonthlyPage }))
 const AccountPage = lazy(async () => ({ default: (await import('./app/account-page')).AccountPage }))
 const MonthlyPage = lazy(async () => ({ default: (await import('./app/monthly-page')).MonthlyPage }))
 const ExpenseDetailsPage = lazy(async () => ({ default: (await import('./app/expense-details-page')).ExpenseDetailsPage }))
@@ -151,6 +152,7 @@ function App() {
               <Route path="/card-setup/:id" element={<CardPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/accounts/new" element={<AccountPage key={budgetId + pathname + search} create fixture={fixture} budget={budget} />} />
               <Route path="/accounts/:id/edit" element={<AccountPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/:id/monthly" element={<CashMonthlyPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<PendingPage title="חיובים קבועים" />} />
               <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />

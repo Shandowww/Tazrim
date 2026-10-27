@@ -36,13 +36,15 @@ export async function bankIdentity(record,accountId,digest=async text=>Array.fro
 }
 export function bankPreview(p,records,options){
  const {accountId,from,to,choices={},modes={}}=options,stored=p.bankImport?.entries??[],known=new Map(stored.map(e=>[e.key,e])),seen=new Map(),rows=[];
+ const migrationKeys=new Set((p.importMigrationGuards?.movements??[]).map(e=>e.key)),migrationFingerprints=new Set((p.importMigrationGuards?.movements??[]).map(e=>e.fingerprint));
  const allowed=new Set([...fields.map(f=>f[0]),...creditCards(p).map(c=>c.id),'exclude']);
  for(const r of records){
   const previous=known.get(r.key)??seen.get(r.key),withinFile=seen.has(r.key);let state=!r.valid||r.currency!=='ILS'||!r.date||r.date<from||r.date>to?'invalid':previous?(previous.fingerprint===r.fingerprint?(withinFile?'duplicate-file':'duplicate'):'conflict'):'new';
   if(r.missingReference&&previous&&state!=='invalid')state='conflict';
   const crossFormatOverlap=r.missingReference&&(p.bankImport?.batches??[]).some(b=>b.accountId===accountId&&r.date>=b.from&&r.date<=b.to&&(/\.pdf$/i.test(b.file)!==/\.pdf$/i.test(options.fileName??''))&&(/\.pdf$/i.test(b.file)||/\.pdf$/i.test(options.fileName??'')));if(crossFormatOverlap)state='conflict';
   const c=choices[r.line]??{},field=state==='duplicate'?previous.field:c.field;
-  const reviewed=['duplicate','duplicate-file'].includes(state)||c.reviewed===true&&allowed.has(field)&&(field==='exclude'||(['salary','otherIncome','incomingTransfers'].includes(field)?r.amountCents>0:r.amountCents<0||field!=='outgoingTransfers'&&(r.reversal===true||c.refund===true)&&r.amountCents>0));
+  if(state!=='invalid'&&(migrationKeys.has(r.key)||migrationFingerprints.has(r.fingerprint)))state='migrated';
+  const reviewed=['duplicate','duplicate-file'].includes(state)||state==='new'&&c.reviewed===true&&allowed.has(field)&&(field==='exclude'||(['salary','otherIncome','incomingTransfers'].includes(field)?r.amountCents>0:r.amountCents<0||field!=='outgoingTransfers'&&(r.reversal===true||c.refund===true)&&r.amountCents>0));
   const row={...r,state,field,reviewed,accountId};rows.push(row);if(!seen.has(r.key)&&!['invalid','conflict'].includes(state))seen.set(r.key,{fingerprint:r.fingerprint,field});
  }
  const conflicts=new Set(rows.filter(r=>r.state==='conflict').map(r=>r.key));for(const r of rows)if(conflicts.has(r.key)&&r.state==='new'){r.state='conflict';r.reviewed=false;}
@@ -120,7 +122,7 @@ export function applyBankImport(p,records,options){
  return next;
 }
 export function undoBankImport(p,id){
- const last=p.bankImport?.batches.at(-1);if(!last||last.id!==id)throw Error('אפשר לבטל את הייבוא האחרון בלבד, כדי לשמור על סדר הדוחות.');
+ const last=p.bankImport?.batches.at(-1);if(last?.migrationBaseline)throw Error('רישום זה הוא קו בסיס של מעבר חשבון. אין לבטל ייבוא ישן בנפרד; השתמשו בביטול המעבר המוגן אם הוא עדיין זמין.');if(!last||last.id!==id)throw Error('אפשר לבטל את הייבוא האחרון בלבד, כדי לשמור על סדר הדוחות.');
  if(!same(p.bankImport.accounts.find(a=>a.id===last.accountId)??null,last.accountAfter))throw Error('כללי החשבון השתנו מאז הייבוא. אין לבטל אותם אוטומטית.');
  if(last.months.some(h=>!same(p.months[h.month]??null,h.after)||Object.hasOwn(h,'afterCash')&&!same(p.cashPlanning?.months[h.month]??null,h.afterCash))||!same(p.savingsGoals??null,last.afterGoals)||!same(p.savingTransfers??null,last.afterTransfers))throw Error('הנתונים השתנו מאז הייבוא. ביטול אוטומטי עלול למחוק עריכה; יש להשוות לגיבוי או לתקן את החודש.');
  const next=clone(p);for(const h of last.months){if(h.before)next.months[h.month]=h.before;else delete next.months[h.month];if(Object.hasOwn(h,'beforeCash')&&next.cashPlanning){if(h.beforeCash)next.cashPlanning.months[h.month]=h.beforeCash;else delete next.cashPlanning.months[h.month];}}

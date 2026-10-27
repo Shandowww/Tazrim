@@ -1,5 +1,5 @@
 import {isVault} from './vault.js';
-import {validatePlan} from './budget.js';
+import {validatePlan,retainImportMigrationGuards} from './budget.js';
 import {budgetSpaceScope} from './space-model.js';
 const reply=(value,status=200)=>Response.json(value,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const identifier=id=>typeof id==='string'&&/^[a-f0-9-]{36}$/.test(id);
@@ -50,6 +50,7 @@ export async function handleSpaces(request,env){
    if(isVault(body.plan)&&body.plan.context!==id)return reply({error:'התקציב המוצפן שייך לתקציב אחר.'},400);
    const old=row.data?JSON.parse(row.data):null;if(isVault(old)&&!isVault(body.plan))return reply({error:'אין להחליף תקציב מוצפן בתקציב גלוי.'},400);
    if(row.owner_id!==user&&((isVault(old)!==isVault(body.plan))||(isVault(old)&&(old.keyId!==body.plan.keyId||old.salt!==body.plan.salt||JSON.stringify(old.wrapped)!==JSON.stringify(body.plan.wrapped)||JSON.stringify(old.recovery)!==JSON.stringify(body.plan.recovery)))))return reply({error:'רק בעל התקציב יכול לשנות את ההצפנה.'},403);
+   if(!isVault(body.plan)&&!retainImportMigrationGuards(old,body.plan))return reply({error:'סימוני מעבר חשבון למניעת קליטה כפולה חסרים או השתנו. רעננו ושמרו אותם גם לאחר איפוס או ייבוא גיבוי.'},409);
    const r=await DB.prepare('UPDATE budgets SET data=?,revision=revision+1,updated_at=? WHERE id=? AND revision=? AND (owner_id=? OR EXISTS (SELECT 1 FROM budget_members m WHERE m.budget_id=budgets.id AND m.user_id=? AND NOT EXISTS(SELECT 1 FROM budget_member_roles r WHERE r.budget_id=m.budget_id AND r.user_id=m.user_id AND r.role=\'viewer\')))').bind(JSON.stringify(body.plan),new Date().toISOString(),id,body.revision,user,user).run();
    return r.meta.changes?reply({revision:body.revision+1}):reply({error:'התקציב השתנה במכשיר אחר או שהגישה הוסרה. ייצאו גיבוי לפני רענון.'},409);
   }
