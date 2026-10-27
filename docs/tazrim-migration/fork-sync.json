@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "4ff666fa459ed1163b312699982fbcf3fd277eaf",
+  "sourceCommit": "33dd35f894256e2fc52d1c8d9611326a20527755",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped report source intake implemented. Native report parser/review/apply, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
+  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 820,
-    "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, history review/undo/retry, goal deposit payer/retry, report source upload/dedupe/exact download checks passed. Prior iframe/download and complete device acceptance limitations remain documented."
+    "regressionTests": 835,
+    "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, history review/undo/retry, goal deposit payer/retry, report source upload/dedupe/exact download, card draft reload/atomic import/lost-commit recovery, archive/reactivation and390px no-overflow checks passed. Prior iframe/download and complete device acceptance limitations remain documented."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

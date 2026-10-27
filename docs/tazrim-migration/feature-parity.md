@@ -74,3 +74,9 @@ Loan lifecycle, savings-goal metadata, recurring evidence decisions and scoped j
 Planned-item removal is now implemented with explicit confirmation, pre-removal backup, preserved reports/details and guarded acknowledgment/retry. This supersedes its older pending status; calculator/scenarios and the other release limits remain open.
 
 Current application checkpoint771a931 includes guarded scenario UI/apply, savings balances/allocation/removal/pace/estimated growth, owner private/shared-space management and plaintext snapshot review/latest undo. Remaining imported-source, deposit/transfer, vault/migration/device/release scope is enumerated in the current acceptance addendum. Earlier pending entries for these completed slices are historical.
+
+## Report review update — 2026-10-27
+
+Native source library/inspection and bounded single-source card review/classification/manual duplicate decisions/progress resume/atomic apply are implemented, using original parsers and financial/receipt models. Lost successful commits recover without replay; source/actor/financial revision guards remain mandatory. Bank/mixed/multiple-sheet/activity/multi-file groups and advanced saved groups still use the existing interface. Report undo and remaining management and complete document/mobile acceptance remain pending. See checkpoint.md;831 tests and15 checks passed. No deployment readiness claim.
+
+Report management follow-up: reversible source archive/reactivation now has explicit confirmation, revision/account guards and uncertain-result recovery. Source and progress are retained; committed-source undo, verified-backup cleanup/delete and advanced group workflows remain pending.835 regressions and15 checks passed.

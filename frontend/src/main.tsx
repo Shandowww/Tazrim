@@ -21,6 +21,8 @@ import './tazrim/globals.css'
 import './app.css'
 import Link from './app/link'
 
+const ReportStatePage = lazy(async () => ({ default: (await import('./app/report-state-page')).ReportStatePage }))
+const CardReportPage = lazy(async () => ({ default: (await import('./app/card-report-page')).CardReportPage }))
 const ReportLibraryPage = lazy(async () => ({ default: (await import('./app/report-library-page')).ReportLibraryPage }))
 const SpacesPage = lazy(async () => ({ default: (await import('./app/spaces-page')).SpacesPage }))
 const SavingsBalancePage = lazy(async () => ({ default: (await import('./app/savings-balance-page')).SavingsBalancePage }))
@@ -182,6 +184,8 @@ function App() {
               <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/upload/:id/state" element={<ReportStatePage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/upload/:id/review" element={<CardReportPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload" element={<ReportLibraryPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />
               <Route path="/search" element={<ExpenseDetailsPage key={budgetId + search} mode="search" fixture={fixture} budget={budget} />} />

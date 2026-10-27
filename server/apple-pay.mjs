@@ -56,10 +56,11 @@ export function createApplePay(db,{origin,now=()=>Date.now(),isAllowed=()=>false
  };
  const merchants=scope=>db.prepare(`SELECT DISTINCT e.merchant,COALESCE(c.category,'') AS category FROM wallet_events e LEFT JOIN wallet_merchant_categories c ON c.scope=e.scope AND c.merchant=e.merchant WHERE e.scope=? ORDER BY e.merchant LIMIT 1001`).all(scope).map(m=>({...m,id:hash(m.merchant),location:''}));
  const manage=async(request,user)=>{
+  if(request.headers.has('x-budget-account-id')&&request.headers.get('x-budget-account-id')!==user?.id)throw fail('החשבון השתנה. יש לפתוח את הדוח מחדש.',403);
   if(!['GET','POST'].includes(request.method))throw fail('הפעולה אינה נתמכת.',405);
   const url=new URL(request.url),budget=url.searchParams.get('budget')??'personal';let {scope,plan}=access(user,budget);
   if(request.method==='GET'){
-   if(url.searchParams.get('merchants')==='1'){const rows=merchants(scope);if(rows.length>1000)throw fail('יותר מ־1,000 בתי עסק. יש לפנות למנהל לפני ייצוא.',413);return json({revision:revision(scope),merchants:rows});}
+   if(url.searchParams.get('merchants')==='1'){const rows=merchants(scope);if(rows.length>1000)throw fail('יותר מ־1,000 בתי עסק. יש לפנות למנהל לפני ייצוא.',413);return json({revision:revision(scope),merchants:rows,identityBound:true});}
    const month=url.searchParams.get('month')??new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).format(new Date(now()));if(!monthOk(month))throw fail('חודש הייבוא אינו תקין.');
    const events=db.prepare('SELECT e.id,e.card_id,e.merchant,e.cents,e.currency,e.occurred_at,e.time_source,e.received_at,e.billing_month,e.state,e.kind,c.category FROM wallet_events e LEFT JOIN wallet_merchant_categories c ON c.scope=e.scope AND c.merchant=e.merchant WHERE e.scope=? AND e.billing_month=? ORDER BY e.occurred_at DESC LIMIT 1000').all(scope,month);
    const connections=db.prepare('SELECT id,card_id,label,created_at,last_success,revoked FROM wallet_connections WHERE scope=? AND user_id=? ORDER BY created_at DESC').all(scope,user.id);
