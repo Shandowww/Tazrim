@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "bacba1a875ff5ddb4600e2d0607ad7ad811334d2",
+  "sourceCommit": "603da5450b7bc968618f3381a1b3c44acd389014",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; setup routing browser accepted, remaining workflow/backend parity and full visual release acceptance pending; not deployed",
+  "status": "Incomplete development preview; active monthly recovery input guard fixed and scoped recovery browser cases accepted; remaining workflow/backend/full visual parity pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
     "regressionTests": 672,
-    "browser": "Passed saved account/card edit routing, reload, second creation, Save-and-Continue, identity-switch write rejection/UI clearing and shared viewer read-only controls. Full responsive/light-dark/device/recovery acceptance remains pending."
+    "browser": "Passed dirty recovery controls, unfinished-input download/restore and invalid-save refusal, wrong-month/account/space and stale-version refusal. Earlier setup/navigation/identity/viewer checks passed. Full visual/device/reduced-motion and remaining workflow acceptance pending."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }
