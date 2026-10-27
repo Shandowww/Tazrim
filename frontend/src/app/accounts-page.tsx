@@ -75,6 +75,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       </ul>
     </section>}
     {selected && <p className="text-sm text-muted-foreground">{kind === 'banks' && 'balance' in selected && selected.balance ? `יתרה מדווחת לתאריך ${selected.balance.date} · ` : ''}הסכומים מוצגים לתקופה שנבחרה בכותרת.</p>}
+    {selected && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/categories?' + new URLSearchParams(kind === 'cards' ? { card: fixture ? 'card1' : selected.id } : { account: selected.id }))}>פתיחת הפירוט השמור {kind === 'cards' ? 'של הכרטיס' : 'של החשבון'}</Link></p>}
     </div>
     <section className="wallet-shell__rest surface rounded-xl p-5 text-sm text-muted-foreground">{fixture ? 'נתוני דוגמה בלבד. אין עריכה או שמירה של נתונים בדוגמה.' : <>תצוגה לקריאה בלבד. <a href={editorHref} className="text-primary underline">עריכה ופרטים נוספים בממשק הקיים</a></>}</section>
   </CardWallet>

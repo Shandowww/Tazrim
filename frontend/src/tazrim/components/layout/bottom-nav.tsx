@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Link from '../../../app/link'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Building2, ChevronLeft, CreditCard, Ellipsis, House, Info, LayoutDashboard, Repeat, Settings, Tag, Upload } from 'lucide-react'
+import { Building2, ChevronLeft, CreditCard, Ellipsis, House, Info, LayoutDashboard, Repeat, Settings, Tag, Upload, Search } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { isNavActive } from '@/lib/accounts/routes'
 import { isMoreActive } from '@/lib/nav/state'
@@ -19,6 +19,7 @@ const TABS: { href: string; label: string; title?: string; icon: typeof LayoutDa
 ]
 
 const MORE_LINKS = [
+  { href: '/search', label: 'חיפוש בפירוט', icon: Search },
   { href: '/upload', label: 'העלאת קבצים', icon: Upload },
   { href: '/categories', label: 'קטגוריות', icon: Tag },
   { href: '/settings', label: 'הגדרות', hint: 'ערכת נושא · ניהול חשבונות', icon: Settings },
@@ -88,7 +89,7 @@ export function BottomNav() {
       <Dialog.Root open={moreOpen} onOpenChange={setMoreOpen}>
         <Dialog.Trigger
           className={cn(TAB, moreActive ? 'text-primary' : 'text-foreground/60')}
-          aria-label="עוד: העלאת קבצים, קטגוריות, הגדרות, אודות"
+          aria-label="עוד: חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, אודות"
         >
           <TabIcon active={moreActive} icon={Ellipsis} />
         </Dialog.Trigger>

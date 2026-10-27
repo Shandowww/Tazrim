@@ -46,3 +46,7 @@ The handwritten Tazrim display candidate is **not** part of this baseline. It re
 Before activation, determine the actual running release and compare its features with this baseline. If production contains newer work, rebase or integrate it; do not deploy a build from an older commit. Independently review canonical uncommitted work to decide what belongs to a release. In particular, do not copy or revert the deleted Apple Pay Shortcut without resolving its current owner.
 
 Each row moves from planned to complete only after navigation, real read/write behavior, privacy and draft checks pass. A link to the old interface is a temporary bridge, not completion.
+
+## Read-only presentation progress — 2026-10-27
+
+The development frontend now includes pinned bank/card wallets and category/search/result presentation. `/categories` and `/search` browse cleared detail only, and `/details/:id` shows allowlisted original saved-row fields; no original-file or bank-global search is claimed. Negative refunds, missing data, billing-period scope, selected-space isolation and split-versus-original amounts remain explicit. These are read-only portions of the table's workflows, not completed edit/report/security parity. See `checkpoint.md` for current tests and remaining release gates.

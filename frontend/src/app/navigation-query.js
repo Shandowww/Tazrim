@@ -15,3 +15,12 @@ export function legacyBudgetHref(search) {
   const budget = new URLSearchParams(search).get('budget') || 'personal'
   return '/?' + new URLSearchParams({ budget })
 }
+
+/** Detail links carry only presentation filters; identity always stays in the URL. */
+export function detailResultHref(id, search, from = 'categories') {
+  const current = new URLSearchParams(search), next = new URLSearchParams()
+  for (const key of ['budget', 'year', 'month', 'category', 'query', 'account', 'card', 'page']) if (current.has(key)) next.set(key, current.get(key))
+  if (current.get('demo') === '1') next.set('demo', '1')
+  next.set('from', from === 'search' ? 'search' : 'categories')
+  return '/details/' + encodeURIComponent(id) + '?' + next
+}

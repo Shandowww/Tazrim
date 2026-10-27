@@ -49,7 +49,11 @@
     "components/layout/period-context.tsx -> frontend/src/tazrim/components/layout/period-context.tsx",
     "components/cards/card-wallet.tsx -> frontend/src/tazrim/components/cards/card-wallet.tsx",
     "components/glass/glass-surface.tsx -> frontend/src/tazrim/components/glass/glass-surface.tsx",
-    "components/glass/glass-bakery.ts -> frontend/src/tazrim/components/glass/glass-bakery.ts"
+    "components/glass/glass-bakery.ts -> frontend/src/tazrim/components/glass/glass-bakery.ts",
+    "components/accounts/page-parts.tsx -> frontend/src/tazrim/components/accounts/page-parts.tsx",
+    "components/cards/category-donut.tsx -> frontend/src/tazrim/components/cards/category-donut.tsx",
+    "components/search/search-result-list.tsx -> frontend/src/tazrim/components/search/search-result-list.tsx",
+    "lib/search/query.ts -> frontend/src/tazrim/lib/search/query.ts"
   ],
   "localPresentationAssets": [
     "frontend/public/fonts/heebo-hebrew-wght-normal.woff2",
@@ -71,6 +75,10 @@
     "Existing-editor bridges explicitly name the selected budget, including personal; sample links retain development fixture mode",
     "Vite development base matches /next/ router while production assets remain /ui-assets/; sidebar bundles the existing Budgit icon through Vite",
     "Reported financial figures and missing states are explicit in account-row accessible names; an unavailable bank pocket total is neither summed nor announced as zero",
-    "Pinned wallet and baked glass renderers load in a separate account-route chunk; Budgit icon and pocket branding remain original"
+    "Pinned wallet and baked glass renderers load in a separate account-route chunk; Budgit icon and pocket branding remain original",
+    "CategoryDonut retains pinned markup and chart behavior with an explicit React Router boundary; it receives only positive cleared-detail purchases, while signed net categories/refunds are shown separately",
+    "page-parts.tsx and lib/search/query.ts include only the pinned chart-header/result-type/highlight presentation sections, excluding server/account-management and Prisma/database query code",
+    "Pinned SearchResultList opens exact saved Budgit source rows with encoded IDs and retained space/period/filter/page context; refunds retain their negative sign",
+    "New read-only category/search/source containers use Budgit analysisMetricSnapshot(metric=detail); search is explicitly limited to displayed merchant names in cleared detail, not all bank movements or original documents"
   ]
 }

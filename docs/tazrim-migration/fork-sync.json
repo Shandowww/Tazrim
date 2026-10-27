@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "5d652ae5cc618bc5b9deb9ec98bfb8e142ff1be1",
+  "sourceCommit": "10cdb9400cd2e75f189691932103bfefec948e9c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete read-only development checkpoint; wallet visual checks completed, full editing/report parity and release acceptance pending; not deployed",
+  "status": "Incomplete read-only development checkpoint; category/merchant-search/saved-source views added; editing/report intake/security parity and release acceptance pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 629,
-    "browser": "Built synthetic app: wallet/period/space/history/keyboard/phone light/desktop dark; full release acceptance remains pending"
+    "regressionTests": 634,
+    "browser": "Built synthetic app: signed refunds, category/merchant/source filters, space isolation, 50+3 pagination/back links, phone dark and desktop light; full release acceptance pending"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

@@ -18,6 +18,7 @@ import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
 import './app.css'
 
+const ExpenseDetailsPage = lazy(async () => ({ default: (await import('./app/expense-details-page')).ExpenseDetailsPage }))
 const AccountsPage = lazy(async () => ({ default: (await import('./app/accounts-page')).AccountsPage }))
 const CombinedChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/combined-chart')).CombinedChart }))
 const CCMonthlyChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/cc-monthly-chart')).CCMonthlyChart }))
@@ -138,7 +139,9 @@ function App() {
               <Route path="/cards/:id" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<PendingPage title="חיובים קבועים" />} />
               <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />
-              <Route path="/categories" element={<PendingPage title="קטגוריות" />} />
+              <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />
+              <Route path="/search" element={<ExpenseDetailsPage key={budgetId + search} mode="search" fixture={fixture} budget={budget} />} />
+              <Route path="/details/:id" element={<ExpenseDetailsPage key={budgetId + search} mode="source" fixture={fixture} budget={budget} />} />
               <Route path="/settings" element={<div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label></div>} />
               <Route path="/about" element={<PendingPage title="אודות" />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
