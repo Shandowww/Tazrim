@@ -1,4 +1,5 @@
 import {useRef,useState} from 'react'
+import {useCreatedEditorRoute} from './use-created-editor-route'
 import {useLocation,useParams} from 'react-router-dom'
 import {creditCards,cashAccountList} from '../../../src/budget.js'
 import {cardConfigEligibility,initialCardDraft,cardDraftFingerprint,prepareCardConfig,type CardDraft} from './card-command'
@@ -32,7 +33,8 @@ function CardEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:Bud
  </form>
 }
 export function CardPage({mode,fixture,budget}:{mode:'list'|'new'|'edit';fixture:boolean;budget:BudgetState}){
- const {id:routeId}=useParams(),{search}=useLocation(),[newId]=useState(()=>'card_'+crypto.randomUUID()),[completed,setCompleted]=useState<string|null>(null),[message,setMessage]=useState(''),href=usePeriodHref(),id=mode==='new'?(completed??newId):(routeId??''),create=mode==='new'&&!completed
+ const {id:routeId}=useParams(),{search,state}=useLocation(),[newId]=useState(()=>'card_'+crypto.randomUUID()),[completed,setCompleted]=useState<string|null>(null),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'?state.setupSavedMessage:''),href=usePeriodHref(),id=mode==='new'?(completed??newId):(routeId??''),create=mode==='new'&&!completed
+ useCreatedEditorRoute(mode==='new'&&completed?href('/card-setup/'+encodeURIComponent(completed)):null,message)
  if(fixture)return <section className="surface rounded-xl p-6">נתוני הדוגמה אינם נשמרים. יש לפתוח תקציב שמור להגדרת כרטיסים.</section>
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען כרטיסים…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>

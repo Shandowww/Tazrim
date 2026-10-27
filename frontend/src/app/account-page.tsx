@@ -1,4 +1,5 @@
 import {useRef,useState} from 'react'
+import {useCreatedEditorRoute} from './use-created-editor-route'
 import {useLocation,useParams} from 'react-router-dom'
 import {accountColors} from '../../../src/budget.js'
 import {accountDraftFingerprint,initialAccountDraft,manualAccountEligibility,prepareManualAccount,type AccountDraft} from './account-command'
@@ -33,7 +34,8 @@ function AccountEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:
  </form>
 }
 export function AccountPage({create=false,fixture,budget}:{create?:boolean;fixture:boolean;budget:BudgetState}){
- const {id:routeId}=useParams(),{search}=useLocation(),[newId]=useState(()=>crypto.randomUUID()),[message,setMessage]=useState(''),[completedId,setCompletedId]=useState<string|null>(null),periodHref=usePeriodHref(),id=create?(completedId??newId):(routeId??'')
+ const {id:routeId}=useParams(),{search,state}=useLocation(),[newId]=useState(()=>crypto.randomUUID()),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'?state.setupSavedMessage:''),[completedId,setCompletedId]=useState<string|null>(null),periodHref=usePeriodHref(),id=create?(completedId??newId):(routeId??'')
+ useCreatedEditorRoute(create&&completedId?periodHref('/accounts/'+encodeURIComponent(completedId)+'/edit'):null,message)
  if(fixture)return <section className="surface rounded-xl p-6">נתוני הדוגמה אינם נשמרים. יש לפתוח תקציב שמור לעריכת חשבונות.</section>
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען חשבון…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>

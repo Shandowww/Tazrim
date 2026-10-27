@@ -116,7 +116,7 @@ function App() {
   const guard = useDraftGuard()
   const [pullHint, setPullHint] = useState('')
   const fixture = useFixtureMode()
-  const { search } = useLocation()
+  const { pathname, search } = useLocation()
   const budgetId = new URLSearchParams(search).get('budget') || 'personal'
   const budget = useBudget(budgetId, !fixture)
   const [theme, setTheme] = useState(() => { try { return localStorage.getItem('budgit-react-appearance') || 'system' } catch { return 'system' } })
@@ -146,11 +146,11 @@ function App() {
               <Route path="/banks/:id" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
               <Route path="/cards" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
-              <Route path="/card-setup" element={<CardPage key={budgetId + search} mode="list" fixture={fixture} budget={budget} />} />
-              <Route path="/card-setup/new" element={<CardPage key={budgetId + search} mode="new" fixture={fixture} budget={budget} />} />
-              <Route path="/card-setup/:id" element={<CardPage key={budgetId + search} mode="edit" fixture={fixture} budget={budget} />} />
-              <Route path="/accounts/new" element={<AccountPage key={budgetId + search} create fixture={fixture} budget={budget} />} />
-              <Route path="/accounts/:id/edit" element={<AccountPage key={budgetId + search} fixture={fixture} budget={budget} />} />
+              <Route path="/card-setup" element={<CardPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
+              <Route path="/card-setup/new" element={<CardPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
+              <Route path="/card-setup/:id" element={<CardPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/new" element={<AccountPage key={budgetId + pathname + search} create fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/:id/edit" element={<AccountPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<PendingPage title="חיובים קבועים" />} />
               <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />

@@ -2,7 +2,7 @@ import {createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,use
 import {useBlocker,type BlockerFunction} from 'react-router-dom'
 import {DraftRegistry,type DraftEntry} from './draft-registry'
 import {ConfirmDialog} from '../tazrim/components/ui/confirm-dialog'
-const Context=createContext<{registry:DraftRegistry;run:(action:()=>void)=>void}|null>(null)
+const Context=createContext<{registry:DraftRegistry;navigationPending:boolean;run:(action:()=>void)=>void}|null>(null)
 export function useDraftGuard(){const value=useContext(Context);if(!value)throw Error('Draft guard provider missing');return value}
 export function useFinancialDraft(entry:DraftEntry){const {registry}=useDraftGuard(),id=useId();useLayoutEffect(()=>{registry.set(id,entry)});useLayoutEffect(()=>()=>registry.remove(id),[registry,id])}
 type Pending={proceed:()=>void;cancel?:()=>void}
@@ -22,5 +22,5 @@ export function DraftGuardProvider({children}:{children:ReactNode}){
  },[registry,run])
  useEffect(()=>{if(pending&&!state.dirty&&!state.busy)proceed()},[pending,state.dirty,state.busy])
  const save=async()=>{const request=pendingRef.current;setError(null);try{if(!await registry.saveAll()){setError('השינויים לא נשמרו. הטיוטה נשארה פתוחה; אפשר לתקן או לנסות שוב.');return}if(pendingRef.current===request)proceed()}catch{setError('השינויים לא נשמרו. הטיוטה נשארה פתוחה.')}}
- return <Context.Provider value={{registry,run}}>{children}<ConfirmDialog open={!!pending} onOpenChange={open=>{if(!open)cancel()}} onConfirm={()=>{void save()}} title="יש שינויים שעדיין לא נשמרו" description={state.busy?'השמירה עדיין בתהליך. יש להמתין לתוצאה לפני מעבר.':'אפשר לשמור ולהמשיך, לצאת בלי לשמור, או להישאר עם הטיוטה.'} busy={state.busy} confirmDisabled={!state.canSave} error={error}><button type="button" className="w-full rounded-xl border px-4 py-3 text-sm text-destructive disabled:opacity-50" disabled={state.busy} onClick={()=>{if(registry.discardAll())proceed()}}>יציאה ללא שמירה</button></ConfirmDialog></Context.Provider>
+ return <Context.Provider value={{registry,run,navigationPending:!!pending||blocker.state!=='unblocked'}}>{children}<ConfirmDialog open={!!pending} onOpenChange={open=>{if(!open)cancel()}} onConfirm={()=>{void save()}} title="יש שינויים שעדיין לא נשמרו" description={state.busy?'השמירה עדיין בתהליך. יש להמתין לתוצאה לפני מעבר.':'אפשר לשמור ולהמשיך, לצאת בלי לשמור, או להישאר עם הטיוטה.'} busy={state.busy} confirmDisabled={!state.canSave} error={error}><button type="button" className="w-full rounded-xl border px-4 py-3 text-sm text-destructive disabled:opacity-50" disabled={state.busy} onClick={()=>{if(registry.discardAll())proceed()}}>יציאה ללא שמירה</button></ConfirmDialog></Context.Provider>
 }
