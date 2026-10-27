@@ -62,3 +62,7 @@ Manual account name/color/buffer/optional opening balance now has a guarded expl
 ## Card setup slice — 2026-10-27
 
 Configured/discontinued card listing and name/alias/billing-day create/edit are implemented with real draft/save protection. Explicit payer selection is supported only for a new zero-total card. Existing payer changes, closure/reactivation, card reports/import reconciliation and browser acceptance remain pending.
+
+## Current write scope — 2026-10-27
+
+The committed canonical backend is reconciled through `eb507d9`; both test families run together. Manual account monthly reports now have their own scoped editor and use original reconciliation/cent arithmetic. Planned items now have list/create/edit and exact installment preview with expected income distinguished from actual receipts. Account/card creation and saved edit routing, draft-file recovery, guarded navigation and role/identity refusals have scoped browser evidence. Imported/source-backed report reconciliation, full scenarios/calculator/removal, loan/savings/goals/report/security/settings/space UI and final release acceptance are still open. See checkpoint for exact restrictions and validation rather than treating the earlier inventory status as current completion.

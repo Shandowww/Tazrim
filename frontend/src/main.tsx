@@ -21,6 +21,8 @@ import './tazrim/globals.css'
 import './app.css'
 
 const CardPage = lazy(async () => ({ default: (await import('./app/card-page')).CardPage }))
+const LoansPage = lazy(async () => ({ default: (await import('./app/loans-page')).LoansPage }))
+const PlannedItemsPage = lazy(async () => ({ default: (await import('./app/planned-items-page')).PlannedItemsPage }))
 const CashMonthlyPage = lazy(async () => ({ default: (await import('./app/cash-monthly-page')).CashMonthlyPage }))
 const AccountPage = lazy(async () => ({ default: (await import('./app/account-page')).AccountPage }))
 const MonthlyPage = lazy(async () => ({ default: (await import('./app/monthly-page')).MonthlyPage }))
@@ -154,6 +156,13 @@ function App() {
               <Route path="/accounts/:id/edit" element={<AccountPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/accounts/:id/monthly" element={<CashMonthlyPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
+              <Route path="/loans" element={<LoansPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
+              <Route path="/loans/new" element={<LoansPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
+              <Route path="/loans/:id/edit" element={<LoansPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
+              <Route path="/loans/:id/remove" element={<LoansPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
+              <Route path="/plans" element={<PlannedItemsPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
+              <Route path="/plans/new" element={<PlannedItemsPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
+              <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<PendingPage title="חיובים קבועים" />} />
               <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />

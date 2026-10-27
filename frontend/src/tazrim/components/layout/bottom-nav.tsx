@@ -19,6 +19,7 @@ const TABS: { href: string; label: string; title?: string; icon: typeof LayoutDa
 ]
 
 const MORE_LINKS = [
+  { href: '/plans', label: 'פריטים מתוכננים', icon: Tag },
   { href: '/monthly', label: 'דיווח חודשי', icon: Tag },
   { href: '/search', label: 'חיפוש בפירוט', icon: Search },
   { href: '/upload', label: 'העלאת קבצים', icon: Upload },
@@ -90,7 +91,7 @@ export function BottomNav() {
       <Dialog.Root open={moreOpen} onOpenChange={setMoreOpen}>
         <Dialog.Trigger
           className={cn(TAB, moreActive ? 'text-primary' : 'text-foreground/60')}
-          aria-label="עוד: דיווח חודשי, חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, אודות"
+          aria-label="עוד: פריטים מתוכננים, דיווח חודשי, חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, אודות"
         >
           <TabIcon active={moreActive} icon={Ellipsis} />
         </Dialog.Trigger>

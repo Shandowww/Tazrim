@@ -43,7 +43,7 @@ export function setLoan(p,loan){
  for(const [m,r] of Object.entries(next.months))if(!r.actual)r.values.loanRepayment=scheduledLoans(next,m);
  if(!validatePlan(next))throw Error('לא ניתן לעדכן את ההלוואה.');return next;
 }
-export function removeLoan(p,id){if(cashAccountList(p).length>1&&!cashAssignedItem(p,loan))throw Error('בחר את החשבון שממנו נגבית ההלוואה.');
+export function removeLoan(p,id){const loan=(p.loans??[]).find(row=>row.id===id);if(loan&&cashAccountList(p).length>1&&!cashAssignedItem(p,loan))throw Error('בחר את החשבון שממנו נגבית ההלוואה.');
  const next=clone(p);next.loans=(p.loans??[]).filter(l=>l.id!==id);for(const [m,r] of Object.entries(next.months))if(!r.actual)r.values.loanRepayment=scheduledLoans(next,m);return next;}
 export function savingTransfersValid(p){return p.savingTransfers===undefined||Array.isArray(p.savingTransfers)&&p.savingTransfers.length<=120&&new Set(p.savingTransfers.map(t=>t?.id)).size===p.savingTransfers.length&&p.savingTransfers.every(t=>t&&typeof t.id==='string'&&t.id.length>0&&t.id.length<=100&&monthOk(t.month)&&t.month>=p.startMonth&&moneyOk(t.personal)&&moneyOk(t.shared)&&cents(t.personal)/100===t.personal&&cents(t.shared)/100===t.shared&&cents(t.personal)+cents(t.shared)>0&&['pending','completed','cancelled'].includes(t.status));}
 export function pendingSavingCents(p,month){return (p.savingTransfers??[]).filter(t=>t.status==='pending'&&t.month===month).reduce((n,t)=>n+cents(t.personal)+cents(t.shared),0);}

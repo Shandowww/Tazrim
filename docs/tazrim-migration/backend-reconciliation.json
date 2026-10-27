@@ -39,5 +39,11 @@
     "server/app.mjs",
     "build.mjs"
   ],
-  "releaseStatus": "Development only; full frontend workflow and release acceptance pending."
+  "releaseStatus": "Development only; full frontend workflow and release acceptance pending.",
+  "canonicalFollowups": [
+    {
+      "commit": "04eb8c0",
+      "scope": "Resolve the selected loan before multi-account removal payer checking; shared core regression tests."
+    }
+  ]
 }

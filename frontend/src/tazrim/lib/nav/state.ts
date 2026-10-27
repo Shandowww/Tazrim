@@ -47,7 +47,7 @@ export function routeAccountId(pathname: string, kind: PagedAccountKind): string
 }
 
 /** Pages reached from the phone's "עוד" sheet. */
-const MORE_PATHS = ['/upload', '/categories', '/settings', '/accounts', '/about']
+const MORE_PATHS = ['/plans', '/loans', '/upload', '/categories', '/settings', '/accounts', '/about']
 
 export function isMoreActive(pathname: string): boolean {
   return MORE_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`))
