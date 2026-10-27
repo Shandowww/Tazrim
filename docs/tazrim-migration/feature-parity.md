@@ -66,3 +66,7 @@ Configured/discontinued card listing and name/alias/billing-day create/edit are 
 ## Current write scope — 2026-10-27
 
 The committed canonical backend is reconciled through `eb507d9`; both test families run together. Manual account monthly reports now have their own scoped editor and use original reconciliation/cent arithmetic. Planned items now have list/create/edit and exact installment preview with expected income distinguished from actual receipts. Account/card creation and saved edit routing, draft-file recovery, guarded navigation and role/identity refusals have scoped browser evidence. Imported/source-backed report reconciliation, full scenarios/calculator/removal, loan/savings/goals/report/security/settings/space UI and final release acceptance are still open. See checkpoint for exact restrictions and validation rather than treating the earlier inventory status as current completion.
+
+## Current bounded workflow coverage — 2026-10-27
+
+Loan lifecycle, savings-goal metadata, recurring evidence decisions and scoped journal/plaintext saved-budget export are now implemented in the React preview. Their financial ledgers remain governed by the existing models and shared actor/revision save boundary. This supersedes the corresponding older pending notes only for these slices. Savings assets/deposits/allocations, source-aware reports, scenarios/removal, space/security management and full release acceptance remain incomplete. See `acceptance.md` and the detailed checkpoint for exact tests, browser evidence and remaining limitations.
