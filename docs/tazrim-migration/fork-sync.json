@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "1ba188a9cf99b025a40dd8957199eaed9924bd37",
+  "sourceCommit": "67239a9e36d2051e431dbb59ebcd0be6e0f194f5",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development checkpoint; guarded card metadata setup added; existing payer/source reconciliation, browser acceptance and remaining parity pending; not deployed",
+  "status": "Incomplete development checkpoint; saved account/card edit routing fixed; post-fix browser acceptance and remaining workflow/backend parity pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
     "regressionTests": 672,
-    "browser": "Work settings disabled access; new card setup and previous UI acceptance pending"
+    "browser": "Scoped draft recovery, interrupted-save retry, conflict, account/card setup and busy-navigation checks passed before interruption. Post-fix reload/Save-and-Continue checks pending Mac unlock."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }
