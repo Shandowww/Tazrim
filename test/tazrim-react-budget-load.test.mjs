@@ -27,3 +27,12 @@ test('space load rejects an identity change between list and plan responses', as
   const fetcher = async url => Response.json(url === '/api/budgets' ? list : { ...plan, accountId: 'bob' })
   await assert.rejects(loadBudgetSnapshot(shared, new AbortController().signal, fetcher), /החשבון השתנה/)
 })
+
+test('Malformed identity/revision and a missing shared-space identity cannot become an editable snapshot', async () => {
+  for (const [listValue, planValue] of [
+    [{ ...list, accountId: '' }, plan], [list, { ...plan, revision: -1 }], [list, { ...plan, budget: undefined }], [list, { ...plan, plan: [] }],
+  ]) {
+    const fetcher = async url => Response.json(url === '/api/budgets' ? listValue : planValue)
+    await assert.rejects(loadBudgetSnapshot(shared, new AbortController().signal, fetcher))
+  }
+})

@@ -1,7 +1,7 @@
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
 import { Sidebar } from './tazrim/components/layout/sidebar'
 import { BottomNav } from './tazrim/components/layout/bottom-nav'
@@ -14,10 +14,13 @@ import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoSummary, demoBankSummary, demoCardSummary } from './app/demo-fixture'
 import { budgetDashboard, budgetNavigation } from './app/budget-adapter'
 import { legacyBudgetHref } from './app/navigation-query'
+import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
+import { installPullRefresh } from './app/pull-refresh'
 import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
 import './app.css'
 
+const MonthlyPage = lazy(async () => ({ default: (await import('./app/monthly-page')).MonthlyPage }))
 const ExpenseDetailsPage = lazy(async () => ({ default: (await import('./app/expense-details-page')).ExpenseDetailsPage }))
 const AccountsPage = lazy(async () => ({ default: (await import('./app/accounts-page')).AccountsPage }))
 const CombinedChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/combined-chart')).CombinedChart }))
@@ -31,6 +34,7 @@ function useFixtureMode() {
 function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
   const { pathname, search } = useLocation()
   const navigate = useNavigate()
+  const guard = useDraftGuard()
   const params = new URLSearchParams(search)
   const year = /^20\d{2}$/.test(params.get('year') || '') ? Number(params.get('year')) : Number(jerusalemMonth().slice(0, 4))
   const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(params.get('month') || '') ? Number(params.get('month')) : undefined
@@ -53,7 +57,7 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
       <div className="min-w-0 text-xs font-semibold text-muted-foreground">{budget.status === 'ready' ? <label className="flex min-w-0 items-center gap-2"><span className="sr-only">מרחב תקציב</span><select className="min-w-0 max-w-full truncate rounded-lg bg-transparent p-1" value={budget.budgetId} onChange={event => selectBudget(event.target.value)}>{budget.spaces.map(space => <option key={space.id} value={space.id}>{space.name}{space.role === 'viewer' ? ' · צפייה בלבד' : ''}</option>)}</select></label> : 'Budgit'}</div>
       <PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod} />
       <div className="flex items-center justify-end gap-2">
-        <button type="button" className="rounded-lg p-2 text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={budget.refresh}><RefreshCw className="h-5 w-5" /></button>
+        <button type="button" className="rounded-lg p-2 text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
       </div>
     </header>
   )
@@ -107,6 +111,8 @@ function PendingPage({ title }: { title: string }) {
 }
 
 function App() {
+  const guard = useDraftGuard()
+  const [pullHint, setPullHint] = useState('')
   const fixture = useFixtureMode()
   const { search } = useLocation()
   const budgetId = new URLSearchParams(search).get('budget') || 'personal'
@@ -121,6 +127,7 @@ function App() {
   }, [])
   const dark = theme === 'dark' || (theme === 'system' && systemDark)
   useEffect(() => { document.documentElement.classList.toggle('dark', dark) }, [dark])
+  useEffect(()=>installPullRefresh({document,window,refresh:()=>guard.run(budget.refresh),isBusy:()=>budget.refreshPending||budget.status==='loading'||guard.registry.getSnapshot().busy,onHint:setPullHint}),[guard,budget.refresh,budget.refreshPending,budget.status])
   const actualPlan: BudgetResponse['plan'] = budget.status === 'ready' ? budget.value.plan : null
   const sections = buildNavSections(fixture ? demoAccounts : actualPlan && actualPlan.format !== 'monthly-flow-encrypted-v1' ? budgetNavigation(actualPlan) : [])
   return (
@@ -137,6 +144,7 @@ function App() {
               <Route path="/banks/:id" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
               <Route path="/cards" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
+              <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<PendingPage title="חיובים קבועים" />} />
               <Route path="/upload" element={<PendingPage title="מרכז הדוחות" />} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />
@@ -151,10 +159,11 @@ function App() {
         </div>
       </div>
       <BottomNav />
+      {pullHint&&<div role="status" className="pointer-events-none fixed inset-x-4 top-[max(0.75rem,env(safe-area-inset-top))] z-40 mx-auto w-fit rounded-xl surface-overlay px-4 py-2 text-sm">{pullHint}</div>}
       {(budget.status === 'error' || budget.status === 'ready' && budget.refreshError) && createPortal(
         <div role="alert" className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[100] mx-auto flex max-w-lg items-center gap-3 rounded-xl bg-foreground p-4 text-background shadow-2xl">
           <span className="min-w-0 flex-1">{budget.status === 'error' ? budget.message : `${budget.refreshError} הנתונים האחרונים נשארו מוצגים.`}</span>
-          <button type="button" className="shrink-0 rounded-lg border border-background/40 px-2 py-1" onClick={budget.refresh}>ניסיון חוזר</button>
+          <button type="button" className="shrink-0 rounded-lg border border-background/40 px-2 py-1" onClick={()=>guard.run(budget.refresh)}>ניסיון חוזר</button>
           {budget.status === 'ready' && <button type="button" className="shrink-0 rounded-lg px-2 py-1" aria-label="סגירת הודעה" onClick={budget.dismissRefreshError}>סגירה</button>}
         </div>, document.body
       )}
@@ -162,4 +171,5 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter basename="/next"><App /></BrowserRouter></StrictMode>)
+const router = createBrowserRouter([{path:'*',element:<DraftGuardProvider><App /></DraftGuardProvider>}],{basename:'/next'})
+createRoot(document.getElementById('root')!).render(<StrictMode><RouterProvider router={router} /></StrictMode>)

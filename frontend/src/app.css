@@ -1,3 +1,4 @@
 @font-face{font-family:Heebo;src:url('/fonts/heebo-hebrew-wght-normal.woff2') format('woff2');font-weight:100 900;font-display:swap;unicode-range:U+0590-05FF,U+FB1D-FB4F}
 @font-face{font-family:Heebo;src:url('/fonts/heebo-latin-wght-normal.woff2') format('woff2');font-weight:100 900;font-display:swap}
 :root{--font-heebo-hebrew:Heebo;--font-heebo-latin:Heebo}
+.draft-guard-layer::backdrop{background:rgb(0 0 0 / .45)}

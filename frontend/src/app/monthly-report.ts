@@ -1,0 +1,58 @@
+import {budgetFields,cashAccountList,clone,monthlyValues,saveMonthReport,validatePlan,cents,indexMonth} from '../../../src/budget.js'
+import {AccessError,loadBudgetSnapshot,type BudgetResponse} from './budget-api.ts'
+export interface MonthlyDraft { values:Record<string,string>; actual:boolean; includesCard:boolean; includesDirect:boolean }
+export class SaveConflict extends Error {}
+export class SaveUncertain extends Error {}
+export class WritePermissionError extends Error {}
+export function manualMonthEligibility(plan:any,month:string){
+ if(!validatePlan(plan)||plan.format||!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(month)||month<plan.startMonth||indexMonth(month)-indexMonth(plan.startMonth)>=120)return 'התקופה או התקציב אינם זמינים לעריכה הזו.'
+ if(cashAccountList(plan).length||plan.bankImport)return 'דיווח לפי חשבון או דוח בנק נשמר בינתיים בממשק הקיים, עם כל השיוכים וההתאמות.'
+ if(plan.months[month]?.cashReport||plan.months[month]?.bankCoverage||(plan.cardBilling?.reports??[]).some((r:any)=>r.dueDate.startsWith(month))||(plan.details??[]).some((r:any)=>r.month===month&&r.statement))return 'לחודש הזה יש מקורות דיווח שמורים. עדכון המקורות נעשה בינתיים בממשק הקיים.'
+ return null
+}
+export function moneyInputCents(raw:string){
+ const text=raw.trim();if(!text)return 0
+ if(!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{0,2})?$/.test(text))throw Error('יש להזין סכום תקין עם עד שתי ספרות אחרי הנקודה.')
+ const [whole,fraction='']=text.replaceAll(',','').split('.'),value=Number(whole)*100+Number(fraction.padEnd(2,'0'))
+ if(!Number.isSafeInteger(value)||value>10000000000)throw Error('הסכום מחוץ לטווח המותר.')
+ return value
+}
+export function initialMonthlyDraft(plan:any,month:string):MonthlyDraft{
+ const record=plan.months[month],values=monthlyValues(plan,month)
+ return {values:Object.fromEntries(budgetFields(plan).map(([key]:string[])=>[key,String(values[key]??0)])),actual:record?.actual??false,includesCard:record?.includesPlannedCard??false,includesDirect:record?.includesPlannedDirect??false}
+}
+export function monthlyDraftFingerprint(draft:MonthlyDraft){
+ return JSON.stringify({values:Object.fromEntries(Object.entries(draft.values).sort(([a],[b])=>a.localeCompare(b)).map(([key,value])=>{try{return[key,moneyInputCents(value)]}catch{return[key,{invalid:value}]}})),actual:draft.actual,card:draft.includesCard,direct:draft.includesDirect})
+}
+export function prepareMonthlyReport(plan:any,month:string,draft:MonthlyDraft,asOf:string){
+ if(!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(asOf))throw Error('תאריך הבדיקה אינו תקין.')
+ const reason=manualMonthEligibility(plan,month);if(reason)throw Error(reason)
+ if(draft.actual&&month>asOf)throw Error('חודש עתידי ניתן לשמור כהערכה בלבד.')
+ const allowed=budgetFields(plan).map(([key]:string[])=>key)
+ if(Object.keys(draft.values).length!==allowed.length||Object.keys(draft.values).some(key=>!allowed.includes(key))||[draft.actual,draft.includesCard,draft.includesDirect].some(value=>typeof value!=='boolean'))throw Error('יש לבדוק את שדות הדיווח.')
+ const next=clone(plan),previous=monthlyValues(plan,month),values={...previous}
+ for(const key of allowed)values[key]=moneyInputCents(draft.values[key])/100
+ next.months[month]={...(next.months[month]??{}),values,actual:next.months[month]?.actual??false,includesPlannedCard:draft.includesCard,includesPlannedDirect:draft.includesDirect}
+ const result=saveMonthReport(next,month,draft.actual,asOf,cents(values.salary)!==cents(previous.salary))
+ if(!validatePlan(result))throw Error('יש לבדוק את הסכומים והתאריכים לפני שמירה.')
+ return result
+}
+function normalize(value:any):any {return value&&typeof value==='object'?Array.isArray(value)?value.map(normalize):Object.fromEntries(Object.keys(value).filter(key=>value[key]!==undefined).sort().map(key=>[key,normalize(value[key])])):value}
+const canonical=(value:any)=>JSON.stringify(normalize(value))
+export async function saveMonthlyReport(input:{budgetId:string;base:BudgetResponse;month:string;draft:MonthlyDraft;asOf:string},fetcher:typeof fetch=fetch){
+ const {budgetId,base,month,draft,asOf}=input,plan=prepareMonthlyReport(base.plan,month,draft,asOf),signal=new AbortController().signal
+ const fresh=await loadBudgetSnapshot(budgetId,signal,fetcher)
+ if(fresh.value.accountId!==base.accountId||fresh.value.accountEmail!==base.accountEmail)throw new AccessError('החשבון השתנה. יש לחזור לחשבון המקורי לפני שמירת הטיוטה.')
+ if(fresh.value.writeIdentityBound!==true)throw Error('השרת עדיין לא תומך בשמירה המוגנת של התצוגה החדשה. יש להשתמש בממשק הקיים.')
+ if(fresh.spaces.find(s=>s.id===budgetId)?.role==='viewer')throw new WritePermissionError('התקציב פתוח כעת לצפייה בלבד. הטיוטה לא נשלחה לשמירה.')
+ // An explicit retry can acknowledge a committed-but-lost receipt; it never overwrites it.
+ if(fresh.value.revision===base.revision+1&&canonical(fresh.value.plan)===canonical(plan))return {...fresh,recovered:true}
+ if(fresh.value.revision!==base.revision||canonical(fresh.value.plan)!==canonical(base.plan))throw new SaveConflict('התקציב השתנה מאז פתיחת הטיוטה. היא נשארה כאן; יש להוריד גיבוי לפני טעינת הגרסה השמורה.')
+ let response:Response
+ try{response=await fetcher('/api/plan?budget='+encodeURIComponent(budgetId),{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,revision:base.revision,accountId:base.accountId})})}catch{throw new SaveUncertain('לא ניתן לאשר אם השמירה הושלמה. הטיוטה נשארה כאן. ניסיון חוזר יבדוק קודם את המצב השמור.')}
+ let result:any
+ try{result=await response.json()}catch{throw new SaveUncertain('לא ניתן לאשר את תוצאת השמירה. יש להשאיר את הטיוטה ולבדוק שוב.')}
+ if(!response.ok){if(response.status===409)throw new SaveConflict(result.error||'התקציב השתנה. הטיוטה נשארה כאן.');if(response.status===401)throw new AccessError('החיבור לחשבון פג. יש להיכנס מחדש.');if(response.status===403){const check=await loadBudgetSnapshot(budgetId,signal,fetcher);if(check.value.accountId!==base.accountId||check.value.accountEmail!==base.accountEmail)throw new AccessError('החשבון השתנה בזמן השמירה. יש להיכנס לחשבון המקורי.');throw new WritePermissionError(result.error||'אין הרשאה לשמירה.')}if(response.status>=500)throw new SaveUncertain('לא ניתן לאשר את תוצאת השמירה. הטיוטה נשארה כאן; ניסיון חוזר יבדוק קודם את המצב השמור.');throw Error(result.error||'הנתונים לא נשמרו. אפשר לנסות שוב.')}
+ if(result.revision!==base.revision+1)throw new SaveUncertain('תוצאת השמירה אינה תואמת לטיוטה. יש לבדוק שוב לפני פעולה נוספת.')
+ return {...fresh,value:{...fresh.value,plan,revision:result.revision},spaces:fresh.spaces.map(space=>space.id===budgetId?{...space,revision:result.revision,hasData:true}:space),recovered:false}
+}

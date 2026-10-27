@@ -53,7 +53,8 @@
     "components/accounts/page-parts.tsx -> frontend/src/tazrim/components/accounts/page-parts.tsx",
     "components/cards/category-donut.tsx -> frontend/src/tazrim/components/cards/category-donut.tsx",
     "components/search/search-result-list.tsx -> frontend/src/tazrim/components/search/search-result-list.tsx",
-    "lib/search/query.ts -> frontend/src/tazrim/lib/search/query.ts"
+    "lib/search/query.ts -> frontend/src/tazrim/lib/search/query.ts",
+    "components/ui/confirm-dialog.tsx -> frontend/src/tazrim/components/ui/confirm-dialog.tsx (surface/button design; native top-layer lifecycle)"
   ],
   "localPresentationAssets": [
     "frontend/public/fonts/heebo-hebrew-wght-normal.woff2",
@@ -79,6 +80,8 @@
     "CategoryDonut retains pinned markup and chart behavior with an explicit React Router boundary; it receives only positive cleared-detail purchases, while signed net categories/refunds are shown separately",
     "page-parts.tsx and lib/search/query.ts include only the pinned chart-header/result-type/highlight presentation sections, excluding server/account-management and Prisma/database query code",
     "Pinned SearchResultList opens exact saved Budgit source rows with encoded IDs and retained space/period/filter/page context; refunds retain their negative sign",
-    "New read-only category/search/source containers use Budgit analysisMetricSnapshot(metric=detail); search is explicitly limited to displayed merchant names in cleared detail, not all bank movements or original documents"
+    "New read-only category/search/source containers use Budgit analysisMetricSnapshot(metric=detail); search is explicitly limited to displayed merchant names in cleared detail, not all bank movements or original documents",
+    "Native top-layer unsaved-work dialog retains pinned confirmation styling while protecting existing native modals; explicit Stay/Discard/Save-and-Continue semantics",
+    "Manual monthly form uses Budgit existing saveMonthReport and validation; typed account-bound API command retains revision conflict/uncertain-response protection and never auto-saves navigation"
   ]
 }

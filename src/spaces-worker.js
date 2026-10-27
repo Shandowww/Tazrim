@@ -42,8 +42,9 @@ export async function handleSpaces(request,env){
  if(!row)return reply({error:'התקציב אינו זמין לחשבון הזה.'},404);
  const memberRole=row.owner_id===user?'owner':(await DB.prepare('SELECT role FROM budget_member_roles WHERE budget_id=? AND user_id=?').bind(id,user).first())?.role??'editor';
  if(path==='/api/plan'){
-  if(request.method==='GET')return reply({plan:row.data?JSON.parse(row.data):null,revision:row.revision,accountEmail:email,accountId:user,budget:{id,name:row.name,role:memberRole,scope:budgetSpaceScope(user,id)}});
+  if(request.method==='GET')return reply({plan:row.data?JSON.parse(row.data):null,revision:row.revision,accountEmail:email,accountId:user,writeIdentityBound:true,budget:{id,name:row.name,role:memberRole,scope:budgetSpaceScope(user,id)}});
   if(request.method==='PUT'){
+   if(body?.accountId!==undefined&&body.accountId!==user)return reply({error:'החשבון השתנה מאז פתיחת הטיוטה. יש להיכנס לחשבון המקורי לפני שמירה.'},403);
    if(memberRole==='viewer')return reply({error:'התקציב פתוח לצפייה בלבד.'},403);
    if(!(validatePlan(body?.plan)||isVault(body?.plan))||!Number.isInteger(body.revision)||body.revision<0)return reply({error:'יש לבדוק את נתוני התקציב.'},400);
    if(isVault(body.plan)&&body.plan.context!==id)return reply({error:'התקציב המוצפן שייך לתקציב אחר.'},400);
