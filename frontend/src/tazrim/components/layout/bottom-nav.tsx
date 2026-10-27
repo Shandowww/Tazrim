@@ -26,7 +26,7 @@ const MORE_LINKS = [
   { href: '/upload', label: 'העלאת קבצים', icon: Upload },
   { href: '/categories', label: 'קטגוריות', icon: Tag },
   { href: '/settings', label: 'הגדרות', hint: 'ערכת נושא · ניהול חשבונות', icon: Settings },
-  { href: '/about', label: 'אודות', hint: 'הסיפור, פרטיות ויצירת קשר', icon: Info },
+  { href: '/about', label: 'עזרה', hint: 'דוחות, תכנון, חיסכון ופרטיות', icon: Info },
 ]
 
 // Each tab is a 1/5 slot of the pill; the active highlight slides between slots
@@ -92,7 +92,7 @@ export function BottomNav() {
       <Dialog.Root open={moreOpen} onOpenChange={setMoreOpen}>
         <Dialog.Trigger
           className={cn(TAB, moreActive ? 'text-primary' : 'text-foreground/60')}
-          aria-label="עוד: חיסכון ומטרות, פריטים מתוכננים, דיווח חודשי, חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, אודות"
+          aria-label="עוד: חיסכון ומטרות, פריטים מתוכננים, דיווח חודשי, חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, עזרה"
         >
           <TabIcon active={moreActive} icon={Ellipsis} />
         </Dialog.Trigger>

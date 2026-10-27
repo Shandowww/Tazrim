@@ -74,6 +74,6 @@ export const MAIN_NAV: NavItem[] = [
 ]
 
 export const SETTINGS_NAV: NavLinkItem = { type: 'link', href: '/settings', label: 'הגדרות', icon: Settings }
-export const ABOUT_NAV: NavLinkItem = { type: 'link', href: '/about', label: 'אודות', icon: Info }
+export const ABOUT_NAV: NavLinkItem = { type: 'link', href: '/about', label: 'עזרה', icon: Info }
 
 export type { NavAccount }
