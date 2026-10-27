@@ -35,3 +35,7 @@ No API is called while creating/reading the recovery data. Metadata includes ver
 ## Shared guarded plan writer and manual account setup
 
 `savePreparedPlan` now owns the existing identity/capability/access/snapshot/revision preflight and actor-bound PUT, with exact successor recovery after an uncertain receipt. Monthly report preparation and manual account preparation call it with a validated next plan. Manual account creation/editing uses the existing `saveCashAccount` pure command; creation is blocked if sole-account fallback assignment would change an existing dependency. It never infers an imported account's source mapping or changes aggregate money. No new server contract was added.
+
+## Guarded card metadata setup
+
+Card create/edit uses the original card-manager metadata transition plus `cardsValid`/`validatePlan`, then the shared actor-bound revision/snapshot writer. New card IDs are stable across retries; new configured-account payers require an explicit valid selection. Existing card payer changes require the legacy source-aware reconciliation flow. No financial totals, bank connection, payment transaction or original document is created by this setup.

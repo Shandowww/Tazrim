@@ -1,4 +1,4 @@
-export type DraftKind = 'monthly' | 'cash' | 'detail' | 'item' | 'scenario' | 'savings' | 'security'
+export type DraftKind = 'monthly' | 'cash' | 'card' | 'detail' | 'item' | 'scenario' | 'savings' | 'security'
 export interface DraftEntry { kind: DraftKind; dirty: boolean; busy: boolean; discard: () => void; save?: () => Promise<boolean> }
 /** In-memory lifecycle only. It never persists financial records or saves implicitly. */
 export class DraftRegistry {

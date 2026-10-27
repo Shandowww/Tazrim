@@ -5,6 +5,7 @@ import {openDatabase} from '../server/database.mjs'
 import {createApp} from '../server/app.mjs'
 import {zero,clone} from '../src/budget.js'
 import {loadBudgetSnapshot,AccessError} from '../frontend/src/app/budget-api.ts'
+import {prepareCardConfig,initialCardDraft} from '../frontend/src/app/card-command.ts'
 import {prepareManualAccount,initialAccountDraft} from '../frontend/src/app/account-command.ts'
 import {savePreparedPlan} from '../frontend/src/app/plan-save.ts'
 import {initialMonthlyDraft,saveMonthlyReport,SaveConflict,SaveUncertain,WritePermissionError} from '../frontend/src/app/monthly-report.ts'
@@ -43,5 +44,13 @@ test('An uncertain account creation receipt is acknowledged on retry without cre
  const h=await harness();try{const plan=prepareManualAccount(h.input.base.plan,'stable-account',{...initialAccountDraft(h.input.base.plan,'','2026-10'),label:'חדש'},{create:true,asOf:'2026-10'});let once=true
  h.intercept(async(path,options)=>{if(options.method==='PUT'&&once){once=false;await h.req('alice',path,'PUT',JSON.parse(options.body));return Response.json({error:'lost account receipt'},{status:503})}})
  const input={budgetId:'personal',base:h.input.base,plan};await assert.rejects(savePreparedPlan(input,h.fetcher),SaveUncertain);const result=await savePreparedPlan(input,h.fetcher);assert.equal(result.recovered,true);assert.equal(result.value.revision,2);assert.equal(result.value.plan.cashPlanning.accounts.length,1);assert.equal(h.calls.filter(row=>row.method==='PUT').length,1)
+ }finally{h.db.close()}
+})
+
+test('Card configuration uses the guarded save API and exact retry acknowledgment without duplicating cards or changing another user',async()=>{
+ const h=await harness();try{const plan=prepareCardConfig(h.input.base.plan,'card_api-new',{name:'כרטיס API',alias:'4321',billingDay:'05',payer:''},true),input={budgetId:'personal',base:h.input.base,plan};let once=true
+ h.intercept(async(path,options)=>{if(options.method==='PUT'&&once){once=false;await h.req('alice',path,'PUT',JSON.parse(options.body));return Response.json({error:'lost card receipt'},{status:503})}})
+ await assert.rejects(savePreparedPlan(input,h.fetcher),SaveUncertain);const saved=await savePreparedPlan(input,h.fetcher);assert.equal(saved.recovered,true);assert.equal(saved.value.revision,2);assert.equal(saved.value.plan.creditCards.filter(c=>c.id==='card_api-new').length,1);assert.equal(saved.value.plan.defaults['card_api-new'],0);assert.equal((await(await h.req('bob','/api/plan')).json()).revision,1);assert.equal(h.calls.filter(r=>r.method==='PUT').length,1)
+ const draft={...initialCardDraft(saved.value.plan,'card_api-new'),name:'כרטיס שונה'},edit=prepareCardConfig(saved.value.plan,'card_api-new',draft);await savePreparedPlan({budgetId:'personal',base:saved.value,plan:edit},h.fetcher);const loaded=await(await h.req('alice','/api/plan')).json();assert.equal(loaded.revision,3);assert.equal(loaded.plan.creditCards.find(c=>c.id==='card_api-new').name,'כרטיס שונה');assert.deepEqual(loaded.plan.months,h.input.base.plan.months)
  }finally{h.db.close()}
 })

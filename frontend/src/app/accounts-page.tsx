@@ -75,6 +75,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       </ul>
     </section>}
     {selected && <p className="text-sm text-muted-foreground">{kind === 'banks' && 'balance' in selected && selected.balance ? `יתרה מדווחת לתאריך ${selected.balance.date} · ` : ''}הסכומים מוצגים לתקופה שנבחרה בכותרת.</p>}
+    {kind === 'cards' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/card-setup')}>הגדרת כרטיסים</Link></p>}
     {kind === 'banks' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref(selected?'/accounts/'+encodeURIComponent(selected.id)+'/edit':'/accounts/new')}>{selected?'עריכת חשבון ידני':'הוספת חשבון ידני'}</Link></p>}
     {selected && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/categories?' + new URLSearchParams(kind === 'cards' ? { card: fixture ? 'card1' : selected.id } : { account: selected.id }))}>פתיחת הפירוט השמור {kind === 'cards' ? 'של הכרטיס' : 'של החשבון'}</Link></p>}
     </div>

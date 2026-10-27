@@ -58,3 +58,7 @@ Manual plaintext monthly reporting now has an explicit load/edit/save/reload pat
 ## Manual bank account setup slice — 2026-10-27
 
 Manual account name/color/buffer/optional opening balance now has a guarded explicit write route. Existing aggregate money and payer identities remain unchanged; source/import account editing, card setup, deletion and account monthly reconciliation remain pending. New UI browser acceptance is blocked by Work settings and is not claimed.
+
+## Card setup slice — 2026-10-27
+
+Configured/discontinued card listing and name/alias/billing-day create/edit are implemented with real draft/save protection. Explicit payer selection is supported only for a new zero-total card. Existing payer changes, closure/reactivation, card reports/import reconciliation and browser acceptance remain pending.
