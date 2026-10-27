@@ -1,15 +1,15 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "f12b6da75b535b2ddea933d90685415ad1c5f0fe",
+  "sourceCommit": "460ffe9f2f30091caee7cb4cf4499af34304de42",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft/commit integration, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
+  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft serialization/resume helpers tested; bank API/draft UI/commit integration, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 843,
+    "regressionTests": 845,
     "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, history review/undo/retry, goal deposit payer/retry, report source upload/dedupe/exact download, card draft reload/atomic import/lost-commit recovery, archive/reactivation and390px no-overflow checks passed. Prior iframe/download and complete device acceptance limitations remain documented."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
