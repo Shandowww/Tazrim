@@ -571,3 +571,6 @@ Original card action connection — 2026-10-28: native billing-total correction 
 
 
 Original group/source acceptance — 2026-10-28: browser found and fixed React JSON cloning of original controller Maps; structured copies now retain decisions across review/progress/resume/discard. Native uncommitted-source deletion calls original atomic source/group-pruning action with scope/hash/revision guards and uncertain-absence recovery. Build/typecheck,894 regressions and15 checks pass. Synthetic browser passed mixed group progress/member resume/deferred categories/lost commit (one commit), bank undo/reimport and lost-delete/sibling resume; other users/scopes unchanged. Remaining vault/space/settings/detail/lifecycle/device/release gates stay open; see docs/tazrim-migration/execution-status.md. No production/Sites/real-record change.
+
+
+Original card no-activity — 2026-10-28: native closed-month declaration/undo use original setCardNoTransactions with evidence/acknowledgment guards and manual-zero provenance restoration. Build/typecheck,896 regressions and15 checks pass; synthetic browser declaration/reopen/undo passed and current charge stayed unchanged. Remaining lifecycle/vault/space/settings/detail/device/release gates are in docs/tazrim-migration/execution-status.md. No production/Sites/real-record change.

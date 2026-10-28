@@ -4,8 +4,8 @@ import {readFileSync} from 'node:fs'
 import vm from 'node:vm'
 import {createHash} from 'node:crypto'
 import {zero,clone,validatePlan,cashAccountForecast} from '../src/budget.js'
-import {saveBillingReport} from '../src/card-billing-model.js'
-import {initialBillingDraft,prepareBillingCorrection} from '../frontend/src/app/billing-command.ts'
+import {saveBillingReport,setCardNoTransactions,cardNoTransactionsConfirmed} from '../src/card-billing-model.js'
+import {initialBillingDraft,prepareBillingCorrection,prepareCardNoActivity} from '../frontend/src/app/billing-command.ts'
 import {openDatabase} from '../server/database.mjs'
 import {createApp} from '../server/app.mjs'
 import {loadBudgetSnapshot} from '../frontend/src/app/budget-api.ts'
@@ -29,5 +29,11 @@ test('Lost manual-total receipts recover one update through existing service, pr
   for(const u of ['alice','bob'])await req(u,'/api/plan','PUT',{plan:base(),revision:0})
   let puts=0,lost=true;const fetcher=async(path,opt={})=>{if(opt.method==='PUT'){puts++;const r=await req('alice',path,'PUT',JSON.parse(opt.body));if(lost){lost=false;return Response.json({error:'lost'},{status:503})}return r}return req('alice',path)}
   const snapshot=(await loadBudgetSnapshot('personal',new AbortController().signal,fetcher)).value,plan=prepareBillingCorrection(snapshot.plan,'card1','2026-10-15',draft,'2026-10-28'),input={budgetId:'personal',base:snapshot,plan};await assert.rejects(savePreparedPlan(input,fetcher),SaveUncertain);const saved=await savePreparedPlan(input,fetcher);assert.equal(saved.recovered,true);assert.equal(puts,1);assert.equal(saved.value.plan.cardBilling.reports.length,1);assert.equal((await(await req('bob','/api/plan')).json()).revision,1);await assert.rejects(savePreparedPlan({...input,plan:prepareBillingCorrection(snapshot.plan,'card1','2026-10-15',{...draft,amount:'124'},'2026-10-28')},fetcher),SaveConflict);assert.equal(puts,1)
+  const zeroInput={budgetId:'personal',base:saved.value,plan:prepareCardNoActivity(saved.value.plan,'card1','2026-09',true,'2026-10-28')};lost=true;await assert.rejects(savePreparedPlan(zeroInput,fetcher),SaveUncertain);const zeroSaved=await savePreparedPlan(zeroInput,fetcher);assert.equal(zeroSaved.recovered,true);assert.equal(puts,2);assert.equal(cardNoTransactionsConfirmed(zeroSaved.value.plan,'card1','2026-09'),true);assert.equal(zeroSaved.value.plan.cardBilling.reports.find(r=>r.dueDate==='2026-10-15').amount,123.45)
  }finally{db.close()}
 })
+
+test('Native no-activity declaration and undo call original model, retain manual-zero provenance and preserve money',()=>{const p=base(),before=clone(p),declared=prepareCardNoActivity(p,'card1','2026-09',true,'2026-10-28');assert.deepEqual(declared,setCardNoTransactions(p,'card1','2026-09',true,'2026-10-28'));assert.deepEqual(declared.months,p.months);assert.deepEqual(declared.defaults,p.defaults);assert.equal(cardNoTransactionsConfirmed(declared,'card1','2026-09'),true);const undone=prepareCardNoActivity(declared,'card1','2026-09',true,'2026-10-28');assert.deepEqual(undone,setCardNoTransactions(declared,'card1','2026-09',false,'2026-10-28'));assert.equal(cardNoTransactionsConfirmed(undone,'card1','2026-09'),false);assert.deepEqual(p,before)
+ const manual=saveBillingReport(p,{cardId:'card1',accountId:'a',dueDate:'2026-09-15',amount:0,source:'manual'},'2026-09-10'),upgraded=prepareCardNoActivity(manual,'card1','2026-09',true,'2026-10-28'),restored=prepareCardNoActivity(upgraded,'card1','2026-09',true,'2026-10-28');assert.deepEqual(restored,manual)
+})
+test('Native no-activity confirmation refuses open months, missing acknowledgment, nonzero reports and uploaded zero statements',()=>{const p=base();assert.throws(()=>prepareCardNoActivity(p,'card1','2026-10',true,'2026-10-28'));assert.throws(()=>prepareCardNoActivity(p,'card1','2026-09',false,'2026-10-28'));for(const [source,amount]of [['file',0],['manual',10]]){const activity=saveBillingReport(p,{cardId:'card1',accountId:'a',dueDate:'2026-09-15',amount,source},'2026-09-10');assert.throws(()=>prepareCardNoActivity(activity,'card1','2026-09',true,'2026-10-28'))}})

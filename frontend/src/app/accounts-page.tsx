@@ -76,6 +76,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       </ul>
     </section>}
     {selected && <p className="text-sm text-muted-foreground">{kind === 'banks' && 'balance' in selected && selected.balance ? `יתרה מדווחת לתאריך ${selected.balance.date} · ` : ''}הסכומים מוצגים לתקופה שנבחרה בכותרת.</p>}
+    {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/no-activity')}>חודש ללא פעילות · אישור וביטול</Link></p>}
     {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/payer')}>שיוך חשבון משלם</Link></p>}
     {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/billing')}>עדכון סך החיוב הרשמי</Link></p>}
     {kind === 'cards' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/card-setup')}>הגדרת כרטיסים</Link></p>}
