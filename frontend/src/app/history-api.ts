@@ -1,3 +1,5 @@
+import {isVault} from '../../../src/vault.js'
+import {revealHistoryVault} from './vault-session.ts'
 import {validatePlan} from '../../../src/budget.js'
 import {AccessError,loadBudgetSnapshot,type BudgetResponse} from './budget-api.ts'
 export interface HistoryEntry{id:string;revision:number;actor:string;at:number;kind:string;fields:string[];snapshot:boolean;unavailable:string|null;canUndo:boolean}
@@ -25,6 +27,7 @@ export async function loadHistory(budgetId:string,base:BudgetResponse,offset:num
 /** Export a freshly authorized saved plan; encrypted envelopes keep their existing legacy workflow. */
 export async function loadBudgetExport(budgetId:string,base:BudgetResponse,signal:AbortSignal,fetcher:typeof fetch=fetch){
  const snapshot=await check(budgetId,base,signal,fetcher),plan=snapshot.value.plan
+ if(snapshot.value.vault)return JSON.stringify(snapshot.value.vault,null,2)
  if(!plan||plan.format||!validatePlan(plan))throw Error('גיבוי התקציב הזה זמין בממשק הקיים בלבד.')
  return JSON.stringify({format:'monthly-flow-v1',plan},null,2)
 }
@@ -38,6 +41,7 @@ export async function loadHistorySnapshot(budgetId:string,base:BudgetResponse,en
  if([401,403,404].includes(response.status))throw new AccessError('העותק ההיסטורי אינו זמין לחשבון או למרחב הזה.')
  if(!response.ok)throw Error('העותק ההיסטורי לא נטען. התקציב לא שונה; אפשר לנסות שוב.')
  const value=await response.json();await check(budgetId,base,signal,fetcher)
+ if(base.vault){if(!isVault(value.before)||!isVault(value.after))throw Error('אין אפשרות לפתוח את הגרסה הקודמת במפתח הנוכחי.');value.before=await revealHistoryVault(budgetId,base,value.before);value.after=await revealHistoryVault(budgetId,base,value.after);await check(budgetId,base,signal,fetcher)}
  if(value?.revision!==entry.revision||typeof value.canUndo!=='boolean'||value.before!==null&&!validatePlan(value.before)||!validatePlan(value.after)||value.before?.format||value.after?.format)throw Error('העותק אינו תקציב גלוי שניתן לאמת. יש להשתמש בממשק הקיים.')
  return{id:entry.id,revision:value.revision,before:value.before,after:value.after,canUndo:value.canUndo,undoIdentityBound:value.undoIdentityBound===true}
 }

@@ -2,6 +2,7 @@ import {useLocation} from 'react-router-dom'
 import {legacyBudgetHref,withViewQuery} from './navigation-query'
 import Link from './link'
 const nativeWorkflows=[
+ ['/settings/security','הצפנה, נעילה, שחזור וייבוא גיבוי'],
  ['/actions','לטיפול ותזכורות אישיות'],
  ['/upload','מרכז הדוחות והמקורות השמורים'],
  ['/settings/report-expectations','דוחות צפויים ומועדי הגעה'],
@@ -21,7 +22,6 @@ const workflows=[
  ['report-history','תיקונים וניהול היסטוריית המקור'],
  ['accounts','שיוך פריטים ואפשרויות נוספות לחשבונות'],
  ['savings','אפשרויות חיסכון נוספות'],
- ['security','הצפנה, נעילה ושחזור'],
  ['backups','גיבוי וייבוא תקציב'],
  ['overview','תמונה כוללת, התאמות ומעברי חשבונות'],
  ['details','מילון קטגוריות ואפשרויות פירוט נוספות'],

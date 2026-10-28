@@ -1,3 +1,4 @@
+import {legacyInterfaceHref} from '../../src/interface-destination.js'
 import {ExistingWorkflowLinks} from './app/existing-workflow-links'
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -22,6 +23,7 @@ import './tazrim/globals.css'
 import './app.css'
 import Link from './app/link'
 
+const SecurityPage = lazy(async () => ({ default: (await import('./app/security-page')).SecurityPage }))
 const HelpPage = lazy(async () => ({ default: (await import('./app/help-page')).HelpPage }))
 const ActionCenterPage = lazy(async () => ({ default: (await import('./app/action-center-page')).ActionCenterPage }))
 const ReportExpectationsPage = lazy(async () => ({ default: (await import('./app/report-expectations-page')).ReportExpectationsPage }))
@@ -169,9 +171,10 @@ function App() {
         <Sidebar initialCollapsed={false} initialClosed={[]} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Header budget={budget} />
+          {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             <Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
-            <Routes>
+            {!fixture && budget.status==='ready' && budget.value.plan?.format==='monthly-flow-encrypted-v1' ? <SecurityPage fixture={fixture} budget={budget}/> : !fixture && budget.status==='ready' && budget.value.vault && pathname.startsWith('/upload') ? <section className="surface space-y-3 rounded-xl p-4"><h1 className="text-xl font-semibold">מרכז הדוחות בתקציב מוצפן</h1><p>קליטה והתקדמות של דוחות בתקציב מוצפן זמינות במרכז הדוחות הקיים.</p><a className="inline-flex min-h-11 items-center text-primary underline" href={legacyInterfaceHref(search,'reports',pathname.match(/^\/upload\/([a-f0-9-]{36})(?:\/|$)/)?.[1]||'')}>פתיחת מרכז הדוחות</a></section> : <Routes>
               <Route path="/" element={<Dashboard fixture={fixture} budget={budget} />} />
               <Route path="/banks" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
               <Route path="/banks/:id" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
@@ -242,11 +245,12 @@ function App() {
               <Route path="/details/:id/annotate" element={<DetailAnnotationPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/details/:id" element={<ExpenseDetailsPage key={budgetId + search} mode="source" fixture={fixture} budget={budget} />} />
               <Route path="/settings/spaces" element={<SpacesPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/settings/security" element={<SecurityPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/history" element={<HistoryPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/settings" element={<div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
-            </Routes>
+            </Routes>}
             </Suspense>
           </main>
         </div>

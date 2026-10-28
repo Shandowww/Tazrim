@@ -1,3 +1,4 @@
+import {forgetNativeVault} from './vault-session.ts'
 import { useCallback, useEffect, useState } from 'react'
 import { AccessError, loadBudgetSnapshot, type BudgetSpace, type BudgetResponse } from './budget-api.ts'
 export { loadBudgetSnapshot } from './budget-api.ts'
@@ -35,7 +36,8 @@ export function useBudget(budgetId: string, enabled = true): BudgetState {
     })
     return () => controller.abort()
   }, [budgetId, enabled, refreshTick])
+  useEffect(()=>{const hide=()=>{forgetNativeVault();setState({status:'loading',budgetId})};const show=(e:PageTransitionEvent)=>{if(e.persisted)setRefreshTick(t=>t+1)};window.addEventListener('pagehide',hide);window.addEventListener('pageshow',show);return()=>{window.removeEventListener('pagehide',hide);window.removeEventListener('pageshow',show)}},[budgetId])
   const refresh = useCallback(() => { if (refreshPending) return; setRefreshPending(true); setRefreshTick(tick => tick + 1) }, [refreshPending])
   const current: State = state.budgetId === budgetId ? state : { status: 'loading', budgetId }
-  return { ...current, accept: snapshot => { setState({status:'ready', budgetId, ...snapshot}); setRefreshError(null) }, invalidate: message => { setState({status:'error',budgetId,message}); setRefreshError(null) }, refresh, refreshPending, refreshError, dismissRefreshError: () => setRefreshError(null) }
+  return { ...current, accept: snapshot => { setState({status:'ready', budgetId, ...snapshot}); setRefreshError(null) }, invalidate: message => { forgetNativeVault();setState({status:'error',budgetId,message}); setRefreshError(null) }, refresh, refreshPending, refreshError, dismissRefreshError: () => setRefreshError(null) }
 }
