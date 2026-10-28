@@ -425,3 +425,6 @@ Settings now exposes seven existing native destinations for report library/histo
 ## Final historical-ID compatibility guard — 2026-10-28
 
 Final review found that the extracted payer map could read inherited object properties for valid older item IDs such as `constructor`, `toString` or `__proto__`, unlike the original prefixed form fields. Shared assignment now reads only explicitly supplied own keys. The added contract retains untouched expense/loan/detail/saving-request arrays for these IDs and verifies an explicit own-key assignment. Exact final build/typecheck, **906 regressions** and **15 core checks** pass. Prior bounded browser evidence remains current; no production/Sites/real-record change.
+
+
+UI wording follow-up — 2026-10-28: native group review, uncommitted-source deletion and billing text now describe user actions without implementation/migration wording. Copy only; original commands, restrictions and save behavior are unchanged. Build/typecheck and15 checks pass; prior906 functional regressions and bounded browser evidence remain current. Production/Sites unchanged.

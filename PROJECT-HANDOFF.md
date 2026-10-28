@@ -580,3 +580,6 @@ Original detail/cheque/limit connection — 2026-10-28: native optional detail/c
 
 
 Final payer compatibility — 2026-10-28: shared original payer extraction reads only explicit own map keys, preserving valid historical IDs such as constructor/toString/__proto__ across expense/loan/detail/saving requests. Exact final build/typecheck,906 regressions and15 core checks pass; prior bounded browser evidence remains current. Remaining registry/display/full assignment/lifecycle/onboarding/investment/action/integration/vault/overview/migration/device/release gates remain open. No production/Sites/real-record change.
+
+
+UI wording follow-up — 2026-10-28: native group review, uncommitted-source deletion and billing text now describe user actions without implementation/migration wording. Copy only; original commands, restrictions and save behavior are unchanged. Build/typecheck and15 checks pass; prior906 functional regressions and bounded browser evidence remain current. Production/Sites unchanged.
