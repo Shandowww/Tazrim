@@ -10,6 +10,7 @@ const nativeWorkflows=[
  ['/details/manage','ניהול צ׳קים ופירוט ידני'],
  ['/categories/manage','ניהול מילון הקטגוריות'],
  ['/categories/limits','תקרות הוצאה לפי קטגוריה'],
+ ['/accounts/assignments','שיוך כרטיסים והתחייבויות לחשבונות'],
  ['/card-setup','פרטי הכרטיסים'],
 ] as const
 const workflows=[

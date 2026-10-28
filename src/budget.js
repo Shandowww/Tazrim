@@ -1323,6 +1323,7 @@ export function saveCashMonth(p,id,month,record,asOf){
 }
 export function assignCashRemainder(p,id,month){const next=clone(p),rest=cashUnassigned(p,month);if(Object.values(rest).some(v=>v<0))throw Error('יש פער בין החשבונות לסיכום; בדוק את הסכומים לפני שיוך.');const current=cashAccountValues(p,id,month);next.cashPlanning=cashPlanningBase(p);next.cashPlanning.months[month]??={};const values=clone(current.values);for(const [k,v]of Object.entries(rest))values[k]=(cents(values[k]??0)+cents(v))/100;next.cashPlanning.months[month][id]={values,actual:current.record?.actual??p.months[month]?.actual??false,includesPlannedCard:current.record?.includesPlannedCard??false,includesPlannedDirect:current.record?.includesPlannedDirect??false,...(current.record?.balance!==undefined?{balance:current.record.balance}:{})};if(!validatePlan(next))throw Error('לא ניתן לשייך את הנתונים.');return next;}
 
+export function cashPayerCandidates(p){return{items:p.expenses.filter(e=>!cashAssignedItem(p,e)),loans:(p.loans??[]).filter(e=>!cashAssignedItem(p,e)),details:(p.details??[]).filter(e=>additionalCheque(e)&&!cashAssignedItem(p,e)),savings:(p.savingTransfers??[]).filter(e=>e.status==='pending'&&!cashAssignedItem(p,e))};}
 // Original cash-settings payer transition, shared by both interfaces. Source records are never moved.
 export function assignCashPayers(p,links){
  const next=clone(p);next.cashPlanning=cashPlanningBase(next);
