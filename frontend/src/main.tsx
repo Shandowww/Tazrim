@@ -3,7 +3,7 @@ import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Bell } from 'lucide-react'
 import { Sidebar } from './tazrim/components/layout/sidebar'
 import { BottomNav } from './tazrim/components/layout/bottom-nav'
 import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
@@ -14,7 +14,7 @@ import { AppearanceContext } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoSummary, demoBankSummary, demoCardSummary } from './app/demo-fixture'
 import { budgetDashboard, budgetNavigation } from './app/budget-adapter'
-import { legacyBudgetHref } from './app/navigation-query'
+import { legacyBudgetHref, withViewQuery } from './app/navigation-query'
 import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
 import { installPullRefresh } from './app/pull-refresh'
 import { useBudget, type BudgetResponse } from './app/use-budget'
@@ -23,6 +23,7 @@ import './app.css'
 import Link from './app/link'
 
 const HelpPage = lazy(async () => ({ default: (await import('./app/help-page')).HelpPage }))
+const ActionCenterPage = lazy(async () => ({ default: (await import('./app/action-center-page')).ActionCenterPage }))
 const ReportExpectationsPage = lazy(async () => ({ default: (await import('./app/report-expectations-page')).ReportExpectationsPage }))
 const ReportHistoryPage = lazy(async () => ({ default: (await import('./app/report-history-page')).ReportHistoryPage }))
 const ReportGroupPage = lazy(async () => ({ default: (await import('./app/report-group-page')).ReportGroupPage }))
@@ -88,7 +89,7 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
     <header className="sticky top-0 z-30 grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b bar-glass px-4 py-2.5">
       <div className="min-w-0 text-xs font-semibold text-muted-foreground">{budget.status === 'ready' ? <label className="flex min-w-0 items-center gap-2"><span className="sr-only">מרחב תקציב</span><select className="min-w-0 max-w-full truncate rounded-lg bg-transparent p-1" value={budget.budgetId} onChange={event => selectBudget(event.target.value)}>{budget.spaces.map(space => <option key={space.id} value={space.id}>{space.name}{space.role === 'viewer' ? ' · צפייה בלבד' : ''}</option>)}</select></label> : 'Budgit'}</div>
       <PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod} />
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-end gap-2"><Link href={withViewQuery('/actions',search)} aria-label="לטיפול" className="rounded-lg p-2 text-muted-foreground"><Bell className="h-5 w-5" /></Link>
         <button type="button" className="rounded-lg p-2 text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
       </div>
     </header>
@@ -227,6 +228,7 @@ function App() {
               <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/actions" element={<ActionCenterPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/settings/report-expectations" element={<ReportExpectationsPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/history" element={<ReportHistoryPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/history/:id/undo" element={<ReportHistoryPage key={budgetId + pathname + search} fixture={fixture} budget={budget} undo />} />

@@ -38,3 +38,6 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
 export function actionIssueVisible(issue,preferences,now){const p=preferences?.[issue.key];return !p||p.evidence!==issue.evidence||!(p.until>now);}
 
 export function validActionTarget(t){return !!t&&typeof t==='object'&&['save','backup','report','unlock','upload','gmail','notice'].includes(t.screen)&&Object.keys(t).every(k=>['screen','month','kind','target','reportId','noticeId'].includes(k))&&(!t.month||/^20\d{2}-(0[1-9]|1[0-2])$/.test(t.month))&&['target','reportId','noticeId'].every(k=>t[k]===undefined||typeof t[k]==='string'&&/^[\w:-]{1,100}$/.test(t[k]));}
+
+export function nextActionAnnouncement(active,preferences,announced){return active.find(i=>i.severity==='required'&&!announced.has(i.key+i.evidence)&&preferences[i.key]?.evidence!==i.evidence);}
+export function actionPreferencePayload(issue,preferences,until,action,accountId,compare=false){const prior=Object.hasOwn(preferences,issue.key)?preferences[issue.key]:null;return{...(action==='read'?{action:'read'}:{}),key:issue.key,evidence:issue.evidence,until,accountId,...(compare?{previous:prior?{evidence:prior.evidence,until:prior.until}:null}:{})};}

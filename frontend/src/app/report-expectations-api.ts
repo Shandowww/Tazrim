@@ -3,7 +3,7 @@ import {AccessError,loadBudgetSnapshot,type BudgetResponse} from './budget-api.t
 import {SaveConflict,SaveUncertain,WritePermissionError} from './plan-save.ts'
 export interface ExpectationRule{kind:'bank'|'card';target:string;enabled:boolean;startMonth:string;dueDay:number;graceDays:number;exceptions:string[]}
 export interface ExpectationInput{enabled:boolean;start:string;due:string;grace:string;exceptions:string}
-export interface ActionsResponse{accountId:string;accountEmail:string;budgetId:string;actionIdentityBound:boolean;revision:number;expectations:ExpectationRule[];reports:any[];preferences:Record<string,{evidence:string;until:number}>}
+export interface ActionsResponse{accountId:string;accountEmail:string;budgetId:string;actionIdentityBound:boolean;actionPreferenceCAS?:boolean;revision:number;expectations:ExpectationRule[];reports:any[];preferences:Record<string,{evidence:string;until:number}>}
 export interface ExpectationsSnapshot{budget:Awaited<ReturnType<typeof loadBudgetSnapshot>>;actions:ActionsResponse}
 const canonical=(value:unknown):string=>JSON.stringify(value,(_key,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(key=>[key,v[key]])):v)
 export function initialExpectationInputs(plan:any,rules:ExpectationRule[],asOf:string):ExpectationInput[]{return reportExpectationEntities(plan).map(e=>{const r=rules.find(row=>row.kind===e.kind&&row.target===e.id);return{enabled:r?.enabled??false,start:r?.startMonth??asOf,due:String(r?.dueDay??15),grace:String(r?.graceDays??3),exceptions:r?.exceptions.join(', ')??''}})}
