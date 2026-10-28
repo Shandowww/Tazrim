@@ -176,6 +176,7 @@ function App() {
               <Route path="/accounts/:id/monthly/correction" element={<CashMonthlyPage key={budgetId + pathname + search} fixture={fixture} budget={budget} correction />} />
               <Route path="/accounts/:id/monthly" element={<CashMonthlyPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
+              <Route path="/upload/:id/delete" element={<ReportStatePage key={budgetId + pathname + search} remove fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/payer" element={<CardPayerPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/billing" element={<BillingPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/billing/:date" element={<BillingPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />

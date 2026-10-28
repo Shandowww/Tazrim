@@ -28,3 +28,6 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
  if(signal.aborted)throw Error('פתיחת הקבוצה בוטלה.')
  return{ui,sources,activitySupported:library.activityCycleReceipts===true}
 }
+
+/** UI copies must preserve the original controller's Maps/Sets; budget JSON cloning drops their decisions. */
+export function copyReportGroupUi(ui:any){return structuredClone(ui)}

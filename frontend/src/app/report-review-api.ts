@@ -62,3 +62,16 @@ export async function commitStoredReportGroup(budgetId:string,base:BudgetRespons
  const saved=await fresh(budgetId,base,signal,fetcher);if(saved.value.revision!==value.revision||!same(saved.value.plan,plan))throw Error('התקציב השתנה לאחר הקליטה; יש לבדוק את הגרסה השמורה.')
  return{...saved,recovered:false}
 }
+
+/** Delete only an uncommitted source through the original atomic group-pruning action. */
+export async function deleteStoredReportSource(budgetId:string,base:BudgetResponse,source:StoredReportDetail,retry=false,fetcher:typeof fetch=fetch){
+ if(source.state==='committed'||!/^[-a-f0-9]{36}$/.test(source.id)||!/^[a-f0-9]{64}$/.test(source.sourceHash))throw Error('אפשר למחוק רק מקור שלא נקלט בתקציב.')
+ const signal=new AbortController().signal;await fresh(budgetId,base,signal,fetcher,true);const library=await loadReportLibrary(budgetId,base,signal,fetcher)
+ if(library.reportIdentityBound!==true||library.encrypted)throw Error('מחיקה מוגנת אינה זמינה בתצוגה הזו. יש להמשיך בממשק הקיים.')
+ const listed=library.reports.find(row=>row.id===source.id)
+ if(!listed){if(retry)return{recovered:true};throw Error('המקור אינו נמצא בתיבה. יש לרענן את הרשימה.')}
+ const current=await loadStoredReport(budgetId,base,source.id,signal,fetcher)
+ if(current.revision!==source.revision||current.state!==source.state||current.sourceHash!==source.sourceHash)throw Error('המקור השתנה. יש לפתוח אותו מחדש לפני מחיקה.')
+ const value=await result(await mutate('/api/reports?budget='+encodeURIComponent(budgetId)+'&id='+encodeURIComponent(source.id),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-budget-account-id':base.accountId},body:JSON.stringify({action:'delete',revision:source.revision,confirm:true})},fetcher))
+ if(value.deleted!==true||value.id!==source.id)throw Error('המחיקה לא אושרה. יש לבדוק שוב את התיבה.');await fresh(budgetId,base,signal,fetcher);return{recovered:false}
+}
