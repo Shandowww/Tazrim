@@ -1,31 +1,6 @@
-async function prepareSpaceTransferVault(state,meta,body,previous,activePlan){
- const envelope=body.plan,matching={envelope,revision:body.revision,status:'locked',key:null,keys:null,legs:[]};
- try{
-  let source;
-  if(activePlan&&meta.id===activeBudget&&typeof vaultRaw!=='undefined'&&vaultRaw){matching.key=vaultKey;matching.keys=await deriveTransferMatchKeys(vaultRaw,envelope);source=await decryptVault(envelope,matching.key);}
-  else if(previous?.key&&previous.envelope.keyId===envelope.keyId&&previous.envelope.context===envelope.context){matching.key=previous.key;matching.keys=previous.keys;source=await decryptVault(envelope,matching.key);}
-  if(source){if(!validatePlan(source))throw Error('Invalid unlocked source');const legs=transferLegs(source,state.user,meta.id,body.revision,state.asOf);matching.legs=legs.slice(0,500);matching.truncated=legs.length>500;matching.status='ready';}
- }catch{matching.status='error';matching.key=null;matching.keys=null;matching.legs=[];}
- return matching;
-}
-function spaceTransferKeys(state){return new Map([...state.entries].filter(([,e])=>['ready','locked'].includes(e.status)&&e.matching?.status==='ready').map(([id,e])=>[id,e.matching.keys]));}
-async function hydrateSpaceSealedMatches(state){
- const snapshot=state.privateMatches;if(!snapshot)return;
- const keys=spaceTransferKeys(state),legs=transferBrowserSelection(state.entries,[]).legs;
- const items=await Promise.all(snapshot.items.map(async m=>{
-  if(!m.sealed||!['sealed','locked','current'].includes(m.status))return m;
-  const sources=m.sealed.sources;
-  if(!sources.every(s=>{const e=state.entries.get(s.budget);return ['ready','locked'].includes(e?.status)&&(s.keyId?e.matching?.revision===s.revision&&e.matching.envelope.keyId===s.keyId&&e.matching.envelope.context===s.context:e.summary?.revision===s.revision);}))return{id:m.id,status:'unavailable'};
-  if(sources.some(s=>s.keyId&&!keys.has(s.budget)))return{id:m.id,sealed:m.sealed,status:'locked'};
-  try{
-   const value=await openTransferMatch(state.user,m.sealed,keys),out=legs.find(l=>transferRefsEqual(l.ref,value.out)),incoming=legs.find(l=>transferRefsEqual(l.ref,value.in));
-   if(!transferPairValid(out,incoming))throw Error('Source mismatch');
-   for(const s of sources){const ref=[out.ref,incoming.ref].find(r=>r.budget===s.budget&&r.revision===s.revision);if(!ref||await transferMatchToken(state.user,ref,keys.get(s.budget))!==s.token)throw Error('Source token mismatch');}
-   return {...m,status:'current',out:out.ref,in:incoming.ref};
-  }catch{return{id:m.id,status:'unavailable'};}
- }));
- if(spaceOverview===state&&state.privateMatches===snapshot)state.privateMatches={...snapshot,items};
-}
+async function prepareSpaceTransferVault(state,meta,body,previous,activePlan){return prepareTransferMatchVault(state,meta,body,previous,activePlan,{budgetId:activeBudget,key:vaultKey,rawKey:typeof vaultRaw==='undefined'?null:vaultRaw});}
+function spaceTransferKeys(state){return transferMatchKeys(state);}
+async function hydrateSpaceSealedMatches(state){const snapshot=state.privateMatches,next=await hydrateTransferMatchSnapshot(state);if(spaceOverview===state&&state.privateMatches===snapshot&&next)state.privateMatches=next;}
 function spaceTransferUnlockView(state){
  return [...state.entries.values()].filter(e=>e.matching&&['ready','locked'].includes(e.status)).map(e=>{
   const m=e.matching;
@@ -41,9 +16,7 @@ async function unlockSpaceTransferVault(form){
   const latest=await spaceOverviewJSON('/api/plan?budget='+encodeURIComponent(id),state.controller.signal);
   if(spaceOverview!==state||state.entries.get(id)!==entry)return;
   if(latest.accountId!==state.user||accountId!==state.user){clearSpaceOverview();spaceRequireReload();render();return;}
-  if(latest.revision!==matching.revision||!isVault(latest.plan)||latest.plan.keyId!==matching.envelope.keyId||latest.plan.context!==matching.envelope.context||JSON.stringify(latest.plan.encrypted)!==JSON.stringify(matching.envelope.encrypted))throw Object.assign(Error('Source changed'),{status:409});
-  result=await unlockVault(matching.envelope,secret,recovery);if(!validatePlan(result.plan))throw Error('Invalid source');
-  const keys=await deriveTransferMatchKeys(result.rawKey,matching.envelope);
+  result=await openTransferMatchSource(state.user,id,matching,latest,secret,recovery,unlockVault);const keys=result.keys;
   if(spaceOverview!==state||state.entries.get(id)!==entry||accountId!==state.user)return;
   const legs=transferLegs(result.plan,state.user,id,matching.revision,state.asOf);
   Object.assign(matching,{key:result.key,keys,status:'ready',legs:legs.slice(0,500),truncated:legs.length>500});

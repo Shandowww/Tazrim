@@ -1,3 +1,4 @@
+import * as matchCommands from '../src/transfer-match-commands.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -41,7 +42,7 @@ test('Only network/server failure may retain a stale summary; denial drops it',(
 function harness(){
  const shared='11111111-1111-4111-8111-111111111111',metas=[{id:'personal',name:'Private',role:'owner',hasData:true},{id:shared,name:'House',role:'viewer'}];
  const state={user:'tal',asOf:'2026-10-26',entries:new Map(),busy:false,error:'',controller:null};let draws=0,cleared=0;
- const c=vm.createContext({AbortController,setTimeout,clearTimeout,window:{addEventListener(){}},document:{getElementById:()=>null},accountId:'tal',activeBudget:'personal',spacesSessionChanged:false,spacePreference:{},budgets:metas,loaded:true,vaultKey:null,vaultEnvelope:null,dirty:false,revision:1,plan:cash(),validatePlan,isVault:p=>p?.format==='vault',summarizeBudgetSpace,overviewLoadFailure,overviewBudgetEntry:(meta,body,user,asOf,active)=>overviewBudgetEntry(meta,body,user,asOf,active,p=>p?.format==='vault'),visibleBudgetSpaces,render(){},spaceRequireReload(){c.spacesSessionChanged=true;},state});
+ const c=vm.createContext({...matchCommands,AbortController,setTimeout,clearTimeout,window:{addEventListener(){}},document:{getElementById:()=>null},accountId:'tal',activeBudget:'personal',spacesSessionChanged:false,spacePreference:{},budgets:metas,loaded:true,vaultKey:null,vaultEnvelope:null,dirty:false,revision:1,plan:cash(),validatePlan,isVault:p=>p?.format==='vault',summarizeBudgetSpace,overviewLoadFailure,overviewBudgetEntry:(meta,body,user,asOf,active)=>overviewBudgetEntry(meta,body,user,asOf,active,p=>p?.format==='vault'),visibleBudgetSpaces,render(){},spaceRequireReload(){c.spacesSessionChanged=true;},state});
  vm.runInContext(readFileSync('src/space-transfer-vaults-client.js','utf8'),c);
  vm.runInContext(readFileSync('src/space-overview-client.js','utf8'),c);
  vm.runInContext('spaceOverview=state',c);

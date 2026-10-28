@@ -1,3 +1,4 @@
+import * as matchCommands from '../src/transfer-match-commands.js';
 import test from 'node:test';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
@@ -105,7 +106,7 @@ async function clientHarness(){
  const out=transferLegs(await plan(),'tal','personal',1,day)[0],incoming=transferLegs(await plan(false),'tal','shared',1,day)[0];
  const state={entries:new Map([['personal',{status:'ready',meta:{name:'פרטי'},summary:{transfers:[out]}}],['shared',{status:'ready',meta:{name:'בית'},summary:{transfers:[incoming]}}]]),privateMatches:{revision:0,items:[]},controller:new AbortController(),transferOut:out.key,transferIn:incoming.key,user:'tal'};
  let draws=0,reloads=0;
- const c=vm.createContext({spaceOverview:state,accountId:'tal',transferBrowserSelection,transferPairValid,spaceOverviewRender(){draws++;},spaceRequireReload(){reloads++;},render(){},clearSpaceOverview(){c.spaceOverview=null;}});
+ const c=vm.createContext({...matchCommands,spaceOverview:state,accountId:'tal',transferBrowserSelection,transferPairValid,spaceOverviewRender(){draws++;},spaceRequireReload(){reloads++;},render(){},clearSpaceOverview(){c.spaceOverview=null;}});
  vm.runInContext(readFileSync('src/space-transfer-vaults-client.js','utf8'),c);
  vm.runInContext(readFileSync('src/space-transfers-client.js','utf8'),c);
  return {c,state,out,incoming,draws:()=>draws,reloads:()=>reloads};
@@ -126,6 +127,6 @@ test('Uncertain or conflicting match save disables retries until refresh; authen
 });
 test('Late match responses cannot repopulate a closed view or a changed identity',async()=>{
  const h=await clientHarness();let resolve;h.c.spaceOverviewJSON=()=>new Promise(r=>resolve=r);
- const saving=h.c.saveSpaceTransferMatch('transfer-save');h.c.spaceOverview=null;resolve({accountId:'tal',revision:1,items:[]});await saving;assert.equal(h.state.privateMatches.revision,0);
+ const saving=h.c.saveSpaceTransferMatch('transfer-save');await new Promise(r=>setImmediate(r));h.c.spaceOverview=null;resolve({accountId:'tal',revision:1,items:[]});await saving;assert.equal(h.state.privateMatches.revision,0);
  const changed=await clientHarness();changed.c.spaceOverviewJSON=async()=>({accountId:'other',revision:1,items:[]});await changed.c.saveSpaceTransferMatch('transfer-save');assert.equal(changed.c.spaceOverview,null);assert.equal(changed.reloads(),1);
 });

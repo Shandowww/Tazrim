@@ -1,3 +1,4 @@
+import * as matchCommands from '../src/transfer-match-commands.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -79,7 +80,7 @@ async function clientFixture(){
  const f=await fixtures(true),matching=(vault,legs)=>({envelope:vault.envelope,revision:1,key:vault.key,keys:f.keys.get(legs[0].ref.budget),legs,status:'ready'});
  const entries=new Map([['personal',{meta:{name:'פרטי'},status:'locked',summary:null,matching:matching(f.a,[f.out])}],['house',{meta:{name:'בית'},status:'locked',summary:null,matching:matching(f.b,[f.incoming])}]]);
  const state={user:'tal',asOf:day,entries,privateMatches:{revision:1,items:[{id:f.sealed.id,status:'sealed',sealed:f.sealed}]},controller:new AbortController()};
- const c=vm.createContext({spaceOverview:state,accountId:'tal',transferBrowserSelection,transferPairValid,transferRefsEqual,transferMatchToken,deriveTransferMatchKeys,openTransferMatch,sealTransferMatch,transferLegs,validatePlan,isVault,unlockVault,decryptVault,spaceOverviewRender(){},clearSpaceOverview(){c.spaceOverview=null;},spaceRequireReload(){},render(){}});
+ const c=vm.createContext({...matchCommands,spaceOverview:state,accountId:'tal',transferBrowserSelection,transferPairValid,transferRefsEqual,transferMatchToken,deriveTransferMatchKeys,openTransferMatch,sealTransferMatch,transferLegs,validatePlan,isVault,unlockVault,decryptVault,spaceOverviewRender(){},clearSpaceOverview(){c.spaceOverview=null;},spaceRequireReload(){},render(){}});
  vm.runInContext(readFileSync('src/space-transfer-vaults-client.js','utf8'),c);vm.runInContext(readFileSync('src/space-transfers-client.js','utf8'),c);return{...f,c,state};
 }
 test('Only unlocked, freshly verified sources turn a sealed server record into a current client match',async()=>{
@@ -102,7 +103,7 @@ test('Encrypted match submission contains ciphertext/tokens only and validates t
 
 test('Closing the overview synchronously releases temporary keys, transfer snippets and decrypted match refs',async()=>{
  const f=await clientFixture(),matching=f.state.entries.get('house').matching;
- const c=vm.createContext({state:f.state,window:{addEventListener(){}},document:{getElementById:()=>null}});
+ const c=vm.createContext({...matchCommands,state:f.state,window:{addEventListener(){}},document:{getElementById:()=>null}});
  vm.runInContext(readFileSync('src/space-overview-client.js','utf8'),c);vm.runInContext('spaceOverview=state;clearSpaceOverview()',c);
  assert.equal(matching.key,null);assert.equal(matching.keys,null);assert.equal(matching.legs.length,0);assert.equal(f.state.entries.size,0);assert.equal(f.state.privateMatches,null);
 });

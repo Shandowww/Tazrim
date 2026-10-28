@@ -17,15 +17,10 @@ async function saveSpaceTransferMatch(action,id){
  const selection=transferBrowserSelection(state.entries,state.privateMatches.items),out=selection.legs.find(l=>l.key===state.transferOut),incoming=selection.legs.find(l=>l.key===state.transferIn);
  if(action==='transfer-save'&&(selection.blocked||!transferPairValid(out,incoming)))return;
  if(action==='transfer-delete'&&!state.privateMatches.items.some(m=>m.id===id))return;
- let body=action==='transfer-save'?{accountId:state.user,out:out.ref,in:incoming.ref,confirmed:true,revision:state.privateMatches.revision}:{accountId:state.user,id,revision:state.privateMatches.revision};
+ let body;
  state.privateMatchSaving=true;state.transferError='';state.transferNotice='';spaceOverviewRender();
  try{
-  if(action==='transfer-save'&&[out,incoming].some(l=>state.entries.get(l.ref.budget)?.matching)){
-   const keys=spaceTransferKeys(state),sources=[];
-   for(const leg of [out,incoming]){const matching=state.entries.get(leg.ref.budget)?.matching;sources.push({budget:leg.ref.budget,revision:leg.ref.revision,token:await transferMatchToken(state.user,leg.ref,keys.get(leg.ref.budget)),...(matching?{keyId:matching.envelope.keyId,context:matching.envelope.context}:{})});}
-   body={accountId:state.user,confirmed:true,revision:state.privateMatches.revision,sealed:await sealTransferMatch(state.user,sources,out.ref,incoming.ref,keys)};
-   if(spaceOverview!==state||accountId!==state.user)return;
-  }
+  body=await transferMatchRequest(state,action,id);if(spaceOverview!==state||accountId!==state.user)return;
   const result=await spaceOverviewJSON('/api/transfer-matches',state.controller.signal,{method:action==='transfer-save'?'POST':'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(spaceOverview!==state)return;
   if(result.accountId!==state.user||accountId!==state.user){clearSpaceOverview();spaceRequireReload();render();return;}
