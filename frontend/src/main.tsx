@@ -35,6 +35,7 @@ const RecurringPage = lazy(async () => ({ default: (await import('./app/recurrin
 const HistoryPage = lazy(async () => ({ default: (await import('./app/history-page')).HistoryPage }))
 const CardPayerPage = lazy(async () => ({ default: (await import('./app/card-payer-page')).CardPayerPage }))
 const BillingPage = lazy(async () => ({ default: (await import('./app/billing-page')).BillingPage }))
+const CardStopPage = lazy(async () => ({ default: (await import('./app/card-stop-page')).CardStopPage }))
 const CardPage = lazy(async () => ({ default: (await import('./app/card-page')).CardPage }))
 const SavingsTransferPage = lazy(async () => ({ default: (await import('./app/savings-transfer-page')).SavingsTransferPage }))
 const InvestmentPage = lazy(async () => ({ default: (await import('./app/investment-page')).InvestmentPage }))
@@ -191,6 +192,7 @@ function App() {
               <Route path="/details/:id/edit" element={<DetailManagementPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/details/:id/delete" element={<DetailManagementPage key={budgetId + pathname + search} mode="delete" fixture={fixture} budget={budget} />} />
               <Route path="/details/:id/clear" element={<DetailManagementPage key={budgetId + pathname + search} mode="clear" fixture={fixture} budget={budget} />} />
+              <Route path="/cards/:id/stop" element={<CardStopPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/no-activity" element={<BillingPage key={budgetId + pathname + search} noActivity fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/billing" element={<BillingPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/billing/:date" element={<BillingPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
