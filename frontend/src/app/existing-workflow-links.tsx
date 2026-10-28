@@ -8,6 +8,7 @@ const nativeWorkflows=[
  ['/savings/schedule','תכנון הפקדות חודשיות לחיסכון'],
  ['/savings/transfers','העברות חיסכון ואישור ביצוע'],
  ['/details/manage','ניהול צ׳קים ופירוט ידני'],
+ ['/categories/manage','ניהול מילון הקטגוריות'],
  ['/categories/limits','תקרות הוצאה לפי קטגוריה'],
  ['/card-setup','פרטי הכרטיסים'],
 ] as const

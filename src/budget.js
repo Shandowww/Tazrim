@@ -505,6 +505,7 @@ export const categoryTree={
 };
 export const detailCategories=Object.entries(categoryTree).flatMap(([parent,children])=>[parent,...children.map(child=>parent+' / '+child)]);
 const categoryKey=value=>String(value??'').normalize('NFKC').trim();
+export function categoryManagementOptions(p){return [...new Set([...detailCategories,...(p.categoryRegistry?.entries??[]).filter(row=>!row.mergedInto).map(row=>row.label),...(p.details??[]).map(row=>categoryRegistryEntry(p,row.category)?.label??row.category)])];}
 export function categoryRegistryEntry(p,label){
  const key=categoryKey(label),entries=p.categoryRegistry?.entries??[];let entry=entries.find(entry=>[entry.label,...entry.aliases].some(name=>categoryKey(name)===key))??null;const seen=new Set();while(entry?.mergedInto&&!seen.has(entry.id)){seen.add(entry.id);entry=entries.find(row=>row.id===entry.mergedInto)??null;}return entry;
 }

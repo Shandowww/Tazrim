@@ -45,6 +45,7 @@ const PlannedItemsPage = lazy(async () => ({ default: (await import('./app/plann
 const CashMonthlyPage = lazy(async () => ({ default: (await import('./app/cash-monthly-page')).CashMonthlyPage }))
 const AccountPage = lazy(async () => ({ default: (await import('./app/account-page')).AccountPage }))
 const MonthlyPage = lazy(async () => ({ default: (await import('./app/monthly-page')).MonthlyPage }))
+const CategoryManagementPage = lazy(async () => ({ default: (await import('./app/category-management-page')).CategoryManagementPage }))
 const CategoryLimitPage = lazy(async () => ({ default: (await import('./app/category-limit-page')).CategoryLimitPage }))
 const DetailManagementPage = lazy(async () => ({ default: (await import('./app/detail-management-page')).DetailManagementPage }))
 const DetailAnnotationPage = lazy(async () => ({ default: (await import('./app/detail-annotation-page')).DetailAnnotationPage }))
@@ -181,6 +182,7 @@ function App() {
               <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/:id/delete" element={<ReportStatePage key={budgetId + pathname + search} remove fixture={fixture} budget={budget} />} />
               <Route path="/cards/:id/payer" element={<CardPayerPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/categories/manage" element={<CategoryManagementPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/categories/limits" element={<CategoryLimitPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/details/manage" element={<DetailManagementPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
               <Route path="/details/new" element={<DetailManagementPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
