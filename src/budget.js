@@ -177,6 +177,9 @@ export function updateSavingSchedule(p,from,amounts){
  if(!validatePlan(next))throw Error('לא ניתן לעדכן את ההפקדות עם הנתונים האלה.');return next;
 }
 
+// Original report-expectation form entity order and capture, shared by both UIs.
+export function reportExpectationEntities(p){return [...cashAccountList(p).map(a=>({kind:'bank',id:a.id,name:a.label})),...creditCards(p).map(c=>({kind:'card',id:c.id,name:c.name}))];}
+export function captureReportExpectationRules(entities,rows){if(!Array.isArray(rows)||rows.length!==entities.length)throw Error('רשימת המקורות השתנתה. יש לפתוח את ההגדרות מחדש.');return rows.map((r,i)=>{if(!r||typeof r.enabled!=='boolean'||['start','due','grace','exceptions'].some(k=>typeof r[k]!=='string'))throw Error('יש לבדוק את שדות הדוחות הצפויים.');const e=entities[i];return{kind:e.kind,target:e.id,enabled:r.enabled,startMonth:r.start,dueDay:Number(r.due),graceDays:Number(r.grace),exceptions:r.exceptions.split(/[,\s]+/).filter(Boolean)};});}
 // Original investment calculator inputs/goal transition, shared by both interfaces.
 export function investmentHistoryFor(p,asOf){const months=Object.keys(p.months).filter(m=>m<=asOf&&p.months[m].actual).sort().slice(-3);return{months,average:months.length?months.reduce((n,m)=>n+cents(p.months[m].values.personalInvest)+cents(p.months[m].values.sharedInvest),0)/months.length/100:0};}
 export function investmentDepositsFor(p,asOf){return Object.entries(p.months).filter(([m,r])=>m<=asOf&&r.actual).reduce((n,[m,r])=>n+cents(r.values.personalInvest)+cents(r.values.sharedInvest),0)/100;}

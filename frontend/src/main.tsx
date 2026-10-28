@@ -23,6 +23,7 @@ import './app.css'
 import Link from './app/link'
 
 const HelpPage = lazy(async () => ({ default: (await import('./app/help-page')).HelpPage }))
+const ReportExpectationsPage = lazy(async () => ({ default: (await import('./app/report-expectations-page')).ReportExpectationsPage }))
 const ReportHistoryPage = lazy(async () => ({ default: (await import('./app/report-history-page')).ReportHistoryPage }))
 const ReportGroupPage = lazy(async () => ({ default: (await import('./app/report-group-page')).ReportGroupPage }))
 const ReportStatePage = lazy(async () => ({ default: (await import('./app/report-state-page')).ReportStatePage }))
@@ -226,6 +227,7 @@ function App() {
               <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/settings/report-expectations" element={<ReportExpectationsPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/history" element={<ReportHistoryPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/history/:id/undo" element={<ReportHistoryPage key={budgetId + pathname + search} fixture={fixture} budget={budget} undo />} />
               <Route path="/upload/group" element={<ReportGroupPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />

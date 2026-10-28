@@ -4,9 +4,10 @@ export function createActions(db,{isAllowed,now=()=>Date.now(),reports=()=>[]}={
  CREATE TABLE IF NOT EXISTS report_expectations(scope TEXT PRIMARY KEY,revision INTEGER NOT NULL,data TEXT NOT NULL);`);
  return async(request,user)=>{try{
  const budget=new URL(request.url).searchParams.get('budget')??'personal',access=budgetAccess(db,user,budget,{isAllowed}),{scope}=access;
- if(request.method==='GET'){const row=db.prepare('SELECT revision,data FROM report_expectations WHERE scope=?').get(scope);return serviceJSON({preferences:Object.fromEntries(db.prepare('SELECT issue_key,evidence,until FROM action_preferences WHERE user_id=? AND scope=?').all(user.id,scope).map(r=>[r.issue_key,{evidence:r.evidence,until:r.until}])),expectations:row?JSON.parse(row.data):[],revision:row?.revision??0,reports:reports(scope)});}
+ if(request.method==='GET'){const row=db.prepare('SELECT revision,data FROM report_expectations WHERE scope=?').get(scope);return serviceJSON({accountId:user.id,accountEmail:user.email,budgetId:budget,actionIdentityBound:true,preferences:Object.fromEntries(db.prepare('SELECT issue_key,evidence,until FROM action_preferences WHERE user_id=? AND scope=?').all(user.id,scope).map(r=>[r.issue_key,{evidence:r.evidence,until:r.until}])),expectations:row?JSON.parse(row.data):[],revision:row?.revision??0,reports:reports(scope)});}
  if(request.method!=='POST')throw serviceError('הפעולה אינה נתמכת.',405);
  const input=await boundedJSON(request);
+ if(Object.hasOwn(input,'accountId')&&input.accountId!==user.id)throw serviceError('החשבון השתנה. יש לפתוח את הפעולה מחדש בחשבון המקורי.',403);
  if(input.action==='expectations'){
   budgetAccess(db,user,budget,{write:true,isAllowed});
   if(!Number.isSafeInteger(input.revision)||input.revision<0||!Array.isArray(input.rules)||input.rules.length>40)throw serviceError('יש לבדוק את הגדרות הדוחות.');
