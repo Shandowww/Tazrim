@@ -217,7 +217,7 @@ app.addEventListener('change',async event=>{let target=event.target,name=target.
  if(handleTrialInput(target,name)){if(target.dataset?.current!==undefined){target.dataset.current=target.value||target.dataset.current;target.placeholder=target.dataset.current;target.value='';}return;}
  if((target.type==='number'||target.dataset.amountInput)&&target.value==='')return;
  if(name==='item-name'&&target.value==='')return;
- if(name==='profile-name'){const next=clone(plan);next.profileName=target.value.trim();mutate(next);return;}
+ if(name==='profile-name'){mutate(updateProfileName(plan,target.value));return;}
  if(name?.startsWith('goal-')){const next=clone(plan);next.goals={saving:0,invest:0,spending:0,income:0,...next.goals,[name.slice(5)]:readNumber(target.value)};mutate(next);return;}
  if(name==='detail-view-month'&&!guardMonthlyNavigation()){render();return;}if(name==='selected-month'){if(!guardMonthlyNavigation()){render();return;}selectedMonth=target.value;if(typeof homeUI!=='undefined'&&homeUI.reportMonth!==null)homeUI.reportMonth=selectedMonth;monthlySalaryChanged=false;render();return;}
  if(name?.startsWith('purchase-')){const key=name.slice(9);purchase[key]=['amount','fees'].includes(key)?readNumber(target.value):target.value;render();return;}

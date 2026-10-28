@@ -1347,3 +1347,5 @@ export function reportInboxValid(p){
  const hash=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s),id=s=>typeof s==='string'&&s.length>0&&s.length<=100;
  return !!b&&b.version===1&&Array.isArray(b.bindings)&&b.bindings.length<=100&&Array.isArray(b.receipts)&&b.receipts.length<=2000&&new Set(b.bindings.map(r=>r?.key)).size===b.bindings.length&&new Set(b.receipts.map(r=>r?.hash)).size===b.receipts.length&&b.bindings.every(r=>r&&hash(r.key)&&['bank','card'].includes(r.kind)&&id(r.target))&&b.receipts.every(r=>r&&hash(r.hash)&&['bank','card'].includes(r.kind)&&id(r.target)&&id(r.reference)&&(r.proof===undefined||hash(r.proof)));
 }
+
+export function updateProfileName(p,value){const next=clone(p);next.profileName=value.trim();return next;}

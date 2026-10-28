@@ -1,3 +1,4 @@
+import {ProfilePage} from './app/profile-page'
 const TransferMatchesPage = lazy(async () => ({ default: (await import('./app/transfer-matches-page')).TransferMatchesPage }))
 const OverviewPage = lazy(async () => ({ default: (await import('./app/overview-page')).OverviewPage }))
 const DeviceDraftPage = lazy(async () => ({ default: (await import('./app/device-draft-page')).DeviceDraftPage }))
@@ -253,6 +254,7 @@ function App() {
               <Route path="/settings/spaces" element={<SpacesPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/settings/security" element={<SecurityPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/history" element={<HistoryPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/settings/profile" element={<ProfilePage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings" element={<div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
