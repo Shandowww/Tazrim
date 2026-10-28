@@ -1307,6 +1307,13 @@ export function saveCashMonth(p,id,month,record,asOf){
 }
 export function assignCashRemainder(p,id,month){const next=clone(p),rest=cashUnassigned(p,month);if(Object.values(rest).some(v=>v<0))throw Error('יש פער בין החשבונות לסיכום; בדוק את הסכומים לפני שיוך.');const current=cashAccountValues(p,id,month);next.cashPlanning=cashPlanningBase(p);next.cashPlanning.months[month]??={};const values=clone(current.values);for(const [k,v]of Object.entries(rest))values[k]=(cents(values[k]??0)+cents(v))/100;next.cashPlanning.months[month][id]={values,actual:current.record?.actual??p.months[month]?.actual??false,includesPlannedCard:current.record?.includesPlannedCard??false,includesPlannedDirect:current.record?.includesPlannedDirect??false,...(current.record?.balance!==undefined?{balance:current.record.balance}:{})};if(!validatePlan(next))throw Error('לא ניתן לשייך את הנתונים.');return next;}
 
+// Original cash-settings payer transition, shared by both interfaces. Source records are never moved.
+export function assignCashPayers(p,links){
+ const next=clone(p);next.cashPlanning=cashPlanningBase(next);
+ for(const c of creditCards(next))if(Object.hasOwn(links.cards??{},c.id)){const id=links.cards[c.id];if(id)next.cashPlanning.cardAccounts[c.id]=id;else delete next.cashPlanning.cardAccounts[c.id];}
+ for(const [key,items]of [['items',next.expenses],['loans',next.loans??[]],['details',next.details??[]],['savings',next.savingTransfers??[]]])for(const item of items){const id=links[key]?.[item.id];if(id)item.cashAccountId=id;}
+ if(!validatePlan(next))throw Error('יש לבדוק את פרטי החשבון והשיוך. דיווחים ופריטים קיימים חייבים להתאים לחשבון המשלם.');return next;
+}
 export function cashLinksValid(p){if(['expenses','loans','details','savingTransfers'].some(k=>p[k]!==undefined&&!Array.isArray(p[k])))return false;const ids=new Set(cashAccountList(p).map(a=>a.id));return [...(p.expenses??[]),...(p.loans??[]),...(p.details??[]),...(p.savingTransfers??[])].every(e=>(e.cashAccountId===undefined||ids.has(e.cashAccountId))&&(e.cardId===undefined||creditCards(p).some(c=>c.id===e.cardId))&&(!e.cashAccountId||!e.cardId||!p.cashPlanning?.cardAccounts[e.cardId]||p.cashPlanning.cardAccounts[e.cardId]===e.cashAccountId));}
 
 function cashPlanIncludes(p,e,month,record){const id=!p._cashAccountProjection&&cashAccountList(p).length>1?cashAssignedItem(p,e):null;const r=id?cashSourceRecords(p,id)[month]:record;return !!(r?.includesPlannedCard&&e.source==='card'&&e.kind==='expense'||r?.includesPlannedDirect&&e.source==='direct');}

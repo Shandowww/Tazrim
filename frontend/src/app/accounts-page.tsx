@@ -20,7 +20,7 @@ function currentPeriod(search: string) {
 }
 
 export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards'; fixture: boolean; budget: ReturnType<typeof useBudget> }) {
-  const { search } = useLocation()
+  const { search, state } = useLocation()
   const { id } = useParams()
   const periodHref = usePeriodHref()
   const editorHref = legacyBudgetHref(search)
@@ -50,6 +50,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
     color: navRows.find(row => row.id === account.id)!.color, colorChoice: account.color, archived: false }))
   return <CardWallet key={kind + budget.budgetId} kind={kind} cards={walletCards}>
     <div className="wallet-shell__head">
+    {!fixture && budget.status==='ready' && typeof state?.setupSavedMessage==='string' && state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId && <p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         {id && <Link href={periodHref(`/${kind}`)} className="mb-2 inline-block text-sm text-primary underline">חזרה אל {title}</Link>}
@@ -75,11 +76,13 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       </ul>
     </section>}
     {selected && <p className="text-sm text-muted-foreground">{kind === 'banks' && 'balance' in selected && selected.balance ? `יתרה מדווחת לתאריך ${selected.balance.date} · ` : ''}הסכומים מוצגים לתקופה שנבחרה בכותרת.</p>}
+    {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/payer')}>שיוך חשבון משלם</Link></p>}
+    {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/billing')}>עדכון סך החיוב הרשמי</Link></p>}
     {kind === 'cards' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/card-setup')}>הגדרת כרטיסים</Link></p>}
-    {kind === 'banks' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref(selected?'/accounts/'+encodeURIComponent(selected.id)+'/edit':'/accounts/new')}>{selected?'עריכת חשבון ידני':'הוספת חשבון ידני'}</Link></p>}
+    {kind === 'banks' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref(selected?'/accounts/'+encodeURIComponent(selected.id)+'/edit':'/accounts/new')}>{selected?'עריכת חשבון':'הוספת חשבון ידני'}</Link></p>}
     {selected && kind === 'banks' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/accounts/'+encodeURIComponent(selected.id)+'/monthly')}>דיווח חודשי לחשבון</Link></p>}
     {selected && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/categories?' + new URLSearchParams(kind === 'cards' ? { card: fixture ? 'card1' : selected.id } : { account: selected.id }))}>פתיחת הפירוט השמור {kind === 'cards' ? 'של הכרטיס' : 'של החשבון'}</Link></p>}
     </div>
-    <section className="wallet-shell__rest surface rounded-xl p-5 text-sm text-muted-foreground">{fixture ? 'נתוני דוגמה בלבד. אין עריכה או שמירה של נתונים בדוגמה.' : <>תצוגה לקריאה בלבד. <a href={editorHref} className="text-primary underline">עריכה ופרטים נוספים בממשק הקיים</a></>}</section>
+    <section className="wallet-shell__rest surface rounded-xl p-5 text-sm text-muted-foreground">{fixture ? 'נתוני דוגמה בלבד. אין עריכה או שמירה של נתונים בדוגמה.' : <>הסיכום מציג נתונים שמורים. <a href={editorHref} className="text-primary underline">עריכה ופרטים נוספים בממשק הקיים</a></>}</section>
   </CardWallet>
 }

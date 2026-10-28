@@ -565,3 +565,6 @@ Source workflow connections — 2026-10-28: React now connects original bank und
 
 
 Original savings connection — 2026-10-28: native recurring schedules, goal redistribution preview/apply and pending saving requests/create/complete/cancel call original models and guarded plan saves. Build/typecheck,886 regressions and15 checks pass. Browser access restored; synthetic schedule/request lost-response recovery, bank-execution acknowledgment, keyboard goal distribution,390px RTL/no-overflow and shared-viewer refusal passed. Broader parity/device/vault/report/space connections and safe release remain open; see docs/tazrim-migration/execution-status.md. Production/Sites/real records unchanged.
+
+
+Original card action connection — 2026-10-28: native billing-total correction and explicit card-payer assignment call original saveBillingReport and shared original assignCashPayers. Source details/receipts/history are preserved, current/near-date and incompatible-payer guards retained. Build/typecheck,891 regressions and15 checks pass. Synthetic browser verified payer save, total lost-response recovery and conflicting-payer refusal; other users/scopes unchanged. Full legacy per-item assignment, lifecycle/source management, vault/space/settings/detail and device/release gates remain; see docs/tazrim-migration/execution-status.md. No production/Sites/real-record change.

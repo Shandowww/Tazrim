@@ -33,6 +33,8 @@ const SavingsBalancePage = lazy(async () => ({ default: (await import('./app/sav
 const ScenarioPage = lazy(async () => ({ default: (await import('./app/scenario-page')).ScenarioPage }))
 const RecurringPage = lazy(async () => ({ default: (await import('./app/recurring-page')).RecurringPage }))
 const HistoryPage = lazy(async () => ({ default: (await import('./app/history-page')).HistoryPage }))
+const CardPayerPage = lazy(async () => ({ default: (await import('./app/card-payer-page')).CardPayerPage }))
+const BillingPage = lazy(async () => ({ default: (await import('./app/billing-page')).BillingPage }))
 const CardPage = lazy(async () => ({ default: (await import('./app/card-page')).CardPage }))
 const SavingsTransferPage = lazy(async () => ({ default: (await import('./app/savings-transfer-page')).SavingsTransferPage }))
 const SavingsSchedulePage = lazy(async () => ({ default: (await import('./app/savings-schedule-page')).SavingsSchedulePage }))
@@ -174,6 +176,9 @@ function App() {
               <Route path="/accounts/:id/monthly/correction" element={<CashMonthlyPage key={budgetId + pathname + search} fixture={fixture} budget={budget} correction />} />
               <Route path="/accounts/:id/monthly" element={<CashMonthlyPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/monthly" element={<MonthlyPage key={budgetId + search} fixture={fixture} budget={budget} />} />
+              <Route path="/cards/:id/payer" element={<CardPayerPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/cards/:id/billing" element={<BillingPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/cards/:id/billing/:date" element={<BillingPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/savings/transfer" element={<SavingsTransferPage key={budgetId + pathname + search} mode="allocation" fixture={fixture} budget={budget} />} />
               <Route path="/savings/transfers" element={<SavingsTransferPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
               <Route path="/savings/transfers/new" element={<SavingsTransferPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />

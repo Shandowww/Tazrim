@@ -1,4 +1,4 @@
-import {creditCards,cardsValid,clone,validatePlan,cashAccountList,cashPlanningBase,cashCardAccount} from '../../../src/budget.js'
+import {creditCards,cardsValid,clone,validatePlan,cashAccountList,cashPlanningBase,cashCardAccount,assignCashPayers} from '../../../src/budget.js'
 export interface CardDraft {name:string;alias:string;billingDay:string;payer:string}
 export function cardConfigEligibility(plan:any,id:string,create=false){
  if(!validatePlan(plan))return 'התקציב אינו זמין לעריכת כרטיסים.'
@@ -23,4 +23,10 @@ export function prepareCardConfig(plan:any,id:string,draft:CardDraft,create=fals
  if(create&&draft.payer){next.cashPlanning=cashPlanningBase(next);next.cashPlanning.cardAccounts[id]=draft.payer}
  if(!cardsValid(next)||!validatePlan(next))throw Error('יש להזין שם וכינוי ייחודי ותקין; אין להזין מספר כרטיס מלא. אפשר לנהל עד 30 כרטיסים.')
  return next
+}
+
+export function prepareCardPayer(plan:any,id:string,payer:string){
+ const reason=cardConfigEligibility(plan,id);if(reason)throw Error(reason)
+ if(typeof payer!=='string'||payer.length>100||payer&&!cashAccountList(plan).some((a:any)=>a.id===payer))throw Error('יש לבחור חשבון שקיים במרחב הזה.')
+ return assignCashPayers(plan,{cards:{[id]:payer}})
 }
