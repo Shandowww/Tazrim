@@ -20,6 +20,7 @@ const nativeWorkflows=[
  ['/card-setup','פרטי הכרטיסים'],
 ] as const
 const workflows=[
+ ['migration','סקירת מעבר חשבון וביצוע מוגן בממשק הקיים'],
  ['reports','אפשרויות נוספות במרכז הדוחות'],
  ['report-history','תיקונים וניהול היסטוריית המקור'],
  ['accounts','שיוך פריטים ואפשרויות נוספות לחשבונות'],
