@@ -669,6 +669,13 @@ export function detailsValid(p){
  }
  return true;
 }
+// Original detail editor actions shared with the React input adapter.
+export function saveExpenseDetail(p,input){
+ const draft={...clone(input),id:input.id||crypto.randomUUID(),name:input.name.trim(),category:input.category.trim()},next=clone(p);next.details=[...(next.details??[])];const index=next.details.findIndex(e=>e.id===draft.id);if(index>=0)next.details[index]=draft;else next.details.push(draft);
+ if(!detailsValid(next)||!validatePlan(next))throw Error('יש לבדוק תיאור, קטגוריה, סכום, שיוך ותאריך בטווח התחזית. עד 5,000 פרטים לתקציב.');return next;
+}
+export function removeExpenseDetail(p,id){const next=clone(p);next.details=(next.details??[]).filter(e=>e.id!==id);if(!validatePlan(next))throw Error('הפריט מקושר למקורות או להחלטות שמורות. יש לבדוק אותם לפני מחיקה.');return next;}
+export function clearExpenseCheque(p,id){const next=clone(p),entry=next.details?.find(e=>e.id===id&&e.method==='checks'&&e.status==='pending');if(!entry)throw Error('הצ׳ק אינו ממתין לפירעון.');entry.status='cleared';if(!validatePlan(next))throw Error('יש לבדוק את שיוך הצ׳ק והמקורות לפני סימון כנפרע.');return next;}
 export function detailSummary(p,m){
  const rows=(p.details??[]).filter(e=>e.month===m&&e.status!=='cancelled'),values=monthlyValues(p,m);
  const groups=paymentMethods(p).filter(([k])=>k!=='transfers').map(([method,label])=>{
@@ -693,6 +700,9 @@ export function categoryMonths(p,m,category='',count=6,asOf=m){
   return{month,amount,hasDetails:summary.hasDetails,actual,complete:actual&&summary.unexplained===0&&!summary.over&&!pending,unexplained:summary.unexplained,over:summary.over};
  });
 }
+export function expenseCategoryOptions(p){return [...new Set([...detailCategories,...analyticalExpenseDetails(p).map(e=>e.category),...Object.keys(p.categoryGoals??{}),...(p.categoryRegistry?.entries??[]).map(entry=>entry.label)].map(label=>categoryRegistryEntry(p,label)?.label??label))].filter(label=>!categoryRegistryEntry(p,label)?.archivedAt);}
+export function setCategorySpendingLimit(p,category,amount){if(!amount||amount<0)throw Error('יש להזין תקרה גדולה מאפס.');const next=clone(p);next.categoryGoals=Object.fromEntries([...Object.entries(next.categoryGoals??{}).filter(([k])=>k!==category),[category,amount]]);if(!validatePlan(next))throw Error('יש לבדוק את הקטגוריה ואת סכום התקרה.');return next;}
+export function removeCategorySpendingLimit(p,category){const next=clone(p);if(next.categoryGoals)delete next.categoryGoals[category];if(!validatePlan(next))throw Error('לא ניתן להסיר את התקרה עם הנתונים האלה.');return next;}
 export function categoryGoalProgress(p,m,category,asOf){
  const summary=detailSummary(p,m),amount=categoryAmount(summary.categories,category);
  const target=Object.hasOwn(p.categoryGoals??{},category)?p.categoryGoals[category]:0;

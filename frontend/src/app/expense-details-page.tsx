@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import Link from './link'
 import { budgetDetailView, budgetDetailSource, detailSearchResults } from './detail-adapter'
-import { legacyBudgetHref } from './navigation-query'
+import { legacyBudgetHref, withViewQuery } from './navigation-query'
 import { CategoryDonut } from '../tazrim/components/cards/category-donut'
 import { SearchResultList } from '../tazrim/components/search/search-result-list'
 import { formatCurrency } from '../tazrim/lib/utils/currency'
@@ -14,6 +14,7 @@ import { demoDetailPlan } from './demo-fixture'
 
 export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categories' | 'search' | 'source'; fixture: boolean; budget: ReturnType<typeof useBudget> }) {
   const { search, state } = useLocation(), navigate = useNavigate(), { id } = useParams(), params = new URLSearchParams(search)
+  const managementHref=withViewQuery('/details/manage',search),limitsHref=withViewQuery('/categories/limits',search)
   const editorHref = legacyBudgetHref(search), options = periodFor(search)
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען פירוט…</section>
   if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message}</section>
@@ -40,7 +41,7 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
       <Link className="text-primary underline" href={href(back, { from: null })}>חזרה לפירוט</Link>
       <h1 className="text-2xl font-semibold">הרשומה המקורית שנשמרה</h1>{!fixture&&budget.status==='ready'&&budget.spaces.find(space=>space.id===budget.budgetId)?.role!=='viewer'&&<Link className="inline-flex min-h-11 items-center text-sm text-primary underline" href={href('/details/'+encodeURIComponent(raw.id)+'/annotate')}>סיווג, פיצול ותגיות</Link>}
       {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
-    {typeof state?.setupSavedMessage==='string'&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
+    {typeof state?.setupSavedMessage==='string'&&(!state?.setupSavedScope||budget.status==='ready'&&state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId)&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
       <section className="surface rounded-xl p-5 space-y-3"><h2 className="font-semibold"><bdi>{raw.name}</bdi></h2>
         <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
           <dt>סכום מקורי שנשמר</dt><dd><bdi dir="ltr">{formatCurrency(raw.amountCents / 100)}</bdi></dd>
@@ -60,9 +61,9 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
   const page = Math.max(1, Math.min(Math.ceil(view.rows.length / 50) || 1, Math.floor(Number(params.get('page')) || 1))), shown = view.rows.slice((page - 1) * 50, page * 50)
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const data = new FormData(event.currentTarget); navigate(href('/' + mode, { query: String(data.get('query') || '').trim() || null, page: null })) }
   return <div className="mx-auto max-w-7xl space-y-5">
-    <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold">{mode === 'search' ? 'חיפוש בפירוט שנפרע' : 'קטגוריות ופירוט'}</h1><Link className="text-primary underline text-sm" href={href(mode === 'search' ? '/categories' : '/search', { page: null })}>{mode === 'search' ? 'פתיחת הקטגוריות' : 'חיפוש בפירוט'}</Link></div>
+    <Link href={limitsHref} className="inline-flex min-h-11 items-center text-sm text-primary underline">תקרות הוצאה לפי קטגוריה</Link><Link href={managementHref} className="inline-flex min-h-11 items-center text-sm text-primary underline">ניהול צ׳קים ופירוט ידני במרחב</Link><div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold">{mode === 'search' ? 'חיפוש בפירוט שנפרע' : 'קטגוריות ופירוט'}</h1><Link className="text-primary underline text-sm" href={href(mode === 'search' ? '/categories' : '/search', { page: null })}>{mode === 'search' ? 'פתיחת הקטגוריות' : 'חיפוש בפירוט'}</Link></div>
     {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
-    {typeof state?.setupSavedMessage==='string'&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
+    {typeof state?.setupSavedMessage==='string'&&(!state?.setupSavedScope||budget.status==='ready'&&state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId)&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
     <p className="text-sm text-muted-foreground">פירוט שנפרע במרחב ובתקופת החיוב שנבחרו בלבד. החיפוש לפי שם בית העסק המוצג; הוא אינו מחפש בכל תנועות הבנק או בקבצים. תאריכי השורות הם תאריכי הרכישה.</p>
     <form key={budget.budgetId + options.query} onSubmit={submit} className="surface flex flex-wrap gap-3 rounded-xl p-4"><label className="flex-1 min-w-0 text-sm">שם בית עסק<input name="query" type="search" maxLength={80} defaultValue={options.query} className="mt-1 w-full rounded-lg border bg-card px-3 py-2" /></label><button className="self-end rounded-lg border px-4 py-2 text-sm" type="submit">חיפוש</button></form>
     {(options.category || options.account || options.card) && <div className="text-sm">מסננים פעילים: <bdi>{options.category || ''}</bdi>{options.account && ' · חשבון נבחר'}{options.card && ' · כרטיס נבחר'} · <Link className="text-primary underline" href={href('/' + mode, { category: null, account: null, card: null, page: null })}>ניקוי מסננים</Link></div>}

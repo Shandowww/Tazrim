@@ -84,7 +84,7 @@ let detailDraft=null,detailDirty=false,trendCategory='',categoryGoalDraft={categ
 const chequeStatuses=[['pending','ממתין לפירעון'],['cleared','נפרע'],['cancelled','בוטל']];
 function hasDetailDraft(){return (typeof hasGmailDraft==='function'&&hasGmailDraft())||(typeof annotationEditorOpen!=='undefined'&&annotationEditorOpen)||categoryGoalDirty||(detailDraft!==null&&(detailDirty||!!detailDraft.id))||(typeof hasPeriodicDraft==='function'&&hasPeriodicDraft())||(typeof hasInsightDraft==='function'&&hasInsightDraft());}
 function guardDetailNavigation(){if(!hasDetailDraft())return true;notify('יש עריכה פתוחה. יש לאשר או לבטל אותה לפני מעבר.');return false;}
-function knownCategories(){return [...new Set([...detailCategories,...analyticalExpenseDetails(plan).map(e=>e.category),...Object.keys(plan.categoryGoals??{}),...(plan.categoryRegistry?.entries??[]).map(entry=>entry.label)].map(label=>categoryRegistryEntry(plan,label)?.label??label))].filter(label=>!categoryRegistryEntry(plan,label)?.archivedAt);}
+function knownCategories(){return expenseCategoryOptions(plan);}
 function detailDate(month){if(month!==todayMonth())return month+'-01';const parts=new Intl.DateTimeFormat('en',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());return ['year','month','day'].map(k=>parts.find(p=>p.type===k).value).join('-');}
 function newDetail(method){detailDraft={id:'',name:'',amount:0,category:'אחר',method,month:selectedMonth,date:detailDate(selectedMonth),number:'',status:method==='checks'?'pending':'cleared',accounting:method==='checks'?'additional':'included'};detailDirty=false;}
 function monthlyChequeNote(){const extra=chequesFor(plan,selectedMonth)/100;return extra?`<div class="warning-note">ועוד ${money(extra)} מצ׳קים מתוכננים. <button class="btn" data-action="details-open" data-section="cheques">בדיקת הצ׳קים</button></div>`:'';}
@@ -148,8 +148,8 @@ function handleDetailChange(target,name){
  return false;
 }
 function handleDetailSubmit(form){
- if(form.id==='category-goal-form'){const data=budgetFormData(form),category=data.get('category-goal-name'),amount=readNumber(data.get('category-goal-amount')||categoryGoalDraft.amount);if(!amount||amount<0){notify('יש להזין תקרה גדולה מאפס.');return true;}const next=clone(plan);next.categoryGoals=Object.fromEntries([...Object.entries(next.categoryGoals??{}).filter(([k])=>k!==category),[category,amount]]);if(mutate(next,'התקרה עודכנה. יש לשמור את התקציב.')){categoryGoalDirty=false;categoryGoalDraft={category,amount:0};render();}return true;}
- if(form.id!=='detail-form')return false;captureDetailForm();const draft={...detailDraft,id:detailDraft.id||crypto.randomUUID(),name:detailDraft.name.trim(),category:detailDraft.category.trim()},next=clone(plan);next.details=[...(next.details??[])];const index=next.details.findIndex(e=>e.id===draft.id);if(index>=0)next.details[index]=draft;else next.details.push(draft);if(!detailsValid(next)){notify('יש לבדוק תיאור, קטגוריה, סכום ותאריך בטווח התחזית. עד 5,000 פרטים לתקציב.');return true;}if(mutate(next,draft.accounting==='included'?'הפירוט עודכן בלי לשנות את הסך החודשי. יש לשמור.':'הצ׳ק עודכן בתזרים. יש לשמור את התקציב.')){detailDraft=null;detailDirty=false;selectedMonth=draft.month;render();scrollToSection(draft.method==='checks'?'#cheques':'#expense-breakdown');}return true;
+ if(form.id==='category-goal-form'){const data=budgetFormData(form),category=data.get('category-goal-name'),amount=readNumber(data.get('category-goal-amount')||categoryGoalDraft.amount);if(!amount||amount<0){notify('יש להזין תקרה גדולה מאפס.');return true;}let next;try{next=setCategorySpendingLimit(plan,category,amount);}catch(error){notify(error.message);return true;}if(mutate(next,'התקרה עודכנה. יש לשמור את התקציב.')){categoryGoalDirty=false;categoryGoalDraft={category,amount:0};render();}return true;}
+ if(form.id!=='detail-form')return false;captureDetailForm();const draft={...detailDraft,id:detailDraft.id||crypto.randomUUID()};let next;try{next=saveExpenseDetail(plan,draft);}catch(error){notify(error.message);return true;}if(mutate(next,draft.accounting==='included'?'הפירוט עודכן בלי לשנות את הסך החודשי. יש לשמור.':'הצ׳ק עודכן בתזרים. יש לשמור את התקציב.')){detailDraft=null;detailDirty=false;selectedMonth=draft.month;render();scrollToSection(draft.method==='checks'?'#cheques':'#expense-breakdown');}return true;
 }
 function detailAction(action,btn){
  if(!['details-open','detail-new','detail-cancel','detail-edit','detail-remove','cheque-clear','detail-enable','detail-jump','category-select','category-goal-remove','category-goal-cancel','card-no-transactions','card-no-transactions-undo','deferred-categories'].includes(action))return false;
@@ -170,11 +170,11 @@ function detailAction(action,btn){
  if(action==='detail-jump'){selectedMonth=btn.dataset.month;render();scrollToSection('#cheques');return true;}
  if(action==='category-select'){trendCategory=btn.dataset.category;render();scrollToSection('#category-trend');return true;}
  if(action==='detail-enable'){const next=clone(plan);next.showDetails=true;mutate(next,'הפירוט הופעל. יש לשמור.');scrollToSection('#expense-breakdown');return true;}
- if(action==='category-goal-remove'){const next=clone(plan);delete next.categoryGoals[btn.dataset.category];mutate(next,'התקרה הוסרה. יש לשמור.');return true;}
+ if(action==='category-goal-remove'){try{mutate(removeCategorySpendingLimit(plan,btn.dataset.category),'התקרה הוסרה. יש לשמור.');}catch(error){notify(error.message);}return true;}
  if(action==='detail-new'){tab='detail-management';newDetail(btn.dataset.method);render();scrollToSection('#detail-editor');return true;}
  const entry=plan.details?.find(e=>e.id===btn.dataset.id);if(!entry)return true;
  if(action==='detail-edit'){detailDraft=clone(entry);detailDirty=false;render();scrollToSection('#detail-editor');return true;}
- if(action==='detail-remove'){confirmAction('למחוק את הפריט?',entry.accounting==='included'?'הפירוט יימחק. הסך החודשי לא ישתנה.':'הצ׳ק יימחק וגם התשלום הנפרד שלו יוסר מהתחזית.',()=>{const next=clone(plan);next.details=next.details.filter(e=>e.id!==entry.id);mutate(next,'הפריט נמחק. יש לשמור.');});return true;}
- if(action==='cheque-clear'){const next=clone(plan);next.details=next.details.map(e=>e.id===entry.id?{...e,status:'cleared'}:e);mutate(next,'הצ׳ק סומן כנפרע. יש לשמור.');return true;}
+ if(action==='detail-remove'){confirmAction('למחוק את הפריט?',entry.accounting==='included'?'הפירוט יימחק. הסך החודשי לא ישתנה.':'הצ׳ק יימחק וגם התשלום הנפרד שלו יוסר מהתחזית.',()=>{try{mutate(removeExpenseDetail(plan,entry.id),'הפריט נמחק. יש לשמור.');}catch(error){notify(error.message);}});return true;}
+ if(action==='cheque-clear'){try{mutate(clearExpenseCheque(plan,entry.id),'הצ׳ק סומן כנפרע. יש לשמור.');}catch(error){notify(error.message);}return true;}
  return true;
 }

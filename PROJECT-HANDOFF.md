@@ -574,3 +574,6 @@ Original group/source acceptance — 2026-10-28: browser found and fixed React J
 
 
 Original card no-activity — 2026-10-28: native closed-month declaration/undo use original setCardNoTransactions with evidence/acknowledgment guards and manual-zero provenance restoration. Build/typecheck,896 regressions and15 checks pass; synthetic browser declaration/reopen/undo passed and current charge stayed unchanged. Remaining lifecycle/vault/space/settings/detail/device/release gates are in docs/tazrim-migration/execution-status.md. No production/Sites/real-record change.
+
+
+Original detail/cheque/limit connection — 2026-10-28: native optional detail/cheque create/edit/delete/clear and category caps share original extracted actions/options and guarded saves. Source metadata/aggregate amounts/linked references and included-versus-additional accounting are retained; future creation follows its month. Build/typecheck,905 regressions and15 checks pass. Synthetic browser covered lost-create recovery, clear/edit/included/delete, cap add/remove, viewer refusal and exact390px RTL/no-overflow forms; other users/scopes unchanged. Registry/display/full assignment/lifecycle/onboarding/investment/action/integration/vault/overview/migration/device/release gates remain; see docs/tazrim-migration/execution-status.md. No production/Sites/real-record change.
