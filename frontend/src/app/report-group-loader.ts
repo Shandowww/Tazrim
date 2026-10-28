@@ -10,7 +10,7 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
  const library=await loadReportLibrary(budgetId,base,signal,fetcher),roots=await Promise.all(ids.map(id=>loadStoredReport(budgetId,base,id,signal,fetcher))),drafts=roots.filter(source=>source.state!=='committed').map(source=>source.draft).filter(Boolean)
  if(reimport&&(ids.length!==1||roots[0].state!=='committed'))throw Error('יש לבחור מקור יחיד שכבר נקלט לבדיקה מחודשת.')
  if(drafts.some(d=>d.version!==1||!Array.isArray(d.items))||new Set(drafts.map(d=>d.groupId)).size>1)throw Error('אין למזג קבוצות שמורות שונות. יש להמשיך בכל קבוצה בנפרד.')
- const draft=drafts[0],active=library.reports.filter(r=>!['committed','archived'].includes(r.state)),selected=new Set([...ids,...(draft?.items??[]).filter((item:any)=>active.some(r=>r.id===item.storedId)).map((item:any)=>item.storedId)])
+ const draft=drafts[0],active=library.reports.filter(r=>!['committed','archived'].includes(r.state)),selected=new Set([...(draft?.items??[]).filter((item:any)=>active.some(r=>r.id===item.storedId)).map((item:any)=>item.storedId),...ids])
  if(selected.size>10)throw Error('הקבוצה כוללת יותר מעשרה מקורות. יש להמשיך בממשק הקיים.')
  const sources:StoredReportDetail[]=await Promise.all([...selected].map(id=>loadStoredReport(budgetId,base,id,signal,fetcher)))
  if(sources.some(source=>source.state==='archived'||source.state==='committed'&&!reimport||source.state!=='committed'&&source.draft&&source.draft.groupId!==draft?.groupId))throw Error('מקור בקבוצה כבר טופל או שייך לקבוצה אחרת.')
@@ -26,7 +26,7 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
  }
  if(ui.items.some((item:any)=>item.kind==='card'))ui.merchantRules=await loadReportMerchantRules(budgetId,base,signal,fetcher)
  if(signal.aborted)throw Error('פתיחת הקבוצה בוטלה.')
- return{ui,sources,activitySupported:library.activityCycleReceipts===true}
+ return{ui,sources,activitySupported:library.activityCycleReceipts===true,storageAllowed:reimport||!library.encrypted||library.storageConsented}
 }
 
 /** UI copies must preserve the original controller's Maps/Sets; budget JSON cloning drops their decisions. */

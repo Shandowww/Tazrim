@@ -1,4 +1,3 @@
-import {legacyInterfaceHref} from '../../src/interface-destination.js'
 import {ExistingWorkflowLinks} from './app/existing-workflow-links'
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -173,8 +172,9 @@ function App() {
           <Header budget={budget} />
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
+            {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}
             <Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
-            {!fixture && budget.status==='ready' && budget.value.plan?.format==='monthly-flow-encrypted-v1' ? <SecurityPage fixture={fixture} budget={budget}/> : !fixture && budget.status==='ready' && budget.value.vault && pathname.startsWith('/upload') ? <section className="surface space-y-3 rounded-xl p-4"><h1 className="text-xl font-semibold">מרכז הדוחות בתקציב מוצפן</h1><p>קליטה והתקדמות של דוחות בתקציב מוצפן זמינות במרכז הדוחות הקיים.</p><a className="inline-flex min-h-11 items-center text-primary underline" href={legacyInterfaceHref(search,'reports',pathname.match(/^\/upload\/([a-f0-9-]{36})(?:\/|$)/)?.[1]||'')}>פתיחת מרכז הדוחות</a></section> : <Routes>
+            {!fixture && budget.status==='ready' && budget.value.plan?.format==='monthly-flow-encrypted-v1' ? <SecurityPage fixture={fixture} budget={budget}/> : <Routes>
               <Route path="/" element={<Dashboard fixture={fixture} budget={budget} />} />
               <Route path="/banks" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
               <Route path="/banks/:id" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />

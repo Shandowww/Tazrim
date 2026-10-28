@@ -99,3 +99,8 @@ export async function changeReportInbox(plan,ui,e,reader=null){
    if(key==='sheet'){const {inspectIntake}=reader;Object.assign(item,inspectIntake([item.sheets[Number(e.value)]]));item.identityKey=item.identity?await inboxHash(item.identity):'';item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}
   }
 }
+
+// Original storedReportWrite body and separate-inbox consent, shared by both UIs.
+export function reportCommitPayload(actionId,revision,plan,reports){return{action:'commit',actionId,revision,plan,reports};}
+export function reportStorageConsentPayload(){return{action:'consent',confirmServerRead:true};}
+export const reportStorageDisclosure='הדוחות והתקדמות הבדיקה יישמרו מוצפנים באחסון, אך השרת יוכל לקרוא אותם. משתתפים מורשים בתקציב יוכלו לעיין במקורות. סיסמת התקציב אינה נמסרת. האישור אינו מסיר את הצפנת התקציב.';
