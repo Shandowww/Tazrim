@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "5568b1f446d09d1e9ac99e2ccd840c698155e60d",
+  "sourceCommit": "bf752b6b3a620888f1b431e521f949e856531d64",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft serialization/resume helpers tested; bank progress/atomic API contracts tested; bank draft UI/commit browser acceptance, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
+  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft serialization/resume helpers tested; native single-bank progress/resume/atomic import and scoped browser recovery implemented; advanced report workflows/full device acceptance, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,

@@ -80,3 +80,7 @@ Current application checkpoint771a931 includes guarded scenario UI/apply, saving
 Native source library/inspection and bounded single-source card review/classification/manual duplicate decisions/progress resume/atomic apply are implemented, using original parsers and financial/receipt models. Lost successful commits recover without replay; source/actor/financial revision guards remain mandatory. Bank/mixed/multiple-sheet/activity/multi-file groups and advanced saved groups still use the existing interface. Report undo and remaining management and complete document/mobile acceptance remain pending. See checkpoint.md;831 tests and15 checks passed. No deployment readiness claim.
 
 Report management follow-up: reversible source archive/reactivation now has explicit confirmation, revision/account guards and uncertain-result recovery. Source and progress are retained; committed-source undo, verified-backup cleanup/delete and advanced group workflows remain pending.835 regressions and15 checks passed.
+
+## Native bank import integration — 2026-10-28
+
+Single unambiguous plaintext bank statements now support native review, saved progress/resume, explicit confirmation, budget backup and atomic plan/source import, including uncertain-response recovery without replay.848 regressions/build/15 checks and scoped desktop/390px browser acceptance pass. Advanced/mixed/activity/group workflows and full document/device/release acceptance remain pending; production unchanged. See checkpoint.md for exact boundaries.
