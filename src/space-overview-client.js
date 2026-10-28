@@ -52,19 +52,8 @@ async function refreshSpaceOverview(){
    try{
     const body=await spaceOverviewJSON('/api/plan?budget='+encodeURIComponent(meta.id),signal);if(!current())return;
     if(body.accountId!==state.user){denied();return;}
-    if(!Number.isInteger(body.revision)||body.revision<0)throw Error('Invalid revision');
-    let source=body.plan;const matchingLocked=isVault(source);
-    if(isVault(source)){
-     // Reuse only the currently unlocked, unchanged active budget in memory.
-     const same=meta.id===activeBudget&&loaded&&vaultKey&&!dirty&&revision===body.revision&&vaultEnvelope?.keyId===source.keyId&&vaultEnvelope?.context===source.context;
-     if(!same){entry={meta,status:'locked',summary:null};source=null;}
-     else source=plan;
-    }
-    if(!entry){
-     if(source!==null&&!validatePlan(source))throw Error('Invalid plan');
-     entry={meta,status:source===null?'empty':'ready',summary:source===null?null:summarizeBudgetSpace(source,state.user,meta.id,body.revision,state.asOf)};
-     if(entry.summary&&matchingLocked){entry.summary.transfers=[];entry.summary.transferMatchingLocked=true;}
-    }
+    const projected=overviewBudgetEntry(meta,body,state.user,state.asOf,{id:activeBudget,loaded,key:vaultKey,dirty,revision,envelope:vaultEnvelope,plan});
+    entry=projected.entry;const {source,matchingLocked}=projected;
     if(matchingLocked){entry.matching=await prepareSpaceTransferVault(state,meta,body,previous.get(meta.id)?.matching,source);if(!current())return;}
    }catch(error){
     if(!current())return;

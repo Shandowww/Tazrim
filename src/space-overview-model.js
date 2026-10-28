@@ -1,3 +1,5 @@
+import {isVault} from './vault.js';
+import {validatePlan} from './budget.js';
 import {transferLegs} from './transfer-matching-model.js';
 import {cashAccountList,cashSourceRecords,cents,savingsBalances,savingsFundingAccounts} from './budget.js';
 import {spaceEntityKey,budgetSpaceScope} from './space-model.js';
@@ -41,4 +43,13 @@ export function overviewGoalSelection(entries,spaceId='all',fundingKey=''){
  const goals=readable.flatMap(e=>(e.summary?.savings?.goals??[]).map(goal=>({goal,meta:e.meta,status:e.status,asOf:e.summary.asOf,snapshotMonth:e.summary.savings.snapshotMonth,throughMonth:e.summary.savings.throughMonth})));
  const rows=goals.filter(({goal})=>!fundingKey||(fundingKey==='unassigned'?!(goal.fundingAccounts?.length):goal.fundingAccounts?.some(a=>a.key===fundingKey)));
  return {spaces,selected,accounts,rows};
+}
+
+// The original per-space read projection; callers retain only summaries.
+export function overviewBudgetEntry(meta,body,user,asOf,active,isEncrypted=isVault){
+ if(!Number.isInteger(body.revision)||body.revision<0)throw Error('Invalid revision');
+ let source=body.plan,entry;const matchingLocked=isEncrypted(source);
+ if(matchingLocked){const same=active&&meta.id===active.id&&active.loaded&&active.key&&!active.dirty&&active.revision===body.revision&&active.envelope?.keyId===source.keyId&&active.envelope?.context===source.context;if(!same){entry={meta,status:'locked',summary:null};source=null;}else source=active.plan;}
+ if(!entry){if(source!==null&&!validatePlan(source))throw Error('Invalid plan');entry={meta,status:source===null?'empty':'ready',summary:source===null?null:summarizeBudgetSpace(source,user,meta.id,body.revision,asOf)};if(entry.summary&&matchingLocked){entry.summary.transfers=[];entry.summary.transferMatchingLocked=true;}}
+ return{entry,source,matchingLocked};
 }

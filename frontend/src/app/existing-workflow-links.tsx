@@ -2,6 +2,7 @@ import {useLocation} from 'react-router-dom'
 import {legacyBudgetHref,withViewQuery} from './navigation-query'
 import Link from './link'
 const nativeWorkflows=[
+ ['/overview','תמונה כוללת · חשבונות ומטרות'],
  ['/settings/device-draft','טיוטה שמורה במכשיר'],
  ['/settings/security','הצפנה, נעילה, שחזור וייבוא גיבוי'],
  ['/actions','לטיפול ותזכורות אישיות'],

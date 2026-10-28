@@ -1,3 +1,4 @@
+const OverviewPage = lazy(async () => ({ default: (await import('./app/overview-page')).OverviewPage }))
 const DeviceDraftPage = lazy(async () => ({ default: (await import('./app/device-draft-page')).DeviceDraftPage }))
 import {ExistingWorkflowLinks} from './app/existing-workflow-links'
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
@@ -233,6 +234,7 @@ function App() {
               <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/settings/device-draft" element={<DeviceDraftPage fixture={fixture} budget={budget} />} />
+              <Route path="/overview" element={<OverviewPage fixture={fixture} budget={budget}/>} />
               <Route path="/actions" element={<ActionCenterPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/settings/report-expectations" element={<ReportExpectationsPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/history" element={<ReportHistoryPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
