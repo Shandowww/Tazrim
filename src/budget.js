@@ -1322,6 +1322,9 @@ export function saveCashMonth(p,id,month,record,asOf){
  if(next.savingsGoals)Object.assign(next,confirmMonthlySavings(next,month,asOf,!next.months[month].actual));
  if(!validatePlan(next))throw Error('הדיווח לחשבון אינו תקין.');return next;
 }
+// Original cash form/list mutations, shared by both interfaces.
+export function appendCashTransfer(p,row){const next=clone(p);next.cashPlanning=cashPlanningBase(p);next.cashPlanning.transfers.push(clone(row));if(!validatePlan(next))throw Error('יש לבדוק את פרטי החשבון והשיוך. העברה חייבת להיות בין חשבונות שונים.');return next;}
+export function removeCashTransfer(p,id){const next=clone(p);next.cashPlanning.transfers=next.cashPlanning.transfers.filter(t=>t.id!==id);if(!validatePlan(next))throw Error('לא ניתן להסיר את ההעברה מהתכנון.');return next;}
 export function assignCashRemainder(p,id,month){const next=clone(p),rest=cashUnassigned(p,month);if(Object.values(rest).some(v=>v<0))throw Error('יש פער בין החשבונות לסיכום; בדוק את הסכומים לפני שיוך.');const current=cashAccountValues(p,id,month);next.cashPlanning=cashPlanningBase(p);next.cashPlanning.months[month]??={};const values=clone(current.values);for(const [k,v]of Object.entries(rest))values[k]=(cents(values[k]??0)+cents(v))/100;next.cashPlanning.months[month][id]={values,actual:current.record?.actual??p.months[month]?.actual??false,includesPlannedCard:current.record?.includesPlannedCard??false,includesPlannedDirect:current.record?.includesPlannedDirect??false,...(current.record?.balance!==undefined?{balance:current.record.balance}:{})};if(!validatePlan(next))throw Error('לא ניתן לשייך את הנתונים.');return next;}
 
 export function cashPayerCandidates(p){return{items:p.expenses.filter(e=>!cashAssignedItem(p,e)),loans:(p.loans??[]).filter(e=>!cashAssignedItem(p,e)),details:(p.details??[]).filter(e=>additionalCheque(e)&&!cashAssignedItem(p,e)),savings:(p.savingTransfers??[]).filter(e=>e.status==='pending'&&!cashAssignedItem(p,e))};}

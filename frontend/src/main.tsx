@@ -44,6 +44,7 @@ const SavingsGoalsPage = lazy(async () => ({ default: (await import('./app/savin
 const LoansPage = lazy(async () => ({ default: (await import('./app/loans-page')).LoansPage }))
 const PlannedItemsPage = lazy(async () => ({ default: (await import('./app/planned-items-page')).PlannedItemsPage }))
 const CashMonthlyPage = lazy(async () => ({ default: (await import('./app/cash-monthly-page')).CashMonthlyPage }))
+const CashFlowPage = lazy(async () => ({ default: (await import('./app/cash-flow-page')).CashFlowPage }))
 const CashAssignmentsPage = lazy(async () => ({ default: (await import('./app/cash-assignments-page')).CashAssignmentsPage }))
 const AccountPage = lazy(async () => ({ default: (await import('./app/account-page')).AccountPage }))
 const MonthlyPage = lazy(async () => ({ default: (await import('./app/monthly-page')).MonthlyPage }))
@@ -177,6 +178,10 @@ function App() {
               <Route path="/card-setup" element={<CardPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
               <Route path="/card-setup/new" element={<CardPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
               <Route path="/card-setup/:id" element={<CardPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/transfers" element={<CashFlowPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/transfers/new" element={<CashFlowPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/transfers/:id/remove" element={<CashFlowPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
+              <Route path="/accounts/:id/assign-remainder" element={<CashFlowPage key={budgetId + pathname + search} mode="remainder" fixture={fixture} budget={budget} />} />
               <Route path="/accounts/assignments" element={<CashAssignmentsPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/accounts/new" element={<AccountPage key={budgetId + pathname + search} create fixture={fixture} budget={budget} />} />
               <Route path="/accounts/:id/edit" element={<AccountPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
