@@ -84,3 +84,5 @@ Report management follow-up: reversible source archive/reactivation now has expl
 ## Native bank import integration — 2026-10-28
 
 Single unambiguous plaintext bank statements now support native review, saved progress/resume, explicit confirmation, budget backup and atomic plan/source import, including uncertain-response recovery without replay.848 regressions/build/15 checks and scoped desktop/390px browser acceptance pass. Advanced/mixed/activity/group workflows and full document/device/release acceptance remain pending; production unchanged. See checkpoint.md for exact boundaries.
+
+Native Cal activity follow-up — 2026-10-28: explicit source cycle/final-total/acknowledgment selection, saved progress/resume and original derived-cycle receipt atomic import are implemented. Unsupported installments and sheet-total substitution fail closed; server capability/proof validation and rollback are covered.856 tests/build/15 checks and scoped CSV/390px browser checks pass. Single stored source commits one cycle; further monthly bills/advanced groups/document/iPhone/release acceptance remain bounded as documented in checkpoint.md. Production unchanged.

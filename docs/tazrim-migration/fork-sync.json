@@ -1,16 +1,16 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "d710d9b1c34e29784139a93e7059385659f9da9e",
+  "sourceCommit": "41160b675d632e05ed3a4bef4d8d87c8f940abe8",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft serialization/resume helpers tested; native single-bank progress/resume/atomic import and scoped browser recovery implemented; advanced report workflows/full device acceptance, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
+  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft serialization/resume helpers tested; native single-bank progress/resume/atomic import and Cal activity cycle selection/derived-receipt commit implemented; advanced report workflows/full device acceptance, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 851,
-    "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, history review/undo/retry, goal deposit payer/retry, report source upload/dedupe/exact download, card draft reload/atomic import/lost-commit recovery, archive/reactivation and390px no-overflow checks passed. Prior iframe/download and complete device acceptance limitations remain documented."
+    "regressionTests": 856,
+    "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, history review/undo/retry, goal deposit payer/retry, report source upload/dedupe/exact download, card draft reload/atomic import/lost-commit recovery, archive/reactivation and390px no-overflow checks passed. Actual XLSX/PDF worker save/resume/import checks passed; complete device acceptance limitations remain documented."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }
