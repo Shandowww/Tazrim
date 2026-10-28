@@ -1,7 +1,7 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "bf752b6b3a620888f1b431e521f949e856531d64",
+  "sourceCommit": "d710d9b1c34e29784139a93e7059385659f9da9e",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
@@ -9,7 +9,7 @@
   "validation": {
     "build": "passed",
     "coreChecks": 15,
-    "regressionTests": 848,
+    "regressionTests": 851,
     "browser": "Synthetic scenario save/retry/phone, savings ledger conservation/removal/growth/failure refresh, space management review/owner access/uncertain result, history review/undo/retry, goal deposit payer/retry, report source upload/dedupe/exact download, card draft reload/atomic import/lost-commit recovery, archive/reactivation and390px no-overflow checks passed. Prior iframe/download and complete device acceptance limitations remain documented."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
