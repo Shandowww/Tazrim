@@ -1,6 +1,6 @@
 # Budgit frontend replacement using Tazrim
 
-Status: implementation plan only, prepared 2026-10-26. No implementation or deployment is authorized by this document alone beyond the user's standing instructions. This turn requests planning, not execution.
+Status: corrected 2026-10-28 by Tal: connect existing Budgit behavior; do not redevelop existing features. **Read [the active completion correction](tazrim-migration/completion-plan.md) first.** Its five completion stages supersede the historical sequential backlog below. Preserve completed work and previous acceptance evidence; this document does not claim release readiness.
 
 Target implementer: **GPT-6.1 Sol (`gpt-6.1-sol`), medium reasoning**. Work sequentially, one numbered task at a time. Do not spawn agents unless Tal requests delegation. Model selection must be set in the execution chat; this file does not change its model.
 
@@ -119,37 +119,17 @@ Implement category/detail drill-down, source-report views, real empty states and
 
 **Gate:** Side-by-side desktop/mobile light/dark comparisons with identical fixture values. Banks/card menus, periods, drill-down and back navigation work. Document every intentional difference.
 
-### 6. Port one complete edit-and-save workflow
+### 6–10. Complete connections to existing behavior (corrected 2026-10-28)
 
-Start with monthly reporting. Extract existing draft/validation/command behavior incrementally; use the original financial modules. Render editors with Tazrim primitives. Include input parsing, untouched/zero distinctions, validation, explicit save, in-flight status, actual success, retry, conflict and recovery.
+Use the active correction's inventory and five-stage checklist. Earlier instructions to “port” each workflow were interpreted too broadly and are superseded. Existing Budgit logic and orchestration are the source of truth; completed React adapters/screens stay unless a demonstrated behavioral mismatch needs correction. Do not restart monthly reporting, scenarios, loans, savings or report slices that already passed their bounded checks.
 
-**Gate:** A synthetic load → edit → save → reload cycle matches the current application. Simulated concurrent update cannot silently overwrite. Failed saves retain edits. This establishes the pattern for subsequent write screens.
+For each unresolved action, identify its original handler/module and tests before editing. Prefer direct reuse; where DOM coupling prevents reuse, extract only the needed behavior into a shared module used by both interfaces. Keep one implementation of domain decisions, source drafts/receipts and persistence semantics. Do not create a parallel React report engine, replace encryption, add a bank provider API or import Tazrim's data layer.
 
-### 7. Port planning, accounts, savings and goals
+Start with the report center: restore optional categorization parity, connect original grouping/resume/edit/undo behavior, and retain atomic services and supported file readers. Then connect existing savings/security/space/settings actions from the inventory. Existing limitations remain limitations; verified-backup cleanup is not a release task merely because an older pending note named it.
 
-Use separate small commits/checkpoints for (a) account/card setup and cash balances, (b) planned items/installments/calculator/scenarios, (c) savings/goals/investment deposits, (d) remaining details/cheques/loans and related screens from the inventory. Reuse the command/state pattern from task 6.
+Temporary original-interface bridges remain available while connections are completed. Verify exact destination, scope and draft protection; a generic home link does not complete an action. Do not silently redefine full UI replacement as a collection of legacy links. Keep the original interface selectable for rollout fallback; do not mount two apps against shared globals or embed the old app as the final React solution.
 
-**Gate per group:** Old/new command results are equal for the same synthetic inputs; account scope, contribution meaning, fees, refunds and installments retain their existing tests. No forecasts become completed progress. Navigation protects active drafts.
-
-### 8. Port report workflows and existing connections
-
-Migrate report intake, parser selection, review, classification, duplicate/partial handling, staged/unfinished reports, apply/undo and report history. Keep Budgit's parser pipeline and existing worker assets. Maintain destination-space labels before file selection. Migrate integration settings and installation/help flows using existing endpoints and credential handling; do not reconnect live accounts for visual testing.
-
-**Gate:** Synthetic import → review → apply → undo and resume workflows pass, including failure/duplicate cases. Existing supported source formats and authenticated external ingestion routes still work. No private report contents appear in screenshots/logs/fixtures.
-
-### 9. Port private/shared spaces, security and remaining settings
-
-Migrate identity display, ownership/viewer controls, invitations, space overview, vault unlock/lock/recovery, export/import, history and existing transfer/migration-review workflows at their recorded implementation status. Use existing encryption modules directly. Complete all remaining inventory rows, appearance/device settings and guarded refresh.
-
-**Gate:** Two synthetic identities and multiple spaces retain isolation; viewer writes fail; revocation clears displayed data; locked spaces expose no records; stale requests cannot restore revoked data; encrypted values/keys are not sent to new server endpoints. Existing restriction and recovery tests pass.
-
-### 10. Remove migration bridges and finish parity
-
-A temporary explicitly labeled link to the old interface may keep unfinished flows usable during development. It is not completion: replace it for every in-scope workflow before declaring the frontend ready. Do not embed old pages in iframes, mount two apps against shared globals, or re-skin legacy DOM as the final solution.
-
-Keep the old interface separately selectable for fallback. Stop loading handwritten Tazrim shim code in the React interface; retire obsolete prototype code only when its useful fixes/tests have equivalents and no existing selection depends on it. Preserve original user preferences rather than silently changing a device's selection.
-
-**Gate:** Feature inventory has no unexplained missing routes, incomplete write flows or silent fallbacks. Budgit branding/manifest/build ID are correct. New screens consistently use Tazrim components/styles.
+**Gate:** Every existing action has a verified connection or a documented pre-existing limitation, with original/new behavior compared on identical synthetic data. Missing React UI is classified as connection work, not a missing product feature. The active correction defines the remaining order; tasks 11–12 below retain their verification and release safeguards.
 
 ### 11. Release acceptance
 
@@ -163,7 +143,7 @@ Check widths 390, 430, 768 and 1440 pixels plus narrow 320px overflow, light/dar
 
 ### 12. Publish the accepted build under the standing deployment authorization
 
-Implementation execution may proceed to publication under Tal's existing authorization when all gates are satisfied; no repetitive approval request is needed. This planning-only turn does not deploy anything.
+Implementation execution may proceed to publication under Tal's existing authorization when all gates are satisfied; no repetitive approval request is needed. Updating this plan alone does not deploy anything.
 
 Verify current live release again. Prepare an exact source commit and archive including required frontend lockfile/build inputs; exclude databases, credentials and private reports. Push the same source commit to GitHub using `github-personal` SSH. Build on existing resources and verify package/runtime hash; if resource limits prevent it, stop and report rather than buy/upgrade hosting.
 
@@ -179,4 +159,4 @@ If a task is too large, split it along a workflow boundary; do not reduce requir
 
 ## Ready-to-use execution prompt
 
-> Implement `docs/TAZRIM-FRONTEND-REPLACEMENT-PLAN.md` in the canonical Budgit repository using GPT-6.1 Sol with medium reasoning. Read project instructions and establish the source/feature baseline first. Follow the numbered tasks sequentially, preserving unrelated work and all existing Budgit data, logic, privacy and save behavior. Reuse the actual pinned Tazrim React components; retain Budgit branding. Keep a durable checkpoint and finish each task's checks before advancing. Continue autonomously within the authorized scope; do not reduce this to another CSS theme or declare incomplete legacy bridges finished. Use synthetic data for tests and screenshots. Publish only after the documented acceptance and existing backup/preflight/rollback requirements pass, using the standing Budgit destination authorization and leaving Sites unchanged. Report blockers accurately; do not bypass browser permissions or purchase resources.
+> Implement `docs/TAZRIM-FRONTEND-REPLACEMENT-PLAN.md` in the canonical Budgit repository using GPT-6.1 Sol with medium reasoning. Read project instructions and establish the source/feature baseline first. Follow the five active completion stages in `docs/tazrim-migration/completion-plan.md`, preserving completed work, unrelated changes and all existing Budgit data, logic, privacy and save behavior. Connect existing features; do not redevelop them. Reuse the actual pinned Tazrim React components; retain Budgit branding. Keep a durable checkpoint and finish each task's checks before advancing. Continue autonomously within the authorized scope; do not reduce this to another CSS theme or declare incomplete legacy bridges finished. Use synthetic data for tests and screenshots. Publish only after the documented acceptance and existing backup/preflight/rollback requirements pass, using the standing Budgit destination authorization and leaving Sites unchanged. Report blockers accurately; do not bypass browser permissions or purchase resources.

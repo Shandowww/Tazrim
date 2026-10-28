@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "41160b675d632e05ed3a4bef4d8d87c8f940abe8",
+  "sourceCommit": "c2c5640923f7ff93b5caa4c50babe4690425c22e",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview: scenario editor, savings balances/allocation/removal/pace/estimated growth, actor-bound space management and snapshot review/latest undo, manual goal deposits and scoped source intake/parser inspection/single-card review, saved progress, atomic apply and reversible archive/reactivation implemented. Native bank/mixed/group/activity imports, bank command preparation and guarded local preview implemented; bank draft serialization/resume helpers tested; native single-bank progress/resume/atomic import and Cal activity cycle selection/derived-receipt commit implemented; advanced report workflows/full device acceptance, source-aware editing, transfer/schedule/vault/migration/full device/release parity still pending; not deployed",
+  "status": "Incomplete development preview; not deployed. Active completion policy: connect existing Budgit workflows, do not redevelop them. See docs/tazrim-migration/completion-plan.md, which supersedes historical pending lists. Preserve completed tested React work; reconcile optional categorization, original report orchestration/group drafts and exact action destinations, then remaining existing-feature connections and acceptance/live-release gates.",
   "validation": {
     "build": "passed",
     "coreChecks": 15,

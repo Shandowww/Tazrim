@@ -1,5 +1,7 @@
 # React migration checkpoint
 
+> **Active scope correction — 2026-10-28:** Tal instructed us to connect existing Budgit features, not rewrite them. [completion-plan.md](completion-plan.md) supersedes historical pending/next-action lists below. They remain evidence only. Classify missing React behavior as connection work; retain original workflow semantics and completed tested work. Source inspection found optional-category parity, grouped draft/orchestration and generic bridge gaps; they are not fixed by this documentation update. Production is unchanged.
+
 Date: 2026-10-26. Plan: `docs/TAZRIM-FRONTEND-REPLACEMENT-PLAN.md`.
 
 ## Source and status
