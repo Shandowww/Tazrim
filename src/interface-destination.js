@@ -1,6 +1,6 @@
 // Presentation-only destinations for the existing interface. No financial action
 // or credential is accepted from a URL; authenticated handlers still own access.
-const interfaceViews=new Set(['home','reports','report-history','savings','accounts','security','connections','backups','spaces','details','monthly','plans','overview','actions','migration']);
+const interfaceViews=new Set(['home','reports','report-history','savings','accounts','security','connections','backups','spaces','details','monthly','plans','overview','actions','migration','gmail','appearance']);
 export function legacyInterfaceHref(search,view='home',reportId=''){
  if(!interfaceViews.has(view)||reportId&&!/^[a-f0-9-]{36}$/.test(reportId)||reportId&&view!=='reports')throw Error('יעד הממשק אינו תקין.');
  const current=new URLSearchParams(search),next=new URLSearchParams({budget:current.get('budget')||'personal'});

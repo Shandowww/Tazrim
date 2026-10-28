@@ -6,7 +6,7 @@ function onboardingStart(){
  if(!loaded||loading||saving||securityBusy||budgetMeta().role==='viewer')return;
  if(!demoPreview&&(hasSecurityDraft()||typeof hasSavingsDraft==='function'&&hasSavingsDraft()||hasDetailDraft()||hasScenarioDraft()||dirty&&!isUnconfiguredBudget(plan))){notify('יש לשמור או לבטל את העריכות לפני תחילת ההגדרה.');return;}
  if(!demoPreview&&!isUnconfiguredBudget(plan)){notify('כבר יש נתונים בתקציב הזה. אפשר לערוך אותם בהגדרות או ליצור תקציב נפרד.');return;}
- onboarding={step:0,scope:activeBudget,snapshot:JSON.stringify(plan),values:{month:todayMonth(),opening:'',buffer:'5000',salary:'',card1:'',card2:'',variable:'',transfers:'',checks:'',personalSaving:'',personalInvest:'',balance:'',accounts:[{id:'saving-1',name:'חסכון 1',balance:0}],goalEnabled:true,goalName:'',target:'',allocated:'',icon:'house'},error:''};render();
+ onboarding={step:0,scope:activeBudget,snapshot:JSON.stringify(plan),values:onboardingInitialValues(todayMonth()),error:''};render();
 }
 function onboardingView(){
  const v=onboarding.values,titles=['נקודת ההתחלה','מה נכנס בכל חודש','מה יוצא בכל חודש','החסכון והמטרה הראשונה','בודקים ומתחילים'];let content='';
@@ -24,7 +24,7 @@ async function onboardingSubmit(form){
  try{if(onboarding.step===3){if(onboarding.values.goalEnabled&&(!onboarding.values.target||readNumber(onboarding.values.target)<=0))throw Error('יש להזין סכום יעד או לבחור להוסיף מטרה בהמשך.');createSetupBudget(onboarding.values);}
  if(onboarding.step<4){onboarding.step++;render();return true;}
  if(onboarding.scope!==activeBudget||onboarding.snapshot!==JSON.stringify(plan))throw Error('התקציב השתנה במהלך ההגדרה. יש לצאת ולפתוח אותה מחדש.');
- const next=createSetupBudget(onboarding.values,crypto.randomUUID());if(!demoPreview){for(const key of ['profileName','goals','showDetails','categoryGoals'])if(plan[key]!==undefined)next[key]=clone(plan[key]);}onboarding=null;savingsReset();selectedMonth=next.startMonth;purchase.firstMonth=next.startMonth;itemDraft={id:'',name:'',amount:0,fees:0,firstMonth:next.startMonth,payments:1,source:'direct',kind:'expense'};scenarioItems=[];tab=next.savingsGoals?.items.length?'progress':'monthly';if(!mutate(next))return true;
+ const next=completeOnboardingBudget(plan,onboarding.values,crypto.randomUUID(),demoPreview);onboarding=null;savingsReset();selectedMonth=next.startMonth;purchase.firstMonth=next.startMonth;itemDraft={id:'',name:'',amount:0,fees:0,firstMonth:next.startMonth,payments:1,source:'direct',kind:'expense'};scenarioItems=[];tab=next.savingsGoals?.items.length?'progress':'monthly';if(!mutate(next))return true;
  if(demoPreview){notify('ההגדרה הוחלה בדוגמה בלבד.');return true;}await save();
  }catch(e){if(onboarding){onboarding.error=e.message;render();}else notify(e.message);}return true;
 }

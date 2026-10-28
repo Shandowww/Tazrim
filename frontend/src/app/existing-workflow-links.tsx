@@ -2,6 +2,9 @@ import {useLocation} from 'react-router-dom'
 import {legacyBudgetHref,withViewQuery} from './navigation-query'
 import Link from './link'
 const nativeWorkflows=[
+ ['/goals','יעדים חודשיים והתקדמות מדיווחי אמת'],
+ ['/settings/forecast','בסיס התחזית והערכות קבועות'],
+ ['/start','התחלה מודרכת לתקציב חדש'],
  ['/settings/profile','שם לתצוגה וחשבון מחובר'],
  ['/overview','תמונה כוללת · חשבונות ומטרות'],
  ['/settings/device-draft','טיוטה שמורה במכשיר'],
@@ -29,7 +32,9 @@ const workflows=[
  ['backups','גיבוי וייבוא תקציב'],
  ['overview','תמונה כוללת, התאמות ומעברי חשבונות'],
  ['details','מילון קטגוריות ואפשרויות פירוט נוספות'],
- ['connections','Apple Pay, Gmail וחיבורים נוספים'],
+ ['connections','Apple Pay וחיבורים נוספים'],
+ ['gmail','סינון דוחות וחיבור Gmail בממשק הקיים'],
+ ['appearance','סגנון וצבעי הממשק הקיים'],
 ] as const
 export function ExistingWorkflowLinks(){
  const {search}=useLocation()

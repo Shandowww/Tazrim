@@ -20,7 +20,7 @@ export async function savePreparedPlan(input:{budgetId:string;base:BudgetRespons
 }
 export async function saveWirePlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>;wire:Record<string,unknown>},fetcher:typeof fetch=fetch){
  const {budgetId,base,plan,wire}=input
- if((!validatePlan(plan)&&!isVault(plan))||(!validatePlan(base.plan)&&!isVault(base.plan)))throw Error('יש לבדוק את נתוני התקציב לפני שמירה.')
+ if((!validatePlan(plan)&&!isVault(plan))||(!validatePlan(base.plan)&&!isVault(base.plan)&&!(base.plan===null&&base.revision===0&&!base.vault)))throw Error('יש לבדוק את נתוני התקציב לפני שמירה.')
  if(!validatePlan(wire)&&!isVault(wire))throw Error('נתוני השמירה אינם תקינים.');
  if((base.vault||isVault(base.plan))&&!isVault(wire))throw Error('לא ניתן לשמור תקציב מוצפן כנתונים גלויים.');
  const signal=new AbortController().signal

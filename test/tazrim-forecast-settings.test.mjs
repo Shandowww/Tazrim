@@ -1,0 +1,28 @@
+import {initialForecastSettings,prepareForecastSettings} from '../frontend/src/app/forecast-settings-command.ts'
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import vm from 'node:vm'
+import {createHash} from 'node:crypto'
+import {readFileSync} from 'node:fs'
+import {zero,clone,cents,forecast,investmentHistoryFor,investmentDepositsFor,updateInvestmentGoal,updateProfileName,updateBudgetSetting,offCardTotal,formBudgetFields,validatePlan} from '../src/budget.js'
+import {investmentProjection} from '../src/investment-model.js'
+import {initialInvestmentDraft,prepareInvestmentProjection,prepareInvestmentGoal} from '../frontend/src/app/investment-command.ts'
+import {openDatabase} from '../server/database.mjs'
+import {createApp} from '../server/app.mjs'
+import {loadBudgetSnapshot,AccessError} from '../frontend/src/app/budget-api.ts'
+import {savePreparedPlan,SaveConflict,SaveUncertain,WritePermissionError} from '../frontend/src/app/plan-save.ts'
+const base=()=>({startMonth:'2026-01',opening:1000,buffer:0,horizon:12,defaults:zero(),months:Object.fromEntries([['2026-01',true,10.01,20.02],['2026-03',true,30.01,0],['2026-05',true,0,40.01],['2026-09',false,999,999],['2026-10',true,20,30],['2026-11',true,1000,1000]].map(([m,actual,personalInvest,sharedInvest])=>[m,{values:{...zero(),personalInvest,sharedInvest},actual,includesPlannedCard:false}])),expenses:[],demo:false,goals:{saving:10,invest:0,spending:20,income:30}}),draft={...initialInvestmentDraft(),monthly:'100.01',years:'2',annualReturn:'5',annualIncrease:'1.5'}
+test('Forecast settings equal frozen original field transitions and preserve untouched off-card components, monthly/source evidence and identities',()=>{const p=base();p.defaults.variable=10;p.defaults.transfers=20;const before=clone(p),initial=initialForecastSettings(p);assert.deepEqual(prepareForecastSettings(p,{...initial,'default-offCard':'30.00'}),p);const expected=clone(p);expected.defaults.salary=123.45;expected.opening=-12.34;assert.deepEqual(prepareForecastSettings(p,{...initial,'default-salary':'123.45','settings-opening':'-12.34'}),expected);assert.deepEqual(p,before);const next=prepareForecastSettings(p,{...initial,'default-offCard':'100000000.25'});assert.equal(next.defaults.variable,100000000);assert.equal(next.defaults.transfers,.25);assert.deepEqual(next.months,p.months);for(const draft of [{...initial,foreign:'1'},{...initial,'settings-startMonth':'2026-13'},{...initial,'default-salary':'-1'},{...initial,'default-salary':'1.001'},{...initial,'settings-horizon':'13'},{...initial,'default-offCard':'200000000.01'}])assert.throws(()=>prepareForecastSettings(p,draft));assert.match(readFileSync('src/client.js','utf8'),/updateBudgetSetting\(plan,name,name==='settings-startMonth'\?target.value:readNumber\(target.value\)\)/)})
+test('Forecast settings save uses the existing service, recovers one lost success and refuses stale/foreign/viewer saves with other scopes unchanged',async()=>{
+ const {db,DB}=openDatabase(':memory:'),origin='https://investment.test',hash=s=>createHash('sha256').update(s).digest('hex')
+ try{
+  for(const u of ['alice','bob']){db.prepare('INSERT INTO auth_users VALUES(?,?,?,?)').run(u,u,u+'@example.test',Date.now());db.prepare('INSERT INTO auth_sessions VALUES(?,?,?)').run(hash(u),u,Date.now()+3600000)}
+  const app=createApp({db,DB,origin,allowedEmails:['alice@example.test','bob@example.test']}),req=(u,path,method='GET',body)=>app(new Request(origin+path,{method,headers:{origin,cookie:'__Host-mf_session='+u,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}))
+  for(const u of ['alice','bob'])await req(u,'/api/plan','PUT',{plan:base(),revision:0})
+  const house=(await(await req('alice','/api/budgets','POST',{name:'בדיקת השקעות'})).json()).id;await req('alice','/api/plan?budget='+house,'PUT',{plan:base(),revision:0});const invite=await(await req('alice','/api/budgets/'+house+'/invites','POST',{email:'bob@example.test',role:'viewer'})).json();await req('bob','/api/budgets/accept','POST',{token:invite.token})
+  let puts=0,lost=true,user='alice';const fetcher=async(path,opt={})=>{if(opt.method==='PUT'){puts++;const r=await req(user,path,'PUT',JSON.parse(opt.body));if(lost){lost=false;return Response.json({error:'lost'},{status:503})}return r}return req(user,path)}
+  const snapshot=(await loadBudgetSnapshot('personal',new AbortController().signal,fetcher)).value,plan=prepareForecastSettings(snapshot.plan,{...initialForecastSettings(snapshot.plan),'default-salary':'123.45'}),input={budgetId:'personal',base:snapshot,plan};await assert.rejects(savePreparedPlan(input,fetcher),SaveUncertain);const saved=await savePreparedPlan(input,fetcher);assert.equal(saved.recovered,true);assert.equal(puts,1);assert.equal(saved.value.plan.defaults.salary,123.45);assert.deepEqual(saved.value.plan.months,snapshot.plan.months)
+  await assert.rejects(savePreparedPlan({...input,plan:prepareForecastSettings(snapshot.plan,{...initialForecastSettings(snapshot.plan),'default-salary':'999'})},fetcher),SaveConflict);user='bob';await assert.rejects(savePreparedPlan(input,fetcher),AccessError)
+  const viewer=(await loadBudgetSnapshot(house,new AbortController().signal,fetcher)).value;await assert.rejects(savePreparedPlan({budgetId:house,base:viewer,plan:prepareForecastSettings(viewer.plan,{...initialForecastSettings(viewer.plan),'default-salary':'1'})},fetcher),WritePermissionError);assert.equal(puts,1);assert.equal((await(await req('bob','/api/plan')).json()).revision,1);assert.equal((await(await req('alice','/api/plan?budget='+house)).json()).revision,1)
+ }finally{db.close()}
+})

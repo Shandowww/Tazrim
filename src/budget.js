@@ -1349,3 +1349,10 @@ export function reportInboxValid(p){
 }
 
 export function updateProfileName(p,value){const next=clone(p);next.profileName=value.trim();return next;}
+
+export function onboardingInitialValues(month){return {month,opening:'',buffer:'5000',salary:'',card1:'',card2:'',variable:'',transfers:'',checks:'',personalSaving:'',personalInvest:'',balance:'',accounts:[{id:'saving-1',name:'חסכון 1',balance:0}],goalEnabled:true,goalName:'',target:'',allocated:'',icon:'house'};}
+export function completeOnboardingBudget(plan,values,id,demo=false){const next=createSetupBudget(values,id);if(!demo){for(const key of ['profileName','goals','showDetails','categoryGoals'])if(plan[key]!==undefined)next[key]=clone(plan[key]);}return next;}
+
+export function updateBudgetSetting(p,name,value){const next=clone(p);if(name.startsWith('default-')){const key=name.slice(8);if(key==='offCard')setOffCardTotal(next.defaults,value);else next.defaults[key]=value;}else next[name.slice(9)]=value;return next;}
+
+export function updateComparisonGoal(p,key,value){const next=clone(p);next.goals={saving:0,invest:0,spending:0,income:0,...next.goals,[key]:value};return next;}

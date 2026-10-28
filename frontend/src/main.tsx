@@ -1,3 +1,7 @@
+import {ComparisonGoalsPage} from './app/comparison-goals-page'
+import {ForecastSettingsPage} from './app/forecast-settings-page'
+import {OnboardingPage} from './app/onboarding-page'
+import {isUnconfiguredBudget} from '../../src/budget.js'
 import {ProfilePage} from './app/profile-page'
 const TransferMatchesPage = lazy(async () => ({ default: (await import('./app/transfer-matches-page')).TransferMatchesPage }))
 const OverviewPage = lazy(async () => ({ default: (await import('./app/overview-page')).OverviewPage }))
@@ -111,7 +115,7 @@ function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<t
   const editorHref = legacyBudgetHref(locationSearch)
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען נתונים…</section>
   if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <a className="text-primary underline" href={editorHref}>פתיחת הממשק הקיים</a></section>
-  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <a className="text-primary underline" href={editorHref}>הגדרת תקציב</a></section>
+  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/upload',locationSearch)}>העלאת דוחות והתחלה</Link><Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/start',locationSearch)}>הגדרה ידנית</Link><Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/settings/security',locationSearch)}>יש לי גיבוי לייבוא</Link></section>
   if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <a className="text-primary underline" href={editorHref}>פתיחה מאובטחת בממשק הקיים</a></section>
   if (!fixture && budget.status === 'ready') {
     const search = new URLSearchParams(window.location.search)
@@ -122,7 +126,7 @@ function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<t
     catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. <a className="text-primary underline" href={editorHref}>פתיחת הממשק הקיים</a></section> }
     const accountCount = budgetNavigation(budget.value.plan).filter(account => account.kind === 'BANK').length
     return <div className="mx-auto max-w-7xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>{isUnconfiguredBudget(budget.value.plan)&&<section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">מתחילים מהדוחות שלך</h2><Link href={withViewQuery('/upload',search)} className="inline-flex min-h-11 items-center text-primary underline">העלאת דוחות והתחלה</Link><Link href={withViewQuery('/start',search)} className="inline-flex min-h-11 items-center px-3 text-primary underline">הגדרה ידנית</Link></section>}
       <p className="text-sm text-muted-foreground">{view.partial ? 'דיווח חלקי · ' : ''}{view.reportedMonths} חודשים מדווחים{budget.value.budget?.role === 'viewer' ? ' · צפייה בלבד' : ''} · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>
       {view.hasReports ? <>
         <DashboardSummaryCards {...view.cards} query={search.toString()} bankHint={accountCount ? `${accountCount} חשבונות` : 'ללא חשבון מוגדר'} cardHint="כרטיסי אשראי" monthHasData={view.reportedMonths > 0} />
@@ -254,6 +258,9 @@ function App() {
               <Route path="/settings/spaces" element={<SpacesPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/settings/security" element={<SecurityPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/history" element={<HistoryPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/settings/forecast" element={<ForecastSettingsPage key={budgetId} fixture={fixture} budget={budget}/>} />
+              <Route path="/goals" element={<ComparisonGoalsPage key={budgetId} fixture={fixture} budget={budget}/>} />
+              <Route path="/start" element={<OnboardingPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings/profile" element={<ProfilePage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings" element={<div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
