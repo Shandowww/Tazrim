@@ -4,12 +4,11 @@ export interface AccountDraft { label:string; color:string; buffer:string; openi
 export function manualAccountEligibility(plan:any,id:string){
  if(!validatePlan(plan))return 'התקציב אינו זמין לעריכה הזו.'
  if(!id)return null
- if(!(plan.cashPlanning?.accounts??[]).some((a:any)=>a.id===id))return 'החשבון אינו חשבון ידני מוגדר במרחב הזה.'
- if((plan.bankImport?.accounts??[]).some((a:any)=>a.id===id))return 'חשבון עם מקורות בנק נערך בינתיים בממשק הקיים, עם כל שיוכי המקור.'
+ if(!cashAccountList(plan).some((a:any)=>a.id===id))return 'החשבון אינו מוגדר במרחב הזה.'
  return null
 }
 export function initialAccountDraft(plan:any,id:string,month:string):AccountDraft{
- const a=(plan.cashPlanning?.accounts??[]).find((row:any)=>row.id===id)
+ const a=cashAccountList(plan).find((row:any)=>row.id===id)
  return {label:a?.label??'',color:a?.color??'',buffer:String(a?.buffer??0),opening:a?.opening===undefined?'':String(a.opening),openingMonth:a?.openingMonth??plan.startMonth??month}
 }
 const signedCents=(text:string)=>text.trim().startsWith('-')?-moneyInputCents(text.trim().slice(1)):moneyInputCents(text)
@@ -18,7 +17,7 @@ export function prepareManualAccount(plan:any,id:string,draft:AccountDraft,{crea
  const reason=manualAccountEligibility(plan,create?'':id);if(reason)throw Error(reason)
  if(typeof id!=='string'||!id||id.length>100||!draft||Object.keys(draft).length!==5||Object.keys(draft).some(key=>!['label','color','buffer','opening','openingMonth'].includes(key))||Object.values(draft).some(value=>typeof value!=='string'||value.length>100))throw Error('יש לבדוק את פרטי החשבון.')
  if(!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(asOf))throw Error('תאריך הבדיקה אינו תקין.')
- const existing=(plan.cashPlanning?.accounts??[]).find((a:any)=>a.id===id)
+ const existing=cashAccountList(plan).find((a:any)=>a.id===id)
  if(create&&cashAccountList(plan).some((a:any)=>a.id===id))throw Error('מזהה החשבון כבר קיים. אין לדרוס אותו.')
  if(!draft.label.trim()||draft.label.trim().length>80||draft.color&&!accountColors.some(([color]:string[])=>color===draft.color))throw Error('יש לבדוק את שם החשבון והצבע.')
  const account={...clone(existing??{}),id,label:draft.label.trim(),buffer:moneyInputCents(draft.buffer)/100}

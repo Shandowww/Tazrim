@@ -1,3 +1,4 @@
+import {savePreparedPlan} from './plan-save.ts'
 import {validatePlan} from '../../../src/budget.js'
 import {AccessError,loadBudgetSnapshot,type BudgetResponse} from './budget-api.ts'
 import {loadReportLibrary,validateReportLibrary,type StoredReport} from './report-library-api.ts'
@@ -46,6 +47,14 @@ export async function commitStoredReportGroup(budgetId:string,base:BudgetRespons
  if(!validatePlan(plan)||!/^[-\w]{16,100}$/.test(actionId)||!sources.length||sources.length>10||new Set(sources.map(s=>s.id)).size!==sources.length)throw Error('תכנון קבוצת הדוחות אינו תקין.')
  const signal=new AbortController().signal,snapshot=await fresh(budgetId,base,signal,fetcher,true),current=await Promise.all(sources.map(source=>loadStoredReport(budgetId,base,source.id,signal,fetcher)))
  if(current.some((source,index)=>source.sourceHash!==sources[index].sourceHash))throw Error('מקור בקבוצה השתנה. יש לפתוח את הקבוצה מחדש.')
+ // Re-reading a committed source uses the original interface's ordinary budget
+ // save, without overwriting that source's immutable historical draft/state.
+ if(sources.some(source=>source.state==='committed')){
+  const source=sources[0],item=draft?.items?.[0]
+  if(sources.length!==1||source.state!=='committed'||current[0].state!=='committed'||current[0].revision!==source.revision||draft?.version!==1||draft.items.length!==1||item.storedId!==source.id||item.hash!==source.sourceHash||item.storedRevision!==source.revision||item.storedCommitted!==true)throw Error('בדיקה מחודשת דורשת מקור שכבר נקלט וקבלה תואמת; אין שילוב עם קבוצה אחרת.')
+  return savePreparedPlan({budgetId,base,plan},fetcher)
+ }
+
  if(snapshot.value.revision===base.revision+1&&same(snapshot.value.plan,plan)&&current.every(source=>source.state==='committed'))return{...snapshot,recovered:true}
  if(snapshot.value.revision!==base.revision||!same(snapshot.value.plan,base.plan)||current.some(source=>['committed','archived'].includes(source.state)))throw Error('התקציב או קבוצת הדוחות השתנו; שום קליטה נוספת לא נשלחה.')
  const ready=await saveStoredReportGroupDraft(budgetId,base,sources,draft,'ready',fetcher),value=await result(await mutate('/api/reports?budget='+encodeURIComponent(budgetId),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-budget-account-id':base.accountId},body:JSON.stringify({action:'commit',actionId,revision:base.revision,plan,reports:ready.map(source=>({id:source.id,revision:source.revision}))})},fetcher))

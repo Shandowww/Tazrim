@@ -1289,6 +1289,13 @@ export function cashOverview(p,month){
 }
 export function cashScenarioSafe(p,additionalIds,asOf){const accounts=cashScenarioForecast(p,additionalIds);return accounts.length>0&&accounts.every(a=>a.rows.filter(r=>r.month>=asOf).length>0&&a.rows.filter(r=>r.month>=asOf).every(r=>r.balance!==null&&!r.issues.length&&r.balance>=r.buffer));}
 export function saveCashAccount(p,account){const next=clone(p);next.cashPlanning=cashPlanningBase(p);next.cashPlanning.accounts=[...next.cashPlanning.accounts.filter(a=>a.id!==account.id),account];if(!validatePlan(next))throw Error('פרטי החשבון אינם תקינים.');return next;}
+// Original manual account form semantics: a manual correction is not another
+// bank reading. Keep its balance when omitted, without copying bank/date flags.
+export function saveManualCashMonth(p,id,month,input,asOf){
+ const previous=cashAccountValues(p,id,month),record={values:clone(input.values),actual:input.actual,includesPlannedCard:input.includesPlannedCard,includesPlannedDirect:input.includesPlannedDirect};
+ if(input.balance!==undefined)record.balance=input.balance;else if(previous.record?.balance!==undefined)record.balance=previous.record.balance;
+ return saveCashMonth(p,id,month,record,asOf);
+}
 export function saveCashMonth(p,id,month,record,asOf){
  if(record.actual&&month>asOf)throw Error('חודש עתידי נשמר כהערכה בלבד.');const next=clone(p),before=cashAccountValues(p,id,month).values;next.cashPlanning=cashPlanningBase(p);next.cashPlanning.months[month]??={};next.cashPlanning.months[month][id]=record;
  const combined=clone(monthlyValues(p,month));for(const [k]of budgetFields(p)){const n=cents(combined[k]??0)-cents(before[k]??0)+cents(record.values[k]??0);if(n<0)throw Error('הסיכום הקיים קטן מסכומי החשבון. יש לשייך תחילה את הנתונים ללא חשבון.');combined[k]=n/100;}
