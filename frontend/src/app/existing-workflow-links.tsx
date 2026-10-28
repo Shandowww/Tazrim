@@ -4,6 +4,7 @@ import Link from './link'
 const nativeWorkflows=[
  ['/upload','מרכז הדוחות והמקורות השמורים'],
  ['/upload/history','היסטוריית ייבוא בנק וביטול קליטה'],
+ ['/investment','סימולציית השקעות ויעד חודשי'],
  ['/savings/schedule','תכנון הפקדות חודשיות לחיסכון'],
  ['/savings/transfers','העברות חיסכון ואישור ביצוע'],
  ['/details/manage','ניהול צ׳קים ופירוט ידני'],

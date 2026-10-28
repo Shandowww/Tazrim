@@ -176,6 +176,11 @@ export function updateSavingSchedule(p,from,amounts){
  if(!validatePlan(next))throw Error('לא ניתן לעדכן את ההפקדות עם הנתונים האלה.');return next;
 }
 
+// Original investment calculator inputs/goal transition, shared by both interfaces.
+export function investmentHistoryFor(p,asOf){const months=Object.keys(p.months).filter(m=>m<=asOf&&p.months[m].actual).sort().slice(-3);return{months,average:months.length?months.reduce((n,m)=>n+cents(p.months[m].values.personalInvest)+cents(p.months[m].values.sharedInvest),0)/months.length/100:0};}
+export function investmentDepositsFor(p,asOf){return Object.entries(p.months).filter(([m,r])=>m<=asOf&&r.actual).reduce((n,[m,r])=>n+cents(r.values.personalInvest)+cents(r.values.sharedInvest),0)/100;}
+export function updateInvestmentGoal(p,monthly){const next=clone(p);next.goals={saving:0,invest:0,spending:0,income:0,...next.goals,invest:monthly};if(!validatePlan(next))throw Error('יש לבדוק את סכום יעד ההשקעה.');return next;}
+
 export function goalsValid(p){
  if(!savingsGoalsValid(p))return false;
  if(p.profileName!==undefined&&(typeof p.profileName!=='string'||p.profileName.length>60))return false;

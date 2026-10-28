@@ -37,6 +37,7 @@ const CardPayerPage = lazy(async () => ({ default: (await import('./app/card-pay
 const BillingPage = lazy(async () => ({ default: (await import('./app/billing-page')).BillingPage }))
 const CardPage = lazy(async () => ({ default: (await import('./app/card-page')).CardPage }))
 const SavingsTransferPage = lazy(async () => ({ default: (await import('./app/savings-transfer-page')).SavingsTransferPage }))
+const InvestmentPage = lazy(async () => ({ default: (await import('./app/investment-page')).InvestmentPage }))
 const SavingsSchedulePage = lazy(async () => ({ default: (await import('./app/savings-schedule-page')).SavingsSchedulePage }))
 const SavingsGoalsPage = lazy(async () => ({ default: (await import('./app/savings-goals-page')).SavingsGoalsPage }))
 const LoansPage = lazy(async () => ({ default: (await import('./app/loans-page')).LoansPage }))
@@ -194,6 +195,7 @@ function App() {
               <Route path="/savings/transfers/new" element={<SavingsTransferPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
               <Route path="/savings/transfers/:id/complete" element={<SavingsTransferPage key={budgetId + pathname + search} mode="complete" fixture={fixture} budget={budget} />} />
               <Route path="/savings/transfers/:id/cancel" element={<SavingsTransferPage key={budgetId + pathname + search} mode="cancel" fixture={fixture} budget={budget} />} />
+              <Route path="/investment" element={<InvestmentPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/savings/schedule" element={<SavingsSchedulePage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/savings/returns" element={<SavingsBalancePage key={budgetId + pathname + search} mode="returns" fixture={fixture} budget={budget} />} />
               <Route path="/savings/accounts" element={<SavingsBalancePage key={budgetId + pathname + search} mode="accounts" fixture={fixture} budget={budget} />} />

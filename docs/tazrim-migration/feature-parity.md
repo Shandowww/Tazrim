@@ -24,7 +24,7 @@ Status codes: **B** = in baseline commit; **R** = read-only by design; **L** = l
 | Purchase calculator and trial scenarios | `src/planner.js`, `src/client.js` | `/next/calculator` | Trials local until applied/saved; draft navigation guard | B/U |
 | Cash forecast and buffer | `src/budget.js`, `src/client.js` | `/next/forecast` | Forecast label; no achieved celebrations | B/U |
 | Savings contributions and combined goals | `src/savings.js`, `src/savings-accounts.js` | `/next/savings`, `/next/goals` | Personal/shared meaning explicit; actual deposits only | B/U |
-| Investment deposits and trends | `src/investment.js`, `src/investment-model.js` | `/next/investments` | Actual deposits, no inferred returns or balances | B/U |
+| Investment deposits and trends | `src/investment.js`, `src/investment-model.js` | `/next/investment` | Connected original simulation/history/explicit goal; 910 regressions and bounded browser evidence in execution-status; no inferred portfolio balance | B/U |
 | Loans and repayment schedules | `src/loans.js` | `/next/loans` | Existing repayment math and forecast effect | B/U |
 | Primary report center and stored reports | `src/report-inbox-client.js`, `src/stored-reports-client.js` | `/next/reports` | Destination space/privacy before upload; resume private reports | B/U |
 | Report parsers and review/classification | `src/bank-import-client.js`, `src/reports.js`, `tools/bank-csv/` | `/next/reports/review` | Duplicate/partial/undo guards; existing parser outputs | B/U |
