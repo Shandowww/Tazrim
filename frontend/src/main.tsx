@@ -23,6 +23,7 @@ import './app.css'
 import Link from './app/link'
 
 const HelpPage = lazy(async () => ({ default: (await import('./app/help-page')).HelpPage }))
+const ReportGroupPage = lazy(async () => ({ default: (await import('./app/report-group-page')).ReportGroupPage }))
 const ReportStatePage = lazy(async () => ({ default: (await import('./app/report-state-page')).ReportStatePage }))
 const CardReportPage = lazy(async () => ({ default: (await import('./app/card-report-page')).CardReportPage }))
 const ReportLibraryPage = lazy(async () => ({ default: (await import('./app/report-library-page')).ReportLibraryPage }))
@@ -186,6 +187,8 @@ function App() {
               <Route path="/plans/:id/edit" element={<PlannedItemsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/plans/:id/remove" element={<PlannedItemsPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/upload/group" element={<ReportGroupPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/upload/:id/group" element={<ReportGroupPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/:id/state" element={<ReportStatePage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/:id/review" element={<CardReportPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload" element={<ReportLibraryPage key={budgetId} fixture={fixture} budget={budget} />} />

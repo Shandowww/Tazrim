@@ -28,3 +28,28 @@ export async function changeStoredReportState(budgetId:string,base:BudgetRespons
 
 /** Shared atomic source/budget protocol; retained card export remains backward compatible. */
 export const commitStoredReport=commitStoredCardReport
+
+/** The original draft-batch/commit endpoints already support groups atomically. */
+export async function saveStoredReportGroupDraft(budgetId:string,base:BudgetResponse,sources:StoredReportDetail[],draft:any,state:'ready'|'needs_review',fetcher:typeof fetch=fetch){
+ if(!sources.length||sources.length>10||new Set(sources.map(s=>s.id)).size!==sources.length||draft?.version!==1||!Array.isArray(draft.items)||draft.items.length!==sources.length)throw Error('יש לבחור קבוצת מקורות מלאה, עד עשרה דוחות.')
+ const items=sources.map(source=>{const matches=draft.items.filter((item:any)=>item.storedId===source.id),item=matches[0];if(matches.length!==1||item.storedRevision!==source.revision+1||item.hash!==source.sourceHash||typeof item.target!=='string')throw Error('התקדמות הקבוצה אינה תואמת למקורות.');return item})
+ const signal=new AbortController().signal;await fresh(budgetId,base,signal,fetcher,true);const library=await loadReportLibrary(budgetId,base,signal,fetcher)
+ if(!library.reportIdentityBound)throw Error('שמירת קבוצת דוחות מוגנת לחשבון אינה זמינה בשרת הזה.')
+ if(items.some((i:any)=>i.activity)&&!library.activityCycleReceipts)throw Error('השרת אינו תומך עדיין בקליטת מחזורי פעילות.')
+ for(const source of sources)if(source.draft){if(source.draft.groupId!==draft.groupId||source.draft.items?.some((old:any)=>library.reports.some(r=>r.id===old.storedId&&!['archived','committed'].includes(r.state))&&!sources.some(s=>s.id===old.storedId)))throw Error('יש לפתוח את כל הקבוצה השמורה; החלטות קיימות לא יוחלפו.')}
+ const reports=sources.map((source,index)=>{const item=items[index];return{id:source.id,revision:source.revision,state:item.error?'failed':state,kind:item.kind,target:item.target,month:item.kind==='card'?item.report?.dueDate?.slice(0,7):item.from?.slice(0,7)===item.to?.slice(0,7)?item.from?.slice(0,7):null}})
+ const value=await result(await mutate('/api/reports?budget='+encodeURIComponent(budgetId),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-budget-account-id':base.accountId},body:JSON.stringify({action:'draft-batch',draft,reports})},fetcher))
+ if(sources.some(source=>value.revisions?.[source.id]!==source.revision+1))throw Error('לא ניתן לאמת את גרסאות הקבוצה; יש לבדוק את המצב השמור.')
+ await fresh(budgetId,base,signal,fetcher);return sources.map((source,index)=>({...source,revision:value.revisions[source.id],state:reports[index].state,draft}))
+}
+export async function commitStoredReportGroup(budgetId:string,base:BudgetResponse,sources:StoredReportDetail[],draft:any,plan:Record<string,unknown>,actionId:string,fetcher:typeof fetch=fetch){
+ if(!validatePlan(plan)||!/^[-\w]{16,100}$/.test(actionId)||!sources.length||sources.length>10||new Set(sources.map(s=>s.id)).size!==sources.length)throw Error('תכנון קבוצת הדוחות אינו תקין.')
+ const signal=new AbortController().signal,snapshot=await fresh(budgetId,base,signal,fetcher,true),current=await Promise.all(sources.map(source=>loadStoredReport(budgetId,base,source.id,signal,fetcher)))
+ if(current.some((source,index)=>source.sourceHash!==sources[index].sourceHash))throw Error('מקור בקבוצה השתנה. יש לפתוח את הקבוצה מחדש.')
+ if(snapshot.value.revision===base.revision+1&&same(snapshot.value.plan,plan)&&current.every(source=>source.state==='committed'))return{...snapshot,recovered:true}
+ if(snapshot.value.revision!==base.revision||!same(snapshot.value.plan,base.plan)||current.some(source=>['committed','archived'].includes(source.state)))throw Error('התקציב או קבוצת הדוחות השתנו; שום קליטה נוספת לא נשלחה.')
+ const ready=await saveStoredReportGroupDraft(budgetId,base,sources,draft,'ready',fetcher),value=await result(await mutate('/api/reports?budget='+encodeURIComponent(budgetId),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-budget-account-id':base.accountId},body:JSON.stringify({action:'commit',actionId,revision:base.revision,plan,reports:ready.map(source=>({id:source.id,revision:source.revision}))})},fetcher))
+ if(value.revision!==base.revision+1)throw Error('תוצאת הקליטה אינה תואמת לגרסת התקציב.')
+ const saved=await fresh(budgetId,base,signal,fetcher);if(saved.value.revision!==value.revision||!same(saved.value.plan,plan))throw Error('התקציב השתנה לאחר הקליטה; יש לבדוק את הגרסה השמורה.')
+ return{...saved,recovered:false}
+}

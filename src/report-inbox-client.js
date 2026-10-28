@@ -12,7 +12,7 @@ async function inboxReadFile(file){
 }
 function inboxAccounts(ui){return [...cashAccountList(plan),...ui.newAccounts];}
 function inboxCards(ui){return [...creditCards(plan),...ui.newCards];}
-function inboxPayer(p,id){const mapped=p.cashPlanning?.cardAccounts[id];if(mapped)return mapped;const old=[...new Set((p.cardBilling?.reports??[]).filter(r=>r.cardId===id).map(r=>r.accountId))];return old.length===1?old[0]:cashAccountList(p).length===1?cashAccountList(p)[0].id:'';}
+function inboxPayer(p,id){return reportInboxPayer(p,id);}
 function inboxBase(ui){return reportInboxBase(plan,ui);}
 function inboxScope(ui){return reportInbox===ui&&ui.scope===accountId+'/'+activeBudget;}
 function openReportInbox(hint={}){
@@ -77,30 +77,7 @@ async function inboxChange(event){
  if(e.matches('[data-inbox-files]')){await inboxLoadFiles(Array.from(e.files??[]));return;}
  ui.error='';
  try{
-  if(e.dataset.inboxCategory!==undefined)ui.categoryChoices.set(e.dataset.inboxCategory,e.value);
-  if(e.dataset.inboxBankGroup!==undefined){const g=ui.bankGroups[Number(e.dataset.inboxBankGroup)];if(e.value)ui.bankChoices.set(g.key,{field:e.value,refund:g.rows[0].amountCents>0&&!['salary','otherIncome','incomingTransfers','outgoingTransfers','exclude'].includes(e.value)});}
-  const keys=['provider','target','payer','date','from','to','scope','direct','duplicate','kind','sheet','label','cycle','cycleTotal','cycleConfirmed'],key=keys.find(k=>e.dataset['inbox'+k[0].toUpperCase()+k.slice(1)]!==undefined);
-  if(key){const index=Number(e.dataset['inbox'+key[0].toUpperCase()+key.slice(1)]),item=ui.items[index];
-   if(key==='cycle'){item.activityCycle=e.value;item.activityTotal='';item.activityConfirmed=false;item.decisions={};}
-   if(key==='cycleTotal'){item.activityTotal=e.value;item.activityConfirmed=false;}
-   if(key==='cycleConfirmed')item.activityConfirmed=e.checked===true;
-   if(key==='target'){
-    item.target=e.value;item.decisions={};
-    if(e.value==='new'){if(item.kind==='bank'){const a={id:'bank_'+crypto.randomUUID(),label:({'one-zero':'וואן זירו',hapoalim:'הפועלים'}[item.provider]??'חשבון בנק')+' חדש',bankName:item.provider||undefined,buffer:0};ui.newAccounts.push(a);item.target=a.id;}else{const c={id:'card_'+crypto.randomUUID(),name:'כרטיס '+(item.identity?.slice(-4)??'חדש'),alias:inboxCardLast4(item)&&!inboxCards(ui).some(c=>c.alias===inboxCardLast4(item))?inboxCardLast4(item):'',billingDay:15};ui.newCards.push(c);item.target=c.id;}}
-    item.payer=inboxPayer(inboxBase(ui),item.target);
-    if(item.identityKey)for(const other of ui.items)if(other!==item&&!other.target&&other.identityKey===item.identityKey&&other.kind===item.kind){other.target=item.target;other.payer=item.payer;}
-   }
-   if(key==='provider'){const a=ui.newAccounts.find(a=>a.id===item.target);if(a)a.bankName=e.value;}
-   if(key==='payer'){item.payer=e.value;if(e.value==='new'){const a={id:'bank_'+crypto.randomUUID(),label:'חשבון משלם חדש',buffer:0};ui.newAccounts.push(a);item.payer=a.id;}}
-   if(key==='date')item.report.dueDate=e.value;
-   if(key==='from'||key==='to'){if(!item.inspection?.pdfReconciliation)item[key]=e.value;}
-   if(key==='scope')item.bankOptions.scope=e.value;
-   if(key==='direct')item.directIncluded[e.dataset.month]=e.value==='included';
-   if(key==='duplicate')item.decisions[e.dataset.row]=e.value;
-   if(key==='label'){const a=ui.newAccounts.find(a=>a.id===item.target),c=ui.newCards.find(c=>c.id===item.target);if(a)a.label=e.value.trim();if(c)c.name=e.value.trim();}
-   if(key==='kind'){if(e.value==='card'){const total=item.records.reduce((n,r)=>n-r.amountCents,0)/100;if(item.records.some(r=>!r.valid||r.currency!=='ILS')||total<0)throw Error('לא זוהה סיכום חיובי כרטיס ברור. בחרו דוח כרטיס נתמך.');item.report={amount:total,dueDate:''};}item.kind=e.value;item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}
-   if(key==='sheet'){const {inspectIntake}=await import('/bank-import/intake-reader.mjs');Object.assign(item,inspectIntake([item.sheets[Number(e.value)]]));item.identityKey=item.identity?await inboxHash(item.identity):'';item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}
-  }
+  const reader=e.dataset.inboxSheet!==undefined?await import('/bank-import/intake-reader.mjs'):null;await changeReportInbox(plan,ui,e,reader);
   ui.busy=true;await inboxBuild(ui);if(typeof persistInboxDraft==='function')await persistInboxDraft(ui);
  }catch(error){ui.error=error.message;ui.issues=Math.max(1,ui.issues??0);}finally{ui.busy=false;inboxRender();}
 }
