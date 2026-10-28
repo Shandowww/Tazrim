@@ -1321,7 +1321,7 @@ export function assignCashRemainder(p,id,month){const next=clone(p),rest=cashUna
 export function assignCashPayers(p,links){
  const next=clone(p);next.cashPlanning=cashPlanningBase(next);
  for(const c of creditCards(next))if(Object.hasOwn(links.cards??{},c.id)){const id=links.cards[c.id];if(id)next.cashPlanning.cardAccounts[c.id]=id;else delete next.cashPlanning.cardAccounts[c.id];}
- for(const [key,items]of [['items',next.expenses],['loans',next.loans??[]],['details',next.details??[]],['savings',next.savingTransfers??[]]])for(const item of items){const id=links[key]?.[item.id];if(id)item.cashAccountId=id;}
+ for(const [key,items]of [['items',next.expenses],['loans',next.loans??[]],['details',next.details??[]],['savings',next.savingTransfers??[]]])for(const item of items){const id=Object.hasOwn(links[key]??{},item.id)?links[key][item.id]:undefined;if(id)item.cashAccountId=id;}
  if(!validatePlan(next))throw Error('יש לבדוק את פרטי החשבון והשיוך. דיווחים ופריטים קיימים חייבים להתאים לחשבון המשלם.');return next;
 }
 export function cashLinksValid(p){if(['expenses','loans','details','savingTransfers'].some(k=>p[k]!==undefined&&!Array.isArray(p[k])))return false;const ids=new Set(cashAccountList(p).map(a=>a.id));return [...(p.expenses??[]),...(p.loans??[]),...(p.details??[]),...(p.savingTransfers??[])].every(e=>(e.cashAccountId===undefined||ids.has(e.cashAccountId))&&(e.cardId===undefined||creditCards(p).some(c=>c.id===e.cardId))&&(!e.cashAccountId||!e.cardId||!p.cashPlanning?.cardAccounts[e.cardId]||p.cashPlanning.cardAccounts[e.cardId]===e.cashAccountId));}
