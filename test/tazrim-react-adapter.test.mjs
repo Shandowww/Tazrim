@@ -74,7 +74,8 @@ test('React navigation keeps the selected budget and period across account pages
 
 test('Existing-editor bridges explicitly retain personal/shared identity and discard unrelated navigation parameters', () => {
   assert.equal(legacyBudgetHref(''), '/?budget=personal')
-  assert.equal(legacyBudgetHref('?budget=house&year=2026&month=10'), '/?budget=house')
+  assert.equal(legacyBudgetHref('?budget=house','reports','invalid-route-id'), '/?budget=house&mf-view=reports')
+  assert.equal(legacyBudgetHref('?budget=house&year=2026&month=10'), '/?budget=house&year=2026&month=10')
   assert.equal(legacyBudgetHref('?budget=a%26b&demo=1'), '/?budget=a%26b')
   assert.equal(withViewQuery('/cards/card1', '?budget=house&year=2026&month=10&demo=1', true), '/cards/card1?year=2026&month=10&budget=house&demo=1')
   assert.equal(withViewQuery('/cards/card1', '?demo=1', false), '/cards/card1')

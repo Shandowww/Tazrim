@@ -1,3 +1,4 @@
+import * as inboxController from '../src/report-inbox-controller.js';
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import fs from 'node:fs';
 import * as bank from '../src/bank-import-model.js';
 import * as budget from '../src/budget.js';import * as billing from '../src/card-statement-model.js';import * as inbox from '../src/report-inbox-model.js';import * as classifier from '../tools/bank-csv/classifier.mjs';
@@ -5,7 +6,7 @@ const base=()=>({startMonth:'2026-01',opening:1000,buffer:100,horizon:12,default
 const report={issuer:'isracard',dueDate:'2026-03-15',amount:10,entries:[{date:'2026-02-12',merchant:'בית עסק חדש',amountCents:1000,originalCents:1000,notes:''}]};
 function harness(){
  const p=base(),ui={scope:'u/personal',snapshot:JSON.stringify(p),revision:1,items:[],newAccounts:[],newCards:[],blank:false,merchantRules:[],categoryChoices:new Map(),bankChoices:new Map(),duplicates:0};
- const c=vm.createContext({...budget,...bank,...billing,...inbox,classifierFixture:classifier,plan:p,accountId:'u',activeBudget:'personal',revision:1,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>null},demoPreview:true,todayMonth:()=> '2026-10',statementMerchant:s=>s.trim().toLowerCase(),ui,crypto:globalThis.crypto});
+ const c=vm.createContext({...inboxController,...budget,...bank,...billing,...inbox,classifierFixture:classifier,plan:p,accountId:'u',activeBudget:'personal',revision:1,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>null},demoPreview:true,todayMonth:()=> '2026-10',statementMerchant:s=>s.trim().toLowerCase(),ui,crypto:globalThis.crypto});
  vm.runInContext(fs.readFileSync('src/card-billing-client.js','utf8'),c);vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8').replace("await import('/bank-import/classifier.mjs')",'classifierFixture'),c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};billingToday=()=>"2026-10-20";',c);return{c,ui,p};
 }
 test('A reconciled statement imports without category questions, retains exact financial amounts and can be categorized later',async()=>{

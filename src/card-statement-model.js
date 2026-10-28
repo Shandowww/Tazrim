@@ -1,6 +1,6 @@
 import {saveBillingReport} from './card-billing-model.js';
 import {cents,clone,validatePlan,detailCategories,creditCards,analyticalExpenseDetails} from './budget.js';
-const statementMerchant=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase();
+export const statementMerchant=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase();
 async function statementDigest(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
 export function statementCycleExists(p,cardId,month){return (p.details??[]).some(e=>e.method===cardId&&e.month===month&&['cal','isracard'].includes(e.statement?.issuer));}
 export async function prepareCardStatement(p,report,cardId,merchantRules=[]){
@@ -58,3 +58,7 @@ export function applyBillingBatch(p,entries,today){
  if(!validatePlan(next)||JSON.stringify(next).length>2000000)throw Error('לא ניתן לשמור את כל הדוחות; בדקו את תקופת התקציב ומגבלת הפירוט.');
  return next;
 }
+
+// Shared original inbox grouping, independent of either presentation.
+export function statementGroups(preview){const groups=new Map();for(const row of preview.rows){if(row.existing)continue;const key=statementMerchant(row.entry.merchant);if(!groups.has(key))groups.set(key,{merchant:row.entry.merchant,rows:[]});groups.get(key).rows.push(row);}return [...groups.values()].map(g=>({...g,category:new Set(g.rows.map(r=>r.category)).size===1?g.rows[0].category:''}));}
+export function statementBatchGroups(batch){const groups=new Map();batch.forEach((item,fileIndex)=>{for(const row of item.statement?.rows??[]){if(row.existing)continue;const key=statementMerchant(row.entry.merchant);if(!groups.has(key))groups.set(key,{key,merchant:row.entry.merchant,rows:[],files:new Set()});const group=groups.get(key);group.rows.push({...row,fileIndex});group.files.add(fileIndex);}});return [...groups.values()].map(g=>({...g,category:new Set(g.rows.map(r=>r.category)).size===1?g.rows[0].category:''}));}

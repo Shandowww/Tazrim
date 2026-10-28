@@ -1,6 +1,7 @@
+import {buildReportInbox,reportInboxDraftForWrite,inboxBankGroupKey} from '../../../src/report-inbox-controller.js'
 import {cashAccountList,clone,validatePlan} from '../../../src/budget.js'
 import {bankIdentity,bankPreview,bankDefaultMonthModes,bankPlannedDirect} from '../../../src/bank-import-model.js'
-import {applyReportInbox,inboxHash,inboxReceiptPresent} from '../../../src/report-inbox-model.js'
+import {inboxHash,inboxReceiptPresent} from '../../../src/report-inbox-model.js'
 import {suggest} from '../../../tools/bank-csv/classifier.mjs'
 export interface BankReportSelection{accountId:string;scope:'complete'|'partial';choices:Record<string,{field:string;refund?:boolean}>;duplicates:Record<string,'same'|'new'>;skipMonths:string[];directIncluded:Record<string,boolean>}
 const object=(v:any)=>!!v&&typeof v==='object'&&!Array.isArray(v)
@@ -26,17 +27,24 @@ export async function previewNativeBankReport(plan:any,parsed:any,source:any,sel
  if(!preview.months.some((m:any)=>m.mode!=='skip'&&m.newCount))questions.push({type:'no-selected-month'})
  return{records,options,preview,questions,receipt:{hash:parsed.hash,kind:'bank',target:account.id,reference:source.id},binding:parsed.identityKey?{key:parsed.identityKey,kind:'bank',target:account.id}:null}
 }
-export async function prepareNativeBankReport(plan:any,parsed:any,source:any,selection:BankReportSelection,asOf:string){const review=await previewNativeBankReport(plan,parsed,source,selection,asOf);if(review.questions.length)throw Error('יש להשלים את בדיקת הכפילויות, הסיווגים, החודשים והתכנון לפני קליטה.');const next=await applyReportInbox(plan,[{records:review.records,options:review.options}],[],[review.receipt],review.binding?[review.binding]:[],asOf);if(!await inboxReceiptPresent(next,review.receipt))throw Error('לא ניתן לאמת את קבלת מקור הבנק.');return{...review,plan:next}}
+export async function prepareNativeBankReport(plan:any,parsed:any,source:any,selection:BankReportSelection,asOf:string){
+ const review=await previewNativeBankReport(plan,parsed,source,selection,asOf)
+ if(review.questions.length)throw Error('יש להשלים את בדיקת הכפילויות, הסיווגים, החודשים והתכנון לפני קליטה.')
+ const draft=await nativeBankStoredDraft(plan,parsed,source,selection,source.id,asOf),ui:any={blank:false,startMonth:plan.startMonth,items:clone(draft.items),newAccounts:[],newCards:[],merchantRules:[],categoryChoices:new Map(),bankChoices:new Map(draft.bankChoices),duplicates:0,error:''}
+ await buildReportInbox(plan,ui,{month:asOf,today:asOf,classifier:{suggest},activityAPI:null})
+ if(!ui.build||ui.issues)throw Error(ui.error||ui.items[0].warning||'יש להשלים את בדיקת הדוח לפני קליטה.')
+ if(!await inboxReceiptPresent(ui.build,review.receipt))throw Error('לא ניתן לאמת את קבלת מקור הבנק.')
+ return{...review,...(ui.banks[0]?{records:ui.banks[0].records,options:ui.banks[0].options}:{}),plan:ui.build}
+}
 
-const merchant=(v:any)=>String(v??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase()
-const groupKey=(accountId:string,row:any)=>JSON.stringify([accountId,merchant(row.description),merchant(row.beneficiary),row.amountCents<0?'out':'in'])
+const groupKey=(accountId:string,row:any)=>inboxBankGroupKey({target:accountId},row)
 /** Serialize exactly the original inbox schema. Different decisions within one legacy group cannot be represented safely. */
 export async function nativeBankStoredDraft(plan:any,parsed:any,source:any,selection:BankReportSelection,groupId:string,asOf:string){
  await previewNativeBankReport(plan,parsed,source,selection,asOf)
  if(!/^[-\w]{16,100}$/.test(groupId))throw Error('מזהה קבוצת הדוח אינו תקין.')
  const groups=new Map<string,any>();for(const row of parsed.records){const chosen=selection.choices[String(row.line)];if(!chosen)continue;const key=groupKey(selection.accountId,row),value={field:chosen.field,refund:chosen.refund===true};if(groups.has(key)&&JSON.stringify(groups.get(key))!==JSON.stringify(value))throw Error('יש סיווגים שונים באותה קבוצת תנועות. יש להמשיך בממשק הקיים לפני שמירת התקדמות.');groups.set(key,value)}
  for(const row of parsed.records)if(groups.has(groupKey(selection.accountId,row))&&!Object.hasOwn(selection.choices,String(row.line)))throw Error('יש לאשר את כל שורות קבוצת התנועות לפני שמירת הסיווג שלה.')
- return{version:1,parserBuild:'react-bank-review-v1',groupId,items:[{id:source.id,name:source.name,size:source.size??0,target:selection.accountId,payer:'',decisions:clone(selection.duplicates),directIncluded:clone(selection.directIncluded),monthDecisions:Object.fromEntries(selection.skipMonths.map(m=>[m,'skip'])),bankOptions:{scope:selection.scope},skip:false,hash:parsed.hash,identityKey:parsed.identityKey??'',kind:'bank',provider:parsed.provider??'',identity:parsed.identity??'',records:clone(parsed.records),from:parsed.from,to:parsed.to,...(parsed.inspection?{inspection:clone(parsed.inspection)}:{}),storedId:source.id,storedRevision:source.revision+1}],categoryChoices:[],bankChoices:[...groups],newAccounts:[],newCards:[],startMonth:plan.startMonth}
+ return reportInboxDraftForWrite({groupId,items:[{id:source.id,name:source.name,size:source.size??0,target:selection.accountId,payer:'',decisions:clone(selection.duplicates),directIncluded:clone(selection.directIncluded),monthDecisions:Object.fromEntries(selection.skipMonths.map(m=>[m,'skip'])),bankOptions:{scope:selection.scope},skip:false,hash:parsed.hash,identityKey:parsed.identityKey??'',kind:'bank',provider:parsed.provider??'',identity:parsed.identity??'',records:clone(parsed.records),from:parsed.from,to:parsed.to,...(parsed.inspection?{inspection:clone(parsed.inspection)}:{}),storedId:source.id,storedRevision:source.revision}],categoryChoices:new Map(),bankChoices:groups,newAccounts:[],newCards:[],startMonth:plan.startMonth},[{storedId:source.id}],'react-bank-review-v1')
 }
 export async function restoreNativeBankSelection(plan:any,parsed:any,source:any,asOf:string):Promise<BankReportSelection>{
  const draft=source.draft,item=draft?.items?.[0];if(!draft||draft.version!==1||draft.parserBuild!=='react-bank-review-v1'||!Array.isArray(draft.items)||draft.items.length!==1||item?.kind!=='bank'||item.storedId!==source.id||item.storedRevision!==source.revision||item.hash!==parsed.hash||item.from!==parsed.from||item.to!==parsed.to||JSON.stringify(item.records)!==JSON.stringify(parsed.records)||draft.startMonth!==plan.startMonth||!Array.isArray(draft.bankChoices)||draft.bankChoices.length>10000||['newAccounts','newCards','categoryChoices'].some(k=>!Array.isArray(draft[k])||draft[k].length)||!object(item.monthDecisions)||Object.values(item.monthDecisions).some(v=>v!=='skip'))throw Error('ההתקדמות השמורה דורשת פתיחה בממשק הקיים כדי לשמור את כל ההחלטות.')

@@ -1,5 +1,7 @@
 # Development acceptance — 2026-10-27
 
+> **Execution status — 2026-10-28:** [execution-status.md](execution-status.md) records the verified production baseline, current per-workflow connections and actual completion limits. Shared original report orchestration/drafts and optional categories are now implemented. Historical pending lists below are not a feature-development queue.
+
 > **Active scope correction — 2026-10-28:** Tal instructed us to connect existing Budgit features, not rewrite them. [completion-plan.md](completion-plan.md) supersedes historical pending/next-action lists below. They remain evidence only. Classify missing React behavior as connection work; retain original workflow semantics and completed tested work. Source inspection found optional-category parity, grouped draft/orchestration and generic bridge gaps; they are not fixed by this documentation update. Production is unchanged.
 
 **Incomplete preview; not released.** Tested application checkpoint: `264953ff97095a44b36fbde9c3e72a153707d35f` plus the subsequent planned-item-removal stage recorded in the checkpoint. Canonical backend baseline: `eb507d9`, with isolated loan-removal fix `04eb8c0`. Tests use synthetic identities and in-memory databases only. No live records, production service or Sites changed.

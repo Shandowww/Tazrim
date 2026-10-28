@@ -1,0 +1,17 @@
+{
+  "checkedAtUtc": "2026-10-28T08:10:41Z",
+  "productionCommit": "a79488ba465e6061edeb542aa22e40b852489631",
+  "sourceFilesCompared": 141,
+  "sourceFileDifferences": [],
+  "runtimeHtmlSha256": "4e9560e7558657ad17eb67c2442a9ffe4fb53a17a03cc89c5a5308c97d795a9a",
+  "budgitImage": "sha256:aaf3aa6ea3ee287f86e398ff80f62405113e665d941234f3a1deb31b57652aa3",
+  "nodeVersion": "v24.22.1",
+  "method": "Read-only RELEASE, SHA256 source comparison, container runtime HTML digest and image/version inspection; no database, environment or credential contents read.",
+  "deploymentPerformed": false,
+  "requiredSourceReconciliation": [
+    "Preserve released original-interface theme and device choice in the frontend branch.",
+    "Preserve incorporated canonical private/shared baseline eb507d9 and loan fix 04eb8c0.",
+    "Exclude unrelated canonical WIP."
+  ],
+  "releaseReady": false
+}

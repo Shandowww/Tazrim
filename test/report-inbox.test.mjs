@@ -1,3 +1,4 @@
+import * as inboxController from '../src/report-inbox-controller.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {zero,validatePlan,forecast} from '../src/budget.js';
 import {bankIdentity,undoBankImport} from '../src/bank-import-model.js';
@@ -34,7 +35,7 @@ test('Automatic intake recognizes bank balance schemas and asks rather than gues
 import vm from 'node:vm';import fs from 'node:fs';
 test('Inbox save retries keep one applied draft and release only its own save guard without bypassing revision protection',async()=>{
  let mutations=0,attempts=0;const p=base(),ui={scope:'user/personal',revision:3,snapshot:JSON.stringify(p),build:{...p,buffer:111},applied:null,busy:false,saving:false,items:[{}],issues:0,origin:'details'};
- const c=vm.createContext({app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>({remove(){}})},accountId:'user',activeBudget:'personal',revision:3,plan:p,dirty:false,demoPreview:false,notify(){},render(){},ui,mutate:next=>{mutations++;c.plan=next;c.dirty=true;return true;},save:async()=>{attempts++;assert.equal(vm.runInContext('reportInboxHasDraft()',c),false);if(attempts===1)throw Error('connection lost');c.dirty=false;c.revision=4;}});
+ const c=vm.createContext({...inboxController,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>({remove(){}})},accountId:'user',activeBudget:'personal',revision:3,plan:p,dirty:false,demoPreview:false,notify(){},render(){},ui,mutate:next=>{mutations++;c.plan=next;c.dirty=true;return true;},save:async()=>{attempts++;assert.equal(vm.runInContext('reportInboxHasDraft()',c),false);if(attempts===1)throw Error('connection lost');c.dirty=false;c.revision=4;}});
  vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8'),c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};',c);
  const event={target:{closest:selector=>selector==='[data-inbox]'?{dataset:{inbox:'save'}}:null}};
  await vm.runInContext('inboxClick',c)(event);assert.equal(mutations,1);assert.match(ui.error,/connection lost/);assert.equal(vm.runInContext('reportInboxHasDraft()',c),true);
@@ -42,7 +43,7 @@ test('Inbox save retries keep one applied draft and release only its own save gu
 });
 test('Pending questions or a stale local plan cannot invoke mutation even with an artificially enabled save button',async()=>{
  let mutations=0;const p=base(),ui={scope:'u/b',revision:1,snapshot:JSON.stringify(p),build:{...p,buffer:111},applied:null,busy:false,items:[{}],issues:1};
- const c=vm.createContext({app:{addEventListener(){}},window:{addEventListener(){}},document:{},accountId:'u',activeBudget:'b',revision:1,plan:p,ui,mutate(){mutations++;},render(){}});vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8'),c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};',c);
+ const c=vm.createContext({...inboxController,app:{addEventListener(){}},window:{addEventListener(){}},document:{},accountId:'u',activeBudget:'b',revision:1,plan:p,ui,mutate(){mutations++;},render(){}});vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8'),c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};',c);
  const event={target:{closest:selector=>selector==='[data-inbox]'?{dataset:{inbox:'save'}}:null}};await vm.runInContext('inboxClick',c)(event);assert.equal(mutations,0);ui.issues=0;c.plan={...p,buffer:112};await vm.runInContext('inboxClick',c)(event);assert.equal(mutations,0);assert.match(ui.error,/התקציב השתנה/);
 });
 
@@ -55,7 +56,7 @@ test('Inbox metadata rejects invalid receipts and duplicate identities while old
  const before=JSON.stringify(p);p.reportInbox.receipts.push({...p.reportInbox.receipts[0]});assert.equal(validatePlan(p),false);Object.assign(p,JSON.parse(before));p.reportInbox.bindings[0].kind='guess';assert.equal(validatePlan(p),false);
 });
 test('Blank setup adapts its start month only while unconfigured and orphaned new targets are not saved',()=>{
- const p=base(),c=vm.createContext({app:{addEventListener(){}},window:{addEventListener(){}},plan:p,clone:structuredClone,cashPlanningBase:p=>structuredClone(p.cashPlanning),creditCards:p=>p.creditCards});vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8'),c);
+ const p=base(),c=vm.createContext({...inboxController,app:{addEventListener(){}},window:{addEventListener(){}},plan:p,clone:structuredClone,cashPlanningBase:p=>structuredClone(p.cashPlanning),creditCards:p=>p.creditCards});vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8'),c);
  const make=vm.runInContext('inboxBase',c);const next=make({blank:true,startMonth:'2025-01',items:[],newAccounts:[{id:'unused',label:'orphan'}],newCards:[{id:'unused',name:'orphan'}]});assert.equal(next.startMonth,'2025-01');assert.equal(next.setupCompleted,true);assert.equal(next.cashPlanning.accounts.length,2);assert.equal(next.creditCards.length,1);assert.equal(p.startMonth,'2026-01');
 });
 

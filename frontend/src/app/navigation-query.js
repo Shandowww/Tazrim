@@ -1,3 +1,4 @@
+import {legacyInterfaceHref} from '../../../src/interface-destination.js'
 /** Keep the selected budget space and display period across internal routes. */
 export function withViewQuery(href, search, development = false) {
   const current = new URLSearchParams(search)
@@ -11,9 +12,8 @@ export function withViewQuery(href, search, development = false) {
 }
 
 /** Existing editor bridge keeps the explicitly selected space, never a prior device selection. */
-export function legacyBudgetHref(search) {
-  const budget = new URLSearchParams(search).get('budget') || 'personal'
-  return '/?' + new URLSearchParams({ budget })
+export function legacyBudgetHref(search,view='home',reportId='') {
+  return legacyInterfaceHref(search,view,/^[a-f0-9-]{36}$/.test(reportId)?reportId:'')
 }
 
 /** Detail links carry only presentation filters; identity always stays in the URL. */

@@ -1,5 +1,7 @@
 # Budgit to Tazrim frontend: feature inventory
 
+> **Execution status — 2026-10-28:** [execution-status.md](execution-status.md) records the verified production baseline, current per-workflow connections and actual completion limits. Shared original report orchestration/drafts and optional categories are now implemented. Historical pending lists below are not a feature-development queue.
+
 > **Active scope correction — 2026-10-28:** Tal instructed us to connect existing Budgit features, not rewrite them. [completion-plan.md](completion-plan.md) supersedes historical pending/next-action lists below. They remain evidence only. Classify missing React behavior as connection work; retain original workflow semantics and completed tested work. Source inspection found optional-category parity, grouped draft/orchestration and generic bridge gaps; they are not fixed by this documentation update. Production is unchanged.
 
 Baseline for this inventory: canonical `3c1bc74fea923e9836420da6abc31d4a3cad2bce`, 2026-10-26. The only **verified live** source recorded by the Tazrim work is `a79488ba465e6061edeb542aa22e40b852489631`; recheck the server before any release. This checkout is a clean clone of the canonical commit, excluding its numerous uncommitted changes. Entries marked “baseline” exist in this commit, not necessarily in production. Some shared-space milestones remain read-only or unfinished by design.

@@ -1,3 +1,4 @@
+import * as inboxController from '../src/report-inbox-controller.js';
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import fs from 'node:fs';
 import * as budget from '../src/budget.js';import * as billing from '../src/card-statement-model.js';import * as inbox from '../src/report-inbox-model.js';
 import * as activityAPI from '../tools/bank-csv/cal-activity.mjs';import {activityFixture} from '../tools/bank-csv/cal-activity-fixture.mjs';
@@ -6,7 +7,7 @@ function harness(p=base()){
  const source=fs.readFileSync('src/report-inbox-client.js','utf8').replace("await import('/bank-import/classifier.mjs')",'({suggest(){throw Error("No bank rows expected");}})').replace("await import('/bank-import/cal-activity.mjs')",'activityAPIFixture');
  const item={...activityAPI.parseCalActivity([activityFixture()]),id:'item',name:'synthetic.xlsx',hash:'a'.repeat(64),target:'card1',payer:'a',decisions:{},directIncluded:{},monthDecisions:{},bankOptions:{scope:'complete'}};
  const ui={scope:'u/personal',snapshot:JSON.stringify(p),revision:1,items:[item],newAccounts:[],newCards:[],blank:false,merchantRules:[],categoryChoices:new Map([['חנות לדוגמה','אחר'],['זיכוי לדוגמה','אחר'],['חנות שנייה','אחר']]),bankChoices:new Map(),duplicates:0};
- const c=vm.createContext({...budget,...billing,...inbox,activityAPIFixture:activityAPI,plan:p,accountId:'u',activeBudget:'personal',revision:1,app:{addEventListener(){}},window:{addEventListener(){}},document:{},billingToday:()=> '2026-10-19',statementMerchant:s=>s.trim().toLowerCase(),money:v=>v+' ₪',esc:s=>String(s??'').replaceAll('<','&lt;'),ui});vm.runInContext(fs.readFileSync('src/card-billing-client.js','utf8'),c);vm.runInContext(source,c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};',c);return{c,ui,item};
+ const c=vm.createContext({...inboxController,...budget,...billing,...inbox,activityAPIFixture:activityAPI,plan:p,accountId:'u',activeBudget:'personal',revision:1,app:{addEventListener(){}},window:{addEventListener(){}},document:{},todayMonth:()=> '2026-10',billingToday:()=> '2026-10-19',statementMerchant:s=>s.trim().toLowerCase(),money:v=>v+' ₪',esc:s=>String(s??'').replaceAll('<','&lt;'),ui});vm.runInContext(fs.readFileSync('src/card-billing-client.js','utf8'),c);vm.runInContext(source,c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};',c);return{c,ui,item};
 }
 test('Activity requires cycle, final total and acknowledgement before the inbox can build a proposal',async()=>{
  const {c,ui,item}=harness();item.report={dueDate:'2026-10-15',amount:430};await c.inboxBuild(ui);assert.equal(ui.build,null);assert.equal(item.report,null);assert.ok(ui.issues>0);
