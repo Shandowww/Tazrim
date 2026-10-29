@@ -86,7 +86,7 @@ test('Encrypted and uninitialized migration routes explicitly block without weak
 function clientHarness(){
  const state={user:'tal',source:'personal',target:'house',account:'a',data:{sourceRevision:1,targetRevision:2},metas:[],busy:false,controller:null};let clears=0,reloads=0;
  const c=vm.createContext({AbortController,URLSearchParams,state,accountId:'tal',window:{addEventListener(){}},document:{getElementById:()=>null},render(){},spaceRequireReload(){reloads++;}});
- vm.runInContext(readFileSync('src/space-migration-client.js','utf8'),c);vm.runInContext('spaceMigrationReview=state',c);c.renderSpaceMigrationReview=()=>{};c.clearSpaceMigrationReview=()=>{state.data=null;c.runClear=true;vm.runInContext('spaceMigrationReview=null',c);clears++;};return{c,state,clears:()=>clears,reloads:()=>reloads};
+ vm.runInContext(readFileSync('src/migration-controller.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/space-migration-client.js','utf8'),c);vm.runInContext('spaceMigrationReview=state',c);c.renderSpaceMigrationReview=()=>{};c.clearSpaceMigrationReview=()=>{state.data=null;c.runClear=true;vm.runInContext('spaceMigrationReview=null',c);clears++;};return{c,state,clears:()=>clears,reloads:()=>reloads};
 }
 test('Client uses GET review with exact source revisions and removes old financial display on any failure or identity change',async()=>{
  for(const mode of ['normal','offline','conflict','identity','revoked']){
@@ -103,7 +103,7 @@ test('Legacy aggregate-only values stay unassigned and source/target names/descr
  const p=await sourcePlan();p.months['2026-03']={values:{...zero(),salary:999},actual:true,includesPlannedCard:false};
  p.cashPlanning.accounts[0].label='<img src=x onerror=bad>';p.bankImport.entries[0].source.description='<script>private</script>';
  const review=reviewAccountMigration(p,base(),opts);assert.ok(review.issues.some(i=>i.code==='unassigned-totals'));assert.equal(review.months.some(m=>m.month==='2026-03'),false);
- const c=vm.createContext({window:{addEventListener(){}},esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),money:n=>String(n)});vm.runInContext(readFileSync('src/space-migration-client.js','utf8'),c);
+ const c=vm.createContext({window:{addEventListener(){}},esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),money:n=>String(n)});vm.runInContext(readFileSync('src/migration-controller.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/space-migration-client.js','utf8'),c);
  const html=c.migrationReviewResults({review,external:{originalReports:1,reportDrafts:1,historyEntries:1,ownPrivateMatches:0,ownImportConnections:0,ownWalletConnections:0,ownGmailConnections:0},audience:{targetPrivate:false,targetMembers:2}});
  assert.doesNotMatch(html,/<script>|<img/);assert.match(html,/&lt;script&gt;/);assert.match(html,/&lt;img/);assert.doesNotMatch(html,/data-migration="apply"/);
 });

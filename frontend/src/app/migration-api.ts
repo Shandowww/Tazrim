@@ -1,0 +1,8 @@
+import {AccessError,type BudgetResponse} from './budget-api.ts'
+export async function migrationJSON(base:BudgetResponse,path:string,signal:AbortSignal,init:RequestInit={},fetcher:typeof fetch=fetch){
+ const controller=new AbortController(),abort=()=>controller.abort();signal.addEventListener('abort',abort,{once:true});if(signal.aborted)controller.abort();const timer=setTimeout(abort,15000)
+ try{const response=await fetcher(path,{...init,credentials:'same-origin',cache:'no-store',signal:controller.signal});let body:any;try{body=await response.json()}catch{throw Object.assign(Error('תוצאת הבקשה אינה זמינה. יש לבדוק את המצב לפני פעולה נוספת.'),{status:response.status})}if(!response.ok)throw Object.assign(Error(body.error||'הבקשה לא הושלמה.'),{status:response.status});if(body.accountId!==base.accountId||body.accountEmail!==undefined&&body.accountEmail!==base.accountEmail)throw Object.assign(new AccessError('החשבון השתנה.'),{status:401});return body}finally{clearTimeout(timer);signal.removeEventListener('abort',abort)}
+}
+export function initialMigrationState(user:string,source:string,notice=''){return{user,source,target:'',account:'',metas:[],data:null,execution:null,operations:[],notice,error:'',busy:false,executing:false,pendingOperation:null,consentPrivacy:false,consentMove:false,undoConsent:'',controller:new AbortController()}}
+/** Leaving an uncertain migration must not expose an old active financial snapshot. */
+export function discardMigrationSelection(state:any){const uncertain=!!state.pendingOperation;state.controller?.abort();Object.assign(state,{target:'',account:'',data:null,execution:null,consentMove:false,consentPrivacy:false,undoConsent:'',pendingOperation:null,busy:false});return uncertain}

@@ -25,27 +25,8 @@ function renderSpaceMigrationReview(preferredFocus){
  dialog.innerHTML=`<header class="section-heading"><h2 id="space-migration-title">סקירת מעבר חשבון</h2><button class="btn" type="button" data-migration="close" data-migration-focus="close" aria-label="סגירת סקירת המעבר">×</button></header><p class="help">בודקים חשבון אחד מול מרחב יעד לפני כל שינוי. המקור והיעד נשארים כפי שנשמרו; אין העברת מסמכים, כסף או חיבורים.</p>${state.notice?`<p role="status">${esc(state.notice)}</p>`:''}<fieldset ${state.busy||state.executing||state.pendingOperation?'disabled':''}><label class="field">מרחב המקור<select data-migration-select="source" data-migration-focus="source">${options(state.source,state.target)}</select></label><label class="field">מרחב היעד<select data-migration-select="target" data-migration-focus="target">${options(state.target,state.source)}</select></label>${state.data?.accounts?`<label class="field">חשבון במקור<select data-migration-select="account" data-migration-focus="account"><option value="">בחירת חשבון לסקירה</option>${state.data.accounts.map(a=>`<option value="${esc(a.id)}" ${a.id===state.account?'selected':''}>${esc(a.name)}</option>`).join('')}</select></label>${!state.data.accounts.length?'<p>אין חשבונות במקור; אין שיוך אוטומטי של התקציב הכללי.</p>':''}`:''}<button class="btn" type="button" data-migration="refresh" data-migration-focus="refresh">רענון הסקירה</button></fieldset><p role="status" aria-live="polite">${state.busy?'טוען נתונים מורשים לסקירה…':''}</p>${state.error?`<p class="error-box" role="alert">${esc(state.error)}</p>`:''}${state.data?.review?migrationReviewResults(state.data):'<p class="help">בחרו שני מרחבים עם הרשאת עריכה וחשבון שמור כדי לראות תלות, פרטיות והשוואת רכיבים. מעבר מוצפן עדיין חסום עד להשלמת השמירה האטומית.</p>'}${typeof migrationExecutionView==='function'?migrationExecutionView(state):''}`;
  if(focus)[...dialog.querySelectorAll('[data-migration-focus]')].find(e=>e.dataset.migrationFocus===focus)?.focus({preventScroll:true});dialog.scrollTop=scroll;
 }
-async function loadSpaceMigrationReview({refresh=false}={}){
- const state=spaceMigrationReview;if(!state||state.busy||state.executing||state.pendingOperation)return;
- const expected=state.data?{source:state.data.sourceRevision,target:state.data.targetRevision}:null;
- state.busy=true;state.error='';state.importPages={};state.savingsForm={};state.savingsResult=null;state.savingsOpen={};state.savingsPages={};state.savingsRoutes={};state.savingsProposal=null;state.execution=null;state.consentPrivacy=false;state.consentMove=false;state.data=null;if(refresh)state.account='';state.controller?.abort();state.controller=new AbortController();const signal=state.controller.signal;
- const current=()=>spaceMigrationReview===state&&!signal.aborted;
- const deny=()=>{clearSpaceMigrationReview();spaceRequireReload();render();};renderSpaceMigrationReview();
- try{
-  const list=await spaceOverviewJSON('/api/budgets',signal);if(!current())return;
-  if(list.accountId!==state.user||accountId!==state.user){deny();return;}
-  if(!Array.isArray(list.budgets))throw Error('Invalid spaces');state.metas=list.budgets;
-  if(!state.source||!state.target){renderSpaceMigrationReview();return;}
-  for(const id of [state.source,state.target])if(!list.budgets.some(m=>m.id===id&&m.role!=='viewer'))throw Error('הגישה לאחד המרחבים השתנתה. בחרו מקור ויעד עם הרשאת עריכה.');
-  const query=new URLSearchParams({source:state.source,target:state.target});
-  if(state.account&&expected){query.set('account',state.account);query.set('sourceRevision',expected.source);query.set('targetRevision',expected.target);}
-  const data=await spaceOverviewJSON('/api/space-migration-review?'+query,signal);if(!current())return;
-  if(data.accountId!==state.user||accountId!==state.user){deny();return;}
-  if(!Number.isSafeInteger(data.sourceRevision)||!Number.isSafeInteger(data.targetRevision)||!Array.isArray(data.accounts)||data.review?.applyAvailable===true)throw Error('Invalid migration review');
-  state.data=data;
- }catch(error){if(!current())return;if(error.status===401){deny();return;}state.data=null;state.account='';state.error=[403,404].includes(error.status)?'ההרשאה לאחד המרחבים אינה זמינה. הסקירה הוסרה; בחרו מחדש ורעננו.':error.status===409?'נתוני המקור או היעד השתנו, או שאחד המרחבים מוצפן. רעננו לבחירה מחדש. מעבר מוצפן טרם זמין וההצפנה נשמרת.':error.message==='הגישה לאחד המרחבים השתנתה. בחרו מקור ויעד עם הרשאת עריכה.'?error.message:'לא ניתן להכין סקירה כרגע. שום תקציב לא שונה. רעננו ונסו שוב.';
- }finally{if(current()){state.busy=false;renderSpaceMigrationReview();}}
-}
+async function loadSpaceMigrationReview({refresh=false}={}){return loadMigrationReview(spaceMigrationReview,migrationControllerPorts(),{refresh});}
+
 function openSpaceMigrationReview(notice=''){
  if(demoPreview||!canSwitchBudget()||!accountId)return;
  clearSpaceOverview();clearSpaceMigrationReview();document.getElementById('app-menu-dialog')?.close();
@@ -59,3 +40,5 @@ function openSpaceMigrationReview(notice=''){
  renderSpaceMigrationReview();dialog.showModal();loadSpaceMigrationReview().then(()=>{if(spaceMigrationReview===state&&typeof migrationOperations==='function')migrationOperations(state);});
 }
 window.addEventListener('pagehide',clearSpaceMigrationReview);
+
+function migrationControllerPorts(){return{current:()=>spaceMigrationReview,accountId:()=>accountId,read:(...args)=>spaceOverviewJSON(...args),render:()=>renderSpaceMigrationReview(),deny:()=>{clearSpaceMigrationReview();spaceRequireReload();render();},denied:error=>migrationExecutionDenied(error),canSwitch:()=>canSwitchBudget(),finished:(...args)=>migrationExecutionFinished(...args),prepareSavings:()=>prepareMigrationSavingsExecution()};}

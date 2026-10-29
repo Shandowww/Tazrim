@@ -1,3 +1,4 @@
+const MigrationPage = lazy(async () => ({ default: (await import('./app/migration-page')).MigrationPage }))
 import {ComparisonGoalsPage} from './app/comparison-goals-page'
 import {ForecastSettingsPage} from './app/forecast-settings-page'
 import {OnboardingPage} from './app/onboarding-page'
@@ -241,6 +242,7 @@ function App() {
               <Route path="/recurring" element={<RecurringPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/settings/device-draft" element={<DeviceDraftPage fixture={fixture} budget={budget} />} />
               <Route path="/overview/transfers" element={<TransferMatchesPage fixture={fixture} budget={budget}/>} />
+              <Route path="/overview/migration" element={<MigrationPage fixture={fixture} budget={budget}/>} />
               <Route path="/overview" element={<OverviewPage fixture={fixture} budget={budget}/>} />
               <Route path="/actions" element={<ActionCenterPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/settings/report-expectations" element={<ReportExpectationsPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />

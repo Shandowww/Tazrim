@@ -22,56 +22,16 @@ function migrationExecutionView(state){
  html+=`<section class="panel"><h3>פעולות המעבר הפרטיות שלך</h3><p class="help">היומן הזה גלוי רק לחשבון המחובר. בדיקת מצב אינה שולחת מעבר חדש.</p>${state.operationsError?`<p class="error-box" role="alert">${esc(state.operationsError)}</p>`:''}<button class="btn" type="button" data-migration="operations" ${state.executing?'disabled':''}>רענון מצב המעברים</button>${(state.operations??[]).map(r=>`<div class="group"><p><bdi>${esc(r.accountName??'פעולה שאינה זמינה')}</bdi> · ${r.status==='applied'?'המעבר נשמר':r.status==='undone'?'המעבר בוטל':'ההרשאה אינה זמינה'}</p>${r.canUndo?`<label class="check"><input type="checkbox" data-migration-undo-consent="${esc(r.id)}" ${state.undoConsent===r.id?'checked':''}><span>להחזיר את שני המרחבים יחד למצב שלפני המעבר, רק אם לא השתנו.</span></label><button class="btn" type="button" data-migration="undo" data-id="${esc(r.id)}" ${state.executing||state.undoConsent!==r.id?'disabled':''}>ביטול המעבר ושמירת שני המרחבים</button>`:r.status==='applied'?'<p class="help">אין ביטול זמין אחרי שינוי בנתונים או בהרשאות.</p>':''}</div>`).join('')}</section>`;
  return html;
 }
-async function migrationOperations(state){
- try{const body=await spaceOverviewJSON('/api/space-migrations?history=1',state.controller.signal);if(spaceMigrationReview!==state)return;
- if(body.accountId!==state.user||accountId!==state.user){clearSpaceMigrationReview();spaceRequireReload();render();return;}
- if(!Array.isArray(body.items))throw Error('Invalid operations');state.operations=body.items;state.operationsError='';
- }catch(error){if(spaceMigrationReview===state&&migrationExecutionDenied(error))return;if(spaceMigrationReview===state){state.operations=[];state.operationsError='לא ניתן לבדוק את מצב המעברים. רעננו לפני פעולה נוספת.';}}
- if(spaceMigrationReview===state)renderSpaceMigrationReview();
-}
-async function prepareMigrationExecution(){
- const state=spaceMigrationReview;if(!state||state.busy||state.executing||!state.data?.review||state.pendingOperation)return;
- if(state.data.review.savings?.from.present){prepareMigrationSavingsExecution();return;}
- state.executing=true;state.execution=null;state.consentPrivacy=false;state.consentMove=false;state.error='';renderSpaceMigrationReview();
- try{
-  const query=new URLSearchParams({accountId:state.user,source:state.source,target:state.target,bankAccount:state.account,sourceRevision:state.data.sourceRevision,targetRevision:state.data.targetRevision});
-  const body=await spaceOverviewJSON('/api/space-migrations?'+query,state.controller.signal);if(spaceMigrationReview!==state)return;
-  if(body.accountId!==state.user||accountId!==state.user){clearSpaceMigrationReview();spaceRequireReload();render();return;}
-  if(typeof body.eligible!=='boolean'||!Array.isArray(body.reasons))throw Error('Invalid preparation');state.execution=body;
- }catch(error){if(spaceMigrationReview===state&&migrationExecutionDenied(error))return;if(spaceMigrationReview===state){state.execution=null;state.data=null;state.error='לא ניתן להכין מעבר מהסקירה הזו. רעננו ובחרו מחדש; שום נתון לא שונה.';}}
- finally{if(spaceMigrationReview===state){state.executing=false;renderSpaceMigrationReview();}}
-}
-async function sendMigrationExecution(action,id){
- const state=spaceMigrationReview;if(!state||state.executing||state.busy||state.pendingOperation||!canSwitchBudget())return;
- let body;
- if(action==='apply'){
-  if(!state.execution?.eligible||!state.consentPrivacy||!state.consentMove||!state.data?.review)return;
-  body={action,operation:crypto.randomUUID(),accountId:state.user,source:state.source,target:state.target,bankAccount:state.account,sourceRevision:state.data.sourceRevision,targetRevision:state.data.targetRevision,reviewToken:state.execution.reviewToken,confirmedMove:true,confirmedPrivacy:true,...(state.savingsProposal?{savingsProposal:state.savingsProposal}:{})};
- }else{
-  const op=state.operations?.find(r=>r.id===id&&r.canUndo);if(!op||state.undoConsent!==id)return;
-  body={action:'undo',operation:id,accountId:state.user,sourceRevision:op.sourceRevision,targetRevision:op.targetRevision,confirmedUndo:true};
- }
- state.pendingOperation=body.operation;state.executing=true;state.error='';renderSpaceMigrationReview();
- try{
-  const result=await spaceOverviewJSON('/api/space-migrations',state.controller.signal,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(spaceMigrationReview!==state)return;
-  if(result.accountId!==state.user||accountId!==state.user){clearSpaceMigrationReview();spaceRequireReload();render();return;}
-  if(!['applied','undone'].includes(result.status))throw Error('Unconfirmed operation');
-  await migrationExecutionFinished(state,result.status);
- }catch(error){if(spaceMigrationReview===state&&migrationExecutionDenied(error))return;if(spaceMigrationReview===state){state.execution=null;state.data=null;state.error='לא ניתן לאשר את תוצאת הפעולה במכשיר. בדקו את מצב הפעולה; אל תשלחו מעבר חדש.';}}
- finally{if(spaceMigrationReview===state){state.executing=false;renderSpaceMigrationReview();}}
-}
+async function migrationOperations(state){return loadMigrationOperations(state,migrationControllerPorts());}
+
+async function prepareMigrationExecution(){return prepareMigration(spaceMigrationReview,migrationControllerPorts());}
+
+async function sendMigrationExecution(action,id){return sendMigration(spaceMigrationReview,migrationControllerPorts(),action,id);}
+
 async function migrationExecutionFinished(state,status){
  if(spaceMigrationReview!==state)return;clearSpaceMigrationReview();
  // Reload saved active data so a stale in-memory budget cannot later overwrite a move.
  const loadedCurrent=await load(false,true);if(!loadedCurrent){notify('הפעולה נשמרה בשרת, אך לא ניתן לטעון את הנתונים העדכניים. רעננו לפני עריכה נוספת.');return;}
  openSpaceMigrationReview(status==='undone'?'המעבר בוטל ושני המרחבים נשמרו.':'המעבר נשמר בשני המרחבים.');
 }
-async function checkMigrationExecution(){
- const state=spaceMigrationReview;if(!state||state.executing||!state.pendingOperation)return;state.executing=true;renderSpaceMigrationReview();
- try{const result=await spaceOverviewJSON('/api/space-migrations?operation='+encodeURIComponent(state.pendingOperation),state.controller.signal);if(spaceMigrationReview!==state)return;
- if(result.accountId!==state.user||accountId!==state.user){clearSpaceMigrationReview();spaceRequireReload();render();return;}
- if(['applied','undone'].includes(result.status))await migrationExecutionFinished(state,result.status);else throw Error('Unavailable');
- }catch(error){if(spaceMigrationReview===state&&migrationExecutionDenied(error))return;if(spaceMigrationReview===state)state.error='מצב הפעולה עדיין אינו מאומת. רעננו את האפליקציה ובדקו את יומן המעברים לפני ניסיון נוסף.';}
- finally{if(spaceMigrationReview===state){state.executing=false;renderSpaceMigrationReview();}}
-}
+async function checkMigrationExecution(){return checkMigration(spaceMigrationReview,migrationControllerPorts());}

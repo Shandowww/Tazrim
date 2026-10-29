@@ -108,7 +108,7 @@ test('Encrypted snapshots cannot be migrated or downgraded, and recovery detects
 function clientHarness(){
  const state={user:'tal',source:'personal',target:'house',account:'a',data:{sourceRevision:1,targetRevision:1,review:{}},execution:{eligible:true,reviewToken:'a'.repeat(64)},consentPrivacy:true,consentMove:true,controller:new AbortController()},finished=[];
  const c=vm.createContext({state,spaceMigrationReview:state,accountId:'tal',crypto,canSwitchBudget:()=>true,renderSpaceMigrationReview(){},clearSpaceMigrationReview(){c.spaceMigrationReview=null;},spaceRequireReload(){c.denied=true;},render(){}});
- vm.runInContext(readFileSync('src/space-migration-execution-client.js','utf8'),c);c.migrationExecutionFinished=async(s,status)=>finished.push(status);return{c,state,finished};
+ vm.runInContext(readFileSync('src/migration-controller.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/space-migration-execution-client.js','utf8')+'\n'+readFileSync('src/space-migration-client.js','utf8').slice(readFileSync('src/space-migration-client.js','utf8').indexOf('function migrationControllerPorts')),c);c.migrationExecutionFinished=async(s,status)=>finished.push(status);return{c,state,finished};
 }
 test('Client requires both consents and sends a single atomic operation without budget payloads or budget PUTs',async()=>{
  const h=clientHarness(),calls=[];h.c.spaceOverviewJSON=async(url,signal,options)=>{calls.push({url,body:JSON.parse(options.body)});return{accountId:'tal',status:'applied'};};

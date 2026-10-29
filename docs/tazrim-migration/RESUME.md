@@ -1,7 +1,5 @@
-# Resume checkpoint — 2026-10-29
+# Current continuation — 2026-10-29
 
-User explicitly requested a stopping point. Active source is this checkout on codex/tazrim-react-frontend. Read completion-plan.md and the last section of execution-status.md.
+Original shared migration orchestration now serves both UIs. Native /overview/migration connects scoped review/manual manifest/dual consent/original atomic apply/private journal/eligible undo; uncertain-result exits require refreshing active financial data. Build/typecheck,1007 regressions,15 core checks pass. Synthetic lost apply/undo recovery, exact paired restoration, pending-exit stale-data protection, user/control-scope isolation, phone and viewer checks passed. Full evidence/limits: execution-status.md final section.
 
-Implemented: shared original encrypted device writer + native profile/forecast/comparison full-plan automatic drafts; monthly original-format/raw behavior retained. Build/typecheck,1001 regressions,15 core checks pass. New editor browser acceptance is pending; only profile opening/unlock was observed before stop. No actual profile auto-write was tested in browser.
-
-Next: bounded synthetic new-editor save/recovery/cross-editor conflict/invalid-input/viewer/phone acceptance, then remaining existing-feature connections. Keep server/Sites/real records unchanged until full release gates pass. Last fixture localhost5212 stopped and its owned tab closed. Earlier work/tests and remaining scope are in execution-status.md.
+Partial scope remains deliberate: imported-source detailed disclosures/execution and original savings ownership/routing UI still use the original full review. Next connect those existing operations, then remaining editor/raw persistence, integrations/global overlays and full device/current-live safe release gates. Keep production/Sites/real records unchanged. Prior settings-editor device draft browser acceptance is complete.

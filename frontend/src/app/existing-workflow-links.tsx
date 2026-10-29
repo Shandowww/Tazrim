@@ -2,6 +2,7 @@ import {useLocation} from 'react-router-dom'
 import {legacyBudgetHref,withViewQuery} from './navigation-query'
 import Link from './link'
 const nativeWorkflows=[
+ ['/overview/migration','סקירת מעבר רישום חשבון בין מרחבים'],
  ['/goals','יעדים חודשיים והתקדמות מדיווחי אמת'],
  ['/settings/forecast','בסיס התחזית והערכות קבועות'],
  ['/start','התחלה מודרכת לתקציב חדש'],
