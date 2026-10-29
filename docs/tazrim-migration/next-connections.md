@@ -1,14 +1,18 @@
 # Remaining original connections — 2026-10-29
 
-This is a source mapping for completion-plan stage3, not a new product plan or evidence of device acceptance. Continue the original commands and their revision/actor/source witnesses. Missing native UI does not mean the capability is missing from Budgit. Current verified checkpoint passes1079 regressions, build/typecheck and15 checks. Bounded synthetic desktop/390px browser acceptance for the consumption/family/periodic slices is documented below; broader device acceptance remains pending.
+This is a source mapping for completion-plan stage3, not a new product plan or evidence of device acceptance. Continue the original commands and their revision/actor/source witnesses. Missing native UI does not mean the capability is missing from Budgit. Current verified checkpoint passes1083 regressions, build/typecheck and15 checks. Bounded synthetic desktop/390px browser acceptance for the consumption/family/periodic slices is documented below; broader device acceptance remains pending.
 
 ## Scope decision — 2026-10-29
 
-Tal explicitly abandoned the Apple Pay connection. Apple Pay/Wallet/Shortcuts development, native monthly-draft handoff and related acceptance are excluded from the remaining plan and release gates. Existing code, stored records and live connections are unchanged by this scope decision; it is not a deletion, credential revocation or deployment. Historical implementation/test evidence remains historical. The next connection is global action overlays and actual scoped save-error evidence.
+Tal explicitly abandoned the Apple Pay connection. Apple Pay/Wallet/Shortcuts development, native monthly-draft handoff and related acceptance are excluded from the remaining plan and release gates. Existing code, stored records and live connections are unchanged by this scope decision; it is not a deletion, credential revocation or deployment. Historical implementation/test evidence remains historical. The implementation rows listed here are now connected in bounded slices. Continue the consolidated acceptance and release work below.
 
-| Remaining connection | Existing implementation to reuse | Existing evidence / boundary |
-| --- | --- | --- |
-| Global action overlays/save-error badges | `src/action-center-model.js`, `src/action-center-client.js`; native action facts/preferences and `draft-registry.ts`/`draft-guard.tsx` | `action-center.test.mjs`, `tazrim-action-center.test.mjs`, `tazrim-action-integrations.test.mjs`. Optional Gmail/private notices/admin-backup facts are already connected. An ordinary dirty draft is not a failed save. The current native registry exposes dirty/busy/save availability, not an error channel; connect actual scoped error evidence instead of inferring it. Preserve original announcement/read/snooze CAS and navigation protection. |
+## Remaining consolidated work
+
+| Work | Existing boundary / next evidence |
+| --- | --- |
+| Original-feature inventory and parity audit | Reconcile current `execution-status.md`/`feature-parity.md` against the original UI and completion plan. Listed connections below are implemented; bounded slices do not certify every original screen/action. Preserve working exact bridges until equivalent acceptance passes. |
+| Consolidated browser/device acceptance | Complete remaining imported/savings migration, settings-draft summary, Drive/Gmail/OAuth, report/vault/download and full navigation/theme/keyboard/reduced-motion/reference-size matrix using synthetic records. Actual device/platform authorization remains explicitly unverified. |
+| Current-live release gates | Reconcile current runtime/source and unrelated canonical work; fresh verified SQLite backup, isolated financial/access/HTTP preflight, rollback source/image, exact Git backup, runtime hash/health/auth/deep routes and parking verification. No deployment has occurred. |
 
 Read `execution-status.md` for the exact accepted slices. The original analysis destination retains allocation/consumption/family/periodic/scenario/coverage tools. Native administrator controls are now connected at `/settings/access`; their original-interface bridge remains available.
 
@@ -24,9 +28,11 @@ Original one-to-one source match/reject/reset/unlink and stale-match cleanup are
 
 The native administrator list now connects the original revision-aware service with additive metadata/opt-in actor binding and compatible original callers. Synthetic service/browser add/remove/retry/nonadmin/390px/draft checks passed with zero financial writes and no live access-list change.
 
+Global action dialog/badges now reuse the existing list/announcement/read/snooze commands. Actual attempted-save evidence is memory-only and scoped to actor/space/editor; ordinary drafts are not failures. Bounded synthetic desktop/390px/keyboard/draft/one-write retry/shared-viewer acceptance passed. Failed background/optional checks are not represented as successful zero results.
+
 ## Acceptance and release
 
-Fresh browser/keyboard/phone checks remain for imported/savings migration, settings-draft summary, Drive, Gmail filters/notices/OAuth and analysis. Existing server/model or render contracts are not device acceptance. Real platform PRF/Face ID remains unverified. Do not claim them from mocked OAuth, synthetic receipts or desktop dimensions.
+Fresh browser/keyboard/phone checks remain for imported/savings migration, settings-draft summary, Drive, Gmail filters/notices/OAuth and the complete analysis/navigation matrix. Existing server/model or render contracts are not device acceptance. Real platform PRF/Face ID remains unverified. Do not claim them from mocked OAuth, synthetic receipts or desktop dimensions.
 
 The current production baseline was previously verified read-only as `a79488b`; no deployment was performed in this continuation. Retain the established live reconciliation, fresh verified SQLite backup, isolated financial/access/HTTP preflight, rollback image/source and runtime hash/health/auth/deep-route/parking gates. Sites remains unchanged. Unrelated canonical WIP stays untouched. Verified-backup cleanup and original-absent bank-account deletion are not additional requirements.
 

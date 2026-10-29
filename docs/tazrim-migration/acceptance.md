@@ -1,5 +1,7 @@
 # Development acceptance — 2026-10-27
 
+> Current continuation — 2026-10-29: the listed original consumption/allocation/family/periodic/insight/coverage/admin/global-action connections now pass1083 regressions, build/typecheck and15 checks. Bounded synthetic desktop/390px/editor/viewer/nonadmin evidence is recorded in the latest `execution-status.md` entries. Apple Pay is excluded. Historical pending lists here remain superseded; consolidated full reference/device/download/live-release gates are still open.
+
 > **Execution status — 2026-10-28:** [execution-status.md](execution-status.md) records the verified production baseline, current per-workflow connections and actual completion limits. Shared original report orchestration/drafts and optional categories are now implemented. Historical pending lists below are not a feature-development queue.
 
 > **Active scope correction — 2026-10-28:** Tal instructed us to connect existing Budgit features, not rewrite them. [completion-plan.md](completion-plan.md) supersedes historical pending/next-action lists below. They remain evidence only. Classify missing React behavior as connection work; retain original workflow semantics and completed tested work. Source inspection found optional-category parity, grouped draft/orchestration and generic bridge gaps; they are not fixed by this documentation update. Production is unchanged.

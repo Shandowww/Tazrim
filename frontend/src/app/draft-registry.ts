@@ -1,18 +1,18 @@
 export type DraftKind = 'monthly' | 'cash' | 'card' | 'detail' | 'item' | 'scenario' | 'savings' | 'security'
-export interface DraftEntry { kind: DraftKind; dirty: boolean; busy: boolean; discard: () => void; save?: () => Promise<boolean> }
+export interface DraftEntry { kind: DraftKind; dirty: boolean; busy: boolean; saveError?: string; discard: () => void; save?: () => Promise<boolean> }
 /** In-memory lifecycle only. It never persists financial records or saves implicitly. */
 export class DraftRegistry {
   private entries = new Map<string, DraftEntry>()
   private listeners = new Set<() => void>()
   private running = false
-  private snapshot = { dirty: false, busy: false, canSave: false, count: 0 }
+  private snapshot = { dirty: false, busy: false, canSave: false, count: 0, errors: [] as string[] }
   getSnapshot = () => this.snapshot
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   set(id: string, entry: DraftEntry) { this.entries.set(id, entry); this.update() }
   remove(id: string) { this.entries.delete(id); this.update() }
   private update() {
     const entries = [...this.entries.values()], dirty = entries.filter(e => e.dirty)
-    const next = { dirty: dirty.length > 0, busy: this.running || entries.some(e => e.busy), canSave: dirty.length > 0 && dirty.every(e => !!e.save), count: dirty.length }
+    const next = { dirty: dirty.length > 0, busy: this.running || entries.some(e => e.busy), canSave: dirty.length > 0 && dirty.every(e => !!e.save), count: dirty.length, errors: [...new Set(dirty.map(e=>e.saveError?.trim()).filter((v):v is string=>!!v))] }
     if (JSON.stringify(next) !== JSON.stringify(this.snapshot)) { this.snapshot = next; this.listeners.forEach(listener => listener()) }
   }
   discardAll() {

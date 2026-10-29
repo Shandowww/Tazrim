@@ -1,3 +1,4 @@
+import {observePreparedSave,saveEvidenceScope,saveEvidenceSource} from './save-failure-evidence.ts'
 import {isVault} from '../../../src/vault.js'
 import {nativeVaultSession,sealNativePlan} from './vault-session.ts'
 import {validatePlan} from '../../../src/budget.js'
@@ -7,18 +8,18 @@ export class SaveUncertain extends Error {}
 export class WritePermissionError extends Error {}
 function normalize(value:any):any {return value&&typeof value==='object'?Array.isArray(value)?value.map(normalize):Object.fromEntries(Object.keys(value).filter(key=>value[key]!==undefined).sort().map(key=>[key,normalize(value[key])])):value}
 export const canonicalPlan=(value:any)=>JSON.stringify(normalize(value))
-export async function savePreparedPlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>},fetcher:typeof fetch=fetch){
+async function runPreparedPlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>},fetcher:typeof fetch=fetch){
  const {budgetId,base,plan}=input
  if(isVault(base.plan))throw Error('יש לפתוח את התקציב לפני שמירה.');
  if(base.vault){
   if(!nativeVaultSession(budgetId,base))throw Error("התקציב ננעל. יש לפתוח מחדש לפני שמירה.");
   if(!validatePlan(plan))throw Error("נתוני התקציב אינם תקינים.");
   const witness=canonicalPlan({budgetId,accountId:base.accountId,revision:base.revision,vault:base.vault,plan}),wire=await sealNativePlan(budgetId,base,plan,witness)
-  return saveWirePlan({budgetId,base,plan,wire},fetcher)
+  return runWirePlan({budgetId,base,plan,wire},fetcher)
  }
- return saveWirePlan({...input,wire:plan},fetcher)
+ return runWirePlan({...input,wire:plan},fetcher)
 }
-export async function saveWirePlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>;wire:Record<string,unknown>},fetcher:typeof fetch=fetch){
+async function runWirePlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>;wire:Record<string,unknown>},fetcher:typeof fetch=fetch){
  const {budgetId,base,plan,wire}=input
  if((!validatePlan(plan)&&!isVault(plan))||(!validatePlan(base.plan)&&!isVault(base.plan)&&!(base.plan===null&&base.revision===0&&!base.vault)))throw Error('יש לבדוק את נתוני התקציב לפני שמירה.')
  if(!validatePlan(wire)&&!isVault(wire))throw Error('נתוני השמירה אינם תקינים.');
@@ -39,3 +40,6 @@ export async function saveWirePlan(input:{budgetId:string;base:BudgetResponse;pl
  if(result.revision!==base.revision+1)throw new SaveUncertain('תוצאת השמירה אינה תואמת לטיוטה. יש לבדוק שוב לפני פעולה נוספת.')
  return {...fresh,value:{...fresh.value,plan, ...(isVault(wire)&&!isVault(plan)?{vault:wire}:{}),revision:result.revision},spaces:fresh.spaces.map(space=>space.id===budgetId?{...space,revision:result.revision,hasData:true}:space),recovered:false}
 }
+
+export function savePreparedPlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>},fetcher:typeof fetch=fetch){return observePreparedSave(saveEvidenceScope(input.budgetId,input.base),saveEvidenceSource(),()=>runPreparedPlan(input,fetcher))}
+export function saveWirePlan(input:{budgetId:string;base:BudgetResponse;plan:Record<string,unknown>;wire:Record<string,unknown>},fetcher:typeof fetch=fetch){return observePreparedSave(saveEvidenceScope(input.budgetId,input.base),saveEvidenceSource(),()=>runWirePlan(input,fetcher))}

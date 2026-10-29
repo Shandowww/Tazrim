@@ -1,3 +1,4 @@
+import {GlobalActionCenter} from './app/global-action-center'
 const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-access-page')).AdminAccessPage }))
 const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
 const WalletPage = lazy(async () => ({ default: (await import('./app/wallet-page')).WalletPage }))
@@ -17,7 +18,7 @@ import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { RefreshCw, Bell } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { Sidebar } from './tazrim/components/layout/sidebar'
 import { BottomNav } from './tazrim/components/layout/bottom-nav'
 import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
@@ -104,7 +105,7 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
     <header className="sticky top-0 z-30 grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b bar-glass px-4 py-2.5">
       <div className="min-w-0 text-xs font-semibold text-muted-foreground">{budget.status === 'ready' ? <label className="flex min-w-0 items-center gap-2"><span className="sr-only">מרחב תקציב</span><select className="min-w-0 max-w-full truncate rounded-lg bg-transparent p-1" value={budget.budgetId} onChange={event => selectBudget(event.target.value)}>{budget.spaces.map(space => <option key={space.id} value={space.id}>{space.name}{space.role === 'viewer' ? ' · צפייה בלבד' : ''}</option>)}</select></label> : 'Budgit'}</div>
       <PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod} />
-      <div className="flex items-center justify-end gap-2"><Link href={withViewQuery('/actions',search)} aria-label="לטיפול" className="rounded-lg p-2 text-muted-foreground"><Bell className="h-5 w-5" /></Link>
+      <div className="flex items-center justify-end gap-2"><GlobalActionCenter budget={budget}/>
         <button type="button" className="rounded-lg p-2 text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
       </div>
     </header>

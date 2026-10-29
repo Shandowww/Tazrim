@@ -6,7 +6,7 @@ test('Draft registration is inert until actual changes and removing a scoped for
  const r=new DraftRegistry();let notified=0;const off=r.subscribe(()=>notified++)
  r.set('personal:monthly',entry());assert.equal(r.getSnapshot().dirty,false);assert.equal(notified,0)
  r.set('personal:monthly',entry({dirty:true}));assert.equal(r.getSnapshot().dirty,true);assert.equal(r.getSnapshot().canSave,false)
- r.remove('personal:monthly');assert.deepEqual(r.getSnapshot(),{dirty:false,busy:false,canSave:false,count:0});off()
+ r.remove('personal:monthly');assert.deepEqual(r.getSnapshot(),{dirty:false,busy:false,canSave:false,count:0,errors:[]});off()
 })
 test('One explicit save runs once, blocks discard while pending and clears only after a real success',async()=>{
  const r=new DraftRegistry();let resolve,calls=0,discarded=0
@@ -22,3 +22,4 @@ test('Failed/unsupported saves retain dirty work; one successful form does not s
 test('Save exceptions cannot leave an in-flight guard stuck or declare a draft saved',async()=>{
  const r=new DraftRegistry();r.set('security',entry({kind:'security',dirty:true,save:async()=>{throw Error('synthetic')}}));await assert.rejects(r.saveAll(),/synthetic/);assert.equal(r.getSnapshot().dirty,true);assert.equal(r.getSnapshot().busy,false)
 })
+test('Only explicit dirty-entry save failures reach the registry error channel and disappear on discard, removal or a clean entry',()=>{const r=new DraftRegistry();r.set('ordinary',entry({dirty:true}));assert.deepEqual(r.getSnapshot().errors,[]);r.set('actual',entry({dirty:true,saveError:'synthetic failed save'}));assert.deepEqual(r.getSnapshot().errors,['synthetic failed save']);r.set('clean',entry({saveError:'stale error without a draft'}));assert.deepEqual(r.getSnapshot().errors,['synthetic failed save']);r.remove('actual');assert.deepEqual(r.getSnapshot().errors,[]);r.set('ordinary',entry({dirty:true,saveError:'retry required'}));r.discardAll();assert.deepEqual(r.getSnapshot().errors,[])});
