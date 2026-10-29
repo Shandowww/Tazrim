@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "f0a0316b154a6a6057ce52f0489c01a7e4345d6c",
+  "sourceCommit": "616eb11b44c1f7c6307382b7a578efdae381cec9",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. All remaining implementation rows listed in next-connections.md now connect original Budgit behavior in bounded native slices. Apple Pay is explicitly excluded by Tal. Consumption/allocations/family/periodic/insight/coverage/admin/global actions retain original source/actor/revision models; actual scoped save-failure evidence is in-memory and ordinary drafts are not errors. Global background action reads preserve financial drafts.1083 regressions, build/typecheck and15 checks pass. Bounded synthetic desktop/390px/editor/viewer/nonadmin/keyboard/lost-result evidence is in execution-status.md. Consolidated original-feature inventory/reference/theme/reduced-motion/device/download and current-live reconciliation/backup/preflight/rollback/release gates remain. No production/Sites/real-record change.",
+  "status": "Incomplete development preview; not deployed. Apple Pay excluded by Tal. All implementation rows listed in next-connections.md connect original Budgit models/commands in bounded native slices. Nested analysis draft locks now propagate before paint.1083 regressions, build/typecheck and15 checks pass. Bounded desktop/320/390/430/768/1440 analysis layout, light/dark/System, global-dialog, actor/space/viewer/nonadmin, original financial witness and one-write retry evidence is recorded in execution-status.md. Other pages/full reference/keyboard/reduced-motion/download/actual-device/Google authorization and current-live reconciliation/backup/preflight/rollback/release gates remain. No production/Sites/real-record change.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
     "regressionTests": 1083,
-    "browser": "Bounded synthetic global dialog: ordinary dirty not failure; exact failed-save retry without duplicate financial PUT; background refresh preserves draft; snooze/deferred counts, guarded navigation, Escape focus,390px and shared-viewer private-notice isolation. All earlier bounded evidence retained; no full device/live-release claim."
+    "browser": "Bounded synthetic analysis320/390/430/768/1440 no-overflow, dark320 dialog visual inspection, immediate Light/Dark and System restoration; nested periodic/insight locks verified before paint. Prior action/editor/viewer/nonadmin/retry evidence retained.0 financial writes in final acceptance fixtures. Full application/device/release acceptance remains pending."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

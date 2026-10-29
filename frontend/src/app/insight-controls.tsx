@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react'
+import {useLayoutEffect,useEffect,useState} from 'react'
 import {setInsightScenario,simulateInsightScenario,insightScenarioActuals,expenseAnomalies,decideExpenseInsight,expenseCategoryOptions,monthAt,periodReviewState,setPeriodReviewed} from '../../../src/budget.js'
 import {newInsightScenario,insightScenarioFormItem,removeInsightScenario} from '../../../src/insight-ui-model.js'
 import {useDraftGuard,useFinancialDraft} from './draft-guard'
@@ -6,7 +6,7 @@ const button='min-h-11 rounded-xl border px-4 py-2 disabled:opacity-50',field='m
 function Actuals({plan,row,asOf}:{plan:any;row:any;asOf:string}){const result=insightScenarioActuals(plan,row,asOf);return !result.available?<p>{result.reason}</p>:<div className="space-y-2"><h4>בדיקת ביצוע מול <bdi>{result.baseline!.month}</bdi></h4><p>בסיס שנשמר <bdi>{money(result.baseline!.cents/100)}</bdi>. הפרש נמדד אינו מוכיח שהתרחיש גרם לשינוי ואינו הישג חיסכון.</p>{result.rows!.map((r:any)=><p key={r.month}><bdi>{r.month}</bdi>: {r.actualCents===null?'חסרים נתונים מתאימים להשוואה':<>הוצאה <bdi>{money(r.actualCents/100)}</bdi> · שינוי מול הבסיס <bdi>{money(r.differenceCents/100)}</bdi> · הוצאה לפי ההנחה <bdi>{money(r.targetCents/100)}</bdi></>}</p>)}{!result.rows!.length&&<p>עדיין אין חודש סגור בתקופת ההנחה.</p>}</div>}
 export function InsightControls({plan,asOf,month,scope,readonly,disabled,onPrepare,onDirty,onExplore}:{plan:any;asOf:string;month:string;scope:string;readonly:boolean;disabled:boolean;onPrepare:(make:()=>any,description:string)=>void;onDirty:(v:boolean)=>void;onExplore:(month:string)=>void}){
  const guard=useDraftGuard(),[draft,setDraft]=useState<any>(null),[threshold,setThreshold]=useState(()=>{try{const stored=localStorage.getItem('monthly-flow-trend-threshold/'+scope),v=Number(stored);return stored!==null&&Number.isFinite(v)&&v>=0&&v<=1000000?v:200}catch{return 200}}),[notice,setNotice]=useState(''),dirty=!!draft,earliest=plan.startMonth>asOf?plan.startMonth:monthAt(asOf,1),clear=()=>{setDraft(null);onDirty(false)},anomaly=(expenseAnomalies as any)(plan,{asOf,minimum:threshold}),item=anomaly.items[0],review=periodReviewState(plan,month),eligible=month<asOf&&!!plan.months[month]?.actual
- useEffect(()=>{onDirty(dirty);return()=>onDirty(false)},[dirty,onDirty])
+ useLayoutEffect(()=>{onDirty(dirty);return()=>onDirty(false)},[dirty,onDirty])
  useFinancialDraft({kind:'detail',dirty:dirty&&!disabled,busy:false,discard:clear})
  let preview:any=null,previewError='';if(draft)try{preview=simulateInsightScenario(plan,{...draft,id:draft.id||'preview'},asOf)}catch(e){previewError=e instanceof Error?e.message:'התרחיש אינו זמין.'}
  const prepare=(make:()=>any,message:string)=>{if(!readonly&&!disabled)onPrepare(make,message)},open=(row:any)=>guard.run(()=>{if(disabled||dirty)return;setDraft(structuredClone(row))})

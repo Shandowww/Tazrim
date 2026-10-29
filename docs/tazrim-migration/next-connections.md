@@ -30,6 +30,8 @@ The native administrator list now connects the original revision-aware service w
 
 Global action dialog/badges now reuse the existing list/announcement/read/snooze commands. Actual attempted-save evidence is memory-only and scoped to actor/space/editor; ordinary drafts are not failures. Bounded synthetic desktop/390px/keyboard/draft/one-write retry/shared-viewer acceptance passed. Failed background/optional checks are not represented as successful zero results.
 
+Analysis layout now has bounded320/390/430/768/1440 no-overflow evidence; native Light/Dark selection and System restoration were checked, plus a visually inspected dark320px global dialog. Nested draft locks now propagate before paint. Other routes, live OS flips, reduced motion and actual-device acceptance remain open.
+
 ## Acceptance and release
 
 Fresh browser/keyboard/phone checks remain for imported/savings migration, settings-draft summary, Drive, Gmail filters/notices/OAuth and the complete analysis/navigation matrix. Existing server/model or render contracts are not device acceptance. Real platform PRF/Face ID remains unverified. Do not claim them from mocked OAuth, synthetic receipts or desktop dimensions.

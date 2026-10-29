@@ -1,11 +1,11 @@
-import {useEffect,useState} from 'react'
+import {useLayoutEffect,useEffect,useState} from 'react'
 import {periodicCostOutlook,setPeriodicCost,markPeriodicCostPaid,periodicSourceRecord,periodicSourceLinkState,linkPeriodicSource,unlinkPeriodicSource,monthAt} from '../../../src/budget.js'
 import {periodicSourceCandidates,removePeriodicCost,periodicCostFormItem} from '../../../src/periodic-ui-model.js'
 import {useDraftGuard,useFinancialDraft} from './draft-guard'
 const button='min-h-11 rounded-xl border px-4 py-2 disabled:opacity-50',field='min-h-11 w-full min-w-0 rounded-xl border bg-card px-3',money=(n:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(n),status={paid:'סומן כשולם ידנית',overdue:'המועד עבר · לא סומן כשולם',due:'מיועד לחודש הנוכחי',upcoming:'צפוי בהמשך'}
 export function PeriodicControls({plan,asOf,readonly,disabled,onPrepare,onDirty}:{plan:any;asOf:string;readonly:boolean;disabled:boolean;onPrepare:(make:()=>any,description:string)=>void;onDirty:(dirty:boolean)=>void}){
  const guard=useDraftGuard(),[edit,setEdit]=useState<any>(null),[link,setLink]=useState<{costId:string;month:string;type:string;query:string;sourceId:string}|null>(null),[error,setError]=useState(''),outlook=periodicCostOutlook(plan,asOf),dirty=!!edit||!!link,clear=()=>{setEdit(null);setLink(null);setError('');onDirty(false)}
- useEffect(()=>{onDirty(dirty);return()=>onDirty(false)},[dirty,onDirty])
+ useLayoutEffect(()=>{onDirty(dirty);return()=>onDirty(false)},[dirty,onDirty])
  useFinancialDraft({kind:'detail',dirty:dirty&&!disabled,busy:false,discard:clear})
  const choose=(make:()=>any,message:string)=>{if(readonly||disabled)return;onPrepare(make,message)},open=(item:any)=>guard.run(()=>{if(readonly||disabled)return;setEdit(structuredClone(item.id?plan.periodicCosts.find((r:any)=>r.id===item.id):item));setError('')}),sources=link?periodicSourceCandidates(plan,link.type,link.query):[],sourceId=link?.sourceId||sources[0]?.id||''
  return <section className="min-w-0 space-y-4 rounded-xl border p-4"><h2 className="font-semibold">הוצאות תקופתיות</h2><p>ביטוח, חגים, חופשות או מסגרות — מתי צפוי חיוב וכמה כדאי להניח בצד עד אליו.</p><p>היערכות חודשית משוערת <bdi>{money(outlook.monthlyReserveCents/100)}</bdi> · מועדים שחלפו ללא סימון תשלום <bdi>{money(outlook.overdueCents/100)}</bdi></p><p>הסכומים להיערכות בלבד: אינם יוצרים חיוב או משנים תחזית. אם ההוצאה כבר כלולה בתקציב אין להוסיף אותה שוב. סימון “שולם” הוא ידני ואינו ראיה מדוח.</p>{!readonly&&<button className={button} disabled={disabled||dirty} onClick={()=>open({id:'',name:'',amount:0,dueMonth:asOf<plan.startMonth?plan.startMonth:asOf,repeat:'once',paidMonths:[]})}>הוספת הוצאה תקופתית</button>}
