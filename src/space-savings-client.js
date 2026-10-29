@@ -26,21 +26,8 @@ function migrationSavingsInput(event){
  state.savingsForm??={};state.savingsForm[ref]??={};state.savingsForm[ref][input.dataset.savingsPart]=input.value;state.savingsResult=null;invalidateSavingsExecution(state);document.querySelector('[data-migration="prepare-savings"]')?.setAttribute('disabled','');
  const result=document.querySelector('#space-migration-dialog [data-savings-result]');if(result)result.textContent='הטיוטה השתנתה. יש לבדוק שוב לפני הסתמכות על הסכומים.';
 }
-async function checkMigrationSavingsOwnership(){
- const state=spaceMigrationReview,review=state?.data?.review?.savings;
- if(!review||state.busy||state.executing||state.pendingOperation)return;
- const proposal={context:review.context,...Object.fromEntries([['assets',review.from.assets],['goals',review.from.goals]].map(([kind,rows])=>[kind,rows.map(r=>({ref:r.ref,personalCents:savingsOwnershipCents(state.savingsForm?.[r.ref]?.personal),sharedCents:savingsOwnershipCents(state.savingsForm?.[r.ref]?.shared)}))]))};
- invalidateSavingsExecution(state);state.busy=true;state.savingsOpen??={};state.savingsOpen.ownership=true;state.savingsChecking=true;state.savingsResult=null;renderSpaceMigrationReview('savings-check');
- const current=()=>spaceMigrationReview===state&&!state.controller?.signal.aborted;
- try{
-  const query=new URLSearchParams({source:state.source,target:state.target,account:state.account,sourceRevision:state.data.sourceRevision,targetRevision:state.data.targetRevision});
-  const body=await spaceOverviewJSON('/api/space-migration-review?'+query,state.controller.signal);if(!current())return;
-  if(body.accountId!==state.user||accountId!==state.user){clearSpaceMigrationReview();spaceRequireReload();render();return;}
-  if(body.review?.savings?.context!==review.context||JSON.stringify(body.review.savings)!==JSON.stringify(review))throw Error('review-changed');
-  state.data=body;state.execution=null;state.consentPrivacy=false;state.consentMove=false;state.savingsResult=evaluateSavingsOwnership(body.review.savings,proposal);
- }catch(error){if(!current())return;if(error.status===401){clearSpaceMigrationReview();spaceRequireReload();render();return;}state.data=null;state.savingsForm={};state.savingsRoutes={};state.savingsProposal=null;state.savingsResult=null;state.account='';state.error='לא ניתן לאמת את הגישה והגרסאות של סקירת הבעלות. הטיוטה הוסרה; רעננו את הסקירה ובחרו מחדש. לא נשמר שום שינוי.';
- }finally{if(current()){state.busy=false;state.savingsChecking=false;renderSpaceMigrationReview('savings-check');}}
-}
+async function checkMigrationSavingsOwnership(){return checkSavingsOwnership(spaceMigrationReview,savingsControllerPorts());}
+
 function migrationSavingsAction(action,event){
  const state=spaceMigrationReview;if(!state)return false;
  const pager=event.target.closest('[data-savings-page]');
@@ -59,22 +46,15 @@ async function openMigrationSavingsSource(){
  if(await switchBudget(source)){tab='settings';settingsSection='savings';render();const form=document.querySelector('[data-sg-form="accounts"]');if(form){form.closest('details').open=true;scrollToSection('[data-sg-form="accounts"]');}}
 }
 
-function savingsProposalFromState(state){
- const review=state.data?.review?.savings;if(!review)return null;
- return{ownership:{context:review.context,...Object.fromEntries([['assets',review.from.assets,'amountCents'],['goals',review.from.goals,'allocatedCents']].map(([kind,rows])=>[kind,rows.map(row=>({ref:row.ref,personalCents:savingsOwnershipCents(state.savingsForm?.[row.ref]?.personal),sharedCents:savingsOwnershipCents(state.savingsForm?.[row.ref]?.shared)}))]))},routes:Object.fromEntries([['assets',review.from.assets],['goals',review.from.goals],['history',review.from.historyRows??[]]].map(([kind,rows])=>[kind,rows.map(row=>({ref:row.ref,destination:state.savingsRoutes?.[row.ref]??''}))]))};
-}
+function savingsProposalFromState(state){return migrationSavingsProposal(state);}
+
 function invalidateSavingsExecution(state){state.execution=null;state.savingsProposal=null;state.consentPrivacy=false;state.consentMove=false;const panel=document.querySelector('[data-migration-execution-panel]');if(panel)panel.textContent='בחירות החסכון השתנו. יש להכין תוכנית מדויקת חדשה לפני מעבר.';}
-async function prepareMigrationSavingsExecution(){
- const state=spaceMigrationReview;if(!state||state.busy||state.executing||state.pendingOperation)return;
- if(!state.savingsResult?.valid){const form=document.querySelector('[data-savings-ownership-form]');if(form)form.open=true;const message=document.querySelector('[data-savings-route-status]');if(message){message.textContent='יש למלא ולבדוק תחילה את חלוקת הבעלות, ואז לבחור יעד לכל נכס, מטרה ורישום היסטוריה.';message.scrollIntoView?.({block:'nearest'});}return;}
- const proposal=savingsProposalFromState(state);if(!proposal||Object.values(proposal.routes).some(rows=>rows.some(row=>!['source','target'].includes(row.destination)))){const form=document.querySelector('[data-savings-ownership-form]');if(form)form.open=true;const message=document.querySelector('[data-savings-route-status]');if(message)message.textContent='יש לבחור במפורש מקור או יעד לכל נכס, מטרה ורישום היסטוריה לפני הכנת מעבר.';return;}
- state.executing=true;state.execution=null;state.savingsProposal=null;state.consentPrivacy=false;state.consentMove=false;state.error='';renderSpaceMigrationReview();
- try{const body=await spaceOverviewJSON('/api/space-migrations',state.controller.signal,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prepare-savings',accountId:state.user,source:state.source,target:state.target,bankAccount:state.account,sourceRevision:state.data.sourceRevision,targetRevision:state.data.targetRevision,savingsProposal:proposal})});if(spaceMigrationReview!==state)return;if(body.accountId!==state.user||accountId!==state.user){clearSpaceMigrationReview();spaceRequireReload();render();return;}if(typeof body.eligible!=='boolean'||!Array.isArray(body.reasons))throw Error('Invalid savings preparation');state.execution=body;if(body.eligible)state.savingsProposal=proposal;
- }catch(error){if(spaceMigrationReview!==state)return;if(migrationExecutionDenied(error))return;state.execution=null;state.savingsProposal=null;state.savingsResult=null;state.data=null;state.savingsForm={};state.savingsRoutes={};state.error='לא ניתן להכין מעבר חסכון מהגרסאות האלה. רעננו ובחרו מחדש; שום נתון לא שונה.';
- }finally{if(spaceMigrationReview===state){state.executing=false;renderSpaceMigrationReview();}}
-}
+async function prepareMigrationSavingsExecution(){return prepareSavingsMigration(spaceMigrationReview,savingsControllerPorts());}
+
 function migrationSavingsExecutionView(s){
  if(!s)return '';
  return `<section class="warning-note savings-execution-review"><h4>תוכנית החסכון המדויקת</h4><p>תמונת יתרה <bdi dir="ltr">${esc(s.snapshotMonth)}</bdi> מתאריך <bdi dir="ltr">${esc(s.date)}</bdi>. רק הבחירות המפורשות להלן יחולו. היתרות והקצאות המטרות נשמרות ללא הפקדה או העברה בבנק.</p><h5>נכסים</h5><ul>${s.assets.map(a=>`<li><bdi>${esc(a.name)}</bdi> · ${money(a.amountCents/100)} · ${a.destination==='target'?'עובר ליעד — גלוי לבעלי הגישה בו':'נשאר במקור'}</li>`).join('')}</ul><h5>מטרות שלמות</h5><ul>${s.goals.map(g=>`<li><bdi>${esc(g.name)}</bdi> · הקצאה ${money(g.allocatedCents/100)}, יעד ${money(g.targetCents/100)}, קצב מתוכנן ${money(g.plannedMonthlyCents/100)} · ${g.destination==='target'?'עוברת ליעד':'נשארת במקור'}</li>`).join('')}</ul><p>${s.history.length} רישומי הפקדה מכוסים שפורטו בסקירה נשמרים כקו בסיס: ${s.history.filter(r=>r.destination==='target').length} ביעד, והשאר במקור. אינם נוספים שוב ליתרה. המקור שומר גם את ההיסטוריה המקורית המלאה; ליעד מגיעים רק הרישומים שנבחרו, ללא סיכומי מאגר פרטיים או חשבונות אחרים.</p><p>כיסוי ההפקדה שכבר כלולה בחודש הבסיס: מקור ${money(s.sourceCoveredCents/100)}, יעד ${money(s.targetCoveredCents/100)}, יחד ${money(s.coveredSnapshotCents/100)}. דיווח חוזר של אותו חודש לא יוסיף את הכסף שוב.</p><p>נכס או מטרה שהועברו מסומנים במקור כדי שייבוא גיבוי ישן לא יחזיר אותם ויכפיל את הרישום. ביטול אפשרי רק דרך ביטול המעבר המוגן כל עוד שני הצדדים לא השתנו.</p><p class="help">במסך צר אפשר לגלול את הטבלה לצדדים כדי לראות את שני הצדדים.</p><div class="table-wrap" tabindex="0" role="region" aria-label="יתרות חסכון לפני ואחרי"><table><thead><tr><th>חודש</th><th>חסכון לפני</th><th>חסכון במקור אחרי</th><th>חסכון ביעד אחרי</th></tr></thead><tbody>${s.comparisons.map(r=>`<tr><th><bdi dir="ltr">${esc(r.month)}</bdi></th><td>${money(r.beforeCents/100)}</td><td>${money(r.sourceAfterCents/100)}</td><td>${money(r.targetAfterCents/100)}</td></tr>`).join('')}</tbody></table></div></section>`;
 }
 function savingsBaselineHistoryView(){const rows=plan.savingsBaselineHistory?.rows??[];if(!rows.length)return '';return `<details class="panel savings-baseline-history"><summary>היסטוריית הפקדות שכבר כלולה ביתרת הבסיס · ${rows.length}</summary><p>רישומים מכוסים ממעבר חשבון מוגן. אלה פרטי עבר, לא הפקדות חדשות ולא סכומים נוספים ליתרה.</p><ul>${rows.map(r=>`<li><bdi dir="ltr">${esc(r.month)}</bdi> · ${r.kind==='goal'?`הקצאת מטרה <bdi>${esc(plan.savingsGoals?.items.find(g=>g.id===r.goalId)?.name??r.goalId)}</bdi>`:'חלק מאגר ללא הקצאה'} · ${money(r.amountCents/100)}</li>`).join('')}</ul></details>`;}
+
+function savingsControllerPorts(){return{requireOwnership:()=>{const form=document.querySelector('[data-savings-ownership-form]');if(form)form.open=true;const message=document.querySelector('[data-savings-route-status]');if(message){message.textContent='יש למלא ולבדוק תחילה את חלוקת הבעלות, ואז לבחור יעד לכל נכס, מטרה ורישום היסטוריה.';message.scrollIntoView?.({block:'nearest'});}},requireRoutes:()=>{const form=document.querySelector('[data-savings-ownership-form]');if(form)form.open=true;const message=document.querySelector('[data-savings-route-status]');if(message)message.textContent='יש לבחור במפורש מקור או יעד לכל נכס, מטרה ורישום היסטוריה לפני הכנת מעבר.';},denied:error=>migrationExecutionDenied(error),current:()=>spaceMigrationReview,accountId:()=>accountId,read:(...args)=>spaceOverviewJSON(...args),render:(focus)=>renderSpaceMigrationReview(focus),invalidate:(state)=>invalidateSavingsExecution(state),deny:()=>{clearSpaceMigrationReview();spaceRequireReload();render();}};}
