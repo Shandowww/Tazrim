@@ -29,7 +29,7 @@ Status codes: **B** = in baseline commit; **R** = read-only by design; **L** = l
 | Primary report center and stored reports | `src/report-inbox-client.js`, `src/stored-reports-client.js` | `/next/reports` | Destination space/privacy before upload; resume private reports | B/U |
 | Report parsers and review/classification | `src/bank-import-client.js`, `src/reports.js`, `tools/bank-csv/` | `/next/reports/review` | Duplicate/partial/undo guards; existing parser outputs | B/U |
 | Incoming and outgoing internal transfers | `src/reports.js`, `src/budget.js` | `/next/reports/review`, `/next/monthly` | Separate from salary/consumption; no automatic recurrence | B/U |
-| Apple Pay and Shortcut entry | `src/apple-pay-client.js`, `server/app.mjs` | `/next/settings/connections` | Current installation/ingest behavior, no credential disclosure | B/U |
+| Apple Pay and Shortcut entry | `src/apple-pay-client.js`, `server/app.mjs` | `/next/settings/connections` | Excluded by Tal on 2026-10-29; existing implementation retained, no remaining development/acceptance gate | Excluded |
 | Gmail connection | `src/gmail-client.js`, `server/app.mjs` | `/next/settings/connections` | Existing OAuth flow and private authorization | B/U |
 | Report review/actions center | `src/action-center-client.js`, `server/actions.mjs` | `/next/actions` | User-specific actions and guarded apply | B/U |
 | Save status, conflicts, draft recovery | `src/save-dock.js`, `src/drafts.js`, `src/client.js` | shared shell | Explicit save; failure retains edits; conflicts visible | B/U |

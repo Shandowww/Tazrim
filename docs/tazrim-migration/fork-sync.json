@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "5b3cdccdc482a092ef59dacbefd7a9e5d8d306d1",
+  "sourceCommit": "6dbda2f7f9a4db6f95e08cf5415b1ad381a01ad9",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Active completion-plan stage3: connect original Budgit behavior. Verified production source a79488b remains unchanged. Native original reports/grouping/encrypted intake and vault/device drafts, personal/shared spaces, source editing/undo, cash/card/savings/investment/category/detail/cheque/planning/settings/private matching and manual/imported/savings migration slices are connected. Later completed stages add original administrator Drive status/run/schedule/disconnect/archive actions; original Gmail filters/example preview/scan/pause/disconnect/private notices and fixed scope-bound OAuth return; original Apple Pay inbox/review/connect/revoke/install help/merchant exchange; original shared analysis metrics/filters/source disclosures/saved views/merchant reset. Exact original commands/models are shared with existing interfaces.1060 regressions/build/typecheck/15 checks pass. Prior bounded synthetic browser evidence remains documented; fresh browser discovery reports disabled, so no new device acceptance or deployment is claimed. Gmail StrictMode cancellation is corrected and the exact original administrator destination only loads its existing authorized list; no access mutation is accepted from URLs. Native Wallet-to-monthly draft, original advanced allocation/consumption/family/periodic/insight-scenario/anomaly/period-review actions, native administrator controls and global overlays/save-error badges remain to connect. Full browser/reference/keyboard/reduced-motion/phone/PRF/Face ID and current-live reconciliation/verified backup/preflight/rollback/release gates remain. Original interfaces retain access; do not rewrite engines or infer product absence from native UI gaps. No production, Sites or real-record change. Exact continuation and evidence: execution-status.md, next-connections.md and RESUME.md.",
+  "status": "Incomplete development preview; not deployed. Active stage3 connects original Budgit commands. Apple Pay/Wallet/Shortcuts explicitly excluded by Tal on 2026-10-29. Native original bank consumption/category review, partial/cross-month source allocations and family category/whole-purchase review now connected. Shared frozen-original eligibility parity, stable same-action plaintext/encrypted saves and bounded synthetic desktop/390px browser acceptance pass. Remaining periodic/source links, insight/anomaly/period review, administrator controls, global overlays and full device/current-live release gates are documented in next-connections.md and execution-status.md. Production/Sites/real records unchanged.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1060,
-    "browser": "Prior bounded synthetic evidence remains documented. Fresh discovery still reports Local browser use disabled; no new imported/savings migration, Drive/Gmail/Wallet/analysis browser or real-device acceptance is claimed."
+    "regressionTests": 1066,
+    "browser": "Synthetic desktop/390px allocation/review/removal and family choices/drill-down/keyboard/draft acceptance passed. Full shared-viewer/browser/device/live-release acceptance remains pending."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }
