@@ -1,10 +1,11 @@
+import {loadDeviceDraft} from './device-draft-api'
 import {useRef,useState} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
 import Link from './link'
 import {withViewQuery} from './navigation-query'
 import {budgetFields,cashAccountList} from '../../../src/budget.js'
 import {initialMonthlyDraft,manualMonthEligibility,monthlyDraftFingerprint,saveMonthlyReport,SaveConflict,type MonthlyDraft} from './monthly-report'
-import {createMonthlyRecovery,readMonthlyRecovery} from './monthly-recovery'
+import {createMonthlyRecovery,readMonthlyRecovery,originalMonthlyFields} from './monthly-recovery'
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
 import {useDraftGuard,useFinancialDraft} from './draft-guard'
@@ -31,6 +32,7 @@ function MonthlyEditor({base,budget,month,asOf,onSaved}:{base:BudgetResponse;bud
   flight.current=true;setRecoveryBusy(true);setError(null)
   try{const recovered=await readMonthlyRecovery(await file.text(),base,budget.budgetId,month);setDraft(recovered);onSaved('הטיוטה נטענה במכשיר בלבד. יש לבדוק ולשמור במפורש כדי לעדכן את התקציב.')}catch(e){setError(e instanceof Error?e.message:'לא ניתן לטעון את הטיוטה.')}finally{flight.current=false;setRecoveryBusy(false)}
  }
+ const restoreDevice=async()=>{if(flight.current||busy||recoveryBusy||dirty)return;flight.current=true;setRecoveryBusy(true);setError(null);try{const local=await loadDeviceDraft(budget.budgetId,base);if(!local)throw Error('לא נמצאה טיוטה לחשבון ולמרחב האלה.');setDraft(originalMonthlyFields(local,base,budget.budgetId,month));onSaved('שדות הטיוטה נטענו במכשיר בלבד. טקסט חלקי נשמר כפי שהוזן; יש לבדוק ולשמור במפורש.')}catch(e){if(e instanceof AccessError)budget.invalidate(e.message);else setError(e instanceof Error?e.message:'הטיוטה לא נטענה.')}finally{flight.current=false;setRecoveryBusy(false)}}
  useFinancialDraft({kind:'monthly',dirty,busy:busy||recoveryBusy,discard,save:blocked?undefined:save})
  return <form className="space-y-5" onChange={()=>onSaved('')} onSubmit={event=>{event.preventDefault();void save()}}>
   <fieldset disabled={busy||recoveryBusy} className="space-y-5">
@@ -46,7 +48,7 @@ function MonthlyEditor({base,budget,month,asOf,onSaved}:{base:BudgetResponse;bud
    </section>
   </fieldset>
   {error&&<p className="rounded-xl border border-destructive p-4 text-sm text-destructive" role="alert">{error}</p>}
-  <section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">שחזור טיוטת דיווח</h2><p className="text-sm text-muted-foreground">אפשר לטעון קובץ טיוטה שהורדת מהתצוגה הזו לאותו חשבון, מרחב, חודש וגרסה שמורה. הטעינה מקומית בלבד ואינה שומרת נתונים. טיוטה מגרסה קודמת נשארת בקובץ לבדיקה ידנית.</p><input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" aria-label="קובץ טיוטת דיווח" disabled={busy||recoveryBusy||dirty} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(file)void restore(file)}} /><button type="button" className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50" disabled={busy||recoveryBusy||dirty} onClick={()=>fileRef.current?.click()}>{recoveryBusy?'מכינים או טוענים טיוטה…':'טעינת טיוטה מקובץ'}</button>{dirty&&<p className="text-sm text-muted-foreground">יש לשמור או לצאת ללא שמירה לפני טעינת טיוטה אחרת.</p>}</section>
+  <section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">שחזור טיוטת דיווח</h2><button type="button" className="my-3 min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50" disabled={dirty||busy||recoveryBusy} onClick={()=>void restoreDevice()}>טעינת שדות מטיוטת המכשיר</button><p className="text-sm text-muted-foreground">נטענים רק שדות תואמים לאותו חודש ולאותה גרסה, ללא שינויים אחרים בתקציב. לבדיקה וייצוא של טיוטה אחרת אפשר לפתוח את מסך טיוטת המכשיר.</p><Link className="inline-flex min-h-11 items-center text-primary underline" href={withViewQuery('/settings/device-draft',window.location.search)}>בדיקת טיוטת המכשיר</Link><p className="text-sm text-muted-foreground">אפשר לטעון קובץ טיוטה שהורדת מהתצוגה הזו לאותו חשבון, מרחב, חודש וגרסה שמורה. הטעינה מקומית בלבד ואינה שומרת נתונים. טיוטה מגרסה קודמת נשארת בקובץ לבדיקה ידנית.</p><input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" aria-label="קובץ טיוטת דיווח" disabled={busy||recoveryBusy||dirty} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(file)void restore(file)}} /><button type="button" className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50" disabled={busy||recoveryBusy||dirty} onClick={()=>fileRef.current?.click()}>{recoveryBusy?'מכינים או טוענים טיוטה…':'טעינת טיוטה מקובץ'}</button>{dirty&&<p className="text-sm text-muted-foreground">יש לשמור או לצאת ללא שמירה לפני טעינת טיוטה אחרת.</p>}</section>
   <div className="surface flex flex-wrap items-center gap-3 rounded-xl p-4"><p className="min-w-0 flex-1 text-sm" role="status">{recoveryBusy?'מכינים או טוענים טיוטה…':busy?'שומרים את הדיווח…':dirty?'יש שינויים שעדיין לא נשמרו':'אין שינויים לשמירה'}</p><button className="h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50" type="submit" disabled={!dirty||busy||recoveryBusy||blocked}>שמירת הדיווח</button><button className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50" type="button" disabled={!dirty||busy||recoveryBusy} onClick={()=>{if(flight.current||busy||recoveryBusy||!dirty)return;flight.current=true;setRecoveryBusy(true);void exportDraft(base,budget.budgetId,month,draft,asOf).catch(e=>setError(e.message||'לא ניתן להכין גיבוי.')).finally(()=>{flight.current=false;setRecoveryBusy(false)})}}>הורדת גיבוי לטיוטה</button>{blocked&&<button className="h-11 rounded-xl border px-4 text-sm" type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)}>טעינת הגרסה השמורה</button>}</div>
  </form>
 }

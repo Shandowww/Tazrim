@@ -30,3 +30,19 @@ export async function readMonthlyRecovery(text:string,base:BudgetResponse,budget
  const reason=manualMonthEligibility(base.plan,month);if(reason)throw Error(reason)
  return checkedDraft(r.draft,base,month)
 }
+
+/** Resume only original raw inputs over an identical saved plan; never drop other edits. */
+export function originalMonthlyFields(draft:any,base:BudgetResponse,budgetId:string,month:string):MonthlyDraft{
+ const reason=manualMonthEligibility(base.plan,month);if(reason)throw Error(reason)
+ const scope=JSON.stringify([base.accountId,budgetId]),v=draft?.value
+ if(draft?.scope!==scope||draft?.box?.archived||v?.revision!==base.revision||v?.selectedMonth!==month||v?.monthlyPending||v?.monthlySalaryChanged||JSON.stringify(normalize(v?.plan))!==JSON.stringify(normalize(base.plan)))throw Error('הטיוטה כוללת גרסה, חודש או שינויים נוספים. יש להמשיך בממשק המקורי; העותק המקומי נשמר.')
+ const result=initialMonthlyDraft(base.plan,month),raw=v.raw
+ if(!raw||typeof raw!=='object'||Array.isArray(raw)||!Object.keys(raw).length)throw Error('אין בטיוטה שדות חודשיים להמשך עריכה.')
+ for(const [name,value]of Object.entries(raw)){
+  const key=name.startsWith('month-')?name.slice(6):''
+  // Original off-card aggregation and income notes need their original controls.
+  if(!key||['variable','transfers','otherIncomeNote','offCard'].includes(key)||!Object.hasOwn(result.values,key)||typeof value!=='string'||value.length>32)throw Error('חלק משדות הטיוטה דורשים את הטופס המקורי. העותק נשמר ולא נטען חלקית.')
+  result.values[key]=value
+ }
+ return result
+}

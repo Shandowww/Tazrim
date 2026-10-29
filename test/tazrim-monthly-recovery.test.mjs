@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {zero,clone,validatePlan} from '../src/budget.js'
 import {initialMonthlyDraft,prepareMonthlyReport} from '../frontend/src/app/monthly-report.ts'
-import {createMonthlyRecovery,readMonthlyRecovery} from '../frontend/src/app/monthly-recovery.ts'
+import {createMonthlyRecovery,readMonthlyRecovery,originalMonthlyFields} from '../frontend/src/app/monthly-recovery.ts'
 const snapshot=()=>({accountId:'alice',accountEmail:'alice@example.test',revision:4,writeIdentityBound:true,plan:{startMonth:'2026-01',opening:1000,buffer:100,horizon:24,defaults:{...zero(),salary:1000},months:{},expenses:[],demo:false,setupCompleted:true}})
 const month='2026-10',asOf='2026-10'
 test('A valid downloaded draft remains an ordinary plan backup and restores exact edits locally without changing the saved baseline',async()=>{
@@ -35,4 +35,12 @@ test('Object-key order does not invalidate the same saved snapshot, while unsupp
  const base=snapshot(),draft=initialMonthlyDraft(base.plan,month),backup=await createMonthlyRecovery(base,'personal',month,draft,asOf),reverse=v=>v&&typeof v==='object'?Array.isArray(v)?v.map(reverse):Object.fromEntries(Object.entries(v).reverse().map(([k,x])=>[k,reverse(x)])):v
  assert.deepEqual(await readMonthlyRecovery(JSON.stringify(backup),{...base,plan:reverse(base.plan)},'personal',month),draft)
  const accounts=clone(base);accounts.plan.cashPlanning={accounts:[{id:'a',label:'חשבון',buffer:0}],months:{},cardAccounts:{},transfers:[]};await assert.rejects(createMonthlyRecovery(accounts,'personal',month,draft,asOf),/חשבון/)
+})
+
+test('Original device raw fields resume exact partial text locally without coercion or mutating either stored snapshot',async()=>{
+ const {deviceDraftScope,sealDeviceDraft}=await import('../src/device-drafts.js'),{loadDeviceDraft}=await import('../frontend/src/app/device-draft-api.ts'),base=snapshot(),scope=deviceDraftScope(base.accountId,'personal'),payload={plan:clone(base.plan),revision:4,selectedMonth:month,monthlyPending:'',monthlySalaryChanged:false,tab:'monthly',raw:{'month-salary':'12..','month-card1':''}},before=JSON.stringify(payload),box=await sealDeviceDraft(scope,payload),local=await loadDeviceDraft('personal',base,async(mode,op)=>op({get:()=>box})),restored=originalMonthlyFields(local,base,'personal',month)
+ assert.equal(restored.values.salary,'12..');assert.equal(restored.values.card1,'');assert.equal(restored.actual,false);assert.throws(()=>prepareMonthlyReport(base.plan,month,restored,asOf));assert.equal(JSON.stringify(payload),before);assert.deepEqual(base,snapshot());restored.values.salary='123.45';assert.equal(prepareMonthlyReport(base.plan,month,restored,asOf).months[month].values.salary,123.45)
+})
+test('Original raw resume refuses stale, archived, foreign, pending or additional plan edits and never partially drops unsupported controls',()=>{
+ const base=snapshot(),local={scope:JSON.stringify(['alice','personal']),box:{},value:{plan:clone(base.plan),revision:4,selectedMonth:month,raw:{'month-salary':'12..'}}};for(const other of [{...local,scope:JSON.stringify(['bob','personal'])},{...local,box:{archived:true}},...[{revision:3},{selectedMonth:'2026-09'},{monthlyPending:month},{monthlySalaryChanged:true},{plan:{...base.plan,buffer:99}},{raw:{'month-salary':'123','month-offCard':'12..'}},{raw:{'month-otherIncomeNote':'פרטי'}},{raw:{'month-variable':'10'}},{raw:{'month-salary':'1'.repeat(33)}},{raw:{}}].map(v=>({...local,value:{...local.value,...v}}))])assert.throws(()=>originalMonthlyFields(other,base,'personal',month));assert.equal(local.value.raw['month-salary'],'12..')
 })
