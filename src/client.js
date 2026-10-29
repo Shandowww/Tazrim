@@ -139,7 +139,7 @@ async function applyLegacyInterfaceDestination(){
  const destination=readLegacyInterfaceDestination(location.search);if(!destination){legacyDestinationConsumed=true;return;}
  if(destination.budget!==activeBudget||dirty||monthlyPending||hasSecurityDraft()||hasSavingsDraft()||hasScenarioDraft()||hasDetailDraft()||hasMonthlyInputDraft())return;
  legacyDestinationConsumed=true;
- const sections={actions:'connections',reports:'connections','report-history':'bank-import',accounts:'cash-accounts',security:'privacy',connections:'connections',backups:'privacy',spaces:'budgets',gmail:'gmail',appearance:'app'};
+ const sections={admin:'admin',actions:'connections',reports:'connections','report-history':'bank-import',accounts:'cash-accounts',security:'privacy',connections:'connections',backups:'privacy',spaces:'budgets',gmail:'gmail',appearance:'app'};
  const tabs={home:'progress',savings:'goals',details:'detail-management',monthly:'monthly',plans:'plans',overview:'progress'};
  if(destination.selectedMonth&&forecast(plan).some(row=>row.month===destination.selectedMonth))selectedMonth=destination.selectedMonth;
  if(sections[destination.view]){tab='settings';settingsSection=sections[destination.view];}else tab=tabs[destination.view]||'progress';
@@ -147,6 +147,7 @@ async function applyLegacyInterfaceDestination(){
  render();
  if(destination.view==='reports'&&budgetMeta().role!=='viewer'){if(destination.reportId)await openStoredReport(destination.reportId);else openReportInbox();}
  if(destination.view==='actions'){await actionCenterFetch(true);if(destination.budget!==activeBudget||!canSwitchBudget())return;if(actionCenterState.error){actionCenterList();document.getElementById('action-center-dialog')?.showModal();return;}if(destination.actionKey&&budgetMeta().role!=='viewer')await actionGo(destination.actionKey);else{actionCenterList();document.getElementById('action-center-dialog')?.showModal();}}
+ if(destination.view==='admin'&&window.monthlyFlowAdmin)document.querySelector('[data-action="admin-access-load"]')?.click();
  if(destination.view==='overview')openSpaceOverview();
  if(destination.view==='migration')openSpaceMigrationReview();
  if(destination.view==='wallet'&&budgetMeta().role!=='viewer')walletOpen(destination.selectedMonth??undefined);
