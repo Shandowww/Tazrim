@@ -1,3 +1,4 @@
+import {fixture} from './helpers/imported-migration-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -11,12 +12,7 @@ import {openDatabase} from '../server/database.mjs';
 import {createApp} from '../server/app.mjs';
 import {createSpaceMigrations} from '../server/space-migrations.mjs';
 const hash=s=>createHash('sha256').update(s).digest('hex'),base=()=>({startMonth:'2026-01',opening:0,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false,setupCompleted:true}),options={user:'tal',sourceId:'personal',targetId:'house',accountId:'a'};
-export async function fixture(){
- const p=base();p.opening=300;p.cashPlanning={accounts:[{id:'a',label:'נבחר',opening:100,buffer:0,defaults:zero(),bankName:'hapoalim'},{id:'b',label:'SECRET-OTHER-ACCOUNT',opening:200,buffer:0,defaults:zero()}],months:{'2026-02':{a:{values:zero(),actual:true,includesPlannedCard:false,includesPlannedDirect:false},b:{values:zero(),actual:true,includesPlannedCard:false,includesPlannedDirect:false}}},cardAccounts:{},transfers:[]};
- const rows=await Promise.all([{line:1,date:'2026-02-10',amountCents:12345,description:'משכורת נבחרת',beneficiary:'מוטב נבחר',details:'פרטים',purpose:'',reference:'salary-ref',currency:'ILS',valid:true,balanceCents:null},{line:2,date:'2026-02-11',amountCents:-2345,description:'הוצאה נבחרת',beneficiary:'מוטב שני',details:'',purpose:'',reference:'expense-ref',currency:'ILS',valid:true,balanceCents:null}].map(r=>bankIdentity(r,'a')));
- const plan=applyBankImport(p,rows,{id:'report-a',accountId:'a',label:'SECRET-IMPORT-LABEL',bankName:'hapoalim',fileName:'SECRET-PRIVATE-FILENAME.csv',from:'2026-02-01',to:'2026-02-28',asOf:'2026-10',coverageConfirmed:true,monthsConfirmed:true,modes:{'2026-02':'full'},choices:{1:{field:'salary',reviewed:true},2:{field:'variable',reviewed:true}},rules:[{text:'SECRET-PRIVATE-RULE',direction:'in',destination:'salary'}]});
- plan.reportInbox={version:1,bindings:[{key:hash('SECRET-BINDING'),kind:'bank',target:'a'}],receipts:[{hash:hash('source-file'),kind:'bank',target:'a',reference:'report-a'}]};plan.bankImport.batches[0].months[0].before={values:zero(),actual:false,includesPlannedCard:false,note:'SECRET-MIXED-SNAPSHOT'};plan.bankImport.batches[0].months[0].beforeCash.b.note='SECRET-OTHER-SNAPSHOT';assert.ok(validatePlan(plan));return{plan,rows};
-}
+
 test('Eligible imported move retains original private history only in source, safe target baseline, stable identities and exact financial/account projections',async()=>{
  const {plan:p}=await fixture(),q=base(),before=JSON.stringify([p,q]),r=prepareManualAccountMigration(p,q,options);assert.equal(r.eligible,true,JSON.stringify(r.reasons));assert.equal(JSON.stringify([p,q]),before);assert.ok(validatePlan(r.sourceAfter));assert.ok(validatePlan(r.targetAfter));
  assert.deepEqual(cashAccountList(r.sourceAfter).map(a=>a.id),['b']);assert.deepEqual(cashAccountList(r.targetAfter).map(a=>a.id),['a']);assert.deepEqual(r.targetAfter.bankImport.entries,p.bankImport.entries);assert.deepEqual(r.sourceAfter.retainedImportHistory.records[0].bankImport.batches,p.bankImport.batches);assert.match(JSON.stringify(r.sourceAfter.retainedImportHistory),/SECRET-MIXED-SNAPSHOT/);assert.doesNotMatch(JSON.stringify(r.targetAfter),/SECRET-/);
