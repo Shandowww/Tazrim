@@ -49,7 +49,7 @@ export function createDriveBackup({db,origin,clientId,clientSecret,admins,source
  const secret=()=>{if(!existsSync(keyFile))try{writeFileSync(keyFile,randomBytes(32),{mode:0o600,flag:'wx'});}catch(e){if(e.code!=='EEXIST')throw e;}const key=readFileSync(keyFile);if(key.length!==32)throw Error('Invalid backup token key');return key;};
  const seal=(value,id)=>{const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',secret(),iv);cipher.setAAD(Buffer.from(id));const data=Buffer.concat([cipher.update(JSON.stringify(value)),cipher.final()]);return JSON.stringify({iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),data:data.toString('base64')});};
  const open=(value,id)=>{const b=JSON.parse(value),cipher=createDecipheriv('aes-256-gcm',secret(),Buffer.from(b.iv,'base64'));cipher.setAAD(Buffer.from(id));cipher.setAuthTag(Buffer.from(b.tag,'base64'));return JSON.parse(Buffer.concat([cipher.update(Buffer.from(b.data,'base64')),cipher.final()]).toString());};
- const status=user=>{const c=db.prepare('SELECT * FROM drive_backup_connections WHERE user_id=?').get(user.id);return{connected:!!c,enabled:!!c?.enabled,scheduleMode:c?.schedule_mode??'changes-nightly',timeZone:'Asia/Jerusalem',scheduledTime:'23:59',pendingChanges:!!c&&(c.last_change_version===null||changeVersion()>c.last_change_version),ready:existsSync(publicKeyFile),lastSuccess:c?.last_success??null,lastAttempt:c?.last_attempt??null,error:c?.error??null,running};};
+ const status=user=>{const c=db.prepare('SELECT * FROM drive_backup_connections WHERE user_id=?').get(user.id);const value={accountId:user.id,accountEmail:user.email,writeIdentityBound:true,connected:!!c,enabled:!!c?.enabled,scheduleMode:c?.schedule_mode??'changes-nightly',timeZone:'Asia/Jerusalem',scheduledTime:'23:59',pendingChanges:!!c&&(c.last_change_version===null||changeVersion()>c.last_change_version),ready:existsSync(publicKeyFile),lastSuccess:c?.last_success??null,lastAttempt:c?.last_attempt??null,error:c?.error??null,running};return{...value,statusWitness:digest(JSON.stringify(value))};};
  async function run(user){
   if(!allowed(user))throw Error('Administrator required');if(running)throw Error('Backup already running');const connection=db.prepare('SELECT * FROM drive_backup_connections WHERE user_id=?').get(user.id);if(!connection)throw Error('Connect Google Drive first');
   running=true;const coveredVersion=changeVersion();let archive,stage='credentials';db.prepare('UPDATE drive_backup_connections SET last_attempt=?,error=NULL WHERE user_id=?').run(now(),user.id);
@@ -89,6 +89,7 @@ export function createDriveBackup({db,origin,clientId,clientSecret,admins,source
  }
  async function files(request,user){
   if(!allowed(user))return json({error:'נדרשת הרשאת מנהל.'},403);
+  const expectedAccount=new URL(request.url).searchParams.get('accountId');if(expectedAccount&&expectedAccount!==user.id)return json({error:'החשבון השתנה. יש לטעון מחדש.'},403);
   const connection=db.prepare('SELECT credentials FROM drive_backup_connections WHERE user_id=?').get(user.id);if(!connection)return json({error:'יש לחבר את Google Drive.'},400);
   const oauth=oauthFactory();oauth.setCredentials(open(connection.credentials,user.id));
   try{
@@ -102,13 +103,15 @@ export function createDriveBackup({db,origin,clientId,clientSecret,admins,source
     return new Response(downloaded.data,{headers:{'Cache-Control':'no-store','Content-Type':'application/octet-stream','X-Content-Type-Options':'nosniff','Content-Disposition':'attachment; filename="budgit-recovery.backup"'}});
    }
    const params=new URLSearchParams({spaces:'appDataFolder',q:"trashed = false and appProperties has { key='type' and value='budgit-encrypted-server-backup' }",fields:'files(id,name,createdTime,size),nextPageToken',orderBy:'createdTime desc',pageSize:'30'});
-   const response=await oauth.request({url:'https://www.googleapis.com/drive/v3/files?'+params,timeout:30000});return json({files:response.data.files??[],more:!!response.data.nextPageToken});
+   const response=await oauth.request({url:'https://www.googleapis.com/drive/v3/files?'+params,timeout:30000});return json({accountId:user.id,accountEmail:user.email,files:response.data.files??[],more:!!response.data.nextPageToken});
   }catch{return json({error:'לא ניתן לקרוא את הגיבויים מ־Drive. בדקו חיבור והרשאות.'},503);}
  }
  async function handle(request,user){
   if(!allowed(user))return json({error:'נדרשת הרשאת מנהל.'},403);
+  const expectedAccount=new URL(request.url).searchParams.get('accountId');if(expectedAccount&&expectedAccount!==user.id)return json({error:'החשבון השתנה. יש לטעון מחדש.'},403);
   if(request.method==='GET')return json(status(user));if(request.method!=='POST')return json({error:'הפעולה אינה נתמכת.'},405);
   let body;try{body=await request.json();}catch{return json({error:'בקשה לא תקינה.'},400);}
+  if(body.requireAccountId===true){if(body.accountId!==user.id)return json({error:'החשבון השתנה. יש לטעון מחדש.'},403);if(typeof body.expectedStatus!=='string'||body.expectedStatus!==status(user).statusWitness)return json({error:'מצב הגיבוי השתנה. רעננו ובדקו לפני פעולה נוספת.'},409);}
   if(body.action==='run'){try{await run(user);return json(status(user));}catch(e){return json({error:e.message},503);}}
   if(body.action==='schedule'&&typeof body.enabled==='boolean'){
    const c=status(user),mode=body.mode??c.scheduleMode;

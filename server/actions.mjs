@@ -1,10 +1,10 @@
 import {budgetAccess,serviceJSON,boundedJSON,serviceError} from './budget-access.mjs';
-export function createActions(db,{isAllowed,now=()=>Date.now(),reports=()=>[]}={}){
+export function createActions(db,{isAllowed,now=()=>Date.now(),reports=()=>[],isAdmin=()=>false}={}){
  db.exec(`CREATE TABLE IF NOT EXISTS action_preferences(user_id TEXT NOT NULL,scope TEXT NOT NULL,issue_key TEXT NOT NULL,evidence TEXT NOT NULL,until INTEGER NOT NULL,PRIMARY KEY(user_id,scope,issue_key));
  CREATE TABLE IF NOT EXISTS report_expectations(scope TEXT PRIMARY KEY,revision INTEGER NOT NULL,data TEXT NOT NULL);`);
  return async(request,user)=>{try{
  const budget=new URL(request.url).searchParams.get('budget')??'personal',access=budgetAccess(db,user,budget,{isAllowed}),{scope}=access;
- if(request.method==='GET'){const row=db.prepare('SELECT revision,data FROM report_expectations WHERE scope=?').get(scope);return serviceJSON({accountId:user.id,accountEmail:user.email,budgetId:budget,actionIdentityBound:true,actionPreferenceCAS:true,preferences:Object.fromEntries(db.prepare('SELECT issue_key,evidence,until FROM action_preferences WHERE user_id=? AND scope=?').all(user.id,scope).map(r=>[r.issue_key,{evidence:r.evidence,until:r.until}])),expectations:row?JSON.parse(row.data):[],revision:row?.revision??0,reports:reports(scope)});}
+ if(request.method==='GET'){const row=db.prepare('SELECT revision,data FROM report_expectations WHERE scope=?').get(scope);return serviceJSON({accountId:user.id,accountEmail:user.email,budgetId:budget,actionIdentityBound:true,actionPreferenceCAS:true,backupAdmin:!!isAdmin(user),preferences:Object.fromEntries(db.prepare('SELECT issue_key,evidence,until FROM action_preferences WHERE user_id=? AND scope=?').all(user.id,scope).map(r=>[r.issue_key,{evidence:r.evidence,until:r.until}])),expectations:row?JSON.parse(row.data):[],revision:row?.revision??0,reports:reports(scope)});}
  if(request.method!=='POST')throw serviceError('הפעולה אינה נתמכת.',405);
  const input=await boundedJSON(request);
  if(Object.hasOwn(input,'accountId')&&input.accountId!==user.id)throw serviceError('החשבון השתנה. יש לפתוח את הפעולה מחדש בחשבון המקורי.',403);

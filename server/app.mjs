@@ -39,7 +39,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const migrations=createSpaceMigrations(db,{isAllowed,secret:reportStore.secret,now});
  const migrationReview=createSpaceMigrationReview(db,{isAllowed});
  const transferMatches=createTransferMatches(db,{isAllowed,secret:reportStore.secret,now});
- const actions=createActions(db,{isAllowed,now,reports:reportStore.list});
+ const actions=createActions(db,{isAllowed,now,reports:reportStore.list,isAdmin:user=>admins.has(user.email.toLowerCase())});
  origin=base.origin;const wallet=createApplePay(db,{origin,now,isAllowed});const configured=!!(clientId&&clientSecret);oauth??=new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback');
  const handle=async function handle(request,{ip='unknown'}={}){
  const u=new URL(request.url),path=u.pathname,time=now();const jar=cookies(request);
