@@ -1,6 +1,6 @@
 # Current continuation — 2026-10-29
 
-Tal excluded Apple Pay/Wallet/Shortcuts from completion and related acceptance gates. Native original bank consumption/source-allocation and family category/purchase review are now connected on analysis, with frozen original projection parity, guarded same-action plaintext/encrypted saves and bounded synthetic desktop/390px browser evidence. Build/typecheck,1066 regressions and15 checks pass. Continue periodic costs/source links, then the remaining rows in `next-connections.md`. Existing original interfaces remain. No production/Sites/real-record change. See the latest entry in `execution-status.md` for evidence and limits.
+Tal excluded Apple Pay/Wallet/Shortcuts from completion and related acceptance gates. Native original bank consumption/source-allocation and family category/purchase review are now connected on analysis, with frozen original projection parity, guarded same-action plaintext/encrypted saves and bounded synthetic desktop/390px browser evidence. Build/typecheck,1069 regressions and15 checks pass. Periodic costs and source links are now connected with original form/source helpers, lost-result recovery and bounded synthetic desktop/390px acceptance. Continue insight scenarios/anomaly follow-up, then the remaining rows in `next-connections.md`. Existing original interfaces remain. No production/Sites/real-record change. See the latest entry in `execution-status.md` for evidence and limits.
 
 # Current continuation — 2026-10-29
 

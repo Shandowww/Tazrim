@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "6dbda2f7f9a4db6f95e08cf5415b1ad381a01ad9",
+  "sourceCommit": "29448e7082f2a63258a66a70132a0cb6857d9eaf",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Active stage3 connects original Budgit commands. Apple Pay/Wallet/Shortcuts explicitly excluded by Tal on 2026-10-29. Native original bank consumption/category review, partial/cross-month source allocations and family category/whole-purchase review now connected. Shared frozen-original eligibility parity, stable same-action plaintext/encrypted saves and bounded synthetic desktop/390px browser acceptance pass. Remaining periodic/source links, insight/anomaly/period review, administrator controls, global overlays and full device/current-live release gates are documented in next-connections.md and execution-status.md. Production/Sites/real records unchanged.",
+  "status": "Incomplete preview; not deployed. Apple Pay explicitly excluded. Original native consumption/source allocations, family category/purchase review and periodic costs/payment/evidence connections complete in bounded slices. Original commands/form capture/source selection, source invalidation and guarded same-action saves retained. Remaining insight/anomaly/period/coverage/admin/global overlay connections and full device/live-release gates: next-connections.md and execution-status.md. Production/Sites/real records unchanged.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1066,
-    "browser": "Synthetic desktop/390px allocation/review/removal and family choices/drill-down/keyboard/draft acceptance passed. Full shared-viewer/browser/device/live-release acceptance remains pending."
+    "regressionTests": 1069,
+    "browser": "Bounded synthetic desktop/390px consumption/family/periodic flow, lost-result, Enter and draft checks pass. Shared-viewer/full device/live-release gates remain."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }
