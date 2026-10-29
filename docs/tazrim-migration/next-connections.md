@@ -1,18 +1,16 @@
 # Remaining original connections — 2026-10-29
 
-This is a source mapping for completion-plan stage3, not a new product plan or evidence of device acceptance. Continue the original commands and their revision/actor/source witnesses. Missing native UI does not mean the capability is missing from Budgit. Current verified checkpoint passes1072 regressions, build/typecheck and15 checks. Bounded synthetic desktop/390px browser acceptance for the consumption/family/periodic slices is documented below; broader device acceptance remains pending.
+This is a source mapping for completion-plan stage3, not a new product plan or evidence of device acceptance. Continue the original commands and their revision/actor/source witnesses. Missing native UI does not mean the capability is missing from Budgit. Current verified checkpoint passes1079 regressions, build/typecheck and15 checks. Bounded synthetic desktop/390px browser acceptance for the consumption/family/periodic slices is documented below; broader device acceptance remains pending.
 
 ## Scope decision — 2026-10-29
 
-Tal explicitly abandoned the Apple Pay connection. Apple Pay/Wallet/Shortcuts development, native monthly-draft handoff and related acceptance are excluded from the remaining plan and release gates. Existing code, stored records and live connections are unchanged by this scope decision; it is not a deletion, credential revocation or deployment. Historical implementation/test evidence remains historical. The next connection is advanced source/coverage actions.
+Tal explicitly abandoned the Apple Pay connection. Apple Pay/Wallet/Shortcuts development, native monthly-draft handoff and related acceptance are excluded from the remaining plan and release gates. Existing code, stored records and live connections are unchanged by this scope decision; it is not a deletion, credential revocation or deployment. Historical implementation/test evidence remains historical. The next connection is global action overlays and actual scoped save-error evidence.
 
 | Remaining connection | Existing implementation to reuse | Existing evidence / boundary |
 | --- | --- | --- |
-| Advanced source/coverage actions | `setPeriodReviewed`, `periodReviewState`; `src/reports.js` and original consumption/reconciliation UI | Original source-witness/client suites. Period close/reopen is now connected through the original source witness. New native `analysis` read/filter/view/reset functions do not implement every original report mutation. Exact original analysis space/month bridge remains. |
-| Global server allow-list UI | `server/app.mjs` `/api/admin/access`; `src/client.js` `drawAdminAccess`/`standaloneAdminAction` | `standalone-auth.test.mjs`, `tazrim-admin-destination.test.mjs`. Exact original admin destination now exists and only auto-loads for the authenticated administrator. A native UI must retain original revision CAS and administrator protection, with expected-actor metadata/preflight consistent with other native services. Granting server login access does not share a budget. All tests must use synthetic lists; do not change live access to test UI. |
 | Global action overlays/save-error badges | `src/action-center-model.js`, `src/action-center-client.js`; native action facts/preferences and `draft-registry.ts`/`draft-guard.tsx` | `action-center.test.mjs`, `tazrim-action-center.test.mjs`, `tazrim-action-integrations.test.mjs`. Optional Gmail/private notices/admin-backup facts are already connected. An ordinary dirty draft is not a failed save. The current native registry exposes dirty/busy/save availability, not an error channel; connect actual scoped error evidence instead of inferring it. Preserve original announcement/read/snooze CAS and navigation protection. |
 
-Read `execution-status.md` for the exact accepted slices. The original analysis destination retains allocation/consumption/family/periodic/scenario/coverage tools. Native admin controls are still pending despite the exact original destination.
+Read `execution-status.md` for the exact accepted slices. The original analysis destination retains allocation/consumption/family/periodic/scenario/coverage tools. Native administrator controls are now connected at `/settings/access`; their original-interface bridge remains available.
 
 ## Connected in this continuation — 2026-10-29
 
@@ -21,6 +19,10 @@ Manual bank consumption/category review and explicit partial/cross-month source 
 Periodic cost create/edit/remove, manual paid/unpaid and explicit source link/unlink now call original models. Original form capture and source-selection projection are shared by both interfaces; submitted month values are captured directly and the confirmation identifies name/amount/due month/repeat. Original payment/source evidence remain separate. Synthetic browser verified lost creation once, cross-month source link without a paid mark, manual annual advancement/undo, draft guard and390px RTL/no-overflow.
 
 Insight assumptions/actual comparisons/anomaly decisions and period close/reopen now call original models and share original form/default/removal helpers. Bounded synthetic desktop/390px save-retry/keyboard/draft/refusal checks passed. Advanced one-to-one source matching/coverage remain separate.
+
+Original one-to-one source match/reject/reset/unlink and stale-match cleanup are now connected, along with original monthly source coverage/audit/category/reconciliation reads. Frozen/service parity and bounded synthetic desktop/390px/editor/shared-viewer checks passed. Coverage/family keys are distinct to prevent duplicate panels after writes.
+
+The native administrator list now connects the original revision-aware service with additive metadata/opt-in actor binding and compatible original callers. Synthetic service/browser add/remove/retry/nonadmin/390px/draft checks passed with zero financial writes and no live access-list change.
 
 ## Acceptance and release
 

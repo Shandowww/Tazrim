@@ -1,3 +1,4 @@
+const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-access-page')).AdminAccessPage }))
 const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
 const WalletPage = lazy(async () => ({ default: (await import('./app/wallet-page')).WalletPage }))
 const GmailPage = lazy(async () => ({ default: (await import('./app/gmail-page')).GmailPage }))
@@ -266,6 +267,7 @@ function App() {
               <Route path="/settings/wallet" element={<WalletPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/gmail" element={<GmailPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/gmail/notices/:id" element={<GmailPage fixture={fixture} budget={budget}/>} />
+              <Route path="/settings/access" element={<AdminAccessPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/drive" element={<DriveBackupPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/security" element={<SecurityPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/history" element={<HistoryPage key={budgetId} fixture={fixture} budget={budget} />} />

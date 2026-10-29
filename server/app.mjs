@@ -106,10 +106,12 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  if(path==='/api/reference/interest'&&request.method==='GET'){if(!rates)return json({error:'נתוני הריבית אינם זמינים כרגע.'},503);return json(rates.snapshot(),200);}
  if(path==='/api/admin/access'){
   if(!admins.has(user.email))return json({error:'רק מנהל האפליקציה יכול לנהל גישה.'},403);
-  const snapshot=()=>({revision:db.prepare('SELECT revision FROM auth_access_state WHERE id=1').get()?.revision??0,entries:[...new Set([...admins,...db.prepare('SELECT email FROM auth_access').all().map(r=>r.email)])].sort().map(email=>({email,admin:admins.has(email)}))});
+  const expected=u.searchParams.get('accountId');if(expected!==null&&expected!==user.id)return json({error:'החשבון השתנה. יש לרענן את הרשימה.'},403);
+  const snapshot=()=>({accountId:user.id,accountEmail:user.email,writeIdentityBound:true,revision:db.prepare('SELECT revision FROM auth_access_state WHERE id=1').get()?.revision??0,entries:[...new Set([...admins,...db.prepare('SELECT email FROM auth_access').all().map(r=>r.email)])].sort().map(email=>({email,admin:admins.has(email)}))});
   if(request.method==='GET')return json(snapshot(),200);
   if(request.method!=='PUT')return json({error:'הפעולה אינה נתמכת.'},405);
   let input;try{input=await request.json()}catch{return json({error:'הבקשה אינה תקינה.'},400)}
+  if((input?.requireAccountId===true||input?.accountId!==undefined)&&input?.accountId!==user.id)return json({error:'החשבון השתנה. הרשימה לא עודכנה.'},403);
   const email=typeof input?.email==='string'?input.email.trim().toLowerCase():'';
   if(email.length>254||! /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(email)||!['add','remove'].includes(input?.action)||!Number.isSafeInteger(input?.revision)||input.revision<0)return json({error:'יש להזין כתובת אימייל תקינה.'},400);
   if(admins.has(email)&&input.action==='remove')return json({error:'לא ניתן להסיר את חשבון המנהל.'},400);

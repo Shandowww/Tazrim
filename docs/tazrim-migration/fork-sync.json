@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "1d7776f9fee47ad7bace5a476d2a02af4f955964",
+  "sourceCommit": "f9617ffab12b9bfd68e18db109152ca4b59e3e17",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete preview; not deployed. Apple Pay explicitly excluded. Original native consumption/source allocations, family review, periodic costs/payment/source evidence, insight assumptions/actuals/anomalies and period close/reopen are connected. Source witnesses, stable plaintext/encrypted saves and original helpers retained. Remaining advanced source/coverage/admin/global overlays and full device/current-live gates: next-connections.md and execution-status.md. Production/Sites/real records unchanged.",
+  "status": "Incomplete preview; not deployed. Apple Pay explicitly excluded. Original native consumption/source allocations, family/periodic/insight/anomaly/period review and full source matching/coverage are connected. Native global administrator access controls now retain original revision CAS and add opt-in actor binding with old-caller compatibility.1079 regressions/build/typecheck/15 checks pass; bounded synthetic desktop/390px/editor/viewer/nonadmin and lost-result acceptance documented. Remaining global action overlays and actual save-error evidence plus full device/current-live release gates: next-connections.md and execution-status.md. Production/Sites/real records unchanged.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1072,
-    "browser": "Bounded synthetic desktop/390px consumption/family/periodic/insight/anomaly/period checks passed, including lost-result, impossible assumptions, Enter and dirty navigation. Full shared-viewer/device/live release pending."
+    "regressionTests": 1079,
+    "browser": "Bounded synthetic source/coverage shared-viewer and administrator add/lost-result/remove/nonadmin/draft/390px checks pass. Zero financial writes in administrator fixture; no live access mutation. Full device/release pending."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }
