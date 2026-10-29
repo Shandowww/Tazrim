@@ -1,0 +1,2 @@
+import {createDemoPlan} from '../../src/budget.js';
+export function sample(){const p=createDemoPlan('2026-10');p.demo=false;p.details=[{id:'d',name:'קנייה',category:'מזון / סופר ומכולת',method:'card1',amount:150,month:'2026-09',date:'2026-08-31',status:'cleared',accounting:'included',number:''},{id:'refund',name:'זיכוי',category:'מזון',method:'variable',amount:-20,refund:true,month:'2026-09',date:'2026-09-02',status:'cleared',accounting:'included',number:''}];p.months={'2026-09':{actual:true,includesPlannedCard:false,values:{...p.defaults,card1:150,variable:0}}};return p;}

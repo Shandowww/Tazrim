@@ -1,8 +1,9 @@
+import {normalizeWalletText} from '../dist/server/wallet-text-model.js';
 import {randomBytes,randomUUID,createHash} from 'node:crypto';
 import {creditCards} from '../dist/server/budget.js';
 import {isVault} from '../dist/server/vault.js';
 const hash=s=>createHash('sha256').update(s).digest('hex');
-const clean=(s,max)=>typeof s==='string'?s.normalize('NFKC').replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g,'').trim().replace(/\s+/g,' ').slice(0,max):'';
+const clean=normalizeWalletText;
 const monthOk=m=>typeof m==='string'&&/^20\d{2}-(0[1-9]|1[0-2])$/.test(m);
 const fail=(message,status=400)=>Object.assign(new Error(message),{status});
 export function createApplePay(db,{origin,now=()=>Date.now(),isAllowed=()=>false}){
@@ -58,14 +59,14 @@ export function createApplePay(db,{origin,now=()=>Date.now(),isAllowed=()=>false
  const manage=async(request,user)=>{
   if(request.headers.has('x-budget-account-id')&&request.headers.get('x-budget-account-id')!==user?.id)throw fail('החשבון השתנה. יש לפתוח את הדוח מחדש.',403);
   if(!['GET','POST'].includes(request.method))throw fail('הפעולה אינה נתמכת.',405);
-  const url=new URL(request.url),budget=url.searchParams.get('budget')??'personal';let {scope,plan}=access(user,budget);
+  const url=new URL(request.url),budget=url.searchParams.get('budget')??'personal';let {scope,plan}=access(user,budget);const identity={accountId:user.id,accountEmail:user.email,budgetId:budget,walletIdentityBound:true},reply=(data,status=200)=>json({...identity,...data},status);
   if(request.method==='GET'){
-   if(url.searchParams.get('merchants')==='1'){const rows=merchants(scope);if(rows.length>1000)throw fail('יותר מ־1,000 בתי עסק. יש לפנות למנהל לפני ייצוא.',413);return json({revision:revision(scope),merchants:rows,identityBound:true});}
+   if(url.searchParams.get('merchants')==='1'){const rows=merchants(scope);if(rows.length>1000)throw fail('יותר מ־1,000 בתי עסק. יש לפנות למנהל לפני ייצוא.',413);return reply({revision:revision(scope),merchants:rows,identityBound:true});}
    const month=url.searchParams.get('month')??new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).format(new Date(now()));if(!monthOk(month))throw fail('חודש הייבוא אינו תקין.');
    const events=db.prepare('SELECT e.id,e.card_id,e.merchant,e.cents,e.currency,e.occurred_at,e.time_source,e.received_at,e.billing_month,e.state,e.kind,c.category FROM wallet_events e LEFT JOIN wallet_merchant_categories c ON c.scope=e.scope AND c.merchant=e.merchant WHERE e.scope=? AND e.billing_month=? ORDER BY e.occurred_at DESC LIMIT 1000').all(scope,month);
    const connections=db.prepare('SELECT id,card_id,label,created_at,last_success,revoked FROM wallet_connections WHERE scope=? AND user_id=? ORDER BY created_at DESC').all(scope,user.id);
    const months=db.prepare('SELECT billing_month AS month,COUNT(*) AS count FROM wallet_events WHERE scope=? GROUP BY billing_month ORDER BY billing_month DESC').all(scope);
-   const truncated=(months.find(r=>r.month===month)?.count??0)>events.length;return json({revision:revision(scope),month,events,connections,months,truncated,endpoint:origin+'/api/imports/apple-pay',encrypted:isVault(plan)});
+   const truncated=(months.find(r=>r.month===month)?.count??0)>events.length;return reply({revision:revision(scope),month,events,connections,months,truncated,endpoint:origin+'/api/imports/apple-pay',encrypted:isVault(plan)});
   }
   const input=await body(request,300000);if(!input||!Number.isSafeInteger(input.revision)||input.revision<0)throw fail('יש לרענן את נתוני הייבוא.');
   return transaction(()=>{
@@ -76,7 +77,7 @@ export function createApplePay(db,{origin,now=()=>Date.now(),isAllowed=()=>false
     const known=new Map(merchants(scope).map(m=>[m.id,m])),seen=new Set();
     for(const row of input.rows){const m=known.get(row?.id);if(!m||seen.has(row.id)||row.merchant!==m.merchant||row.location!==''||row.previousCategory!==m.category||typeof row.recommendedCategory!=='string'||!row.recommendedCategory.trim()||row.recommendedCategory.length>60||clean(row.recommendedCategory,60)!==row.recommendedCategory)throw fail('המלצה שונתה או אינה תקינה. רעננו וייבאו מחדש.');seen.add(row.id);}
     for(const row of input.rows)db.prepare('INSERT INTO wallet_merchant_categories VALUES(?,?,?) ON CONFLICT(scope,merchant) DO UPDATE SET category=excluded.category').run(scope,row.merchant,row.recommendedCategory);
-    advance(scope);return json({ok:true,revision:revision(scope)});
+    advance(scope);return reply({ok:true,revision:revision(scope)});
    }
    if(input.action==='connect'){
     if(!plan)throw fail('יש לשמור את התקציב תחילה.');
@@ -86,7 +87,7 @@ export function createApplePay(db,{origin,now=()=>Date.now(),isAllowed=()=>false
     if(db.prepare('SELECT COUNT(*) AS n FROM wallet_connections WHERE user_id=? AND revoked=0').get(user.id).n>=20)throw fail('יש לבטל חיבור קודם לפני יצירת חיבור נוסף.');
     const secret=randomBytes(32).toString('base64url'),id=randomUUID(),label=clean(input.label,60);if(!label)throw fail('יש לתת שם לחיבור.');
     db.prepare('INSERT INTO wallet_connections VALUES(?,?,?,?,?,?,?,?,NULL,0)').run(id,hash(secret),user.id,budget,scope,input.cardId,label,new Date(now()).toISOString());advance(scope);
-    return json({id,secret,revision:revision(scope)},201);
+    return reply({id,secret,revision:revision(scope)},201);
    }
    if(input.action==='revoke'){
     const result=db.prepare('UPDATE wallet_connections SET revoked=1 WHERE id=? AND user_id=? AND scope=? AND revoked=0').run(input.id,user.id,scope);if(!result.changes)throw fail('החיבור אינו זמין.',404);
@@ -97,7 +98,7 @@ export function createApplePay(db,{origin,now=()=>Date.now(),isAllowed=()=>false
    }else if(input.action==='approve-month'){
     if(!monthOk(input.month)||typeof input.cardId!=='string')throw fail('יש לבחור חודש וכרטיס.');
     db.prepare("UPDATE wallet_events SET state='included' WHERE scope=? AND billing_month=? AND card_id=? AND state='pending' AND currency='ILS'").run(scope,input.month,input.cardId);
-   }else throw fail('הפעולה אינה נתמכת.');advance(scope);return json({ok:true,revision:revision(scope)});
+   }else throw fail('הפעולה אינה נתמכת.');advance(scope);return reply({ok:true,revision:revision(scope)});
   });
  };
  return async(request,user)=>{try{return new URL(request.url).pathname==='/api/imports/apple-pay'?await receive(request):await manage(request,user);}catch(error){return json({error:error.status?error.message:'הייבוא לא נשמר. נסו שוב.'},error.status??503);}};

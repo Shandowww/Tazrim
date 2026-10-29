@@ -2,6 +2,8 @@ import {useLocation} from 'react-router-dom'
 import {legacyBudgetHref,withViewQuery} from './navigation-query'
 import Link from './link'
 const nativeWorkflows=[
+ ['/analysis','מדדי הוצאה, השוואה ותצוגות שמורות'],
+ ['/settings/wallet','Apple Pay · חיבור האייפון ובדיקת הייבוא'],
  ['/settings/gmail','מצב Gmail ועדכוני בנק פרטיים'],
  ['/settings/drive','גיבוי חיצוני ב־Google Drive · למנהל השרת'],
  ['/overview/migration','סקירת מעבר רישום חשבון בין מרחבים'],

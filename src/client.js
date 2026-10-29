@@ -143,11 +143,13 @@ async function applyLegacyInterfaceDestination(){
  const tabs={home:'progress',savings:'goals',details:'detail-management',monthly:'monthly',plans:'plans',overview:'progress'};
  if(destination.selectedMonth&&forecast(plan).some(row=>row.month===destination.selectedMonth))selectedMonth=destination.selectedMonth;
  if(sections[destination.view]){tab='settings';settingsSection=sections[destination.view];}else tab=tabs[destination.view]||'progress';
+ if(destination.view==='analysis'){graphState();chartMode='reports';reportView='explore';tab='forecast';if(destination.selectedMonth&&destination.selectedMonth>=plan.startMonth&&destination.selectedMonth<=todayMonth()){setDataContextMonth(destination.selectedMonth);exploreUI.end=destination.selectedMonth;}}
  render();
  if(destination.view==='reports'&&budgetMeta().role!=='viewer'){if(destination.reportId)await openStoredReport(destination.reportId);else openReportInbox();}
  if(destination.view==='actions'){await actionCenterFetch(true);if(destination.budget!==activeBudget||!canSwitchBudget())return;if(actionCenterState.error){actionCenterList();document.getElementById('action-center-dialog')?.showModal();return;}if(destination.actionKey&&budgetMeta().role!=='viewer')await actionGo(destination.actionKey);else{actionCenterList();document.getElementById('action-center-dialog')?.showModal();}}
  if(destination.view==='overview')openSpaceOverview();
  if(destination.view==='migration')openSpaceMigrationReview();
+ if(destination.view==='wallet'&&budgetMeta().role!=='viewer')walletOpen(destination.selectedMonth??undefined);
 }
 async function load(refresh=false,switching=false){
  if(demoPreview){plan=createDemoPlan(todayMonth());selectedMonth=todayMonth();revision=0;loaded=true;loading=false;dirty=false;loadError='';refreshView=null;purchase={name:'מדיח כלים',amount:6000,fees:180,firstMonth:todayMonth()};selectedPayments=6;if(typeof markDraftBaseline==='function')markDraftBaseline();scenarioItems=[{id:'demo-trial-bike',name:'אופניים',amount:1800,fees:60,firstMonth:monthAt(todayMonth(),1),payments:3,source:'direct',enabled:true}];render();return true;}

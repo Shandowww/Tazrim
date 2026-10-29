@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createDemoPlan,analysisMetricSnapshot,analysisMetricSeries,clone,forecast,annotateExpenseDetail} from '../src/budget.js';
-function sample(){const p=createDemoPlan('2026-10');p.demo=false;p.details=[{id:'d',name:'קנייה',category:'מזון / סופר ומכולת',method:'card1',amount:150,month:'2026-09',date:'2026-08-31',status:'cleared',accounting:'included',number:''},{id:'refund',name:'זיכוי',category:'מזון',method:'variable',amount:-20,refund:true,month:'2026-09',date:'2026-09-02',status:'cleared',accounting:'included',number:''}];p.months={'2026-09':{actual:true,includesPlannedCard:false,values:{...p.defaults,card1:150,variable:0}}};return p;}
+import {sample} from './helpers/analysis-fixture.mjs';
+
 test('Metric series and drilldown share exact signed cents, source identities, dates, scope and revision',()=>{
  const p=sample(),before=clone(p),baseline=forecast(p);
  for(const metric of ['identified','detail','reported'])for(const dateBasis of metric==='reported'?['billing']:['billing','purchase']){

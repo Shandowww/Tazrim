@@ -1,3 +1,5 @@
+const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
+const WalletPage = lazy(async () => ({ default: (await import('./app/wallet-page')).WalletPage }))
 const GmailPage = lazy(async () => ({ default: (await import('./app/gmail-page')).GmailPage }))
 const DriveBackupPage = lazy(async () => ({ default: (await import('./app/drive-backup-page')).DriveBackupPage }))
 const MigrationPage = lazy(async () => ({ default: (await import('./app/migration-page')).MigrationPage }))
@@ -260,6 +262,8 @@ function App() {
               <Route path="/details/:id/annotate" element={<DetailAnnotationPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/details/:id" element={<ExpenseDetailsPage key={budgetId + search} mode="source" fixture={fixture} budget={budget} />} />
               <Route path="/settings/spaces" element={<SpacesPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/analysis" element={<AnalysisPage fixture={fixture} budget={budget}/>} />
+              <Route path="/settings/wallet" element={<WalletPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/gmail" element={<GmailPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/gmail/notices/:id" element={<GmailPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/drive" element={<DriveBackupPage fixture={fixture} budget={budget}/>} />

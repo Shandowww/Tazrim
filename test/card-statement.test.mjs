@@ -54,7 +54,7 @@ test('Edited details are preserved on exact reimport, and preview conflicts or l
 test('Wallet cannot replace a statement total, including purchases initially assigned to their purchase month',async()=>{
  const preview=await prepareCardStatement(base(),report(),'card1'),p=applyCardStatement(base(),preview,choices(preview));let message='';
  const c=vm.createContext({plan:p,statementCycleExists,statementWalletMatch,notify:m=>message=m,document:{getElementById:()=>null}});
- vm.runInContext(fs.readFileSync('src/apple-pay-client.js','utf8'),c);
+ vm.runInContext(fs.readFileSync('src/wallet-ui-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+fs.readFileSync('src/apple-pay-client.js','utf8'),c);
  vm.runInContext("walletMonth='2026-11';walletApply('card1')",c);assert.match(message,/כבר נקלט/);
  vm.runInContext("walletMonth='2026-10';walletData={events:[{card_id:'card1',merchant:'חנות לדוגמה',cents:30075,currency:'ILS',occurred_at:'2026-10-13T10:00:00Z',kind:'purchase',state:'included'}]};walletApply('card1')",c);assert.match(message,/אין להעתיק שוב/);
  assert.equal(p.months['2026-10'],undefined);assert.equal(p.details.length,1);
