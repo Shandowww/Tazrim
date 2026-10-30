@@ -77,3 +77,6 @@ Original logout native connection and current feature inventory are now implemen
 
 
 Release preflight now verifies all pre-existing authoritative table columns/rows on its disposable migrated copy, alongside original financial/projection/integrity checks. Synthetic corruption refusal passed; no current-live-data preflight is claimed. Exact1093 regressions/build/typecheck/15 checks pass.
+
+
+Targeted reduced-motion source fixes now disable loading pulses and small hover/press transforms under the OS preference; build/typecheck/15 checks and generated rules verified. Browser/OS-change acceptance remains open; no new financial code.

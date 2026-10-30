@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils/cn'
 // Pinned Tazrim confirmation surface/buttons, adapted to a native top-layer dialog
 // so unsaved work is protected even when another native modal is open.
-const BUTTON = 'inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-medium transition-[background-color,transform] duration-quick ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:opacity-50'
+const BUTTON = 'inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-medium transition-[background-color,transform] duration-quick ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:opacity-50'
 export function ConfirmDialog({open,onOpenChange,onConfirm,title,description,confirmLabel='שמירה והמשך',cancelLabel='להישאר',busy=false,confirmDisabled=false,error,children}:{open:boolean;onOpenChange:(open:boolean)=>void;onConfirm:()=>void;title:ReactNode;description:ReactNode;confirmLabel?:string;cancelLabel?:string;busy?:boolean;confirmDisabled?:boolean;error?:string|null;children?:ReactNode}) {
  const ref=useRef<HTMLDialogElement>(null),cancelRef=useRef<HTMLButtonElement>(null),id=useId()
  useEffect(()=>{const dialog=ref.current;if(!dialog)return;if(open&&!dialog.open){dialog.showModal();cancelRef.current?.focus()}else if(!open&&dialog.open)dialog.close()},[open])

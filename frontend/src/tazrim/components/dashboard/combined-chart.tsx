@@ -135,7 +135,7 @@ function CombinedChartInner({ bankSummary, maxSummary, cardsName = 'מקס', sel
 
 export function CombinedChart(props: Props) {
   return (
-    <Suspense fallback={<div className="rounded-xl surface p-5 h-52 sm:h-64 md:h-80 animate-pulse" />}>
+    <Suspense fallback={<div className="rounded-xl surface p-5 h-52 sm:h-64 md:h-80 animate-pulse motion-reduce:animate-none" />}>
       <CombinedChartInner {...props} />
     </Suspense>
   )

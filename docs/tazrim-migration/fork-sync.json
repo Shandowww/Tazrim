@@ -1,18 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "a8aa27941a6f05bdfa8f5f920ba687eb7689f8fe",
+  "sourceCommit": "317f06c3ac3f90eeec7b07050cc6a2a094974b10",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Apple Pay/Wallet/Shortcuts development and acceptance excluded by Tal. Exact source passes1093 regressions, build/typecheck and15 checks. Prior bounded synthetic imported/savings migration and Gmail browser evidence retained. Drive disconnected guidance/nightly-daily copy/confirmed-unknown-result mode resync repaired; original fixed POST logout connected through native draft guard in Settings and locked/unlocked security. Real original-service archive download contract verifies exact mocked bytes, private headers, hash rejection and actor refusal. Original session logout preserves budgets and other sessions. Feature inventory audited against actual routes/source/tests. Copy-only release preflight now verifies all pre-existing authoritative table columns and rows across startup and repeated startup, including encrypted source/history/role/connection records, without private output; synthetic corruption fails closed with supplied backup unchanged. Fresh browser discovery/new tab/fresh session still report disabled after user intended to enable it. Current-live SSH source check times out; public health ok:true/loginConfigured:true and anonymous plan401 confirm availability/access only. Remaining browser download/logout/state fixes, larger pagination/settings-draft and complete route/theme/reduced-motion/device/reference acceptance plus current-live source/verified SQLite backup/isolated preflight/rollback/release gates remain. No production, Sites, real-record or real Google change. Separate upstream history and notices retained. See RESUME.md and execution-status.md.",
+  "status": "Incomplete development preview; not deployed. Apple Pay excluded by Tal. Original Drive recovery guidance/mode resync and guarded fixed POST logout connected; original-feature inventory audited. Copy-only release preflight now hashes all pre-existing authoritative table columns/rows and verifies preservation across startup/restart without private output; synthetic corruption fails closed and leaves the supplied backup untouched.1093 regressions passed at a8aa279; latest presentation-only reduced-motion follow-up passes build/typecheck/15 core checks with targeted generated CSS rules verified. Prior bounded synthetic migration/Gmail/Drive browser evidence retained. New Drive download/logout/reduced-motion/device acceptance remains open because browser discovery/new-tab/fresh-session report disabled. Current-live SSH source check timed out; public health/access probes passed without credentials. Fresh verified SQLite backup, source reconciliation, isolated preflight, rollback and full release gates remain. No production/Sites/real-record/real Google changes. Exact current evidence and remaining work in RESUME.md, feature-parity.md and execution-status.md. Independent upstream history/notices preserved.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
     "regressionTests": 1093,
-    "browser": "Prior bounded synthetic evidence retained; fresh tool discovery/new tab/fresh session reports disabled. No new Drive download/logout/device acceptance.",
-    "production": "Read-only health and anonymous access passed; SSH source check timed out. No deployment or live-data backup/preflight claim."
+    "regressionSource": "a8aa279; remains current for subsequent CSS-class-only reduced-motion follow-up",
+    "browser": "Prior bounded synthetic evidence retained. Fresh browser tool discovery/new tab/fresh session reports disabled; no new Drive download/logout/reduced-motion/device acceptance.",
+    "production": "Read-only health and anonymous401 passed; SSH source check timed out. No deployment/live backup/live-data preflight."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

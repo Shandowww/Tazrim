@@ -122,7 +122,7 @@ function CCMonthlyChartInner({ data, series, selectedMonth }: Props) {
 
 export function CCMonthlyChart(props: Props) {
   return (
-    <Suspense fallback={<div className="rounded-xl surface p-5 h-48 sm:h-64 animate-pulse" />}>
+    <Suspense fallback={<div className="rounded-xl surface p-5 h-48 sm:h-64 animate-pulse motion-reduce:animate-none" />}>
       <CCMonthlyChartInner {...props} />
     </Suspense>
   )

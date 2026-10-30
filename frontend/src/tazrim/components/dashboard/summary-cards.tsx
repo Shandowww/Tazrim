@@ -167,7 +167,7 @@ export function StatTile({
         {bare && hint && <span className="hidden truncate text-xs xl:inline">· {hint}</span>}
         {href && (
           <ChevronLeft
-            className="ms-auto h-4 w-4 opacity-0 transition-all duration-fast group-hover:opacity-100 group-hover:-translate-x-0.5"
+            className="ms-auto h-4 w-4 opacity-0 transition-all duration-fast group-hover:opacity-100 group-hover:-translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
             aria-hidden
           />
         )}
@@ -215,7 +215,7 @@ export function StatTile({
       className={cn(
         base,
         'transition-[background-color,border-color,box-shadow,transform] duration-fast',
-        'hover:border-primary/30 hover:shadow-e3 active:scale-[0.99]',
+        'hover:border-primary/30 hover:shadow-e3 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
       )}
     >

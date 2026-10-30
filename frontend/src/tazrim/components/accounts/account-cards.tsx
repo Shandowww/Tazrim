@@ -67,7 +67,7 @@ function SummaryRow({
             </div>
           )}
         </div>
-        <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-fast group-hover:-translate-x-0.5" aria-hidden />
+        <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-fast group-hover:-translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" aria-hidden />
       </Link>
     </li>
   )

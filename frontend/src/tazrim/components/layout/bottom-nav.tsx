@@ -38,7 +38,7 @@ function TabIcon({ active, icon: Icon }: { active: boolean; icon: typeof LayoutD
     <Icon
       aria-hidden
       strokeWidth={active ? 2.2 : 1.8}
-      className="h-6 w-6 transition-transform duration-quick ease-out group-active:scale-[0.88]"
+      className="h-6 w-6 transition-transform duration-quick ease-out group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100"
     />
   )
 }

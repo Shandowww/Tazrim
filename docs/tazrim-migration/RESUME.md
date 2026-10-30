@@ -1,3 +1,9 @@
+# Current continuation — reduced-motion source follow-up — 2026-10-30
+
+Latest presentation follow-up adds targeted reduced-motion overrides for chart loading pulses, account/dashboard chevrons and navigation/confirmation press transforms. Build/typecheck/15 core checks pass and generated CSS verified. Prior1093 functional regressions from a8aa279 remain current; no data/command change. Drive/logout/preflight/inventory stage is backed up at a8aa279 (Tazrim5aa12a8). Public health and anonymous401 passed; SSH source access times out, browser disabled even after fresh session. No fresh browser/device/live-data preflight/release claim.
+
+Next acceptance still needs the browser: Drive repaired guidance/mode recovery/download, logout dirty/stay/save/discard/back-navigation, reduced motion/OS flips/full route/reference sizes, larger migration pagination and settings-draft summary. Production needs fresh source reconciliation and verified SQLite backup followed by isolated preservation/financial/access/HTTP preflight and rollback/release gates. All fixtures/tabs stopped; production/Sites/real records/Google unchanged. Apple Pay excluded. Current feature inventory maps real routes; older entries are historical.
+
 # Current continuation — stronger release preservation gate — 2026-10-30
 
 Latest exact source passes1093 regressions, build/typecheck and15 checks. Drive repairs, original guarded logout and audited inventory are in2fe791a. Existing copy-only preflight now hashes all pre-existing authoritative table columns/rows, including report/source/history/role/connection ciphertext; it verifies startup and repeated startup without logging private values. Synthetic corruption is refused and supplied backup remains untouched. This is verification tooling, not a production schema/financial change.
