@@ -1,3 +1,19 @@
+# Current continuation — stronger release preservation gate — 2026-10-30
+
+Latest exact source passes1093 regressions, build/typecheck and15 checks. Drive repairs, original guarded logout and audited inventory are in2fe791a. Existing copy-only preflight now hashes all pre-existing authoritative table columns/rows, including report/source/history/role/connection ciphertext; it verifies startup and repeated startup without logging private values. Synthetic corruption is refused and supplied backup remains untouched. This is verification tooling, not a production schema/financial change.
+
+Public health is ok:true/loginConfigured:true; anonymous plan401. Production SSH source verification timed out. Browser discovery/new-tab/fresh-session still report disabled after Tal said he would enable it. No fresh live-data backup/preflight, browser acceptance or deployment claimed. No production/Sites/real-record/real Google change; Apple Pay remains excluded.
+
+Next remains browser acceptance of Drive repairs/download/confirmed-disconnect mode and logout dirty/stay/save/discard/back navigation, larger migration pagination/settings-draft summary and consolidated route/theme/reduced-motion/device/download matrix. Then current-live source reconciliation, fresh verified SQLite backup, isolated preservation/financial/access/HTTP preflight, rollback source/image and established release verification. No fixture or owned tab left running. Earlier entries are historical.
+
+# Current continuation — Drive repair, logout and audited inventory — 2026-10-30
+
+Drive disconnected guidance/nightly-vs-daily copy/confirmed-unknown-disconnect mode resync are fixed. Original service download verifies exact mocked bytes/private headers, rejects hash mismatch and foreign users, one upload only. Original POST logout is connected in native Settings and locked/unlocked security via shared draft guard; service test preserves financial bytes and other sessions. Current feature-parity.md table maps actual routes/source/tests and explicit acceptance limits. Exact build/typecheck,1089 regressions and15 checks pass.
+
+Fresh browser acceptance is blocked: discovery/new tab/fresh session still report local browser access disabled after Tal said he would enable it. No new tab/screenshot opened and no fixture left running. Production SSH source verification also timed out; no new source or database baseline verified. Do not deploy. Apple Pay excluded; no production/Sites/real-record/real Google change.
+
+Next: browser acceptance of Drive repairs/download/false-draft recovery and logout dirty/stay/save/discard/back navigation; then larger migration pagination/settings-draft summary and the consolidated route/theme/reduced-motion/device/download matrix. Current-live source reconciliation, verified backup/isolated preflight/rollback/release gates remain. Last application source before these changesc418a80; latest execution-status.md records this stage. Historical entries below are not current instructions.
+
 # Current continuation — Drive acceptance boundary — 2026-10-30
 
 Application source3560fb5 passes1086 regressions/build/typecheck/15 checks. Migration and Gmail bounded synthetic browser acceptance passed; Apple Pay excluded. Drive schedule/run/disconnect lost-success checks each executed once, with one mock upload and unchanged synthetic financial data;390px and nonadmin refusal passed. Download remains unverified because the disposable mock lacks file metadata/hash/media responses and the unbounded browser event wait hung. No production/Sites/real-record/Google changes.

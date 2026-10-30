@@ -1,3 +1,4 @@
+import {DatabaseSync} from 'node:sqlite';
 import {spawnSync} from 'node:child_process';import test from 'node:test';import assert from 'node:assert/strict';import {mkdtempSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {openDatabase} from '../server/database.mjs';import {financialProjection,queryFinancialTransactions} from '../server/financial-data.mjs';import {createDemoPlan,clone,validatePlan} from '../src/budget.js';import {createVault} from '../src/vault.js';
 const sample=()=>{const p=createDemoPlan('2026-10');p.demo=false;p.bankImport={version:1,accounts:[{id:'bank',label:'בדיקה',rules:[]}],batches:[{id:'batch',file:'bank.csv',accountId:'bank',from:'2026-10-01',to:'2026-10-31',months:[]}],entries:[{key:'a'.repeat(64),fingerprint:'b'.repeat(64),month:'2026-10',field:'salary',cents:12345,batchId:'batch',accountId:'bank'}]};p.details=[{id:'detail',name:'חנות בדיקה',amount:25.15,category:'קניות / כללי',method:'card1',month:'2026-10',date:'2026-10-01',number:'',status:'cleared',accounting:'included'}];return p;};
@@ -58,4 +59,12 @@ test('Search pagination can bind a revision and rejects a changed snapshot inste
   const next=clone(p);next.details[0].amount+=1;await put(DB,'alice',next,1);
   assert.deepEqual(queryFinancialTransactions(db,'personal:alice',{offset:1,revision:first.revision}),{conflict:true,revision:2});
  }finally{db.close();}
+});
+
+test('Release preflight refuses a copied startup that changes stored source bytes and leaves the supplied backup untouched',()=>{
+ const directory=mkdtempSync(join(tmpdir(),'budgit-preservation-failure-')),file=join(directory,'backup.sqlite');try{
+  const {db}=openDatabase(file),data=JSON.stringify(sample());db.prepare('INSERT INTO plans VALUES(?,?,?,?)').run('alice',data,3,'2026-10-30');db.exec("CREATE TABLE preserved_source(id TEXT PRIMARY KEY,data BLOB NOT NULL);INSERT INTO preserved_source VALUES('synthetic',x'00ff01');CREATE TRIGGER simulate_startup_data_loss AFTER INSERT ON financial_transactions BEGIN UPDATE preserved_source SET data=x'00ff02'; END;");db.close();
+  const result=spawnSync(process.execPath,['server/preflight-financial-data.mjs',file],{encoding:'utf8',timeout:15000});assert.notEqual(result.status,0);assert.match(result.stderr,/Startup changed existing stored records: preserved_source/);assert.ok(!result.stderr.includes(data));
+  const original=new DatabaseSync(file,{readOnly:true});try{assert.equal(original.prepare('SELECT hex(data) bytes FROM preserved_source').get().bytes,'00FF01');assert.equal(original.prepare('SELECT data FROM plans').get().data,data);assert.equal(original.prepare('SELECT COUNT(*) n FROM financial_transactions').get().n,0)}finally{original.close()}
+ }finally{rmSync(directory,{recursive:true,force:true})}
 });

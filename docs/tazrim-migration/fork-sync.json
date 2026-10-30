@@ -1,17 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "c418a8056481d59b2c2f2d640b1f041a0059a25d",
+  "sourceCommit": "a8aa27941a6f05bdfa8f5f920ba687eb7689f8fe",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Original Budgit workflow connections are implemented in bounded native slices. Apple Pay/Wallet/Shortcuts development and acceptance excluded by Tal. Exact source passes1086 regressions, build/typecheck and15 checks. Synthetic imported/savings migration and Gmail browser acceptance passed, including lost apply/undo/config/scan recovery without replay and scope/privacy guards. Canonical proposal-key comparison and pre-scan coverage display repaired. Drive schedule/run/disconnect/390px/nonadmin acceptance passed with one mock upload and unchanged financial bytes; browser download remains unverified due incomplete disposable provider mock and a hung event wait. Concrete remaining Drive presentation fixes and full inventory/parity/device/reference/settings-draft/larger pagination/download/real OAuth/platform PRF/current-live reconciliation/verified backup/preflight/rollback/release gates are documented in next-connections.md, execution-status.md and RESUME.md. No production, Sites, real-record or real Google change. Separate upstream history and notices preserved.",
+  "status": "Incomplete development preview; not deployed. Apple Pay/Wallet/Shortcuts development and acceptance excluded by Tal. Exact source passes1093 regressions, build/typecheck and15 checks. Prior bounded synthetic imported/savings migration and Gmail browser evidence retained. Drive disconnected guidance/nightly-daily copy/confirmed-unknown-result mode resync repaired; original fixed POST logout connected through native draft guard in Settings and locked/unlocked security. Real original-service archive download contract verifies exact mocked bytes, private headers, hash rejection and actor refusal. Original session logout preserves budgets and other sessions. Feature inventory audited against actual routes/source/tests. Copy-only release preflight now verifies all pre-existing authoritative table columns and rows across startup and repeated startup, including encrypted source/history/role/connection records, without private output; synthetic corruption fails closed with supplied backup unchanged. Fresh browser discovery/new tab/fresh session still report disabled after user intended to enable it. Current-live SSH source check times out; public health ok:true/loginConfigured:true and anonymous plan401 confirm availability/access only. Remaining browser download/logout/state fixes, larger pagination/settings-draft and complete route/theme/reduced-motion/device/reference acceptance plus current-live source/verified SQLite backup/isolated preflight/rollback/release gates remain. No production, Sites, real-record or real Google change. Separate upstream history and notices retained. See RESUME.md and execution-status.md.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1086,
-    "browser": "Bounded synthetic migration/Gmail and Drive schedule/run/disconnect/390px/nonadmin checks passed. Download, real OAuth/platform/device and full consolidated release acceptance remain open. See execution-status.md final entries."
+    "regressionTests": 1093,
+    "browser": "Prior bounded synthetic evidence retained; fresh tool discovery/new tab/fresh session reports disabled. No new Drive download/logout/device acceptance.",
+    "production": "Read-only health and anonymous access passed; SSH source check timed out. No deployment or live-data backup/preflight claim."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

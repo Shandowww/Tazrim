@@ -1,0 +1,15 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {snapshotStoredRecords,assertStoredRecords} from '../server/preflight-preservation.mjs';
+test('Release witness preserves existing source ciphertext, nullable values, sharing roles and exact integers while allowing additive schema',()=>{
+ const db=new DatabaseSync(':memory:');try{
+ db.exec('CREATE TABLE report_sources(id TEXT PRIMARY KEY,source BLOB,metadata BLOB,draft BLOB,revision INTEGER);CREATE TABLE budget_member_roles(budget_id TEXT,user_id TEXT,role TEXT);CREATE TABLE financial_scopes(scope TEXT);');
+ db.prepare('INSERT INTO report_sources VALUES(?,?,?,?,?)').run('source',Buffer.from([0,255,1]),Buffer.from('synthetic ciphertext'),null,9007199254740993n);db.prepare('INSERT INTO budget_member_roles VALUES(?,?,?)').run('shared','viewer','viewer');const before=snapshotStoredRecords(db);assert.equal(before.length,2);assertStoredRecords(db,before);
+ db.exec('ALTER TABLE report_sources ADD COLUMN native_hint TEXT;CREATE TABLE new_derived_state(id TEXT);INSERT INTO financial_scopes VALUES(\'new projection\');');assertStoredRecords(db,before);
+ for(const change of ["UPDATE report_sources SET source=x'00ff02'","UPDATE report_sources SET draft=x''","UPDATE report_sources SET revision=9007199254740994","UPDATE budget_member_roles SET role='editor'","DELETE FROM report_sources"]){db.exec('SAVEPOINT witness');db.exec(change);assert.throws(()=>assertStoredRecords(db,before),/Startup changed existing stored records/);db.exec('ROLLBACK TO witness;RELEASE witness');assertStoredRecords(db,before)}
+ }finally{db.close()}
+})
+test('Release witness is independent of row insertion order and unambiguously distinguishes text, blobs, null and empty values',()=>{
+ const db=new DatabaseSync(':memory:');try{db.exec('CREATE TABLE records(id TEXT,value);');const put=db.prepare('INSERT INTO records VALUES(?,?)');put.run('b',null);put.run('a','');const before=snapshotStoredRecords(db);db.exec('DELETE FROM records');put.run('a','');put.run('b',null);assertStoredRecords(db,before);db.exec("UPDATE records SET value=x'' WHERE id='a'");assert.throws(()=>assertStoredRecords(db,before),/Startup changed/);assert.ok(!JSON.stringify(before).includes('synthetic ciphertext'));}finally{db.close()}
+})
+
+
+test('Release witness rejects removed columns even for empty tables and orders case-insensitive text by exact bytes',()=>{const db=new DatabaseSync(':memory:');try{db.exec('CREATE TABLE empty_records(id TEXT, original TEXT);CREATE TABLE names(value TEXT COLLATE NOCASE);');db.prepare('INSERT INTO names VALUES(?)').run('a');db.prepare('INSERT INTO names VALUES(?)').run('A');const before=snapshotStoredRecords(db);db.exec('DELETE FROM names');db.prepare('INSERT INTO names VALUES(?)').run('A');db.prepare('INSERT INTO names VALUES(?)').run('a');assertStoredRecords(db,before);db.exec('ALTER TABLE empty_records DROP COLUMN original');assert.throws(()=>assertStoredRecords(db,before),/Startup removed existing stored columns/)}finally{db.close()}})
