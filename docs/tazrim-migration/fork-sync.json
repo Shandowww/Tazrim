@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "616eb11b44c1f7c6307382b7a578efdae381cec9",
+  "sourceCommit": "c418a8056481d59b2c2f2d640b1f041a0059a25d",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Apple Pay excluded by Tal. All implementation rows listed in next-connections.md connect original Budgit models/commands in bounded native slices. Nested analysis draft locks now propagate before paint.1083 regressions, build/typecheck and15 checks pass. Bounded desktop/320/390/430/768/1440 analysis layout, light/dark/System, global-dialog, actor/space/viewer/nonadmin, original financial witness and one-write retry evidence is recorded in execution-status.md. Other pages/full reference/keyboard/reduced-motion/download/actual-device/Google authorization and current-live reconciliation/backup/preflight/rollback/release gates remain. No production/Sites/real-record change.",
+  "status": "Incomplete development preview; not deployed. Original Budgit workflow connections are implemented in bounded native slices. Apple Pay/Wallet/Shortcuts development and acceptance excluded by Tal. Exact source passes1086 regressions, build/typecheck and15 checks. Synthetic imported/savings migration and Gmail browser acceptance passed, including lost apply/undo/config/scan recovery without replay and scope/privacy guards. Canonical proposal-key comparison and pre-scan coverage display repaired. Drive schedule/run/disconnect/390px/nonadmin acceptance passed with one mock upload and unchanged financial bytes; browser download remains unverified due incomplete disposable provider mock and a hung event wait. Concrete remaining Drive presentation fixes and full inventory/parity/device/reference/settings-draft/larger pagination/download/real OAuth/platform PRF/current-live reconciliation/verified backup/preflight/rollback/release gates are documented in next-connections.md, execution-status.md and RESUME.md. No production, Sites, real-record or real Google change. Separate upstream history and notices preserved.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1083,
-    "browser": "Bounded synthetic analysis320/390/430/768/1440 no-overflow, dark320 dialog visual inspection, immediate Light/Dark and System restoration; nested periodic/insight locks verified before paint. Prior action/editor/viewer/nonadmin/retry evidence retained.0 financial writes in final acceptance fixtures. Full application/device/release acceptance remains pending."
+    "regressionTests": 1086,
+    "browser": "Bounded synthetic migration/Gmail and Drive schedule/run/disconnect/390px/nonadmin checks passed. Download, real OAuth/platform/device and full consolidated release acceptance remain open. See execution-status.md final entries."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

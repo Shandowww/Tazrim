@@ -1,6 +1,6 @@
 # Budgit adaptation of Tazrim — development branch
 
-This branch mirrors the completed React development checkpoint from `Shandowww/monthly-flow-budget`, commit `616eb11b44c1f7c6307382b7a578efdae381cec9`. It uses Budgit’s existing backend and financial rules with Tazrim’s React presentation. It is an incomplete development preview with guarded manual monthly, account and card editing; remaining workflow parity, backend integration and release acceptance are pending. It is not a published release. The original Tazrim application remains on this fork’s `main` branch.
+This branch mirrors the completed React development checkpoint from `Shandowww/monthly-flow-budget`, commit `c418a8056481d59b2c2f2d640b1f041a0059a25d`. It uses Budgit’s existing backend and financial rules with Tazrim’s React presentation. It is an incomplete development preview with guarded manual monthly, account and card editing; remaining workflow parity, backend integration and release acceptance are pending. It is not a published release. The original Tazrim application remains on this fork’s `main` branch.
 
 See [the implementation checkpoint](docs/tazrim-migration/checkpoint.md) and [source synchronization record](docs/tazrim-migration/fork-sync.json). Tazrim’s MIT license and Heebo’s license are retained.
 

@@ -1,4 +1,4 @@
-import {useLayoutEffect,useEffect,useState} from 'react'
+import {useLayoutEffect,useState} from 'react'
 import {setInsightScenario,simulateInsightScenario,insightScenarioActuals,expenseAnomalies,decideExpenseInsight,expenseCategoryOptions,monthAt,periodReviewState,setPeriodReviewed} from '../../../src/budget.js'
 import {newInsightScenario,insightScenarioFormItem,removeInsightScenario} from '../../../src/insight-ui-model.js'
 import {useDraftGuard,useFinancialDraft} from './draft-guard'

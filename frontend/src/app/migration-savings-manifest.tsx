@@ -1,5 +1,12 @@
 const money=(n:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(n/100),amount=(n:number)=><bdi>{money(n)}</bdi>
-const same=(a:any,b:any)=>JSON.stringify(a)===JSON.stringify(b)
+// The service canonicalizes object keys before signing the proposal. Array order,
+// keys and values remain exact; property insertion order is not financial data.
+const same=(a:any,b:any):boolean=>{
+ if(a===b)return true
+ if(!a||!b||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false
+ const keys=Object.keys(a),other=Object.keys(b)
+ return keys.length===other.length&&keys.every(key=>Object.hasOwn(b,key)&&same(a[key],b[key]))
+}
 /** Confirmation requires every original inventory row, unchanged chosen ownership/routes and exact displayed amounts. */
 export function savingsManifestVisible(s:any,review:any,proposal:any){
  if(!s||!review?.from||!proposal||!same(s.ownership,proposal.ownership)||!same(s.routes,proposal.routes)||s.ownership.context!==review.context||s.snapshotMonth!==review.from.snapshotMonth||!/^\d{4}-\d{2}-\d{2}$/.test(s.date??''))return false

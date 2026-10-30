@@ -1,3 +1,19 @@
+# Current continuation — Drive acceptance boundary — 2026-10-30
+
+Application source3560fb5 passes1086 regressions/build/typecheck/15 checks. Migration and Gmail bounded synthetic browser acceptance passed; Apple Pay excluded. Drive schedule/run/disconnect lost-success checks each executed once, with one mock upload and unchanged synthetic financial data;390px and nonadmin refusal passed. Download remains unverified because the disposable mock lacks file metadata/hash/media responses and the unbounded browser event wait hung. No production/Sites/real-record/Google changes.
+
+Next concrete fixes: disconnected Drive guidance, daily/nightly explanation, resync selected mode after confirmed lost-disconnect status; repair only the disposable provider mock and verify synthetic archive download with a bounded timeout. Then remaining larger migration pagination, settings-draft summary, inventory/parity/full device/reference/download/live-release gates. See final execution-status.md entry. Fixtures/tabs stopped; weekly quota99% used. Earlier lists are historical.
+
+# Current continuation — Gmail acceptance — 2026-10-30
+
+Migration repair checkpoint7ab55a1 is backed up. Native Gmail now has bounded synthetic desktop/390px acceptance for preview/activation/scan/notices/pause/disconnect, lost-success recovery without replay and shared-viewer privacy. Shared Gmail status no longer calls the pre-scan cursor a completed range. Exact build/typecheck,1086 regressions and15 checks pass. No real Google/OAuth/provider/financial/production/Sites change. Continue remaining Drive, larger migration pagination, settings-draft summary and consolidated full navigation/device/download/reference/parity/live-release gates. Apple Pay remains excluded. See latest execution-status.md entry for exact evidence.
+
+# Current continuation — migration acceptance repair — 2026-10-30
+
+Imported and savings account migration now have bounded synthetic browser evidence, including dual consent, explicit ownership/history routes, exact privacy disclosure, lost successful apply/undo without replay, exact paired plan restoration,390px RTL/keyboard/draft protection and viewer refusal. The browser found and fixed a canonical-object-key ordering mismatch in native savings confirmation. Exact build/typecheck,1085 regressions and15 checks pass. See execution-status.md final entry. Apple Pay remains excluded; production/Sites/real records unchanged.
+
+Next: remaining consolidated inventory/parity, settings-draft summary, Drive/Gmail/OAuth and report/vault/download/full navigation/theme/reduced-motion/reference-size/device acceptance, followed by current-live source reconciliation and the verified-backup/preflight/rollback/release gates. Larger migration pagination remains unverified in browser. Historical entries below are not a current implementation queue.
+
 # Current continuation — global connection checkpoint — 2026-10-29
 
 All implementation rows formerly listed in `next-connections.md` are connected in bounded native slices. Apple Pay is excluded by Tal. Latest application passes build/typecheck,1083 regressions and15 checks, with bounded synthetic desktop/390px/editor/viewer/nonadmin/global-dialog evidence. Actual attempted-save evidence is scoped and memory-only; background action reads do not replace an active financial draft.

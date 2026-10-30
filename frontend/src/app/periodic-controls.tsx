@@ -1,4 +1,4 @@
-import {useLayoutEffect,useEffect,useState} from 'react'
+import {useLayoutEffect,useState} from 'react'
 import {periodicCostOutlook,setPeriodicCost,markPeriodicCostPaid,periodicSourceRecord,periodicSourceLinkState,linkPeriodicSource,unlinkPeriodicSource,monthAt} from '../../../src/budget.js'
 import {periodicSourceCandidates,removePeriodicCost,periodicCostFormItem} from '../../../src/periodic-ui-model.js'
 import {useDraftGuard,useFinancialDraft} from './draft-guard'
