@@ -1,5 +1,12 @@
 # Monthly Flow — project handoff
 
+## Specific-loan repayments and native home-screen launch live — 2026-11-01
+
+Verified application `cd0ee85` is live on the existing Hetzner server. `/next/loans` now connects bank-payment evidence to individual loans and recognizes exact future matches in the original atomic import flow, with refunds/unlink/stop, signed-cent progress against the planned total and protected historical reclassification. No principal/interest calculation or silent term change. Original loan edits retain evidence, payer changes retain historical payments, ambiguous/changed matches require review, and viewers remain read-only. Bare-root GET/HEAD now redirects without caching to `/next`; manifest ID/scope stay stable while start URL/native metadata and explicit legacy login return are corrected. Existing query-bearing original-interface bridges remain.
+
+Build/typecheck,1,108 regressions and15 core checks pass, including actual CSV atomic lost-commit recovery, encrypted metadata, undo/reimport and actor/space isolation. Synthetic320/390/1440px Light/Dark, draft guards, uncertain-action freeze and one-PUT retry, preserved expense/net, viewer refusal and root launch passed. Fresh verified backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation. Actual runtime hashes/health/auth/deep routes/root redirect/manifest verified; authoritative records/settings/keys/parking unchanged. No production record edits or provider consent. Existing device/platform/provider limits remain; real-iPhone OS launch still needs owner confirmation. After user adoption retain binding/matching compatibility in later rollbacks. Evidence: release-loan-payments-2026-11-01.json and loan-payment-links-2026-11-01.md.
+
+
 ## Hetzner-only hosting — 2026-11-01
 
 Tal retired Sites from the publication workflow. Budgit runs on the existing Hetzner server at https://budgit.duckdns.org; publish there and back up the same completed source to GitHub. Older instructions to publish to Sites or preserve its audience are superseded. Retain historical Site identity only as source provenance/build validation. Hosted deletion could not be performed: the connected Sites account returns NOT_FOUND for this project and lists only the separate older Site, which must not be touched. Do not claim deletion.

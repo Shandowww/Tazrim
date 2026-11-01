@@ -1,0 +1,47 @@
+{
+  "releasedAtDate": "2026-11-01",
+  "applicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f",
+  "previousCommit": "7ecacc0964a41c05ac2b6abc846b4a387e9787dd",
+  "entry": "https://budgit.duckdns.org/next/loans",
+  "runtimeImage": "sha256:c75e692f3d389867a872ef270b21c48259e17a27bb6ff6ca05c9e9f50bb0c464",
+  "changes": [
+    "Specific-loan bank-payment evidence and future matching through original import orchestration",
+    "Repayment progress against the planned total, refunds, unlink and stop recognition",
+    "Existing bare-root home-screen launch redirects to native UI; manifest start/native metadata and explicit legacy login destination retained"
+  ],
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressions": 1108,
+    "coreChecks": 15,
+    "browser": "Synthetic320/390/1440px, Light/Dark, selected debit confirmation, dirty navigation, uncertain-write freeze/one-PUT recovery, unchanged spending/net, scoped viewer refusal and root-to-native launch",
+    "actualNativeCSVAtomicImport": "passed; lost successful response recovered with one commit",
+    "encryptedMetadataRoundTrip": "passed",
+    "freshVerifiedSQLiteBackup": "passed",
+    "isolatedFinancialAccessHTTPAllRecordPreservation": "passed",
+    "storedEncryptedSources": "verified offline",
+    "runtimeHashes": "matched local build",
+    "healthyAndLoginConfigured": true,
+    "anonymousAndForgedDenied": true,
+    "deepRoutesAndNoStore": true,
+    "homeScreenRootRedirect": true,
+    "manifestStartsNative": true,
+    "explicitLegacyEntryRetained": true,
+    "authoritativeRecordsUnchanged": true,
+    "credentialsKeysProxyUnchanged": true,
+    "parkingUnchanged": true
+  },
+  "limits": [
+    "Tracks net identified repayments against planned total; no bank principal/interest/amortization calculation",
+    "Future matching requires the same payer, normalized description/beneficiary/sample amount and loan term; ambiguous/changed matches require review",
+    "Past reclassification requires sufficient actual/source-supported totals; protected/partial/unsourced reports require source review",
+    "Original schedule/term is retained; elapsed unreported months are not assumed paid",
+    "Real iPhone OS launch and existing platform/provider limits remain unverified; an already-running page may need refresh/reopen",
+    "Later rollback must preserve payment bindings and matching behavior after user adoption; do not restore financial records to fit an older interface"
+  ],
+  "runtimeHashes": {
+    "server/app.mjs": "ca15398008d97094c273e53800035bd218619f10dc9dbf777298d1e9b0f234ea",
+    "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+    "dist/index.html": "04ea598cb07324f58506c032c55e4204f182ea93184841188fb4342733dc130d",
+    "dist/frontend/index.html": "92fcc21c217b55c3bcc0738bae81e5775c6f229f39013b4566aedd361a5b0a9d"
+  }
+}

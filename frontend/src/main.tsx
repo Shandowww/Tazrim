@@ -60,6 +60,7 @@ const SavingsTransferPage = lazy(async () => ({ default: (await import('./app/sa
 const InvestmentPage = lazy(async () => ({ default: (await import('./app/investment-page')).InvestmentPage }))
 const SavingsSchedulePage = lazy(async () => ({ default: (await import('./app/savings-schedule-page')).SavingsSchedulePage }))
 const SavingsGoalsPage = lazy(async () => ({ default: (await import('./app/savings-goals-page')).SavingsGoalsPage }))
+const LoanPaymentsPage = lazy(async () => ({default:(await import('./app/loan-payments-page')).LoanPaymentsPage}))
 const LoansPage = lazy(async () => ({ default: (await import('./app/loans-page')).LoansPage }))
 const PlannedItemsPage = lazy(async () => ({ default: (await import('./app/planned-items-page')).PlannedItemsPage }))
 const CashMonthlyPage = lazy(async () => ({ default: (await import('./app/cash-monthly-page')).CashMonthlyPage }))
@@ -239,6 +240,7 @@ function App() {
               <Route path="/savings/:id/edit" element={<SavingsGoalsPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/loans" element={<LoansPage key={budgetId + pathname + search} mode="list" fixture={fixture} budget={budget} />} />
               <Route path="/loans/new" element={<LoansPage key={budgetId + pathname + search} mode="new" fixture={fixture} budget={budget} />} />
+              <Route path="/loans/:id/payments" element={<LoanPaymentsPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/loans/:id/edit" element={<LoansPage key={budgetId + pathname + search} mode="edit" fixture={fixture} budget={budget} />} />
               <Route path="/loans/:id/remove" element={<LoansPage key={budgetId + pathname + search} mode="remove" fixture={fixture} budget={budget} />} />
               <Route path="/plans/scenario" element={<ScenarioPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />

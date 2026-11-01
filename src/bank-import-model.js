@@ -1,4 +1,4 @@
-import {clone,fields,creditCards,monthlyValues,forecast,confirmMonthlySavings,validatePlan,cents,paymentFor,monthAt,cashAccountList,cashAccountValues,cashAssignedItem} from './budget.js';
+import {clone,fields,creditCards,monthlyValues,forecast,confirmMonthlySavings,validatePlan,cents,paymentFor,monthAt,cashAccountList,cashAccountValues,cashAssignedItem,loanBankMatch,loanMatchText,indexMonth} from './budget.js';
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function bankMonthSources(p,month){
  const sources=new Map();for(const batch of p.bankImport?.batches??[])for(const h of batch.months??[])if(h.month===month){const c=h.after?.bankCoverage;if(c?.accountId!==batch.accountId)continue;const explicit=Object.hasOwn(c,'sourceBalanceCents');sources.set(batch.accountId,{complete:c.accountComplete??c.complete,balance:explicit?c.sourceBalanceCents:h.after.cashReport?cents(h.after.cashReport.balance):null,date:c.date});}return sources;
@@ -42,7 +42,7 @@ export function bankPreview(p,records,options){
   const previous=known.get(r.key)??seen.get(r.key),withinFile=seen.has(r.key);let state=!r.valid||r.currency!=='ILS'||!r.date||r.date<from||r.date>to?'invalid':previous?(previous.fingerprint===r.fingerprint?(withinFile?'duplicate-file':'duplicate'):'conflict'):'new';
   if(r.missingReference&&previous&&state!=='invalid')state='conflict';
   const crossFormatOverlap=r.missingReference&&(p.bankImport?.batches??[]).some(b=>b.accountId===accountId&&r.date>=b.from&&r.date<=b.to&&(/\.pdf$/i.test(b.file)!==/\.pdf$/i.test(options.fileName??''))&&(/\.pdf$/i.test(b.file)||/\.pdf$/i.test(options.fileName??'')));if(crossFormatOverlap)state='conflict';
-  const c=choices[r.line]??{},field=state==='duplicate'?previous.field:c.field;
+  const original=choices[r.line]??{},match=loanBankMatch(p,accountId,r),c=original.manual?original:match.ambiguous?{field:'',reviewed:false}:match.loanId?{field:'loanRepayment',reviewed:true,refund:r.amountCents>0}:original,field=state==='duplicate'?previous.field:c.field;
   if(state!=='invalid'&&(migrationKeys.has(r.key)||migrationFingerprints.has(r.fingerprint)))state='migrated';
   const reviewed=['duplicate','duplicate-file'].includes(state)||state==='new'&&c.reviewed===true&&allowed.has(field)&&(field==='exclude'||(['salary','otherIncome','incomingTransfers'].includes(field)?r.amountCents>0:r.amountCents<0||field!=='outgoingTransfers'&&(r.reversal===true||c.refund===true)&&r.amountCents>0));
   const row={...r,state,field,reviewed,accountId};rows.push(row);if(!seen.has(r.key)&&!['invalid','conflict'].includes(state))seen.set(r.key,{fingerprint:r.fingerprint,field});
@@ -116,6 +116,7 @@ export function applyBankImport(p,records,options){
  const accountIndex=bank.accounts.findIndex(a=>a.id===accountId),accountBefore=clone(bank.accounts.find(a=>a.id===accountId)??null),account={id:accountId,label,rules,personal:options.personal===true,...(options.bankName?{bankName:options.bankName}:{})};if(accountIndex<0)bank.accounts.push(account);else bank.accounts[accountIndex]=account;
  const accepted=preview.rows.filter(r=>r.state==='new'&&r.reviewed&&selected.some(m=>m.month===r.date.slice(0,7)));
  bank.entries.push(...accepted.map(r=>({key:r.key,fingerprint:r.fingerprint,month:r.date.slice(0,7),field:r.field,cents:r.amountCents,batchId:id,accountId,source:{...(Number.isInteger(r.line)&&r.line>0&&r.line<=30000?{line:r.line,parserVersion:1}:{}),date:r.date,valueDate:r.valueDate??null,description:r.description??'',details:r.details??'',beneficiary:r.beneficiary??'',purpose:r.purpose??'',reference:r.reference??'',currency:r.currency??'ILS',...(Number.isSafeInteger(r.balanceCents)?{balanceCents:r.balanceCents}:{})}})));
+ for(const r of accepted)if(r.field==='loanRepayment'){const match=loanBankMatch(p,accountId,r),loan=next.loans?.find(l=>l.id===match.loanId);if(loan){loan.repayments??={version:1,keys:[]};if(!loan.repayments.keys.some(x=>x.key===r.key))loan.repayments.keys.push({key:r.key,fingerprint:r.fingerprint,accountId});}}
  for(const h of history){h.after=clone(next.months[h.month]);h.afterCash=clone(next.cashPlanning?.months[h.month]??null);}
  bank.batches.push({id,accountId,file:options.fileName,from,to,months:history,beforeGoals,afterGoals:clone(next.savingsGoals??null),beforeTransfers,afterTransfers:clone(next.savingTransfers??null),accountBefore,accountIndex,accountAfter:account});
  if(!validatePlan(next)||JSON.stringify(next).length>2000000)throw Error('הייבוא גדול מדי או אינו מתאים לתקציב. נסה תקופה קצרה יותר; שום נתון לא נשמר.');
@@ -130,3 +131,40 @@ export function undoBankImport(p,id){
  next.bankImport.entries=next.bankImport.entries.filter(e=>e.batchId!==id);next.bankImport.batches.pop();next.bankImport.accounts=next.bankImport.accounts.filter(a=>a.id!==last.accountId);if(last.accountBefore)next.bankImport.accounts.splice(Number.isInteger(last.accountIndex)&&last.accountIndex>=0?last.accountIndex:next.bankImport.accounts.length,0,last.accountBefore);
  if(!validatePlan(next))throw Error('לא ניתן לבטל את הייבוא עם הנתונים הקיימים.');return next;
 }
+
+
+// A manual category correction moves an already reported expense; it never posts another debit.
+export function linkLoanPayment(p,loanId,key,remember=false){
+ if(!validatePlan(p)||typeof remember!=='boolean')throw Error('לא ניתן לאמת את פרטי השיוך.');
+ const loan=p.loans?.find(l=>l.id===loanId),entry=p.bankImport?.entries.find(e=>e.key===key);
+ if(!loan||!entry?.source||entry.source.date.slice(0,7)!==entry.month||!entry.cents||cashAssignedItem(p,loan)!==entry.accountId)throw Error('יש לבחור תנועה מהחשבון שמשלם את ההלוואה.');
+ if(entry.month<loan.from||indexMonth(entry.month)>=indexMonth(loan.from)+loan.months)throw Error('התנועה מחוץ לתקופת ההחזר של ההלוואה.');
+ if(p.loans.some(l=>l.id!==loanId&&l.repayments?.keys.some(r=>r.key===key)))throw Error('התנועה כבר משויכת להלוואה אחרת.');
+ if(entry.cents>0&&(entry.field!=='loanRepayment'||remember))throw Error('ביטול או החזר תשלום דורשים סיווג החזר הלוואה, ללא זיהוי אוטומטי של חיובים.');
+ const next=clone(p),target=next.loans.find(l=>l.id===loanId),row=next.bankImport.entries.find(e=>e.key===key);
+ if(row.field!=='loanRepayment'){
+  if(!['variable','transfers','checks'].includes(row.field)||row.cents>=0)throw Error('יש לבדוק את הסיווג בדוח המקור לפני שיוך התשלום להלוואה.');
+  const records=[next.months[row.month]],account=next.cashPlanning?.months[row.month]?.[row.accountId];
+  if(account)records.push(account);else if(cashAccountList(p).length>1)throw Error('נדרש דיווח חודשי מלא לחשבון לפני שינוי הסיווג.');
+  const amount=-row.cents;
+  const sourced=accountId=>(p.bankImport.entries??[]).filter(e=>e.month===row.month&&e.field==='loanRepayment'&&(!accountId||e.accountId===accountId)).reduce((n,e)=>n-e.cents,0);
+  if(cents(records[0]?.values.loanRepayment??0)!==sourced(null)||account&&cents(account.values.loanRepayment??0)!==sourced(row.accountId))throw Error('קיים סכום החזר נוסף שאינו תואם לתנועות המקור. יש לבדוק את הדיווח החודשי כדי למנוע ספירה כפולה.');
+  for(const record of records){if(!record?.actual||cents(record.values[row.field]??0)<amount)throw Error('שינוי סיווג דורש דיווח בפועל וסכום הוצאה שמכסה את התנועה. יש לסקור את דוח המקור.');record.values[row.field]=(cents(record.values[row.field])-amount)/100;record.values.loanRepayment=(cents(record.values.loanRepayment??0)+amount)/100;}
+  row.field='loanRepayment';delete row.bankCategoryId;
+ }
+ target.repayments??={version:1,keys:[]};if(!target.repayments.keys.some(r=>r.key===key))target.repayments.keys.push({key:row.key,fingerprint:row.fingerprint,accountId:row.accountId});
+ if(target.repayments.ignored)target.repayments.ignored=target.repayments.ignored.filter(r=>r.key!==key);
+ if(remember){
+  const rule={accountId:row.accountId,action:loanMatchText(row.source.description),beneficiary:loanMatchText(row.source.beneficiary),amountCents:-row.cents};
+  if(!(rule.action||rule.beneficiary))throw Error('אין בתנועה תיאור או מוטב לזיהוי תשלומים עתידיים.');
+  const conflict=next.loans.some(other=>{const r=other.repayments?.rule;return other.id!==loanId&&r&&r.accountId===rule.accountId&&loanMatchText(r.action)===rule.action&&loanMatchText(r.beneficiary)===rule.beneficiary&&r.amountCents===rule.amountCents&&Math.max(indexMonth(other.from),indexMonth(target.from))<Math.min(indexMonth(other.from)+other.months,indexMonth(target.from)+target.months)});
+  if(conflict)throw Error('כלל זה מתאים להלוואה נוספת באותה תקופה. אפשר לשייך את התנועה ידנית ללא זיהוי עתידי.');target.repayments.rule=rule;
+ }
+ if(!validatePlan(next))throw Error('השיוך מתנגש עם פירוט או התאמות קיימים. יש לסקור את דוח המקור לפני שינוי הסיווג.');return next;
+}
+export function unlinkLoanPayment(p,loanId,key){
+ if(!validatePlan(p))throw Error('התקציב אינו תקין.');const next=clone(p),loan=next.loans?.find(l=>l.id===loanId),ref=loan?.repayments?.keys.find(r=>r.key===key);if(!ref)throw Error('התשלום אינו משויך להלוואה הזו.');
+ loan.repayments.keys=loan.repayments.keys.filter(r=>r.key!==key);loan.repayments.ignored??=[];if(!loan.repayments.ignored.some(r=>r.key===key))loan.repayments.ignored.push(ref);
+ if(!validatePlan(next))throw Error('לא ניתן לבטל את השיוך.');return next;
+}
+export function stopLoanPaymentRule(p,loanId){if(!validatePlan(p))throw Error('התקציב אינו תקין.');const next=clone(p),loan=next.loans?.find(l=>l.id===loanId);if(!loan?.repayments?.rule)throw Error('אין זיהוי אוטומטי להלוואה הזו.');delete loan.repayments.rule;return next;}

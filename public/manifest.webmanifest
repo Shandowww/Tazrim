@@ -5,7 +5,7 @@
   "description": "תכנון חודשי רגוע של הכנסות, חיסכון ורכישות.",
   "lang": "he",
   "dir": "rtl",
-  "start_url": "/",
+  "start_url": "/next",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8f5f0",

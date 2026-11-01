@@ -36,8 +36,36 @@ export function setOffCardTotal(v,total){if(!Number.isFinite(total)||total<0||to
 export const formBudgetFields=p=>budgetFields(p).filter(([k])=>k!=='transfers').map(f=>f[0]==='variable'?['offCard','הוצאות שלא שולמו בכרטיס',f[2]]:f);
 export const zero=()=>Object.fromEntries(fields.map(([k])=>[k,0]));
 export function scheduledLoans(p,month){return (p.loans??[]).filter(l=>month>=l.from&&indexMonth(month)<indexMonth(l.from)+l.months).reduce((n,l)=>n+cents(l.monthly),0)/100;}
-export function loansValid(p){return p.loans===undefined||Array.isArray(p.loans)&&p.loans.length<=20&&new Set(p.loans.map(l=>l?.id)).size===p.loans.length&&p.loans.every(l=>l&&typeof l.id==='string'&&l.id.length>0&&l.id.length<=100&&typeof l.name==='string'&&l.name.trim()&&l.name.length<=80&&moneyOk(l.monthly)&&l.monthly>0&&cents(l.monthly)/100===l.monthly&&monthOk(l.from)&&Number.isInteger(l.months)&&l.months>=1&&l.months<=120&&indexMonth(l.from)-indexMonth(p.startMonth)+l.months<=120);}
+// Payment evidence stays attached to its loan; a source undo removes its contribution by lookup.
+export const loanMatchText=value=>String(value??'').normalize('NFKC').replace(/[״׳"']/g,'').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+export function loanRepaymentsValid(loan){
+ const r=loan.repayments;if(r===undefined)return true;
+ const refs=v=>Array.isArray(v)&&v.length<=240&&new Set(v.map(x=>x?.key)).size===v.length&&v.every(x=>x&&Object.keys(x).sort().join(',')==='accountId,fingerprint,key'&&typeof x.accountId==='string'&&x.accountId.length>0&&x.accountId.length<=100&&/^[a-f0-9]{64}$/.test(x.key)&&/^[a-f0-9]{64}$/.test(x.fingerprint));
+ if(!r||r.version!==1||Object.keys(r).some(k=>!['version','keys','ignored','rule'].includes(k))||!refs(r.keys)||r.ignored!==undefined&&!refs(r.ignored))return false;
+ if(r.ignored?.some(x=>r.keys.some(k=>k.key===x.key)))return false;
+ const rule=r.rule;return rule===undefined||rule&&Object.keys(rule).sort().join(',')==='accountId,action,amountCents,beneficiary'&&typeof rule.accountId==='string'&&rule.accountId.length>0&&rule.accountId.length<=100&&['action','beneficiary'].every(k=>typeof rule[k]==='string'&&rule[k].length<=2000)&&!!(loanMatchText(rule.action)||loanMatchText(rule.beneficiary))&&Number.isSafeInteger(rule.amountCents)&&rule.amountCents>0&&rule.amountCents<=10000000000;
+}
+export function loansValid(p){
+ if(p.loans===undefined)return true;
+ if(!Array.isArray(p.loans)||p.loans.length>20||new Set(p.loans.map(l=>l?.id)).size!==p.loans.length)return false;
+ if(!p.loans.every(l=>l&&typeof l.id==='string'&&l.id.length>0&&l.id.length<=100&&typeof l.name==='string'&&l.name.trim()&&l.name.length<=80&&moneyOk(l.monthly)&&l.monthly>0&&cents(l.monthly)/100===l.monthly&&monthOk(l.from)&&Number.isInteger(l.months)&&l.months>=1&&l.months<=120&&indexMonth(l.from)-indexMonth(p.startMonth)+l.months<=120&&loanRepaymentsValid(l)))return false;
+ const keys=p.loans.flatMap(l=>l.repayments?.keys??[]).map(x=>x.key);return new Set(keys).size===keys.length;
+}
+export function loanBankMatch(p,accountId,row){
+ const amount=row.amountCents,date=row.date,ref=r=>r.key===row.key&&r.fingerprint===row.fingerprint&&r.accountId===accountId;
+ const explicit=(p.loans??[]).filter(l=>l.repayments?.keys.some(ref));
+ if(explicit.length)return {loanId:explicit.length===1?explicit[0].id:null,ambiguous:explicit.length>1};
+ const matches=(p.loans??[]).filter(l=>{const rule=l.repayments?.rule;return rule&&cashAssignedItem(p,l)===accountId&&rule.accountId===accountId&&amount<0&&!row.reversal&&-amount===rule.amountCents&&typeof date==='string'&&date.slice(0,7)>=l.from&&indexMonth(date.slice(0,7))<indexMonth(l.from)+l.months&&loanMatchText(row.description)===loanMatchText(rule.action)&&loanMatchText(row.beneficiary)===loanMatchText(rule.beneficiary)&&!l.repayments?.ignored?.some(ref)});
+ return {loanId:matches.length===1?matches[0].id:null,ambiguous:matches.length>1};
+}
+export function loanPaymentEvidence(p,id){
+ const loan=p.loans?.find(l=>l.id===id);if(!loan)throw Error('ההלוואה אינה זמינה במרחב הזה.');
+ const refs=new Map((loan.repayments?.keys??[]).map(r=>[r.key,r])),rows=(p.bankImport?.entries??[]).filter(e=>refs.get(e.key)?.fingerprint===e.fingerprint&&refs.get(e.key)?.accountId===e.accountId&&e.field==='loanRepayment'&&e.source);
+ const totalCents=cents(loan.monthly)*loan.months,paidCents=rows.reduce((n,e)=>n-e.cents,0);
+ return {rows:clone(rows),totalCents,paidCents,remainingCents:Math.max(0,totalCents-paidCents),extraCents:Math.max(0,paidCents-totalCents)};
+}
 export function setLoan(p,loan){
+ const previous=p.loans?.find(l=>l.id===loan.id);if(previous?.repayments&&loan.repayments===undefined)loan={...loan,repayments:clone(previous.repayments)};
  if(cashAccountList(p).length>1&&!cashAssignedItem(p,loan))throw Error('בחר את החשבון שממנו נגבית ההלוואה.');
  const next=clone(p);next.loans=[...(p.loans??[]).filter(l=>l.id!==loan.id),loan];
  if(!loansValid(next))throw Error('יש להזין שם, החזר חודשי ומספר חודשים תקינים בתוך תקופת התכנון.');

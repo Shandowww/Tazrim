@@ -1,20 +1,21 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "dda2da052f8f568f70945f06e72f84c35a975ed4",
+  "sourceCommit": "a7dfb54e3606627c7afaa67e0f8d7f6961e849e3",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Application7ecacc0 is verified live on the existing Hetzner service. The bank wallet front now shows combined reported balances for the selected scope/period with signed cents, zero/missing distinctions, partial coverage and reporting dates. Individual account rows remain visible. Original filling goal paintings/library and first-repayment full loan terms remain live. Build/typecheck,1097 regressions and15 core checks pass; synthetic320/390px full/zero/partial/missing states, Light/Dark and1440px checks used zero PUTs and left all test revisions unchanged. Fresh verified backup and isolated financial/all-record/access/HTTP/source-decryption preflight and rollback preceded activation. Runtime hashes/health/auth/deep routes verified; authoritative records/settings/keys/parking unchanged. No financial mutation, provider consent, resource upgrade or Sites publication. Sites is retired; actual hosted deletion unavailable. Existing real-device/platform/provider limitations remain. Independent upstream history and MIT/OFL notices preserved.",
+  "status": "Applicationcd0ee85 is verified live on the existing Hetzner server. Specific-loan bank-payment evidence, original-import exact future matching, planned-total progress, refunds/unlink/stop and protected historical expense reclassification are implemented without principal/interest calculations or term changes. Source key/fingerprint/account bindings prevent double attribution; original loan edits and historical payer evidence are preserved. Bare-root home-screen launch now redirects without caching to /next; manifest ID/scope stay stable and explicit original-interface login destinations remain available. Earlier bank wallet totals and filling goal paintings/library remain live. Build/typecheck,1108 regressions and15 core checks pass, including actual CSV atomic lost-commit recovery, encrypted metadata, undo/reimport and actor/viewer isolation. Bounded synthetic320/390/1440px Light/Dark/draft/uncertain-action/one-PUT/root-launch checks passed. Fresh verified backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation. Runtime hashes/health/auth/root/manifest verified; authoritative records/settings/keys/parking unchanged. No production financial edits, provider consent or resource upgrade. Real-device/platform/provider limits remain; later rollback must preserve binding/matching compatibility. Sites is retired; hosted deletion unavailable. Independent upstream history and MIT/OFL notices retained.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1097,
-    "browser": "Synthetic full/zero/partial/missing balances at320/390px, Light/Dark and1440px; individual rows visible; zero PUTs and unchanged test private/shared revisions. No new real-iPhone claim.",
-    "production": "Application7ecacc0 verified active after fresh backup/isolated preflight/rollback. Runtime hashes match; authoritative records/settings/keys/parking unchanged.",
-    "evidence": "docs/tazrim-migration/release-bank-summary-2026-11-01.json"
+    "regressionTests": 1108,
+    "browser": "Bounded synthetic320/390/1440px Light/Dark, protected selection/draft/uncertain-save recovery, one PUT, unchanged expense/net, viewer scope/refusal and root launch. No new real-iPhone OS claim.",
+    "atomicReports": "Actual CSV native preparation/original atomic commit with lost successful response recovered once; undo/reimport/refunds and encrypted metadata contracts pass.",
+    "production": "Applicationcd0ee85 verified active after fresh backup/isolated preflight/rollback. Runtime hashes match; auth/root/manifest pass and authoritative records/settings/keys/parking unchanged.",
+    "evidence": "docs/tazrim-migration/release-loan-payments-2026-11-01.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "7ecacc0964a41c05ac2b6abc846b4a387e9787dd"
+  "productionApplicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f"
 }
