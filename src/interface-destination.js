@@ -20,3 +20,16 @@ export function readLegacyInterfaceDestination(search){
 }
 
 export function legacyActionCenterHref(search,key=''){if(typeof key!=='string'||key.length>400||/[\u0000-\u001f\u007f]/.test(key))throw Error('מזהה הפעולה אינו תקין.');const query=new URLSearchParams(legacyInterfaceHref(search,'actions').slice(2));if(key)query.set('mf-action-key',key);return '/?'+query;}
+
+// Interface preference changes presentation only; every destination still authenticates normally.
+export function interfaceLayoutCookie(layout,secure=true){
+ if(!['original','tazrim'].includes(layout))throw Error('סגנון העיצוב אינו תקין.');
+ return 'budgit-interface='+layout+'; Path=/; Max-Age=31536000; SameSite=Lax'+(secure?'; Secure':'');
+}
+export function interfaceLayoutHref(layout,search){
+ if(layout==='original')return legacyInterfaceHref(search,'appearance');
+ if(layout!=='tazrim')throw Error('סגנון העיצוב אינו תקין.');
+ const current=new URLSearchParams(search),next=new URLSearchParams({budget:current.get('budget')||'personal'}),year=current.get('year'),month=current.get('month');
+ if(/^(?:19|2\d)\d{2}$/.test(year??'')){next.set('year',year);if(/^(?:0?[1-9]|1[0-2])$/.test(month??''))next.set('month',String(Number(month)));}
+ return '/next/settings?'+next;
+}

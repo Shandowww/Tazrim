@@ -1,0 +1,15 @@
+# Layout navigation, bell dismissal and hosted-copy audit — 2026-11-01
+
+The original appearance selector only changed a legacy CSS preference, while the newer interface lives at `/next`. A device-local layout choice now navigates between the actual original appearance page and native Settings, retaining budget/year/month and stripping unrelated/action parameters. Both Settings interfaces expose the choice. Original monthly/savings/detail/security/scenario/item/report/onboarding/save guards run before changing preference or leaving; native switching uses the existing draft registry. A bounded non-authentication cookie remembers the choice for the bare-root/home-screen launch. Explicit URLs remain authoritative. No financial write, API/auth shortcut, cross-origin redirect or shared user preference was added.
+
+The native bell's always-mounted dialog and ActionList now portal to document.body with explicit viewport centering. Header/Close stays outside the scrollable list, preserving badge polling, announcements, uncertain preference writes and draft registry lifetime. Close button, native Escape and an actual backdrop click dismiss it and restore trigger focus. The original action panel gets a sticky close header and backdrop dismissal too. Existing action models/save flows are reused, without a parallel state engine.
+
+Validation: build/typecheck,1,116 regressions and15 core checks pass. Added layout-route/cookie/auth and original unsaved-guard contracts. Synthetic browser verified both actual interfaces and return URLs, remembered original root launch, native Close/outside/Escape, an18-item list at390px with Close still80..124px after scrolling, and original Close. Alice/Bob financial revisions stay1 and browser audit has zero writes. Screenshot: canonical outputs/design-2026-11-01/bell-dismiss-phone.png. Physical iPhone remains unverified. Temporary preview stopped, tab closed and viewport reset.
+
+## Read-only hosted-copy audit
+
+- Existing server: exactly one running Budgit container, release11e9add at audit time. Other running containers are the parking app and shared Caddy proxy; neither is another Budgit instance. Rollback/candidate images and Git checkouts are not running app instances.
+- Connected Sites account: one owned active Site, `appgprj_6ac15fd9d7708191965b3d0d6f7ea72b`, URL https://monthly-flow-budget.t88s.chatgpt.site, version38, metadata last updated2026-10-11. This is an older independent hosted copy, with separate storage and no ongoing sync to the server. Earlier “retired” notes refer to publication policy; they did not establish hosted deletion. It is now accessible to this connected account.
+- Historical wife's project `appgprj_6ac140473ec48191b53d29bf6473f15b` returns NOT_FOUND to this connection. Its current existence/activity cannot be verified; do not count it as confirmed running or claim it was deleted.
+
+Thus two hosted Budgit copies are confirmed: the current server and the older active Site. This is an accessible/known-project audit, not a global inventory of other people's accounts. No Site, access audience, database, provider or parked application was changed by the audit.

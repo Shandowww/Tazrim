@@ -1,18 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "32a181b00d9657268bc2fd64ea6a57bac015c43b",
+  "sourceCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Application11e9add is verified live on the existing Hetzner server. All pending native wallet actions/logos/RTL/current-month/guarded pull-refresh and primary Goals-tab/one-goal-carousel changes are published. Exact build/typecheck,1113 regressions and15 core checks pass.378 previous-live source files matched; fresh verified SQLite backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation. Running source/HTML hashes, health/auth/deep routes/root/manifest verified; authoritative records/settings/keys/parking unchanged. Already-open pages may need browser reload/reopen. No hosting/resource upgrade, real-record edits or Sites changes. Physical iPhone/platform/provider limits remain. See release-ui-2026-11-01.json. Independent upstream history and notices retained.",
+  "status": "Layout-switch and bell-dismissal fix checkpoint prepared after live11e9add. Settings now switches between actual original/native interfaces, preserves scope/period and remembers root launch per device without bypassing auth. Bell dialogs retain mounted action/preference state and have visible Close, Escape and real backdrop dismissal. Build/typecheck,1116 regressions and15 core checks pass; synthetic round-trip/root and18-item390px dismissal checks pass with unchanged financial revisions. Read-only hosting audit confirms one Budgit server plus one old active Sites copy (v38,2026-10-11); historic wife project is inaccessible, not verified deleted. No Site/audience mutation. Publication preflight is running; this metadata does not yet claim this fix is live. Independent history and notices retained.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1113,
+    "regressionTests": 1116,
     "coreChecks": 15,
-    "release": "Application11e9add live, verified runtime hashes/health/auth/routes and preserved authoritative records; fresh backup/preflight/rollback complete.",
-    "browser": "Earlier bounded synthetic desktop/phone checks; physical iPhone touch remains unverified."
+    "browser": "Synthetic actual-interface roundtrip/root preference, desktop Close/outside/Escape,18-item390px list with visible sticky Close, original Close; zero financial writes."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f"
