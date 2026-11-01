@@ -1,20 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "a7dfb54e3606627c7afaa67e0f8d7f6961e849e3",
+  "sourceCommit": "956f9b99077a148ded68fcee7b6c026c59388630",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Applicationcd0ee85 is verified live on the existing Hetzner server. Specific-loan bank-payment evidence, original-import exact future matching, planned-total progress, refunds/unlink/stop and protected historical expense reclassification are implemented without principal/interest calculations or term changes. Source key/fingerprint/account bindings prevent double attribution; original loan edits and historical payer evidence are preserved. Bare-root home-screen launch now redirects without caching to /next; manifest ID/scope stay stable and explicit original-interface login destinations remain available. Earlier bank wallet totals and filling goal paintings/library remain live. Build/typecheck,1108 regressions and15 core checks pass, including actual CSV atomic lost-commit recovery, encrypted metadata, undo/reimport and actor/viewer isolation. Bounded synthetic320/390/1440px Light/Dark/draft/uncertain-action/one-PUT/root-launch checks passed. Fresh verified backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation. Runtime hashes/health/auth/root/manifest verified; authoritative records/settings/keys/parking unchanged. No production financial edits, provider consent or resource upgrade. Real-device/platform/provider limits remain; later rollback must preserve binding/matching compatibility. Sites is retired; hosted deletion unavailable. Independent upstream history and MIT/OFL notices retained.",
+  "status": "Native wallet action/navigation checkpoint, not yet deployed. Existing bank/card editors, monthly reports, payer, billing/no-activity, stop estimates, reports/history and detail reads are reachable directly from wallet action groups. Dashboard uses native workflows; optional previous-interface links remain collapsed in Settings. Actual React interface also receives current-month launch, more accessible guarded pull refresh, bank RTL alignment and local official provider logos. Existing financial models, saves and permissions retained. Exact build/typecheck,1113 regressions and15 core checks pass; final17 focused contracts pass after viewer-empty-state/bank-label adjustments. Synthetic desktop/390px owner/card-edit/payer/monthly/draft/viewer/no-overflow/logo checks made zero financial writes; Alice/Bob revisions unchanged. Real-iPhone touch/full-device parity not claimed. Production stays at prior verified release; publication requires existing backup/preflight/rollback/runtime gates. See native-wallet-actions-2026-11-01.md. Independent upstream history and MIT/OFL notices retained.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
+    "regressionTests": 1113,
     "coreChecks": 15,
-    "regressionTests": 1108,
-    "browser": "Bounded synthetic320/390/1440px Light/Dark, protected selection/draft/uncertain-save recovery, one PUT, unchanged expense/net, viewer scope/refusal and root launch. No new real-iPhone OS claim.",
-    "atomicReports": "Actual CSV native preparation/original atomic commit with lost successful response recovered once; undo/reimport/refunds and encrypted metadata contracts pass.",
-    "production": "Applicationcd0ee85 verified active after fresh backup/isolated preflight/rollback. Runtime hashes match; auth/root/manifest pass and authoritative records/settings/keys/parking unchanged.",
-    "evidence": "docs/tazrim-migration/release-loan-payments-2026-11-01.json"
+    "browser": "Bounded synthetic owner/shared viewer/native editor/dirty navigation/390px checks; zero financial writes; actual device touch unverified."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f"

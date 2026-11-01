@@ -1,3 +1,4 @@
+import {ProviderLogo,hasProviderLogo} from './provider-logo'
 'use client'
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
@@ -230,7 +231,7 @@ export function PaymentCard({
           <p className={cn('acct-card__name', !name.trim() && 'is-placeholder')} dir="auto">
             {shownName}
           </p>
-          {wordmark && (
+          {hasProviderLogo(provider)?<ProviderLogo provider={provider}/>:wordmark && (
             <span key={providerKey(provider)} className={cn('acct-card__wordmark', !knownIssuer && 'is-label', live && 'acct-swap')} dir="auto">
               {wordmark}
             </span>
@@ -435,6 +436,7 @@ export function BankElement({
       {face.glass && <GlassSurface baked={glassBaked} />}
       <div className="acct-bank__band">
         {!face.glass && <Material />}
+        {hasProviderLogo(provider)&&<ProviderLogo provider={provider}/>}
         {bank && bank !== shownName && <p className="acct-bank__bank">{bank}</p>}
         <p className={cn('acct-bank__name', !name.trim() && 'is-placeholder')}>
           <bdi>{shownName}</bdi>

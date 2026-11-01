@@ -1,3 +1,4 @@
+import {openingViewSearch} from './app/navigation-query'
 import {SessionControls} from './app/session-controls'
 import {GlobalActionCenter} from './app/global-action-center'
 const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-access-page')).AdminAccessPage }))
@@ -142,7 +143,7 @@ function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<t
         <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={view.bankSummary} maxSummary={view.cardSummary} cardsName="כרטיס" selectedMonth={month ? Number(month) : undefined} /></Suspense>
         <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={view.cardSummary} selectedMonth={month ? Number(month) : undefined} /></Suspense></div>
       </> : <section className="surface rounded-xl p-6">אין נתוני אמת לתקופה זו. תחזיות וסכומי ברירת מחדל אינם מוצגים כדיווח.</section>}
-      <section className="surface rounded-xl p-6 text-sm text-muted-foreground">תצוגה לקריאה בלבד. <a className="text-primary underline" href={editorHref}>עריכה בממשק הקיים</a></section>
+      <section className="surface rounded-xl p-5"><h2 className="mb-3 font-semibold">עדכונים וניהול</h2><nav aria-label="פעולות התקציב" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{[['/upload','דוחות ומקורות'],['/monthly','עדכון החודש'],['/banks','חשבונות בנק'],['/cards','כרטיסי אשראי'],['/plans','הוצאות מתוכננות'],['/loans','הלוואות'],['/savings','חיסכון ומטרות'],['/settings','כל ההגדרות']].map(([path,label])=><Link key={path} href={withViewQuery(path,locationSearch)} className="flex min-h-12 items-center rounded-xl border px-4 py-3 text-sm text-primary">{label}</Link>)}</nav></section>
     </div>
   }
   return (
@@ -300,5 +301,7 @@ function App() {
   )
 }
 
+const openingSearch=openingViewSearch(window.location.search,jerusalemMonth())
+if(openingSearch!==window.location.search.slice(1))window.history.replaceState(window.history.state,'',window.location.pathname+(openingSearch?'?'+openingSearch:'')+window.location.hash)
 const router = createBrowserRouter([{path:'*',element:<DraftGuardProvider><App /></DraftGuardProvider>}],{basename:'/next'})
 createRoot(document.getElementById('root')!).render(<StrictMode><RouterProvider router={router} /></StrictMode>)

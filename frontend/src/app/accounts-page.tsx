@@ -2,7 +2,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import Link from './link'
 import { BankSummaryRow, CardSummaryRow } from '../tazrim/components/accounts/account-cards'
 import { CardWallet, CardHeroTotal, BankHeroBalance, CardStackTotal } from '../tazrim/components/cards/card-wallet'
-import { legacyBudgetHref } from './navigation-query'
+import { accountWorkflows } from './account-workflows'
 import { buildNavSections } from '../tazrim/lib/nav/state'
 import { usePeriodHref } from '../tazrim/components/layout/period-context'
 import { demoAccounts } from './demo-fixture'
@@ -23,12 +23,12 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
   const { search, state } = useLocation()
   const { id } = useParams()
   const periodHref = usePeriodHref()
-  const editorHref = legacyBudgetHref(search)
+  const readOnly = !fixture && budget.status === 'ready' && budget.spaces.find(space => space.id === budget.budgetId)?.role === 'viewer'
   const title = kind === 'banks' ? 'בנקים' : 'כרטיסי אשראי'
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען נתונים…</section>
-  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <a href={editorHref} className="text-primary underline">פתיחת הממשק הקיים</a></section>
-  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <a href={editorHref} className="text-primary underline">הגדרת תקציב</a></section>
-  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <a href={editorHref} className="text-primary underline">פתיחה מאובטחת בממשק הקיים</a></section>
+  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <button type="button" className="min-h-11 text-primary underline" onClick={budget.refresh}>ניסיון חוזר</button></section>
+  if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <Link href={periodHref('/start')} className="min-h-11 text-primary underline">הגדרת תקציב</Link></section>
+  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <Link href={periodHref('/settings/security')} className="min-h-11 text-primary underline">פתיחת התקציב</Link></section>
 
   let overview: ReturnType<typeof budgetAccountOverview>
   try {
@@ -37,7 +37,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       cards: demoAccounts.filter(account => account.kind === 'CREDIT_CARD').map(account => ({ ...account, total: 4280, reportedMonths: 1 })),
     } : budgetAccountOverview(budget.status === 'ready' ? budget.value.plan : null, currentPeriod(search))
   } catch {
-    return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני החשבונות. <a href={editorHref} className="text-primary underline">פתיחת הממשק הקיים</a></section>
+    return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני החשבונות. <button type="button" className="min-h-11 text-primary underline" onClick={budget.refresh}>ניסיון חוזר</button></section>
   }
   const navigation = buildNavSections(fixture ? demoAccounts : [...overview.banks, ...overview.cards])
   const accountRows = kind === 'banks' ? overview.banks : overview.cards
@@ -65,7 +65,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
     <div className="wallet-shell__beside space-y-5">
     {accountRows.length === 0 ? <section className="surface rounded-xl p-6">
       <p className="font-medium">{kind === 'banks' ? 'עדיין לא הוגדרו חשבונות בנק בתקציב הזה.' : 'עדיין לא הוגדרו כרטיסי אשראי בתקציב הזה.'}</p>
-      <a href={editorHref} className="mt-3 inline-block text-primary underline">הגדרה בממשק הקיים</a>
+      {!readOnly&&<Link href={periodHref(kind==='banks'?'/accounts/new':'/card-setup/new')} className="mt-3 inline-flex min-h-11 items-center text-primary underline">{kind==='banks'?'הוספת חשבון':'הוספת כרטיס'}</Link>}
     </section> : <section className="surface overflow-hidden rounded-xl">
       <ul className="divide-y divide-border">
         {accountRows.filter(account => !id || account.id === id).map(account => {
@@ -76,16 +76,23 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
       </ul>
     </section>}
     {selected && <p className="text-sm text-muted-foreground">{kind === 'banks' && 'balance' in selected && selected.balance ? `יתרה מדווחת לתאריך ${selected.balance.date} · ` : ''}הסכומים מוצגים לתקופה שנבחרה בכותרת.</p>}
-    {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/no-activity')}>חודש ללא פעילות · אישור וביטול</Link></p>}
-    {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/payer')}>שיוך חשבון משלם</Link></p>}
-    {selected && kind === 'cards' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/cards/'+encodeURIComponent(selected.id)+'/billing')}>עדכון סך החיוב הרשמי</Link></p>}
-    {kind === 'cards' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/card-setup')}>הגדרת כרטיסים</Link></p>}
-    {selected && kind === 'banks' && !fixture && <p className="text-sm"><Link className="inline-flex min-h-11 items-center text-primary underline" href={periodHref('/accounts/'+encodeURIComponent(selected.id)+'/assign-remainder')}>שיוך הסכומים החודשיים ללא חשבון</Link></p>}
-    {kind === 'banks' && !fixture && <p className="text-sm"><Link className="inline-flex min-h-11 items-center text-primary underline" href={periodHref('/accounts/transfers'+(selected?'?account='+encodeURIComponent(selected.id):''))}>העברות בתכנון בין החשבונות</Link></p>}
-    {kind === 'banks' && !fixture && budget.status === 'ready' && <p className="text-sm"><Link className="me-4 inline-flex min-h-11 items-center text-primary underline" href={periodHref('/accounts/assignments')}>שיוך כרטיסים והתחייבויות</Link><Link className="text-primary underline" href={periodHref(selected?'/accounts/'+encodeURIComponent(selected.id)+'/edit':'/accounts/new')}>{selected?'עריכת חשבון':'הוספת חשבון ידני'}</Link></p>}
-    {selected && kind === 'banks' && !fixture && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/accounts/'+encodeURIComponent(selected.id)+'/monthly')}>דיווח חודשי לחשבון</Link></p>}
-    {selected && <p className="text-sm"><Link className="text-primary underline" href={periodHref('/categories?' + new URLSearchParams(kind === 'cards' ? { card: fixture ? 'card1' : selected.id } : { account: selected.id }))}>פתיחת הפירוט השמור {kind === 'cards' ? 'של הכרטיס' : 'של החשבון'}</Link></p>}
     </div>
-    <section className="wallet-shell__rest surface rounded-xl p-5 text-sm text-muted-foreground">{fixture ? 'נתוני דוגמה בלבד. אין עריכה או שמירה של נתונים בדוגמה.' : <>הסיכום מציג נתונים שמורים. <a href={editorHref} className="text-primary underline">עריכה ופרטים נוספים בממשק הקיים</a></>}</section>
+    <section className="wallet-shell__rest space-y-5" aria-label="פעולות וניהול">
+      {fixture ? <p className="surface rounded-xl p-5 text-sm text-muted-foreground">נתוני דוגמה בלבד. אין עריכה או שמירה של נתונים בדוגמה.</p> : <>
+        {readOnly && <p className="surface rounded-xl p-4 text-sm">התקציב פתוח לצפייה בלבד. אפשר לעיין בפירוט ובדוחות השמורים.</p>}
+        <section className="surface rounded-xl p-5">
+          <h2 className="mb-3 font-semibold">{kind==='cards'?'ניהול הכרטיסים והדוחות':'ניהול החשבונות והדוחות'}</h2>
+          <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" aria-label="פעולות כלליות">
+            {accountWorkflows(kind,'',readOnly).map(action=><Link key={action.href} href={periodHref(action.href)} className="flex min-h-12 items-center rounded-xl border px-4 py-3 text-sm text-primary">{action.label}</Link>)}
+          </nav>
+        </section>
+        {accountRows.filter(account=>!id||account.id===id).map(account=><details key={account.id} open={id?true:undefined} className="surface rounded-xl p-5">
+          <summary className="min-h-11 cursor-pointer py-2 font-semibold"><bdi>{account.displayName}</bdi> · פעולות ופרטים</summary>
+          <nav className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3" aria-label={'פעולות עבור '+account.displayName}>
+            {accountWorkflows(kind,account.id,readOnly).map(action=><Link key={action.href} href={periodHref(action.href)} className="flex min-h-12 items-center rounded-xl border px-4 py-3 text-sm text-primary">{action.label}</Link>)}
+          </nav>
+        </details>)}
+      </>}
+    </section>
   </CardWallet>
 }

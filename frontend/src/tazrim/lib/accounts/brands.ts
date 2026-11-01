@@ -115,6 +115,7 @@ export const PROVIDER_LABELS: Record<string, string> = {
   isracard: 'ישראכרט',
   amex: 'אמריקן אקספרס',
   hitech: 'הייטקזון',
+  'one-zero': 'ONE ZERO',
 }
 
 export function providerLabel(provider: string): string {
