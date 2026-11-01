@@ -1,5 +1,11 @@
 # Current continuation — authenticated React rollout is live — 2026-11-01
 
+## Pending UI bundle published — 2026-11-01
+
+Verified application `11e9add` is live at https://budgit.duckdns.org/next. Native bank/card actions, local provider logos, bank RTL alignment, current-month launch, improved guarded pull refresh, the primary Goals tab and original-style one-goal carousel are published together. Recurring expenses remain under More/sidebar. Exact build/typecheck,1,113 regressions and15 core checks pass.378 previous-live source files matched; fresh verified SQLite backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation. Running hashes/health/auth/deep routes/root/manifest passed; authoritative records/settings/keys/parking unchanged. No production financial edits, paid resource upgrade or Sites change. Physical iPhone/provider limits remain. Already-open pages may need browser reload/reopen. Evidence: docs/tazrim-migration/release-ui-2026-11-01.json.
+
+Current application source is branch `codex/tazrim-react-frontend`, managed checkout `/Users/talshandor/.codex/worktrees/tazrim-react-frontend/monthly-flow`, with the matching independent tracked-source Tazrim export. Older unrelated canonical theme/shortcut WIP is preserved; do not deploy the older canonical working tree over this release. Earlier “not published” notes for the two pending UI checkpoints are superseded by this verified release.
+
 ## Specific-loan repayments and native home-screen launch live — 2026-11-01
 
 Verified application `cd0ee85` is live on the existing Hetzner server. `/next/loans` now connects bank-payment evidence to individual loans and recognizes exact future matches in the original atomic import flow, with refunds/unlink/stop, signed-cent progress against the planned total and protected historical reclassification. No principal/interest calculation or silent term change. Original loan edits retain evidence, payer changes retain historical payments, ambiguous/changed matches require review, and viewers remain read-only. Bare-root GET/HEAD now redirects without caching to `/next`; manifest ID/scope stay stable while start URL/native metadata and explicit legacy login return are corrected. Existing query-bearing original-interface bridges remain.

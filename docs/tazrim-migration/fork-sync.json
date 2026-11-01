@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "11e9add0b541cd24879930b28ffd71e007941008",
+  "sourceCommit": "32a181b00d9657268bc2fd64ea6a57bac015c43b",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Goals are now a primary mobile tab instead of recurring expenses, which remain in More/sidebar. Original one-goal browsing is restored with filling artwork, wrapped arrows, dots, RTL pointer swipe and keyboard arrows; existing savings math and guarded native goal actions are unchanged. Build/typecheck,31 savings/art regressions and15 core checks pass for this presentation checkpoint; previous full1113-regression evidence remains documented. Synthetic390px/desktop selection, correct goal actions, primary-tab highlight, More recurring navigation, no-overflow and zero-financial-write checks passed. Physical iPhone touch remains unverified. Native wallet actions from the preceding checkpoint remain. This checkpoint is not deployed; existing production/release gates remain. Independent upstream history and notices retained.",
+  "status": "Application11e9add is verified live on the existing Hetzner server. All pending native wallet actions/logos/RTL/current-month/guarded pull-refresh and primary Goals-tab/one-goal-carousel changes are published. Exact build/typecheck,1113 regressions and15 core checks pass.378 previous-live source files matched; fresh verified SQLite backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation. Running source/HTML hashes, health/auth/deep routes/root/manifest verified; authoritative records/settings/keys/parking unchanged. Already-open pages may need browser reload/reopen. No hosting/resource upgrade, real-record edits or Sites changes. Physical iPhone/platform/provider limits remain. See release-ui-2026-11-01.json. Independent upstream history and notices retained.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
+    "regressionTests": 1113,
     "coreChecks": 15,
-    "focusedSavingsTests": 31,
-    "priorFullRegressionTests": 1113,
-    "browser": "One displayed goal, arrows/dots/keyboard/RTL pointer drag, main-tab active state, recurring in More, phone/desktop no overflow, zero financial writes. Physical iPhone touch unverified."
+    "release": "Application11e9add live, verified runtime hashes/health/auth/routes and preserved authoritative records; fresh backup/preflight/rollback complete.",
+    "browser": "Earlier bounded synthetic desktop/phone checks; physical iPhone touch remains unverified."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f"

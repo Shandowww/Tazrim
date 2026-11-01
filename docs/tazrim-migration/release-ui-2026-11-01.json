@@ -1,0 +1,48 @@
+{
+  "releasedAtDate": "2026-11-01",
+  "applicationCommit": "11e9add0b541cd24879930b28ffd71e007941008",
+  "previousCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f",
+  "entry": "https://budgit.duckdns.org/next",
+  "runtimeImage": "sha256:baa2d50105b57eb0d0dcded051c62ba54a693849bb52e510e8e0e5256339c81b",
+  "sourceArchiveSha256": "a292b3526c5085ce177d8c10e9d7af661f8e9133d28a2bb39337e0d4368ee450",
+  "changes": [
+    "Native bank/card action areas and dashboard workflow navigation",
+    "Local bank/card issuer logos and right-aligned bank names",
+    "Current Jerusalem month on fresh launch and wider/shorter guarded pull-refresh gesture",
+    "Primary Goals tab instead of recurring expenses; recurring retained in More/sidebar",
+    "One-goal savings carousel with filling artwork, arrows, dots and RTL pointer/keyboard navigation"
+  ],
+  "validation": {
+    "exactBuildAndTypecheck": "passed",
+    "regressions": 1113,
+    "coreChecks": 15,
+    "previousLiveSourceFilesVerified": 378,
+    "freshVerifiedSQLiteBackup": true,
+    "isolatedFinancialAccessHTTPAllRecordPreservation": true,
+    "storedEncryptedSourcesVerified": true,
+    "rollbackSourceAndImagePrepared": true,
+    "runtimeHashesMatchedTestedBuild": true,
+    "healthy": true,
+    "loginConfigured": true,
+    "anonymousAndForgedDenied": true,
+    "deepRoutesNoStore": true,
+    "homeScreenRootRedirect": true,
+    "manifestStartsNative": true,
+    "explicitLegacyEntryRetained": true,
+    "authoritativeRecordsUnchanged": true,
+    "settingsAndKeysUnchanged": true,
+    "parkingUnchanged": true
+  },
+  "runtimeHashes": {
+    "server/app.mjs": "ca15398008d97094c273e53800035bd218619f10dc9dbf777298d1e9b0f234ea",
+    "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+    "dist/index.html": "bea57c2b6a94f009ab60e69b0aa376060a98c47bd52dfafb680db834077a046e",
+    "dist/frontend/index.html": "af38a0f9b6ab031979b222918c02a2259605a6f7ef3937a3140997e5b86f39cd"
+  },
+  "limits": [
+    "Physical iPhone touch and platform/provider acceptance are not inferred from desktop/mobile-layout checks.",
+    "An already-open app may require a browser reload or close/reopen to retrieve the new UI.",
+    "Older unrelated canonical theme/shortcut WIP was preserved; release used the current tracked React source.",
+    "Existing recurring, original-interface compatibility and financial behavior remain; no hosting/resource upgrade or Sites change."
+  ]
+}
