@@ -6,7 +6,7 @@ import { legacyBudgetHref } from './navigation-query'
 import { buildNavSections } from '../tazrim/lib/nav/state'
 import { usePeriodHref } from '../tazrim/components/layout/period-context'
 import { demoAccounts } from './demo-fixture'
-import { budgetAccountOverview } from './budget-adapter'
+import { budgetAccountOverview, summarizeBankBalances } from './budget-adapter'
 import type { useBudget } from './use-budget'
 
 function currentPeriod(search: string) {
@@ -48,7 +48,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
   const walletCards = accountRows.map(account => ({ id: account.id, path: navRows.find(row => row.id === account.id)!.href,
     provider: account.provider, name: account.displayName, lastFour: account.cardLastFour, network: account.cardNetwork,
     color: navRows.find(row => row.id === account.id)!.color, colorChoice: account.color, archived: false }))
-  return <CardWallet key={kind + budget.budgetId} kind={kind} cards={walletCards}>
+  return <CardWallet key={kind + budget.budgetId} kind={kind} cards={walletCards} bankSummary={kind==='banks'?summarizeBankBalances(overview.banks):undefined}>
     <div className="wallet-shell__head">
     {!fixture && budget.status==='ready' && typeof state?.setupSavedMessage==='string' && state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId && <p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
     <div className="flex flex-wrap items-center justify-between gap-3">

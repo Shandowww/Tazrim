@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { clone, demoPlan, zero } from '../src/budget.js'
-import { budgetAccountOverview, budgetDashboard, budgetNavigation } from '../frontend/src/app/budget-adapter.js'
+import { clone, demoPlan, zero, validatePlan } from '../src/budget.js'
+import { budgetAccountOverview, budgetDashboard, budgetNavigation, summarizeBankBalances } from '../frontend/src/app/budget-adapter.js'
 import { withViewQuery, legacyBudgetHref } from '../frontend/src/app/navigation-query.js'
 
 test('React summary keeps consumption, card breakdown and full net distinct', () => {
@@ -87,4 +87,20 @@ test('Card faces reuse only an explicit four-digit alias, never infer card numbe
   const before = JSON.stringify(plan)
   assert.deepEqual(budgetNavigation(plan).filter(account => account.kind === 'CREDIT_CARD').map(account => account.cardLastFour), ['1234', null])
   assert.equal(JSON.stringify(plan), before)
+})
+
+
+test('Bank wallet totals preserve cents and negative balances, distinguish missing readings from zero and disclose report dates',()=>{
+ const rows=[{id:'a',balance:{value:100.10,date:'2026-10-21'}},{id:'b',balance:{value:-50.03,date:'2026-10-25'}}],before=JSON.stringify(rows)
+ assert.deepEqual(summarizeBankBalances(rows),{value:50.07,reported:2,total:2,from:'2026-10-21',to:'2026-10-25'})
+ assert.deepEqual(summarizeBankBalances([{balance:{value:0,date:'2026-10-25'}},{balance:null}]),{value:0,reported:1,total:2,from:'2026-10-25',to:'2026-10-25'})
+ assert.equal(summarizeBankBalances([{balance:null}]).value,null);assert.equal(summarizeBankBalances([]).value,null);assert.equal(JSON.stringify(rows),before)
+})
+
+test('Bank wallet summary uses only actual scoped readings in the selected period, excluding estimates and future balances',()=>{
+ const plan=clone(demoPlan);plan.startMonth='2026-01';plan.expenses=[];plan.cashPlanning={accounts:[{id:'a',label:'A',buffer:0},{id:'b',label:'B',buffer:0}],months:{'2026-09':{a:{actual:true,values:zero(),includesPlannedCard:false,includesPlannedDirect:false,balance:999,date:'2026-09-30'}},'2026-10':{a:{actual:true,values:zero(),includesPlannedCard:false,includesPlannedDirect:false,balance:100.10,date:'2026-10-21'},b:{actual:false,values:zero(),includesPlannedCard:false,includesPlannedDirect:false,balance:5000,date:'2026-10-22'}},'2026-11':{a:{actual:true,values:zero(),includesPlannedCard:false,includesPlannedDirect:false,balance:888,date:'2026-11-01'}}},cardAccounts:{},transfers:[]}
+ assert.ok(validatePlan(plan));const before=JSON.stringify(plan),period={year:'2026',month:'10',asOf:'2026-10'}
+ assert.deepEqual(summarizeBankBalances(budgetAccountOverview(plan,period).banks),{value:100.10,reported:1,total:2,from:'2026-10-21',to:'2026-10-21'})
+ const other=clone(plan);other.cashPlanning.months['2026-10'].a.balance=0;assert.equal(summarizeBankBalances(budgetAccountOverview(other,period).banks).value,0)
+ assert.equal(summarizeBankBalances(budgetAccountOverview(plan,{...period,month:'12'}).banks).value,null);assert.equal(JSON.stringify(plan),before)
 })

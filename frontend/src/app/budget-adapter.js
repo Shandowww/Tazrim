@@ -54,3 +54,11 @@ export function budgetAccountOverview(plan, { year, month = '', asOf }) {
   })
   return { banks, cards }
 }
+
+/** Sum only the already scoped/period-filtered reported balance readings, in cents. */
+export function summarizeBankBalances(banks) {
+  const reported=banks.filter(bank=>bank.balance&&Number.isFinite(bank.balance.value))
+  const dates=reported.map(bank=>bank.balance.date).sort()
+  return {value:reported.length?reported.reduce((sum,bank)=>sum+Math.round(bank.balance.value*100),0)/100:null,
+    reported:reported.length,total:banks.length,from:dates[0]??null,to:dates.at(-1)??null}
+}

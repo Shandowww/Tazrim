@@ -1,8 +1,8 @@
 # Budgit adaptation of Tazrim
 
-> Current release2026-11-01: application c7f9608 is live at https://budgit.duckdns.org/next on the existing Hetzner server. Filling goal paintings, visual illustration library and full loan terms from the first repayment month are restored. Sites is retired from publishing; actual hosted deletion was unavailable. The original interface remains available.
+> Current release2026-11-01: application7ecacc0 is verified live at https://budgit.duckdns.org/next/banks on the existing Hetzner server. The wallet front shows combined reported bank balances, coverage and reporting dates; individual account rows remain visible. Filling goal paintings/library and first-repayment full loan terms remain live. Sites is retired from publishing; actual hosted deletion was unavailable. The original root interface remains available.
 
-This branch contains the tracked-source snapshot of `Shandowww/monthly-flow-budget`, commit `76efdc28999480322670c9bce9e8aae82640c195`, including release evidence. It combines Budgit’s existing backend and financial rules with Tazrim’s React presentation. It contains no private Git history or financial records. Build/typecheck,1,095 regressions and15 core checks pass; real-device/platform/provider limitations remain documented. The original Tazrim application remains on this fork’s `main` branch. Preserve first-repayment validator compatibility in any later runtime rollback.
+This branch contains the tracked-source snapshot of `Shandowww/monthly-flow-budget`, commit `dda2da052f8f568f70945f06e72f84c35a975ed4`, including release evidence. It combines Budgit’s existing backend and financial rules with Tazrim’s React presentation. It contains no private Git history or financial records. Build/typecheck,1,097 regressions and15 core checks pass; existing real-device/platform/provider limitations remain documented. The original Tazrim application remains on this fork’s `main` branch.
 
 See [the implementation checkpoint](docs/tazrim-migration/checkpoint.md) and [source synchronization record](docs/tazrim-migration/fork-sync.json). Tazrim’s MIT license and Heebo’s license are retained.
 

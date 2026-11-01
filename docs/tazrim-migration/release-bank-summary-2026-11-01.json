@@ -1,0 +1,35 @@
+{
+  "releasedAtDate": "2026-11-01",
+  "applicationCommit": "7ecacc0964a41c05ac2b6abc846b4a387e9787dd",
+  "previousCommit": "c7f9608a5ec71ea08707c764f263ebc8ec385552",
+  "entry": "https://budgit.duckdns.org/next/banks",
+  "runtimeImage": "sha256:1c8db5dada71c22562b5c75cb9aa5199baf71682be2841f11e57cdbb5f63e7c2",
+  "change": "Bank wallet front shows combined reported balances, account coverage and report dates; individual account rows remain visible. No financial mutation.",
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressions": 1097,
+    "coreChecks": 15,
+    "browser": "Synthetic full/zero/partial/missing balances at320/390px, Light/Dark and1440px; visible individual balances; zero PUTs and unchanged synthetic private/shared revisions",
+    "freshVerifiedSQLiteBackup": "passed",
+    "isolatedFinancialAccessHTTPAllRecordPreservation": "passed",
+    "storedEncryptedSources": "verified offline",
+    "runtimeHashes": "matched local build",
+    "healthyAndLoginConfigured": true,
+    "anonymousAndForgedDenied": true,
+    "deepRoutesAndNoStore": true,
+    "authoritativeRecordsUnchanged": true,
+    "credentialsKeysProxyUnchanged": true,
+    "parkingUnchanged": true
+  },
+  "limits": [
+    "Sum of reported balances in the selected scope/period; not a live or available-to-spend allowance",
+    "Different dates and partial account coverage are disclosed",
+    "Existing real-device/platform/provider acceptance limits remain; no new real-iPhone claim"
+  ],
+  "runtimeHashes": {
+    "server/app.mjs": "31efcc00edd76e55a4b5503f8aae25a1da07146ba2e5c985255b579f2f653983",
+    "dist/server/budget.js": "b31e191e3681ec6f16a0d5a0ed76c908cca3430301648d09b0a9c479858f11fc",
+    "dist/index.html": "3f78027359f867a10813fb8901246ae26ec56cb3a44a032fd452bab7177ed18d",
+    "dist/frontend/index.html": "3b9698a160924d7b0e2a0f31b3b4e8711cf03b61ae6345be3cb53015a9e44d06"
+  }
+}

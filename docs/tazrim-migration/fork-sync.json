@@ -1,20 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "76efdc28999480322670c9bce9e8aae82640c195",
+  "sourceCommit": "dda2da052f8f568f70945f06e72f84c35a975ed4",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Application c7f9608 is live at the authenticated https://budgit.duckdns.org/next entry. Original filling goal paintings and the nine-picture visual library are restored in the Tazrim theme; loan first-repayment dates and full terms accept pre-budget starts without altering existing records. Exact source passes1095 regressions/build/typecheck/15 checks and bounded synthetic artwork/library/keyboard/draft/retry/phone/desktop/Light-Dark/viewer checks. Fresh verified backup and isolated financial/all-record/access/HTTP/encrypted-source preflight and rollback preceded activation. Runtime hashes/health/auth/deep routes and unchanged authoritative records/settings/keys/parking verified. Sites is retired from publishing; hosted deletion unavailable in the connected account. Original interface remains available. No production financial edits, provider consent or resource upgrades. Real-iPhone/touch/Face ID/PRF/provider limits remain explicit. Later rollback must retain pre-budget loan validation compatibility. Tracked-source export preserves independent upstream history and MIT/OFL notices.",
+  "status": "Application7ecacc0 is verified live on the existing Hetzner service. The bank wallet front now shows combined reported balances for the selected scope/period with signed cents, zero/missing distinctions, partial coverage and reporting dates. Individual account rows remain visible. Original filling goal paintings/library and first-repayment full loan terms remain live. Build/typecheck,1097 regressions and15 core checks pass; synthetic320/390px full/zero/partial/missing states, Light/Dark and1440px checks used zero PUTs and left all test revisions unchanged. Fresh verified backup and isolated financial/all-record/access/HTTP/source-decryption preflight and rollback preceded activation. Runtime hashes/health/auth/deep routes verified; authoritative records/settings/keys/parking unchanged. No financial mutation, provider consent, resource upgrade or Sites publication. Sites is retired; actual hosted deletion unavailable. Existing real-device/platform/provider limitations remain. Independent upstream history and MIT/OFL notices preserved.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1095,
-    "browser": "Bounded synthetic empty/partial/full paintings, nine-choice library, keyboard/draft guard, one-PUT lost-save recovery, checked320/390/1280/1440 widths and Light/Dark, historical first date save/reload and shared-viewer refusal. Real device/platform/provider limits remain.",
-    "production": "Application c7f9608 verified active on existing Hetzner after fresh backup/isolated preflight/rollback. Authoritative records/settings/keys/parking unchanged.",
-    "evidence": "docs/tazrim-migration/release-goals-loans-2026-11-01.json"
+    "regressionTests": 1097,
+    "browser": "Synthetic full/zero/partial/missing balances at320/390px, Light/Dark and1440px; individual rows visible; zero PUTs and unchanged test private/shared revisions. No new real-iPhone claim.",
+    "production": "Application7ecacc0 verified active after fresh backup/isolated preflight/rollback. Runtime hashes match; authoritative records/settings/keys/parking unchanged.",
+    "evidence": "docs/tazrim-migration/release-bank-summary-2026-11-01.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "c7f9608a5ec71ea08707c764f263ebc8ec385552"
+  "productionApplicationCommit": "7ecacc0964a41c05ac2b6abc846b4a387e9787dd"
 }

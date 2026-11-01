@@ -1,5 +1,7 @@
 'use client'
 
+import {BankWalletSummary,type BankBalanceSummary} from '../../../app/bank-wallet-summary'
+
 import {
   createContext,
   useContext,
@@ -302,10 +304,12 @@ export function CardStackTotal({ value }: { value: number }) {
 export function CardWallet({
   cards,
   kind = 'cards',
+  bankSummary,
   children,
 }: {
   cards: WalletCard[]
   kind?: WalletKind
+  bankSummary?: BankBalanceSummary
   children: ReactNode
 }) {
   const base = BASE[kind]
@@ -351,6 +355,7 @@ export function CardWallet({
             under it does not jump while the cards are already moving */}
         <Wallet
           kind={kind}
+          bankSummary={bankSummary}
           cards={cards}
           mode={visibleMode}
           heightMode={routeMode}
@@ -378,6 +383,7 @@ const boxKey = (kind: WalletMode['kind'], width: number) => `${kind}:${Math.roun
 
 function Wallet({
   kind,
+  bankSummary,
   cards,
   mode,
   heightMode,
@@ -388,6 +394,7 @@ function Wallet({
   setStackTotal,
 }: {
   kind: WalletKind
+  bankSummary?: BankBalanceSummary
   cards: WalletCard[]
   mode: WalletMode
   heightMode: WalletMode
@@ -632,12 +639,14 @@ function Wallet({
           >
             <div className="wallet-pocket__leather">
               <div className="wallet-pocket__body wallet-pocket__deboss">
+                {kind==='banks'&&bankSummary?<BankWalletSummary summary={bankSummary}/>:<>
                 <p className="wallet-pocket__label">{kind === 'banks' ? 'חשבונות הבנק' : stackTotal === null ? 'כרטיסי האשראי' : 'סה״כ חיובים בכל הכרטיסים'}</p>
                 {/* Hidden until the page gives the total; on the first visit it rolls up from 0, later from the last total */}
                 <p className="wallet-pocket__total wallet-pocket__totalwrap" data-visible={stackTotal !== null ? '' : undefined} aria-hidden={stackTotal === null}>
                   <span className="wallet-pocket__currency">₪</span>
                   <RollingNumber value={stackTotal ?? lastStackTotal} format="decimal" />
                 </p>
+                </>}
               </div>
               <div className="wallet-pocket__foot wallet-pocket__deboss">
                 <span className="wallet-pocket__chip">

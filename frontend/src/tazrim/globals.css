@@ -1380,3 +1380,7 @@ html[data-bg='ribbons'] body { background-size: 100% auto; background-repeat: re
 @media (prefers-reduced-motion: reduce) {
   .color-swatch__dot, .color-swatch::after { transition: none; }
 }
+
+/* The bank pocket reports the sum and its coverage, rather than only a count. */
+.wallet[data-kind='banks'] .wallet-pocket__balance-note{font-size:11px;line-height:1.4;color:#d6e3f5;overflow-wrap:anywhere;margin-top:4px}
+.wallet[data-kind='banks'] .wallet-pocket__total{font-size:clamp(20px,8cqw,38px);max-width:100%}

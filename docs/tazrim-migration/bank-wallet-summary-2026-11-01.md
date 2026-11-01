@@ -1,0 +1,9 @@
+# Bank wallet front summary
+
+The bank wallet front previously displayed only a title and account count, covering the individual cards without adding a financial figure. It now shows the combined reported balance for the selected budget and period. The existing individual balance list and account-detail navigation remain available below/beside the wallet. Credit-card totals and wallet motion are unchanged.
+
+The display sums the already scoped original account overview readings in integer cents, including negative and zero balances. Missing readings never become zero: partial sums show their account coverage; no readings show a dash and explicit missing-data text. Report dates are visible and different dates are disclosed. This is the sum of reported balances, not an available-to-spend allowance, live bank synchronization, income, a forecast or an additional financial record. Existing account-source selection and actual-only period filtering remain authoritative; no API writes or model mutations are introduced.
+
+Validation: build/typecheck;1,097 regressions and15 core checks. Meaningful regressions cover signed cents, zero versus missing, different report dates, plan immutability, actual-only selected-period scope, estimates and future balances. Synthetic phone checks at320/390px confirm full/partial/zero/no-reading states and no horizontal overflow; Light/Dark and1440px desktop checked. Synthetic full total is₪1,150.07 from₪1,200.10 and−₪50.03; each account remains readable below the wallet. No production records were edited during acceptance.
+
+Application7ecacc0 is verified live after the fresh-backup/isolated preflight/rollback gates. Runtime and record-preservation evidence: release-bank-summary-2026-11-01.json. Synthetic acceptance used zero financial PUTs; Alice/Bob/shared revisions stayed unchanged.
