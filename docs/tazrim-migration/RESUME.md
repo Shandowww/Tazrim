@@ -1,3 +1,11 @@
+# Current continuation — restored browser acceptance — 2026-11-01
+
+Exact source passes build/typecheck,1093 regressions and15 checks. Native same-file backup reselection after cancellation is repaired; long migration dependency/privacy identifiers wrap without document overflow. An old VM regression fixture now freezes selectedMonth together with todayMonth to prevent November host-date drift; product date rules unchanged.
+
+Drive browser download matches22 synthetic bytes exactly; lost schedule/run/disconnect results each recover without replay (one mock upload; financial rows unchanged). Logout Stay/discard/confirmed-save/Back and settings draft saved100→draft250.75 comparison/explicit restore pass. Larger migration paging passes for54 imported movements,56 savings allocations and84 covered-history routes; one explicit route survives paging with siblings blank. Migration audit: zero apply/undo/financial PUTs and unchanged source/target/Bob. Evidence/width caveats/download-tool stall: execution-status.md final entry. Browser is available, superseding disabled notes. No real Google/OAuth/iPhone/Face ID claim.
+
+Next: finish consolidated route/reference-size/theme/live OS reduced-motion/keyboard/touch/report/vault/download acceptance. Current-live server SSH still times out; fresh runtime/source/verified SQLite backup, isolated financial/access/HTTP preservation preflight and rollback/release verification remain mandatory. No production/Sites/real-record changes; Apple Pay excluded. All disposable services stopped, owned tabs closed and viewport reset. Earlier lists below are historical.
+
 # Current continuation — reduced-motion source follow-up — 2026-10-30
 
 Latest presentation follow-up adds targeted reduced-motion overrides for chart loading pulses, account/dashboard chevrons and navigation/confirmation press transforms. Build/typecheck/15 core checks pass and generated CSS verified. Prior1093 functional regressions from a8aa279 remain current; no data/command change. Drive/logout/preflight/inventory stage is backed up at a8aa279 (Tazrim5aa12a8). Public health and anonymous401 passed; SSH source access times out, browser disabled even after fresh session. No fresh browser/device/live-data preflight/release claim.

@@ -1,19 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "317f06c3ac3f90eeec7b07050cc6a2a094974b10",
+  "sourceCommit": "72f5e60ba5eabdca9155544ec13ee39bc84f3376",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Apple Pay excluded by Tal. Original Drive recovery guidance/mode resync and guarded fixed POST logout connected; original-feature inventory audited. Copy-only release preflight now hashes all pre-existing authoritative table columns/rows and verifies preservation across startup/restart without private output; synthetic corruption fails closed and leaves the supplied backup untouched.1093 regressions passed at a8aa279; latest presentation-only reduced-motion follow-up passes build/typecheck/15 core checks with targeted generated CSS rules verified. Prior bounded synthetic migration/Gmail/Drive browser evidence retained. New Drive download/logout/reduced-motion/device acceptance remains open because browser discovery/new-tab/fresh-session report disabled. Current-live SSH source check timed out; public health/access probes passed without credentials. Fresh verified SQLite backup, source reconciliation, isolated preflight, rollback and full release gates remain. No production/Sites/real-record/real Google changes. Exact current evidence and remaining work in RESUME.md, feature-parity.md and execution-status.md. Independent upstream history/notices preserved.",
+  "status": "Incomplete development preview; not deployed. Apple Pay excluded. Browser access restored: exact synthetic Drive download, lost schedule/run/disconnect recovery, logout Stay/discard/confirmed-save/Back, settings device-draft comparison/restoration and larger imported/savings history pagination accepted. Browser found and repaired same-file backup reselection and long dependency identifier overflow. Original models/services unchanged. A deterministic VM test clock now fixes selectedMonth alongside todayMonth. Exact build/typecheck,1093 regressions and15 checks pass. Migration pagination made zero financial writes and retained source/target/other-user data. SSH current-live source read still times out; full consolidated route/theme/OS reduced-motion/keyboard/touch/report/vault/real-device/authorization acceptance and fresh source/verified backup/isolated preflight/rollback/release gates remain. No production/Sites/real-record/real Google changes. Exact evidence and limitations: RESUME.md and execution-status.md. Independent upstream history and notices preserved.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
     "regressionTests": 1093,
-    "regressionSource": "a8aa279; remains current for subsequent CSS-class-only reduced-motion follow-up",
-    "browser": "Prior bounded synthetic evidence retained. Fresh browser tool discovery/new tab/fresh session reports disabled; no new Drive download/logout/reduced-motion/device acceptance.",
-    "production": "Read-only health and anonymous401 passed; SSH source check timed out. No deployment/live backup/live-data preflight."
+    "browser": "Bounded synthetic Drive/logout/settings draft and54-movement/56-allocation/84-history pagination pass. Imported narrow width433px due browser zoom; savings390px and1280px observed. Exact22-byte mock download verified, but browser download timeout was not honored. No real OAuth/phone/PRF/Face ID claim.",
+    "production": "SSH source check timed out; no fresh source/SQLite backup/live-data preflight or deployment."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported."
 }

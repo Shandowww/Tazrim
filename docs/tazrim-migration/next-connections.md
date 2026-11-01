@@ -80,3 +80,6 @@ Release preflight now verifies all pre-existing authoritative table columns/rows
 
 
 Targeted reduced-motion source fixes now disable loading pulses and small hover/press transforms under the OS preference; build/typecheck/15 checks and generated rules verified. Browser/OS-change acceptance remains open; no new financial code.
+
+
+2026-11-01 superseding acceptance: repaired Drive guidance/mode clearing and exact22-byte synthetic browser download now pass; original guarded logout and settings device-draft comparison/restoration pass. Larger54-movement/56-allocation/84-history paging and explicit route retention pass, with zero migration writes. Narrow identifier overflow and same-file import reselection found/repaired in browser. Exact1093 regressions/build/typecheck/15 checks pass. Consolidated route/theme/live OS reduced-motion/reference/device/report/vault and real authorization limitations plus current-live source/backup/preflight/rollback/release gates remain. SSH still times out. See latest execution-status.md and RESUME.md; browser-disabled and open-larger-pagination notes are historical. No production/Sites/real-record changes.
