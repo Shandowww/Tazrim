@@ -1,17 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d",
+  "sourceCommit": "9aedd5c90b5a26e6978df963f66bc0e1a803e5ae",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Layout-switch and bell-dismissal fix checkpoint prepared after live11e9add. Settings now switches between actual original/native interfaces, preserves scope/period and remembers root launch per device without bypassing auth. Bell dialogs retain mounted action/preference state and have visible Close, Escape and real backdrop dismissal. Build/typecheck,1116 regressions and15 core checks pass; synthetic round-trip/root and18-item390px dismissal checks pass with unchanged financial revisions. Read-only hosting audit confirms one Budgit server plus one old active Sites copy (v38,2026-10-11); historic wife project is inaccessible, not verified deleted. No Site/audience mutation. Publication preflight is running; this metadata does not yet claim this fix is live. Independent history and notices retained.",
+  "status": "Application54633e5 is verified live on the existing server. Real original/native layout switching, guarded scope/period retention and device bare-root preference are connected; explicit native routes remain native. Bell keeps action/preference state mounted while portaling to the viewport, with fixed visible Close, outside and Escape dismissal; original bell fixed too. Build/typecheck,1116 regressions and15 core checks pass.386 prior source files matched; fresh verified backup, isolated financial/all-record/access/HTTP/source-decryption checks and rollback preceded activation. Live runtime hashes/health/auth/default and preferred root/deep routes passed; authoritative records/settings/keys/parking unchanged. Read-only audit confirms one Budgit server and one older active Sites copy, separate unsynced storage; historic wife project inaccessible. No Site/audience change. See release-layout-bell-2026-11-01.json. Existing device/provider limits remain; independent history/notices retained.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1116,
     "coreChecks": 15,
-    "browser": "Synthetic actual-interface roundtrip/root preference, desktop Close/outside/Escape,18-item390px list with visible sticky Close, original Close; zero financial writes."
+    "release": "54633e5 live, matched runtime hashes, healthy/auth/routes/preferred root; preserved records/keys/settings/parking.",
+    "browser": "Actual-layout roundtrip, remembered bare-root, native/original Close, desktop outside/Escape,18-item390px list with Close visible after scrolling. No physical iPhone claim."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f"

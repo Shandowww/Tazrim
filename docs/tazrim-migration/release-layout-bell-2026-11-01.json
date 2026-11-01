@@ -1,0 +1,63 @@
+{
+  "releasedAtDate": "2026-11-01",
+  "applicationCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d",
+  "previousCommit": "11e9add0b541cd24879930b28ffd71e007941008",
+  "entry": "https://budgit.duckdns.org/next",
+  "runtimeImage": "sha256:61f67298fc2bb06d6593ba78a5e34716b6caf64f36ba44a531749eb243230b8b",
+  "sourceArchiveSha256": "b22f6202e2515885350496473238521949eddf43013b9dc0be36f13c1fc6a453",
+  "changes": [
+    "Actual original/native layout selection in both Settings pages, guarded and scope/period-preserving",
+    "Device layout hint for bare-root launch; explicit native URLs retain their destination",
+    "Viewport-centered always-mounted bell dialog, visible close header, real backdrop/Escape dismissal; original bell also repaired"
+  ],
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressions": 1116,
+    "coreChecks": 15,
+    "previousSourceFilesMatched": 386,
+    "freshVerifiedSQLiteBackup": true,
+    "rollbackPrepared": true,
+    "isolatedFinancialAllRecordAccessHTTPAndEncryptedSourcePreflight": true,
+    "runtimeHashesMatched": true,
+    "healthy": true,
+    "loginConfigured": true,
+    "anonymousAndForgedDenied": true,
+    "deepRoutesNoStore": true,
+    "defaultNativeRootLaunch": true,
+    "originalCookieRootLaunch": true,
+    "authoritativeRecordsUnchanged": true,
+    "settingsAndKeysUnchanged": true,
+    "parkingUnchanged": true
+  },
+  "runtimeHashes": {
+    "server/app.mjs": "22de6be1b62f36c41049e68d71500892233b151d1cdfc5cda5412c95fff7b180",
+    "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+    "dist/index.html": "1eb76a7e35ede6c17a7de246f7be94eed3f11d97bca9cf9381e6348ee18c9435",
+    "dist/frontend/index.html": "54a8a736ef269dd3113509aa3766d491f2975c87fc98361c1297a782c45248d0"
+  },
+  "hostedCopyAudit": {
+    "confirmedHostedCopies": 2,
+    "currentBudgitServerInstances": 1,
+    "otherServerServices": [
+      "parking application",
+      "shared web proxy"
+    ],
+    "connectedSitesCopies": [
+      {
+        "url": "https://monthly-flow-budget.t88s.chatgpt.site",
+        "status": "active",
+        "metadataUpdatedAt": "2026-10-11",
+        "separateUnsyncedData": true
+      }
+    ],
+    "historicalWifeProject": "NOT_FOUND in connected account; current existence/activity not verified",
+    "sitesChanged": false,
+    "localPreviewProcessesRemainingOnKnownPorts": false
+  },
+  "limits": [
+    "Physical iPhone touch remains unverified.",
+    "Already-open pages require browser reload/reopen to receive the new code.",
+    "Bare-root preference does not override explicit /next routes or icons whose saved start URL is explicitly /next.",
+    "Older Sites copy remains hosted; no deletion, redirect or audience change was requested or performed."
+  ]
+}
