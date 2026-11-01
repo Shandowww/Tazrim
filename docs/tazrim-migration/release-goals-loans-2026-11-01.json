@@ -1,0 +1,40 @@
+{
+  "releasedAtDate": "2026-11-01",
+  "applicationCommit": "c7f9608a5ec71ea08707c764f263ebc8ec385552",
+  "previousCommit": "1457bf0cd36cf00bd1619aece271b0e713ac6cfe",
+  "entry": "https://budgit.duckdns.org/next",
+  "runtimeImage": "sha256:11f759b2feacd2c22d344745e5ae1ccd27ed06dad17796e9c337fd8ffcc67dac",
+  "changes": [
+    "Original filling savings illustrations and visual library within the native theme",
+    "Loan first repayment month and full inclusive term, including pre-budget start dates",
+    "Sites retired from release workflow; actual hosted deletion unavailable"
+  ],
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressions": 1095,
+    "coreChecks": 15,
+    "browser": "Synthetic empty/partial/full artwork, nine-choice library, keyboard/draft guard, one-PUT lost response recovery, Light/Dark and checked 320/390/1280/1440 widths; historical first repayment saved/reloaded; shared viewer has no illustration edit controls",
+    "freshVerifiedSQLiteBackup": "passed",
+    "isolatedFinancialAccessHTTPAllRecordPreservation": "passed",
+    "storedEncryptedSources": "verified offline",
+    "runtimeHashes": "matched local build",
+    "healthyAndLoginConfigured": true,
+    "anonymousAndForgedDenied": true,
+    "deepRoutesAndNoStore": true,
+    "authoritativeRecordsUnchanged": true,
+    "credentialsKeysProxyUnchanged": true,
+    "parkingUnchanged": true
+  },
+  "limits": [
+    "Real iPhone/touch/Face ID/PRF/provider acceptance remains as previously documented",
+    "Existing loan dates and full terms were not inferred or migrated",
+    "After newly supported pre-budget loan dates are saved, later rollbacks must retain validator compatibility",
+    "Sites project unavailable in connected account; hosted deletion not performed"
+  ],
+  "runtimeHashes": {
+    "server/app.mjs": "31efcc00edd76e55a4b5503f8aae25a1da07146ba2e5c985255b579f2f653983",
+    "dist/server/budget.js": "b31e191e3681ec6f16a0d5a0ed76c908cca3430301648d09b0a9c479858f11fc",
+    "dist/index.html": "ad985a48310f822458683b6b1aba3a87317865000c989133bd8e873a64a7dfa6",
+    "dist/frontend/index.html": "5c6593ac0db3209fcdef6340557b16847565543588370132787677b38fa62c55"
+  }
+}

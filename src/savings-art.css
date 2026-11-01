@@ -1,0 +1,66 @@
+:is(#savings-home,.goal-art-scope) .c-art{--art-mint:var(--c-mint);--art-purple:var(--c-purple);--art-peach:var(--c-peach);--art-sun:var(--c-sun);--art-blue:light-dark(#93bdd8,#83abc8);position:relative;width:100%;height:100%;}
+:is(#savings-home,.goal-art-scope) [data-gray-icon] .c-art{--art-mint:var(--c-gray);--art-purple:var(--c-gray);--art-peach:var(--c-gray);--art-sun:var(--c-gray);--art-blue:var(--c-gray)}
+:is(#savings-home,.goal-art-scope) .c-art>span{position:absolute;display:block}
+:is(#savings-home,.goal-art-scope) .c-gallery .c-art{width:100%;height:auto;aspect-ratio:1;max-width:150px}
+:is(#savings-home,.goal-art-scope) .art-roof{left:15%;top:7%;width:74%;height:39%;background:var(--art-purple);clip-path:polygon(50% 0,100% 76%,94% 89%,50% 24%,6% 89%,0 76%)}
+:is(#savings-home,.goal-art-scope) .art-chimney{left:73%;top:16%;width:8%;height:25%;border-radius:12% 12% 0 0;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-wall{left:24%;top:42%;width:58%;height:40%;border-radius:6%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-window-a,:is(#savings-home,.goal-art-scope) .art-window-b{top:49%;width:11%;height:11%;border-radius:20%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-window-a{left:32%}:is(#savings-home,.goal-art-scope) .art-window-b{left:63%}
+:is(#savings-home,.goal-art-scope) .art-door{left:46%;top:62%;width:15%;height:20%;border-radius:15% 15% 0 0;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-tree{left:9%;top:61%;width:17%;height:17%;border-radius:50%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-trunk{left:16%;top:73%;width:3%;height:10%;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-plane-body{left:10%;top:38%;width:80%;height:23%;border-radius:15% 55% 55% 15%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-wing-top{left:40%;top:15%;width:34%;height:37%;background:var(--art-purple);clip-path:polygon(0 0,31% 0,100% 100%,5% 100%)}
+:is(#savings-home,.goal-art-scope) .art-wing-bottom{left:40%;top:51%;width:34%;height:34%;background:var(--art-purple);clip-path:polygon(5% 0,100% 0,31% 100%,0 100%)}
+:is(#savings-home,.goal-art-scope) .art-tail{left:11%;top:19%;width:19%;height:30%;background:var(--art-peach);clip-path:polygon(0 0,35% 0,100% 100%,15% 100%)}
+:is(#savings-home,.goal-art-scope) .art-cockpit{left:76%;top:43%;width:10%;height:8%;border-radius:40%;background:var(--art-blue)}
+:is(#savings-home,.goal-art-scope) .art-plane-window-a,:is(#savings-home,.goal-art-scope) .art-plane-window-b,:is(#savings-home,.goal-art-scope) .art-plane-window-c{top:44%;width:5%;height:7%;border-radius:25%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-plane-window-a{left:29%}:is(#savings-home,.goal-art-scope) .art-plane-window-b{left:40%}:is(#savings-home,.goal-art-scope) .art-plane-window-c{left:51%}
+:is(#savings-home,.goal-art-scope) .art-chair-back{left:23%;top:16%;width:54%;height:56%;border-radius:18%;background:var(--art-purple)}
+:is(#savings-home,.goal-art-scope) .art-chair-cushion{left:31%;top:28%;width:38%;height:28%;border-radius:15%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-chair-leg-a,:is(#savings-home,.goal-art-scope) .art-chair-leg-b{top:73%;width:8%;height:13%;border-radius:0 0 20% 20%;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-chair-leg-a{left:25%}:is(#savings-home,.goal-art-scope) .art-chair-leg-b{left:67%}
+:is(#savings-home,.goal-art-scope) .art-chair-seat{left:22%;top:57%;width:56%;height:18%;border-radius:20%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-chair-arm-a,:is(#savings-home,.goal-art-scope) .art-chair-arm-b{top:45%;width:16%;height:31%;border-radius:25%;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-chair-arm-a{left:14%}:is(#savings-home,.goal-art-scope) .art-chair-arm-b{left:70%}
+:is(#savings-home,.goal-art-scope) .art-stroller-canopy{left:40%;top:14%;width:40%;height:40%;border-radius:100% 0 0 0;background:var(--art-purple)}
+:is(#savings-home,.goal-art-scope) .art-stroller-basket{left:22%;top:49%;width:58%;height:23%;border-radius:0 0 50% 50%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-stroller-handle{left:14%;top:29%;width:25%;height:24%;border-top:5px solid var(--art-peach);border-left:5px solid var(--art-peach);border-radius:30% 0 0 0}
+:is(#savings-home,.goal-art-scope) .art-wheel-a,:is(#savings-home,.goal-art-scope) .art-wheel-b{top:72%;width:15%;height:15%;border-radius:50%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-wheel-a{left:26%}:is(#savings-home,.goal-art-scope) .art-wheel-b{left:61%}
+:is(#savings-home,.goal-art-scope) .art-trophy-handle-a,:is(#savings-home,.goal-art-scope) .art-trophy-handle-b{top:23%;width:27%;height:30%;border:8px solid var(--art-peach);border-radius:50%;background:transparent}
+:is(#savings-home,.goal-art-scope) .art-trophy-handle-a{left:12%}:is(#savings-home,.goal-art-scope) .art-trophy-handle-b{left:61%}
+:is(#savings-home,.goal-art-scope) .art-trophy-stem{left:45%;top:51%;width:10%;height:24%;background:var(--art-purple)}
+:is(#savings-home,.goal-art-scope) .art-trophy-bowl{left:28%;top:15%;width:44%;height:44%;border-radius:0 0 50% 50%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-trophy-star{left:42%;top:25%;width:16%;height:16%;background:var(--art-peach);clip-path:polygon(50% 0,63% 33%,100% 38%,73% 62%,81% 100%,50% 80%,19% 100%,27% 62%,0 38%,37% 33%)}
+:is(#savings-home,.goal-art-scope) .art-trophy-base{left:30%;top:72%;width:40%;height:13%;border-radius:15%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-cone{left:16%;top:40%;width:55%;height:45%;background:var(--art-purple);clip-path:polygon(0 100%,30% 0,100% 70%)}
+:is(#savings-home,.goal-art-scope) .art-cone-stripe{left:24%;top:54%;width:32%;height:23%;background:var(--art-peach);clip-path:polygon(0 66%,30% 0,100% 70%,50% 100%)}
+:is(#savings-home,.goal-art-scope) .art-confetti-a,:is(#savings-home,.goal-art-scope) .art-confetti-b,:is(#savings-home,.goal-art-scope) .art-confetti-c,:is(#savings-home,.goal-art-scope) .art-confetti-d{width:9%;height:12%;border-radius:12%;transform:rotate(25deg)}
+:is(#savings-home,.goal-art-scope) .art-confetti-a{left:26%;top:16%;background:var(--art-sun)}:is(#savings-home,.goal-art-scope) .art-confetti-b{left:66%;top:22%;background:var(--art-mint);transform:rotate(-20deg)}:is(#savings-home,.goal-art-scope) .art-confetti-c{left:76%;top:51%;background:var(--art-peach);transform:rotate(60deg)}:is(#savings-home,.goal-art-scope) .art-confetti-d{left:47%;top:33%;background:var(--art-blue);transform:rotate(-35deg)}
+:is(#savings-home,.goal-art-scope) .art-confetti-dot{left:52%;top:12%;width:8%;height:8%;border-radius:50%;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .sg-new-dialog .c-gallery .c-art{width:70px;max-width:100%}
+:is(#savings-home,.goal-art-scope) .art-car-cabin{left:26%;top:26%;width:50%;height:34%;background:var(--art-purple);clip-path:polygon(22% 0,76% 0,100% 100%,0 100%);border-radius:12%}
+:is(#savings-home,.goal-art-scope) .art-car-glass-a{left:33%;top:32%;width:17%;height:20%;background:var(--art-blue);clip-path:polygon(27% 0,100% 0,100% 100%,0 100%)}
+:is(#savings-home,.goal-art-scope) .art-car-glass-b{left:54%;top:32%;width:17%;height:20%;background:var(--art-blue);clip-path:polygon(0 0,70% 0,100% 100%,0 100%)}
+:is(#savings-home,.goal-art-scope) .art-car-body{left:10%;top:51%;width:80%;height:24%;border-radius:24% 28% 14% 14%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-car-light-a,:is(#savings-home,.goal-art-scope) .art-car-light-b{top:56%;width:8%;height:7%;border-radius:28%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-car-light-a{left:12%}:is(#savings-home,.goal-art-scope) .art-car-light-b{left:81%;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-car-wheel-a,:is(#savings-home,.goal-art-scope) .art-car-wheel-b{top:66%;width:16%;height:16%;border-radius:50%;background:var(--art-purple)}
+:is(#savings-home,.goal-art-scope) .art-car-wheel-a{left:24%}:is(#savings-home,.goal-art-scope) .art-car-wheel-b{left:64%}
+:is(#savings-home,.goal-art-scope) .art-car-hub-a,:is(#savings-home,.goal-art-scope) .art-car-hub-b{top:71%;width:6%;height:6%;border-radius:50%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-car-hub-a{left:29%}:is(#savings-home,.goal-art-scope) .art-car-hub-b{left:69%}
+:is(#savings-home,.goal-art-scope) .art-safety-shield{left:18%;top:12%;width:64%;height:76%;background:var(--art-purple);clip-path:polygon(50% 0,100% 16%,94% 61%,78% 83%,50% 100%,22% 83%,6% 61%,0 16%)}
+:is(#savings-home,.goal-art-scope) .art-safety-inner{left:26%;top:22%;width:48%;height:55%;background:var(--art-mint);clip-path:polygon(50% 0,100% 14%,92% 61%,75% 83%,50% 100%,25% 83%,8% 61%,0 14%)}
+:is(#savings-home,.goal-art-scope) .art-safety-coin{left:35%;top:33%;width:30%;height:30%;border-radius:50%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-safety-check{left:42%;top:40%;width:17%;height:15%;background:var(--art-peach);clip-path:polygon(0 47%,20% 28%,42% 51%,82% 0,100% 18%,44% 100%)}
+:is(#savings-home,.goal-art-scope) .art-shop-wall{left:20%;top:36%;width:60%;height:46%;border-radius:5%;background:var(--art-mint)}
+:is(#savings-home,.goal-art-scope) .art-shop-sign{left:30%;top:14%;width:40%;height:16%;border-radius:14%;background:var(--art-purple)}
+:is(#savings-home,.goal-art-scope) .art-shop-sign-line{left:38%;top:20%;width:24%;height:4%;border-radius:30%;background:var(--art-sun)}
+:is(#savings-home,.goal-art-scope) .art-shop-window{left:28%;top:52%;width:23%;height:20%;border-radius:8%;background:var(--art-blue)}
+:is(#savings-home,.goal-art-scope) .art-shop-door{left:59%;top:50%;width:14%;height:32%;border-radius:12% 12% 0 0;background:var(--art-peach)}
+:is(#savings-home,.goal-art-scope) .art-shop-awning{left:14%;top:31%;width:72%;height:15%;background:var(--art-sun);clip-path:polygon(9% 0,91% 0,100% 72%,100% 100%,0 100%,0 72%);border-radius:0 0 12% 12%}
+:is(#savings-home,.goal-art-scope) .art-shop-stripe-a,:is(#savings-home,.goal-art-scope) .art-shop-stripe-b,:is(#savings-home,.goal-art-scope) .art-shop-stripe-c{top:31%;width:10%;height:15%;background:var(--art-peach);border-radius:0 0 20% 20%}
+:is(#savings-home,.goal-art-scope) .art-shop-stripe-a{left:29%}:is(#savings-home,.goal-art-scope) .art-shop-stripe-b{left:45%}:is(#savings-home,.goal-art-scope) .art-shop-stripe-c{left:61%}
+:is(#savings-home,.goal-art-scope) .art-shop-step{left:16%;top:80%;width:68%;height:4%;border-radius:30%;background:var(--art-purple)}

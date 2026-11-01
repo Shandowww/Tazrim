@@ -20,7 +20,7 @@ test('Editing retains metadata and other loans; normalized input does not invent
 })
 test('Invalid periods, amounts, names, payer identities, collisions and malformed loan fields are refused',()=>{
  const p=base(),d=draft(p),before=JSON.stringify(p)
- for(const bad of [{...d,monthly:'0'},{...d,monthly:'-1'},{...d,monthly:'1.001'},{...d,months:'121'},{...d,months:'1.5'},{...d,from:'2025-12'},{...d,from:'2035-12',months:'3'},{...d,name:''},{...d,cashAccountId:'foreign'},{...d,cashAccountId:''},{...d,extra:'x'}])assert.throws(()=>prepareLoan(p,'id',bad,true))
+ for(const bad of [{...d,monthly:'0'},{...d,monthly:'-1'},{...d,monthly:'1.001'},{...d,months:'121'},{...d,months:'1.5'},{...d,from:'1999-12'},{...d,from:'2035-12',months:'3'},{...d,name:''},{...d,cashAccountId:'foreign'},{...d,cashAccountId:''},{...d,extra:'x'}])assert.throws(()=>prepareLoan(p,'id',bad,true))
  const next=prepareLoan(p,'id',d,true);assert.throws(()=>prepareLoan(next,'id',d,true));assert.throws(()=>prepareLoan(p,'missing',d));assert.equal(JSON.stringify(p),before)
 })
 test('Loan removal updates only estimates while retaining actuals and other financial records',()=>{
@@ -37,4 +37,14 @@ test('Real API loan creation and removal recover lost receipts without duplicate
   const snapshot=(await loadBudgetSnapshot('personal',new AbortController().signal,fetcher)).value,input={budgetId:'personal',base:snapshot,plan:prepareLoan(snapshot.plan,'stable',draft(snapshot.plan),true)};await assert.rejects(savePreparedPlan(input,fetcher),SaveUncertain);const created=await savePreparedPlan(input,fetcher);assert.equal(created.recovered,true);assert.equal(puts,1);assert.equal(created.value.plan.loans.length,1)
   lost=true;const removal={budgetId:'personal',base:created.value,plan:prepareLoanRemoval(created.value.plan,'stable')};await assert.rejects(savePreparedPlan(removal,fetcher),SaveUncertain);const removed=await savePreparedPlan(removal,fetcher);assert.equal(removed.recovered,true);assert.equal(puts,2);assert.equal(removed.value.revision,3);assert.deepEqual(removed.value.plan.loans,[]);assert.equal((await(await req('bob','/api/plan')).json()).revision,1);assert.deepEqual(removed.value.plan.months['2026-09'],snapshot.plan.months['2026-09'])
  }finally{db.close()}
+})
+
+test('First repayment before the budget start retains the full term and projects only its remaining months',()=>{
+ const p=base(),before=JSON.stringify(p),next=prepareLoan(p,'historical',{...draft(p),from:'2025-03',months:'24',monthly:'1000'},true)
+ assert.ok(validatePlan(next));assert.equal(next.loans[0].from,'2025-03');assert.equal(next.loans[0].months,24)
+ assert.equal(scheduledLoans(next,'2025-02'),0);assert.equal(scheduledLoans(next,'2025-03'),1000);assert.equal(scheduledLoans(next,'2027-02'),1000);assert.equal(scheduledLoans(next,'2027-03'),0)
+ assert.equal(forecast(next).find(r=>r.month==='2027-02').spending,1000);assert.equal(forecast(next).find(r=>r.month==='2027-03').spending,0)
+ assert.deepEqual(next.months['2026-09'],p.months['2026-09']);assert.equal(JSON.stringify(p),before)
+ const d=initialLoanDraft(next,'historical','2026-11');assert.equal(d.from,'2025-03');assert.equal(d.months,'24');assert.deepEqual(prepareLoan(next,'historical',d),next)
+ const finished=prepareLoan(p,'finished',{...draft(p),from:'2024-01',months:'12'},true);assert.ok(validatePlan(finished));assert.equal(scheduledLoans(finished,'2026-01'),0)
 })

@@ -30,48 +30,6 @@
 #savings-home .c-gallery button{background:var(--c-bg);font-size:15px;padding:14px 4px;display:grid;justify-items:center;gap:8px}
 #savings-home .c-gallery svg{width:52px;height:52px;stroke-width:1.3;fill:color-mix(in srgb,var(--c-purple) 35%,transparent)}
 #savings-home .c-gallery button[aria-pressed=true]{background:var(--c-action);color:var(--c-action-text)}
-#savings-home .c-art{--art-mint:var(--c-mint);--art-purple:var(--c-purple);--art-peach:var(--c-peach);--art-sun:var(--c-sun);--art-blue:light-dark(#93bdd8,#83abc8);position:relative;width:100%;height:100%;}
-#savings-home [data-gray-icon] .c-art{--art-mint:var(--c-gray);--art-purple:var(--c-gray);--art-peach:var(--c-gray);--art-sun:var(--c-gray);--art-blue:var(--c-gray)}
-#savings-home .c-art>span{position:absolute;display:block}
-#savings-home .c-gallery .c-art{width:100%;height:auto;aspect-ratio:1;max-width:150px}
-#savings-home .art-roof{left:15%;top:7%;width:74%;height:39%;background:var(--art-purple);clip-path:polygon(50% 0,100% 76%,94% 89%,50% 24%,6% 89%,0 76%)}
-#savings-home .art-chimney{left:73%;top:16%;width:8%;height:25%;border-radius:12% 12% 0 0;background:var(--art-peach)}
-#savings-home .art-wall{left:24%;top:42%;width:58%;height:40%;border-radius:6%;background:var(--art-mint)}
-#savings-home .art-window-a,#savings-home .art-window-b{top:49%;width:11%;height:11%;border-radius:20%;background:var(--art-sun)}
-#savings-home .art-window-a{left:32%}#savings-home .art-window-b{left:63%}
-#savings-home .art-door{left:46%;top:62%;width:15%;height:20%;border-radius:15% 15% 0 0;background:var(--art-peach)}
-#savings-home .art-tree{left:9%;top:61%;width:17%;height:17%;border-radius:50%;background:var(--art-mint)}
-#savings-home .art-trunk{left:16%;top:73%;width:3%;height:10%;background:var(--art-peach)}
-#savings-home .art-plane-body{left:10%;top:38%;width:80%;height:23%;border-radius:15% 55% 55% 15%;background:var(--art-mint)}
-#savings-home .art-wing-top{left:40%;top:15%;width:34%;height:37%;background:var(--art-purple);clip-path:polygon(0 0,31% 0,100% 100%,5% 100%)}
-#savings-home .art-wing-bottom{left:40%;top:51%;width:34%;height:34%;background:var(--art-purple);clip-path:polygon(5% 0,100% 0,31% 100%,0 100%)}
-#savings-home .art-tail{left:11%;top:19%;width:19%;height:30%;background:var(--art-peach);clip-path:polygon(0 0,35% 0,100% 100%,15% 100%)}
-#savings-home .art-cockpit{left:76%;top:43%;width:10%;height:8%;border-radius:40%;background:var(--art-blue)}
-#savings-home .art-plane-window-a,#savings-home .art-plane-window-b,#savings-home .art-plane-window-c{top:44%;width:5%;height:7%;border-radius:25%;background:var(--art-sun)}
-#savings-home .art-plane-window-a{left:29%}#savings-home .art-plane-window-b{left:40%}#savings-home .art-plane-window-c{left:51%}
-#savings-home .art-chair-back{left:23%;top:16%;width:54%;height:56%;border-radius:18%;background:var(--art-purple)}
-#savings-home .art-chair-cushion{left:31%;top:28%;width:38%;height:28%;border-radius:15%;background:var(--art-mint)}
-#savings-home .art-chair-leg-a,#savings-home .art-chair-leg-b{top:73%;width:8%;height:13%;border-radius:0 0 20% 20%;background:var(--art-peach)}
-#savings-home .art-chair-leg-a{left:25%}#savings-home .art-chair-leg-b{left:67%}
-#savings-home .art-chair-seat{left:22%;top:57%;width:56%;height:18%;border-radius:20%;background:var(--art-sun)}
-#savings-home .art-chair-arm-a,#savings-home .art-chair-arm-b{top:45%;width:16%;height:31%;border-radius:25%;background:var(--art-peach)}
-#savings-home .art-chair-arm-a{left:14%}#savings-home .art-chair-arm-b{left:70%}
-#savings-home .art-stroller-canopy{left:40%;top:14%;width:40%;height:40%;border-radius:100% 0 0 0;background:var(--art-purple)}
-#savings-home .art-stroller-basket{left:22%;top:49%;width:58%;height:23%;border-radius:0 0 50% 50%;background:var(--art-mint)}
-#savings-home .art-stroller-handle{left:14%;top:29%;width:25%;height:24%;border-top:5px solid var(--art-peach);border-left:5px solid var(--art-peach);border-radius:30% 0 0 0}
-#savings-home .art-wheel-a,#savings-home .art-wheel-b{top:72%;width:15%;height:15%;border-radius:50%;background:var(--art-sun)}
-#savings-home .art-wheel-a{left:26%}#savings-home .art-wheel-b{left:61%}
-#savings-home .art-trophy-handle-a,#savings-home .art-trophy-handle-b{top:23%;width:27%;height:30%;border:8px solid var(--art-peach);border-radius:50%;background:transparent}
-#savings-home .art-trophy-handle-a{left:12%}#savings-home .art-trophy-handle-b{left:61%}
-#savings-home .art-trophy-stem{left:45%;top:51%;width:10%;height:24%;background:var(--art-purple)}
-#savings-home .art-trophy-bowl{left:28%;top:15%;width:44%;height:44%;border-radius:0 0 50% 50%;background:var(--art-sun)}
-#savings-home .art-trophy-star{left:42%;top:25%;width:16%;height:16%;background:var(--art-peach);clip-path:polygon(50% 0,63% 33%,100% 38%,73% 62%,81% 100%,50% 80%,19% 100%,27% 62%,0 38%,37% 33%)}
-#savings-home .art-trophy-base{left:30%;top:72%;width:40%;height:13%;border-radius:15%;background:var(--art-mint)}
-#savings-home .art-cone{left:16%;top:40%;width:55%;height:45%;background:var(--art-purple);clip-path:polygon(0 100%,30% 0,100% 70%)}
-#savings-home .art-cone-stripe{left:24%;top:54%;width:32%;height:23%;background:var(--art-peach);clip-path:polygon(0 66%,30% 0,100% 70%,50% 100%)}
-#savings-home .art-confetti-a,#savings-home .art-confetti-b,#savings-home .art-confetti-c,#savings-home .art-confetti-d{width:9%;height:12%;border-radius:12%;transform:rotate(25deg)}
-#savings-home .art-confetti-a{left:26%;top:16%;background:var(--art-sun)}#savings-home .art-confetti-b{left:66%;top:22%;background:var(--art-mint);transform:rotate(-20deg)}#savings-home .art-confetti-c{left:76%;top:51%;background:var(--art-peach);transform:rotate(60deg)}#savings-home .art-confetti-d{left:47%;top:33%;background:var(--art-blue);transform:rotate(-35deg)}
-#savings-home .art-confetti-dot{left:52%;top:12%;width:8%;height:8%;border-radius:50%;background:var(--art-peach)}
 #savings-home .c-field-space{display:block;margin:4px 0 14px;color:var(--c-muted);font-size:14px}
 #savings-home .c-ring{width:140px;height:140px;border-radius:50%;margin:16px auto;display:grid;place-items:center;background:conic-gradient(var(--c-mint) 0% 60%,var(--c-gray) 60% 100%);position:relative}
 #savings-home .c-ring:before{content:'';position:absolute;inset:18px;border-radius:50%;background:var(--c-panel)}
@@ -217,34 +175,10 @@
 #savings-home .sg-new-dialog .c-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
 #savings-home .sg-new-dialog .c-gallery button{padding:8px 4px;gap:2px;border:2px solid transparent;background:var(--c-bg)}
 #savings-home .sg-new-dialog .c-gallery button[aria-pressed=true]{border-color:var(--c-action);background:var(--c-bg);color:var(--c-text)}
-#savings-home .sg-new-dialog .c-gallery .c-art{width:70px;max-width:100%}
 #savings-home .sg-new-dialog .c-muted{font-size:13px;line-height:1.5}
 #savings-home .sg-new-actions{display:flex;gap:8px;align-items:center}
 #savings-home .sg-new-actions .c-primary{flex:1}
 /* Goal gallery: car, emergency reserve and business, using the same palette. */
-#savings-home .art-car-cabin{left:26%;top:26%;width:50%;height:34%;background:var(--art-purple);clip-path:polygon(22% 0,76% 0,100% 100%,0 100%);border-radius:12%}
-#savings-home .art-car-glass-a{left:33%;top:32%;width:17%;height:20%;background:var(--art-blue);clip-path:polygon(27% 0,100% 0,100% 100%,0 100%)}
-#savings-home .art-car-glass-b{left:54%;top:32%;width:17%;height:20%;background:var(--art-blue);clip-path:polygon(0 0,70% 0,100% 100%,0 100%)}
-#savings-home .art-car-body{left:10%;top:51%;width:80%;height:24%;border-radius:24% 28% 14% 14%;background:var(--art-mint)}
-#savings-home .art-car-light-a,#savings-home .art-car-light-b{top:56%;width:8%;height:7%;border-radius:28%;background:var(--art-sun)}
-#savings-home .art-car-light-a{left:12%}#savings-home .art-car-light-b{left:81%;background:var(--art-peach)}
-#savings-home .art-car-wheel-a,#savings-home .art-car-wheel-b{top:66%;width:16%;height:16%;border-radius:50%;background:var(--art-purple)}
-#savings-home .art-car-wheel-a{left:24%}#savings-home .art-car-wheel-b{left:64%}
-#savings-home .art-car-hub-a,#savings-home .art-car-hub-b{top:71%;width:6%;height:6%;border-radius:50%;background:var(--art-sun)}
-#savings-home .art-car-hub-a{left:29%}#savings-home .art-car-hub-b{left:69%}
-#savings-home .art-safety-shield{left:18%;top:12%;width:64%;height:76%;background:var(--art-purple);clip-path:polygon(50% 0,100% 16%,94% 61%,78% 83%,50% 100%,22% 83%,6% 61%,0 16%)}
-#savings-home .art-safety-inner{left:26%;top:22%;width:48%;height:55%;background:var(--art-mint);clip-path:polygon(50% 0,100% 14%,92% 61%,75% 83%,50% 100%,25% 83%,8% 61%,0 14%)}
-#savings-home .art-safety-coin{left:35%;top:33%;width:30%;height:30%;border-radius:50%;background:var(--art-sun)}
-#savings-home .art-safety-check{left:42%;top:40%;width:17%;height:15%;background:var(--art-peach);clip-path:polygon(0 47%,20% 28%,42% 51%,82% 0,100% 18%,44% 100%)}
-#savings-home .art-shop-wall{left:20%;top:36%;width:60%;height:46%;border-radius:5%;background:var(--art-mint)}
-#savings-home .art-shop-sign{left:30%;top:14%;width:40%;height:16%;border-radius:14%;background:var(--art-purple)}
-#savings-home .art-shop-sign-line{left:38%;top:20%;width:24%;height:4%;border-radius:30%;background:var(--art-sun)}
-#savings-home .art-shop-window{left:28%;top:52%;width:23%;height:20%;border-radius:8%;background:var(--art-blue)}
-#savings-home .art-shop-door{left:59%;top:50%;width:14%;height:32%;border-radius:12% 12% 0 0;background:var(--art-peach)}
-#savings-home .art-shop-awning{left:14%;top:31%;width:72%;height:15%;background:var(--art-sun);clip-path:polygon(9% 0,91% 0,100% 72%,100% 100%,0 100%,0 72%);border-radius:0 0 12% 12%}
-#savings-home .art-shop-stripe-a,#savings-home .art-shop-stripe-b,#savings-home .art-shop-stripe-c{top:31%;width:10%;height:15%;background:var(--art-peach);border-radius:0 0 20% 20%}
-#savings-home .art-shop-stripe-a{left:29%}#savings-home .art-shop-stripe-b{left:45%}#savings-home .art-shop-stripe-c{left:61%}
-#savings-home .art-shop-step{left:16%;top:80%;width:68%;height:4%;border-radius:30%;background:var(--art-purple)}
 
 /* Free funds are a compact invitation; goal progress stays the focus. */
 #savings-home .sg-free-pool{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--hairline);border-radius:18px;background:color-mix(in srgb,var(--c-mint) 18%,var(--c-bg));margin:0 0 8px}

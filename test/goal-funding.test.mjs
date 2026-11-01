@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import * as budget from '../src/budget.js';
+import * as art from '../src/savings-art.js';
 import {summarizeBudgetSpace} from '../src/space-overview-model.js';
 
 function fixture(){return{startMonth:'2026-10',opening:5100,buffer:0,horizon:12,defaults:budget.zero(),months:{},expenses:[],demo:false,
@@ -42,7 +43,7 @@ test('Calculator cannot use another space or a rich sibling account to cover the
 });
 
 function client(){
- const c=vm.createContext({...budget,plan:fixture(),activeBudget:'personal',demoPreview:false,loaded:true,loading:false,saving:false,crypto,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>null},todayMonth:()=> '2026-10',esc:String,notify(){},render(){},budgetMeta:()=>({role:'owner'}),mutate(next){c.plan=next;c.dirty=true;return true;}});
+ const c=vm.createContext({...budget,...art,plan:fixture(),activeBudget:'personal',demoPreview:false,loaded:true,loading:false,saving:false,crypto,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>null},todayMonth:()=> '2026-10',esc:String,notify(){},render(){},budgetMeta:()=>({role:'owner'}),mutate(next){c.plan=next;c.dirty=true;return true;}});
  vm.runInContext(readFileSync('src/savings.js','utf8'),c);return{c,run:s=>vm.runInContext(s,c)};
 }
 test('Funding UI lists only local bank labels and leaves legacy goals unassigned',()=>{

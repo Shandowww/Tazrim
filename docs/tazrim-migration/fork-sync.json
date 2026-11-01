@@ -1,20 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "89406d3975303f7f69d9ab1ddb9e167f505d9524",
+  "sourceCommit": "76efdc28999480322670c9bce9e8aae82640c195",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Authenticated opt-in React interface is live at https://budgit.duckdns.org/next as of2026-11-01 from application1457bf0. Original root/interface and Sites retained. Final exact application passes1094 regressions/build/typecheck/15 checks,880 bounded layouts, live System/Reduce Motion preferences with originals restored and native Safari encrypted synthetic export. Fresh production source141-file baseline/verified private SQLite backup, isolated actual-backup financial/all-record preservation/access/HTTP/decryption and previous-image compatibility passed before Budgit-only activation. Actual runtime backend/HTML hashes, healthy configured login, public anonymous/forged refusal, native deep login/no-store/private assets and unchanged budgets/revisions/membership/allow-list/report keys verified. Credentials/proxy files and parking HTTP200/container identities remain unchanged. No production financial edits/imports/migrations/test identities/provider consent/resource upgrade. Real-iPhone/touch/PRF/Face ID/provider and in-app Blob completion limitations remain explicit. Documentation source checkpoint may follow the application release without changing runtime. Exact evidence in release-2026-11-01.json, acceptance-2026-11-01.md and RESUME.md. Independent upstream history and MIT/OFL notices preserved.",
+  "status": "Application c7f9608 is live at the authenticated https://budgit.duckdns.org/next entry. Original filling goal paintings and the nine-picture visual library are restored in the Tazrim theme; loan first-repayment dates and full terms accept pre-budget starts without altering existing records. Exact source passes1095 regressions/build/typecheck/15 checks and bounded synthetic artwork/library/keyboard/draft/retry/phone/desktop/Light-Dark/viewer checks. Fresh verified backup and isolated financial/all-record/access/HTTP/encrypted-source preflight and rollback preceded activation. Runtime hashes/health/auth/deep routes and unchanged authoritative records/settings/keys/parking verified. Sites is retired from publishing; hosted deletion unavailable in the connected account. Original interface remains available. No production financial edits, provider consent or resource upgrades. Real-iPhone/touch/Face ID/PRF/provider limits remain explicit. Later rollback must retain pre-budget loan validation compatibility. Tracked-source export preserves independent upstream history and MIT/OFL notices.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1094,
-    "browser": "880 final bounded layout observations across88 destinations/78 paths/five widths/Light-Dark. Live macOS System/Reduce Motion and keyboard checks pass; originals restored. Native Safari encrypted synthetic export saved/decrypted. Real device/platform/provider and in-app Blob limits explicit.",
-    "production": "Application1457bf0 active at /next after verified backup/isolated preflight/rollback gates. Actual runtime hashes/health/auth/native routes/record preservation/parking verified. Original root and Sites retained.",
-    "evidence": "docs/tazrim-migration/release-2026-11-01.json"
+    "regressionTests": 1095,
+    "browser": "Bounded synthetic empty/partial/full paintings, nine-choice library, keyboard/draft guard, one-PUT lost-save recovery, checked320/390/1280/1440 widths and Light/Dark, historical first date save/reload and shared-viewer refusal. Real device/platform/provider limits remain.",
+    "production": "Application c7f9608 verified active on existing Hetzner after fresh backup/isolated preflight/rollback. Authoritative records/settings/keys/parking unchanged.",
+    "evidence": "docs/tazrim-migration/release-goals-loans-2026-11-01.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "1457bf0cd36cf00bd1619aece271b0e713ac6cfe"
+  "productionApplicationCommit": "c7f9608a5ec71ea08707c764f263ebc8ec385552"
 }

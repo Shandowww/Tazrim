@@ -3,5 +3,8 @@
   "former_path": "/Users/talshandor/Documents/ChatGPT/Monthly Flow Budget",
   "project_id": "appgprj_6ac15fd9d7708191965b3d0d6f7ea72b",
   "site_url": "https://monthly-flow-budget.t88s.chatgpt.site/",
-  "repository": "https://github.com/Shandowww/monthly-flow-budget"
+  "repository": "https://github.com/Shandowww/monthly-flow-budget",
+  "production_url": "https://budgit.duckdns.org",
+  "hosting": "hetzner",
+  "sites_status": "retired; hosted deletion unavailable in connected account"
 }

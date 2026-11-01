@@ -36,7 +36,7 @@ export function setOffCardTotal(v,total){if(!Number.isFinite(total)||total<0||to
 export const formBudgetFields=p=>budgetFields(p).filter(([k])=>k!=='transfers').map(f=>f[0]==='variable'?['offCard','הוצאות שלא שולמו בכרטיס',f[2]]:f);
 export const zero=()=>Object.fromEntries(fields.map(([k])=>[k,0]));
 export function scheduledLoans(p,month){return (p.loans??[]).filter(l=>month>=l.from&&indexMonth(month)<indexMonth(l.from)+l.months).reduce((n,l)=>n+cents(l.monthly),0)/100;}
-export function loansValid(p){return p.loans===undefined||Array.isArray(p.loans)&&p.loans.length<=20&&new Set(p.loans.map(l=>l?.id)).size===p.loans.length&&p.loans.every(l=>l&&typeof l.id==='string'&&l.id.length>0&&l.id.length<=100&&typeof l.name==='string'&&l.name.trim()&&l.name.length<=80&&moneyOk(l.monthly)&&l.monthly>0&&cents(l.monthly)/100===l.monthly&&monthOk(l.from)&&l.from>=p.startMonth&&Number.isInteger(l.months)&&l.months>=1&&l.months<=120&&indexMonth(l.from)-indexMonth(p.startMonth)+l.months<=120);}
+export function loansValid(p){return p.loans===undefined||Array.isArray(p.loans)&&p.loans.length<=20&&new Set(p.loans.map(l=>l?.id)).size===p.loans.length&&p.loans.every(l=>l&&typeof l.id==='string'&&l.id.length>0&&l.id.length<=100&&typeof l.name==='string'&&l.name.trim()&&l.name.length<=80&&moneyOk(l.monthly)&&l.monthly>0&&cents(l.monthly)/100===l.monthly&&monthOk(l.from)&&Number.isInteger(l.months)&&l.months>=1&&l.months<=120&&indexMonth(l.from)-indexMonth(p.startMonth)+l.months<=120);}
 export function setLoan(p,loan){
  if(cashAccountList(p).length>1&&!cashAssignedItem(p,loan))throw Error('בחר את החשבון שממנו נגבית ההלוואה.');
  const next=clone(p);next.loans=[...(p.loans??[]).filter(l=>l.id!==loan.id),loan];

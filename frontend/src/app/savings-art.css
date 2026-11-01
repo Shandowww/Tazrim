@@ -1,0 +1,5 @@
+.goal-art-scope{--c-mint:color-mix(in srgb,hsl(var(--primary)) 32%,hsl(var(--card)));--c-purple:color-mix(in srgb,hsl(var(--primary)) 64%,hsl(var(--card)));--c-peach:light-dark(#eeb39a,#d29a80);--c-sun:light-dark(#efd07b,#e7c977);--c-gray:color-mix(in srgb,hsl(var(--muted-foreground)) 26%,hsl(var(--card)))}
+.goal-painting{position:relative;width:min(100%,280px);aspect-ratio:1;margin:0 auto}
+.goal-painting>div{position:absolute;inset:0;display:grid;place-items:center}
+.goal-library-painting{display:block;width:min(100%,120px);aspect-ratio:1}
+.goal-art-choice[aria-pressed=true]{border-color:hsl(var(--primary));background:color-mix(in srgb,hsl(var(--primary)) 12%,hsl(var(--card)));box-shadow:inset 0 0 0 1px hsl(var(--primary))}

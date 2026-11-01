@@ -1,5 +1,10 @@
 # Monthly Flow — project handoff
 
+## Hetzner-only hosting — 2026-11-01
+
+Tal retired Sites from the publication workflow. Budgit runs on the existing Hetzner server at https://budgit.duckdns.org; publish there and back up the same completed source to GitHub. Older instructions to publish to Sites or preserve its audience are superseded. Retain historical Site identity only as source provenance/build validation. Hosted deletion could not be performed: the connected Sites account returns NOT_FOUND for this project and lists only the separate older Site, which must not be touched. Do not claim deletion.
+
+
 ## React interface rollout — 2026-11-01
 
 The authenticated React interface is live at https://budgit.duckdns.org/next from application commit1457bf0. The existing root interface stays available as a rollout fallback; Sites and hosting resources are unchanged. Fresh verified backup/isolated financial, stored-record, access, HTTP and encrypted-source checks passed; running hashes/health/login and unchanged budgets/revisions/sharing/access/key records were verified. Parking is unchanged. Exact final source passes1094 regressions, build/typecheck and15 core checks. See docs/tazrim-migration/release-2026-11-01.json and RESUME.md for evidence and real-device/platform/provider limitations. Historical preparation/SSH-blocked notes below are superseded.

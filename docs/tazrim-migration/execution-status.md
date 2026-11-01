@@ -1,5 +1,10 @@
 # Completion execution — 2026-10-28
 
+## Filling goals and first repayment dates live — 2026-11-01
+
+Verified application `c7f9608` is live at https://budgit.duckdns.org/next. Original filling paintings and the nine-picture library are restored in the native theme. Loans use the first repayment month and full inclusive term, accepting pre-budget dates without rewriting actual reports or old loan records. Build/typecheck,1,095 regressions and15 core checks pass. Synthetic artwork/library/keyboard/draft/lost-response/shared-viewer and bounded phone/desktop Light-Dark checks pass. Fresh verified backup, isolated financial/access/HTTP/all-record/source-decryption checks and rollback prepared; runtime hashes/health/auth/deep routes and unchanged authoritative records/settings/keys/parking verified. Sites is retired from publishing; hosted deletion was unavailable in the connected account. After new pre-budget dates are saved, rollback must retain validator compatibility. Real-device/platform/provider limitations remain. Evidence: release-goals-loans-2026-11-01.json and goal-art-loan-start-2026-11-01.md.
+
+
 The active scope is [completion-plan.md](completion-plan.md): connect existing Budgit workflows. This status replaces older pending lists as the current connection inventory. A working bridge retains access while a React screen is unfinished; it does not certify full frontend parity.
 
 > Latest verified source scope (2026-10-29): native original settings/device drafts, private matching, manual/imported/savings migration, administrator Drive actions, Gmail filters/preview/scan/private notices/OAuth return, Apple Pay inbox/connections/merchant recommendations and shared analysis metrics/saved views/merchant reset. Build/typecheck, **1060 regressions** and **15 core checks** pass. This remains completion-plan stage3; the current continuation boundary at the end names remaining original UI connections and acceptance/release gates. Browser discovery still reports disabled; no new device acceptance or deployment. Historical next-action lists are superseded by completed later entries. Production/Sites/real records unchanged.

@@ -1,5 +1,10 @@
 # React migration checkpoint
 
+## Filling goals and first repayment dates live — 2026-11-01
+
+Verified application `c7f9608` is live at https://budgit.duckdns.org/next. Original filling paintings and the nine-picture library are restored in the native theme. Loans use the first repayment month and full inclusive term, accepting pre-budget dates without rewriting actual reports or old loan records. Build/typecheck,1,095 regressions and15 core checks pass. Synthetic artwork/library/keyboard/draft/lost-response/shared-viewer and bounded phone/desktop Light-Dark checks pass. Fresh verified backup, isolated financial/access/HTTP/all-record/source-decryption checks and rollback prepared; runtime hashes/health/auth/deep routes and unchanged authoritative records/settings/keys/parking verified. Sites is retired from publishing; hosted deletion was unavailable in the connected account. After new pre-budget dates are saved, rollback must retain validator compatibility. Real-device/platform/provider limitations remain. Evidence: release-goals-loans-2026-11-01.json and goal-art-loan-start-2026-11-01.md.
+
+
 > **Execution status — 2026-10-28:** [execution-status.md](execution-status.md) records the verified production baseline, current per-workflow connections and actual completion limits. Shared original report orchestration/drafts and optional categories are now implemented. Historical pending lists below are not a feature-development queue.
 
 > **Active scope correction — 2026-10-28:** Tal instructed us to connect existing Budgit features, not rewrite them. [completion-plan.md](completion-plan.md) supersedes historical pending/next-action lists below. They remain evidence only. Classify missing React behavior as connection work; retain original workflow semantics and completed tested work. Source inspection found optional-category parity, grouped draft/orchestration and generic bridge gaps; they are not fixed by this documentation update. Production is unchanged.
