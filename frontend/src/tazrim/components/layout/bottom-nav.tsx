@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Link from '../../../app/link'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Building2, ChevronLeft, CreditCard, Ellipsis, House, Info, LayoutDashboard, Repeat, Settings, Tag, Upload, Search } from 'lucide-react'
+import { Building2, ChevronLeft, CreditCard, Ellipsis, House, Info, LayoutDashboard, Repeat, Target, Settings, Tag, Upload, Search } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { isNavActive } from '@/lib/accounts/routes'
 import { isMoreActive } from '@/lib/nav/state'
@@ -15,11 +15,11 @@ const TABS: { href: string; label: string; title?: string; icon: typeof LayoutDa
   { href: '/banks', label: 'בנקים', icon: Building2 },
   { href: '/cards', label: 'כרטיסים', title: 'כרטיסי אשראי', icon: CreditCard },
   { href: '/', label: 'לוח בקרה', icon: House },
-  { href: '/recurring', label: 'קבועים', title: 'חיובים קבועים', icon: Repeat },
+  { href: '/savings', label: 'מטרות', title: 'חיסכון ומטרות', icon: Target },
 ]
 
 const MORE_LINKS = [
-  { href: '/savings', label: 'חיסכון ומטרות', icon: Tag },
+  { href: '/recurring', label: 'חיובים קבועים', icon: Repeat },
   { href: '/plans', label: 'פריטים מתוכננים', icon: Tag },
   { href: '/monthly', label: 'דיווח חודשי', icon: Tag },
   { href: '/search', label: 'חיפוש בפירוט', icon: Search },
@@ -92,7 +92,7 @@ export function BottomNav() {
       <Dialog.Root open={moreOpen} onOpenChange={setMoreOpen}>
         <Dialog.Trigger
           className={cn(TAB, moreActive ? 'text-primary' : 'text-foreground/60')}
-          aria-label="עוד: חיסכון ומטרות, פריטים מתוכננים, דיווח חודשי, חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, עזרה"
+          aria-label="עוד: חיובים קבועים, פריטים מתוכננים, דיווח חודשי, חיפוש בפירוט, העלאת קבצים, קטגוריות, הגדרות, עזרה"
         >
           <TabIcon active={moreActive} icon={Ellipsis} />
         </Dialog.Trigger>
