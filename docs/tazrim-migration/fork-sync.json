@@ -1,18 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "72f5e60ba5eabdca9155544ec13ee39bc84f3376",
+  "sourceCommit": "89406d3975303f7f69d9ab1ddb9e167f505d9524",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Incomplete development preview; not deployed. Apple Pay excluded. Browser access restored: exact synthetic Drive download, lost schedule/run/disconnect recovery, logout Stay/discard/confirmed-save/Back, settings device-draft comparison/restoration and larger imported/savings history pagination accepted. Browser found and repaired same-file backup reselection and long dependency identifier overflow. Original models/services unchanged. A deterministic VM test clock now fixes selectedMonth alongside todayMonth. Exact build/typecheck,1093 regressions and15 checks pass. Migration pagination made zero financial writes and retained source/target/other-user data. SSH current-live source read still times out; full consolidated route/theme/OS reduced-motion/keyboard/touch/report/vault/real-device/authorization acceptance and fresh source/verified backup/isolated preflight/rollback/release gates remain. No production/Sites/real-record/real Google changes. Exact evidence and limitations: RESUME.md and execution-status.md. Independent upstream history and notices preserved.",
+  "status": "Authenticated opt-in React interface is live at https://budgit.duckdns.org/next as of2026-11-01 from application1457bf0. Original root/interface and Sites retained. Final exact application passes1094 regressions/build/typecheck/15 checks,880 bounded layouts, live System/Reduce Motion preferences with originals restored and native Safari encrypted synthetic export. Fresh production source141-file baseline/verified private SQLite backup, isolated actual-backup financial/all-record preservation/access/HTTP/decryption and previous-image compatibility passed before Budgit-only activation. Actual runtime backend/HTML hashes, healthy configured login, public anonymous/forged refusal, native deep login/no-store/private assets and unchanged budgets/revisions/membership/allow-list/report keys verified. Credentials/proxy files and parking HTTP200/container identities remain unchanged. No production financial edits/imports/migrations/test identities/provider consent/resource upgrade. Real-iPhone/touch/PRF/Face ID/provider and in-app Blob completion limitations remain explicit. Documentation source checkpoint may follow the application release without changing runtime. Exact evidence in release-2026-11-01.json, acceptance-2026-11-01.md and RESUME.md. Independent upstream history and MIT/OFL notices preserved.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "coreChecks": 15,
-    "regressionTests": 1093,
-    "browser": "Bounded synthetic Drive/logout/settings draft and54-movement/56-allocation/84-history pagination pass. Imported narrow width433px due browser zoom; savings390px and1280px observed. Exact22-byte mock download verified, but browser download timeout was not honored. No real OAuth/phone/PRF/Face ID claim.",
-    "production": "SSH source check timed out; no fresh source/SQLite backup/live-data preflight or deployment."
+    "regressionTests": 1094,
+    "browser": "880 final bounded layout observations across88 destinations/78 paths/five widths/Light-Dark. Live macOS System/Reduce Motion and keyboard checks pass; originals restored. Native Safari encrypted synthetic export saved/decrypted. Real device/platform/provider and in-app Blob limits explicit.",
+    "production": "Application1457bf0 active at /next after verified backup/isolated preflight/rollback gates. Actual runtime hashes/health/auth/native routes/record preservation/parking verified. Original root and Sites retained.",
+    "evidence": "docs/tazrim-migration/release-2026-11-01.json"
   },
-  "history": "Tracked source snapshot; Budgit private Git history is not imported."
+  "history": "Tracked source snapshot; Budgit private Git history is not imported.",
+  "productionApplicationCommit": "1457bf0cd36cf00bd1619aece271b0e713ac6cfe"
 }

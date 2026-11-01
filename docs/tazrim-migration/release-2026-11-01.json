@@ -1,0 +1,57 @@
+{
+  "releasedAtDate": "2026-11-01",
+  "applicationCommit": "1457bf0cd36cf00bd1619aece271b0e713ac6cfe",
+  "previousCommit": "a79488ba465e6061edeb542aa22e40b852489631",
+  "entry": "https://budgit.duckdns.org/next",
+  "rollout": "Authenticated opt-in React interface; original root/interface remains available. No default-choice removal.",
+  "runtimeImage": "sha256:84f3a109b043c00c1a3811c72c1dcb497cd40a8378dde7081d942dde79ba1b44",
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressions": 1094,
+    "coreChecks": 15,
+    "layoutObservations": 880,
+    "layoutDestinations": 88,
+    "layoutPaths": 78,
+    "widths": [
+      320,
+      390,
+      430,
+      768,
+      1440
+    ],
+    "themes": [
+      "Light",
+      "Dark"
+    ],
+    "liveSystemAppearanceAndReduceMotion": "passed; original macOS preferences restored",
+    "nativeSafariEncryptedExport": "saved and locally decrypted/validated on synthetic data",
+    "freshProductionBaselineFilesVerified": 141,
+    "freshVerifiedSQLiteBackup": "passed; private receipt retained only on server",
+    "isolatedFinancialAndAllExistingRecordPreservation": "passed",
+    "isolatedAccessAndRealHTTP": "passed",
+    "storedReportMailboxAndJournalDecryption": "passed offline",
+    "previousImageAgainstCandidateInitializedCopy": "passed after normalizing disposable WAL copy for read-only testing",
+    "localAndImageHTMLHashes": "matched",
+    "actualRunningBackendAndHTMLHashes": "matched",
+    "liveHealth": "healthy; login configured",
+    "publicAnonymousAndForgedAPIs": "denied",
+    "nativeDeepRouteLoginAndNoStore": "passed",
+    "liveBudgetsRevisionsMembershipAllowlistAndReportKeyRecords": "unchanged across activation",
+    "credentialsReportKeysAndProxyConfiguration": "unchanged",
+    "parking": "HTTP200; app/proxy container identity/image/start time unchanged",
+    "sites": "unchanged",
+    "runtimeCriticalErrorsObserved": false
+  },
+  "limits": [
+    "Desktop width checks are not real-iPhone/touch acceptance.",
+    "Platform PRF/Face ID and real Google/provider consent were not exercised.",
+    "In-app Blob download completion was not independently verified; native Safari export passed.",
+    "No real user budget edits, report import, migration, sharing change or provider connection was performed."
+  ],
+  "rollback": {
+    "imageTag": "budgit-budgit:before-react-7570792-20261101",
+    "sourceReference": "a79488ba465e6061edeb542aa22e40b852489631",
+    "databaseRestoreDuringActivation": false,
+    "privateBackupMetadata": "Not included in source or fork export"
+  }
+}

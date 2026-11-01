@@ -1,5 +1,10 @@
 # Monthly Flow — project handoff
 
+## React interface rollout — 2026-11-01
+
+The authenticated React interface is live at https://budgit.duckdns.org/next from application commit1457bf0. The existing root interface stays available as a rollout fallback; Sites and hosting resources are unchanged. Fresh verified backup/isolated financial, stored-record, access, HTTP and encrypted-source checks passed; running hashes/health/login and unchanged budgets/revisions/sharing/access/key records were verified. Parking is unchanged. Exact final source passes1094 regressions, build/typecheck and15 core checks. See docs/tazrim-migration/release-2026-11-01.json and RESUME.md for evidence and real-device/platform/provider limitations. Historical preparation/SSH-blocked notes below are superseded.
+
+
 ## One current source — 2026-10-11
 
 The canonical checkout is `/Users/talshandor/Documents/personal-projects/monthly-flow`. `/Users/talshandor/Documents/ChatGPT/Monthly Flow Budget` now contains only a relocation notice, with no independent source checkout. Open the canonical project in Codex for all future work. Always work here, retain the Site ID in SOURCE-OF-TRUTH.json, and publish the same commit to Sites and the GitHub backup. Build refuses a different Site identity. The app menu displays a content-derived build identifier; refresh an already-open app to load published changes. HTML and budget responses use no-store.

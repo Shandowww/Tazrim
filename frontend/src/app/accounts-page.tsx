@@ -52,9 +52,9 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
     <div className="wallet-shell__head">
     {!fixture && budget.status==='ready' && typeof state?.setupSavedMessage==='string' && state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId && <p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div>
+      <div className="min-w-0 flex-1">
         {id && <Link href={periodHref(`/${kind}`)} className="mb-2 inline-block text-sm text-primary underline">חזרה אל {title}</Link>}
-        <h1 className="text-2xl font-semibold tracking-tight">{selected?.displayName || title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight [overflow-wrap:anywhere]">{selected?.displayName || title}</h1>
         {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
       </div>
     </div>

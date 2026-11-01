@@ -39,11 +39,29 @@
     "server/app.mjs",
     "build.mjs"
   ],
-  "releaseStatus": "Development only; full frontend workflow and release acceptance pending.",
+  "releaseStatus": "Authenticated opt-in rollout active 2026-11-01 at /next; original root retained; Sites unchanged.",
   "canonicalFollowups": [
     {
       "commit": "04eb8c0",
       "scope": "Resolve the selected loan before multi-account removal payer checking; shared core regression tests."
     }
-  ]
+  ],
+  "currentLiveVerification": {
+    "date": "2026-11-01",
+    "commit": "a79488ba465e6061edeb542aa22e40b852489631",
+    "sourceFilesCompared": 141,
+    "sourceFilesDifferent": 0,
+    "method": "Read-only SSH source SHA256 comparison; runtime release marker and healthy existing service metadata verified."
+  },
+  "candidatePreflight": {
+    "sourceCommit": "1457bf0cd36cf00bd1619aece271b0e713ac6cfe",
+    "financialProjectionAndAllExistingRecords": "passed on final fresh private verified backup in network-none container",
+    "accessAndHTTP": "passed",
+    "nativeDeepRoutesAndPrivateAssets": "passed",
+    "storedReportMailboxAndJournalDecryption": "passed offline",
+    "localAndContainerHTMLHashes": "matched",
+    "previousImageAgainstCandidateInitializedCopy": "passed after normalizing only disposable WAL copy for read-only mount",
+    "activation": "completed; runtime hashes/health/login/public access and unchanged live financial/membership/access/key records verified; parking/credentials/proxy/Sites unchanged",
+    "evidence": "release-2026-11-01.json"
+  }
 }

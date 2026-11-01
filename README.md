@@ -1,6 +1,8 @@
 # Budgit adaptation of Tazrim — development branch
 
-This branch mirrors the completed React development checkpoint from `Shandowww/monthly-flow-budget`, commit `72f5e60ba5eabdca9155544ec13ee39bc84f3376`. It uses Budgit’s existing backend and financial rules with Tazrim’s React presentation. It is an incomplete development preview with guarded manual monthly, account and card editing; remaining workflow parity, backend integration and release acceptance are pending. It is not a published release. The original Tazrim application remains on this fork’s `main` branch.
+> Rollout2026-11-01: Budgit application1457bf0 is active at the authenticated https://budgit.duckdns.org/next entry. Original interface and Sites retained. This snapshot contains the current source and release evidence, not private Git history or financial records. Real-device/platform/provider limitations are recorded in docs/tazrim-migration/release-2026-11-01.json.
+
+This branch mirrors the completed React development checkpoint from `Shandowww/monthly-flow-budget`, commit `89406d3975303f7f69d9ab1ddb9e167f505d9524`. It uses Budgit’s existing backend and financial rules with Tazrim’s React presentation. It is an incomplete development preview with guarded manual monthly, account and card editing; remaining workflow parity, backend integration and release acceptance are pending. It is not a published release. The original Tazrim application remains on this fork’s `main` branch.
 
 See [the implementation checkpoint](docs/tazrim-migration/checkpoint.md) and [source synchronization record](docs/tazrim-migration/fork-sync.json). Tazrim’s MIT license and Heebo’s license are retained.
 

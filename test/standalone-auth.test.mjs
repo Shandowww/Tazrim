@@ -59,3 +59,20 @@ test('Authenticated application, login and shortcut HTML enforce exact-script CS
  const c=setup();try{const signed=await login(c);for(const [path,cookie]of [['/',signed.cookie],['/shortcuts/install',''],['/','']]){const response=await c.handle(new Request(origin+path,{headers:{cookie}}));assert.equal(response.status,200);const html=await response.text(),policy=response.headers.get('Content-Security-Policy');assert.equal(policy,scriptReportPolicy(html));assert.ok(!policy.split('script-src ')[1].split(';')[0].includes('unsafe-inline'));for(const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi))if(match[1])assert.ok(policy.includes("'sha256-"+createHash('sha256').update(match[1]).digest('base64')+"'"));if(cookie)assert.match(html,/window.monthlyFlowStandalone=true/);}}finally{c.db.close();}
 });
 test('Action, report and Gmail endpoints keep session and origin gates; upload tokens grant no mailbox or budget access',async()=>{const c=setup();try{const headers={'oai-authenticated-user-id':'victim',authorization:'Bearer '+'a'.repeat(43)};for(const path of ['/api/actions','/api/reports','/api/gmail'])assert.equal((await c.handle(new Request(origin+path,{headers}))).status,401);const signed=await login(c);for(const path of ['/api/actions','/api/reports','/api/gmail']){assert.equal((await c.handle(new Request(origin+path,{method:'POST',headers:{cookie:signed.cookie,origin:'https://evil.test'},body:'{}'}))).status,403);assert.equal((await c.handle(new Request(origin+path,{headers:{cookie:signed.cookie}}))).status,200);}assert.equal((await c.handle(new Request(origin+'/api/imports/reports',{method:'POST',headers:{authorization:headers.authorization},body:'source'}))).status,401);}finally{c.db.close();}});
+
+test('Native sign-in retains the exact deep route through the existing OAuth return and retry while legacy root stays unchanged',async()=>{
+ const target='/next/settings/security?budget=shared-test&year=2026&month=9',c=setup();
+ try{
+  const before=JSON.stringify(['plans','budgets'].map(table=>c.db.prepare('SELECT * FROM '+table).all()));
+  const link=html=>html.match(/<a href="([^"]+)">כניסה עם Google/)[1];
+  assert.equal(link(await(await c.handle(new Request(origin+'/'))).text()),'/auth/google');
+  const native=await c.handle(new Request(origin+target));assert.equal(native.status,200);assert.equal(native.headers.get('cache-control'),'no-store');
+  const href=link(await native.text());assert.equal(new URL(href,origin).pathname,'/auth/google');assert.equal(new URL(href,origin).searchParams.get('returnTo'),target);
+  const start=await c.handle(new Request(new URL(href,origin))),state=new URL(start.headers.get('Location')).searchParams.get('state');
+  assert.equal(c.db.prepare('SELECT return_to FROM auth_pending').get().return_to,target);
+  const result=await c.handle(new Request(origin+'/auth/google/callback?state='+state+'&code=test',{headers:{cookie:'__Host-mf_oauth='+state}}));assert.equal(result.status,303);assert.equal(result.headers.get('Location'),target);
+  const retryStart=await c.handle(new Request(new URL(href,origin))),retryState=new URL(retryStart.headers.get('Location')).searchParams.get('state');c.fail();
+  const failed=await c.handle(new Request(origin+'/auth/google/callback?state='+retryState+'&code=test',{headers:{cookie:'__Host-mf_oauth='+retryState}}));assert.equal(failed.status,401);assert.equal(new URL(link(await failed.text()),origin).searchParams.get('returnTo'),target);
+  assert.equal(JSON.stringify(['plans','budgets'].map(table=>c.db.prepare('SELECT * FROM '+table).all())),before);
+ }finally{c.db.close()}
+});
