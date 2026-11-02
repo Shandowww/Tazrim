@@ -13,7 +13,7 @@ export async function loadDeviceDraft(budgetId:string,base:BudgetResponse,store=
  const value=await openDeviceDraft(scope,box,current?.key,base.vault?.keyId??'')
  if(epoch!==vaultGeneration()||base.vault&&current!==nativeVaultSession(budgetId,base))throw new AccessError('התקציב ננעל בזמן פתיחת הטיוטה.')
  if(typeof value?.selectedMonth!=='string'||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(value.selectedMonth)||!validatePlan(value?.plan)||!Number.isSafeInteger(value.revision)||value.revision<0||value.raw!==undefined&&(!value.raw||typeof value.raw!=='object'||Array.isArray(value.raw)||Object.values(value.raw).some(v=>typeof v!=='string')))throw Error('טיוטת המכשיר אינה תקינה. העותק המקומי נשמר.')
- const reason=box.archived?'הטיוטה נשמרה בנפרד בזמן רענון.':value.revision!==base.revision?'הגרסה השמורה השתנתה מאז יצירת הטיוטה.':Object.keys(value.raw??{}).length||value.monthlyPending||value.monthlySalaryChanged?'יש בטיוטה שדות חודשיים שדורשים השלמה בממשק המקורי.':''
+ const reason=box.archived?'הטיוטה נשמרה בנפרד בזמן רענון.':value.revision!==base.revision?'הגרסה השמורה השתנתה מאז יצירת הטיוטה.':Object.keys(value.raw??{}).length||value.monthlyPending||value.monthlySalaryChanged?'יש בטיוטה שדות חודשיים להשלמה במסך הדיווח החודשי.':''
  return{box,value,scope,restorable:!reason,reason}
 }
 export function exportDeviceDraft(draft:LocalDraft){return deviceDraftExport(draft.value)}

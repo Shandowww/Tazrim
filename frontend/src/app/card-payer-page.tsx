@@ -1,3 +1,4 @@
+import {withViewQuery} from './navigation-query'
 import {useRef,useState} from 'react'
 import {useLocation,useParams} from 'react-router-dom'
 import {cashAccountList,creditCards} from '../../../src/budget.js'
@@ -8,7 +9,6 @@ import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {useCreatedEditorRoute} from './use-created-editor-route'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import {legacyBudgetHref} from './navigation-query'
 import Link from './link'
 const button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 function PayerEditor({budget,base,id,onSaved}:{budget:BudgetState;base:BudgetResponse;id:string;onSaved:(message:string)=>void}){
@@ -25,5 +25,5 @@ export function CardPayerPage({budget,fixture}:{budget:BudgetState;fixture:boole
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען שיוך…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan,card=plan&&!plan.format?creditCards(plan).find((c:any)=>c.id===id):null,reason=!card?'הכרטיס אינו זמין בתקציב גלוי במרחב הזה.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון אינה זמינה בשרת הזה.':''
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/cards/'+encodeURIComponent(id))} className="text-sm text-primary underline">חזרה לכרטיס</Link><h1 className="text-2xl font-semibold">שיוך חשבון משלם · <bdi>{card?.name}</bdi></h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<PayerEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} onSaved={setMessage}/>}<Link href={href('/accounts/assignments')} className="inline-flex min-h-11 items-center text-sm text-primary underline">שיוך התחייבויות שטרם שויכו</Link><a href={legacyBudgetHref(search,'accounts')} className="inline-flex min-h-11 items-center text-sm text-primary underline">סקירת כל שיוכי הפריטים בממשק הקיים</a></div>
+ return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/cards/'+encodeURIComponent(id))} className="text-sm text-primary underline">חזרה לכרטיס</Link><h1 className="text-2xl font-semibold">שיוך חשבון משלם · <bdi>{card?.name}</bdi></h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<PayerEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} onSaved={setMessage}/>}<Link href={href('/accounts/assignments')} className="inline-flex min-h-11 items-center text-sm text-primary underline">שיוך התחייבויות שטרם שויכו</Link><Link className="inline-flex min-h-11 items-center text-primary underline" href={withViewQuery('/accounts/assignments',search)}>שיוך כרטיסים והתחייבויות לחשבונות</Link></div>
 }

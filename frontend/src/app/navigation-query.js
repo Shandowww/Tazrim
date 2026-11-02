@@ -27,3 +27,6 @@ export function detailResultHref(id, search, from = 'categories') {
 
 /** First launch defaults to this month; explicit annual and historical links retain their period. */
 export function openingViewSearch(search, asOf){const query=new URLSearchParams(search);if(!query.has('year')&&!query.has('month')&&/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(asOf)){query.set('year',asOf.slice(0,4));query.set('month',String(Number(asOf.slice(5))))}return query.toString()}
+
+/** Draft recovery opens the original selected month, without carrying action or private parameters. */
+export function monthlyDraftHref(search,month){const q=new URLSearchParams(search);if(/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(month??'')){q.set('year',month.slice(0,4));q.set('month',String(Number(month.slice(5))))}return withViewQuery('/monthly','?'+q)}

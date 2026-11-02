@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import Link from './link'
 import { budgetDetailView, budgetDetailSource, detailSearchResults } from './detail-adapter'
-import { legacyBudgetHref, withViewQuery } from './navigation-query'
+import { withViewQuery } from './navigation-query'
 import { CategoryDonut } from '../tazrim/components/cards/category-donut'
 import { SearchResultList } from '../tazrim/components/search/search-result-list'
 import { formatCurrency } from '../tazrim/lib/utils/currency'
@@ -15,18 +15,18 @@ import { demoDetailPlan } from './demo-fixture'
 export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categories' | 'search' | 'source'; fixture: boolean; budget: ReturnType<typeof useBudget> }) {
   const { search, state } = useLocation(), navigate = useNavigate(), { id } = useParams(), params = new URLSearchParams(search)
   const managementHref=withViewQuery('/details/manage',search),limitsHref=withViewQuery('/categories/limits',search)
-  const editorHref = legacyBudgetHref(search), options = periodFor(search)
+  const options = periodFor(search)
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען פירוט…</section>
   if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message}</section>
   const plan: Record<string, unknown> | null = fixture ? demoDetailPlan : budget.status === 'ready' ? budget.value.plan : null
-  if (!plan || plan.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">{plan ? 'התקציב מוצפן.' : 'עדיין אין תקציב שמור.'} <a href={editorHref} className="text-primary underline">פתיחה בממשק הקיים</a></section>
+  if (!plan || plan.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">{plan ? 'התקציב מוצפן.' : 'עדיין אין תקציב שמור.'} <Link className="inline-flex min-h-11 items-center text-primary underline" href={withViewQuery('/details/manage',search)}>ניהול פירוט וצ׳קים</Link></section>
   let view: ReturnType<typeof budgetDetailView>
   let source: ReturnType<typeof budgetDetailSource> = null
   try {
     view = budgetDetailView(plan, options)
     if (mode === 'source') source = budgetDetailSource(plan, id || '', options)
   } catch {
-    return <section className="surface rounded-xl p-6" role="alert">הפירוט או המסננים אינם זמינים במרחב ובתקופה האלה. <a href={editorHref} className="text-primary underline">פתיחת התקציב בממשק הקיים</a></section>
+    return <section className="surface rounded-xl p-6" role="alert">הפירוט או המסננים אינם זמינים במרחב ובתקופה האלה. <Link className="inline-flex min-h-11 items-center text-primary underline" href={withViewQuery('/details/manage',search)}>ניהול פירוט וצ׳קים</Link></section>
   }
   const href = (path: string, changes: Record<string, string | null> = {}) => {
     const next = new URLSearchParams(search)
@@ -73,6 +73,6 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
     <section className="surface rounded-xl p-4 sm:p-6"><h2 className="font-semibold">הרשומות השמורות</h2><p className="text-sm text-muted-foreground" role="status">{view.rows.length === 1 ? 'רשומה אחת' : `${view.rows.length} רשומות`} · עמוד {page} מתוך {Math.ceil(view.rows.length / 50) || 1}</p>{shown.length ? <SearchResultList results={detailSearchResults(plan, shown)} terms={options.query ? [options.query] : []} /> : <p className="py-8 text-sm text-muted-foreground">אין פירוט שנפרע התואם לתקופה ולמסננים. חוסר פירוט אינו אפס.</p>}
       {view.rows.length > 50 && <nav className="mt-4 flex gap-4" aria-label="עמודי פירוט">{page > 1 && <Link className="text-primary underline" href={href('/' + mode, { page: String(page - 1) })}>העמוד הקודם</Link>}{page * 50 < view.rows.length && <Link className="text-primary underline" href={href('/' + mode, { page: String(page + 1) })}>העמוד הבא</Link>}</nav>}
     </section>
-    {!fixture && <p className="text-sm text-muted-foreground">תצוגה לקריאה בלבד. <a href={editorHref} className="text-primary underline">עריכה בממשק הקיים</a></p>}
+    {!fixture && <p className="text-sm text-muted-foreground">תצוגה לקריאה בלבד. <Link className="inline-flex min-h-11 items-center text-primary underline" href={withViewQuery('/details/manage',search)}>ניהול פירוט וצ׳קים</Link></p>}
   </div>
 }

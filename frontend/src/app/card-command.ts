@@ -16,7 +16,7 @@ export function prepareCardConfig(plan:any,id:string,draft:CardDraft,create=fals
  if(create&&existing)throw Error('מזהה הכרטיס כבר קיים; אין לדרוס אותו.')
  const accounts=cashAccountList(plan)
  if(create&&(accounts.length&&!accounts.some((a:any)=>a.id===draft.payer)||!accounts.length&&draft.payer))throw Error('יש לבחור חשבון משלם מפורש לכרטיס החדש.')
- if(!create&&draft.payer!==(cashCardAccount(plan,id)??''))throw Error('שינוי חשבון משלם לכרטיס קיים דורש סקירת דיווחים ושיוכים בממשק הקיים.')
+ if(!create&&draft.payer!==(cashCardAccount(plan,id)??''))throw Error('שינוי החשבון המשלם נעשה במסך החשבון המשלם של הכרטיס, עם בדיקת הדיווחים והשיוכים.')
  const next=clone(plan);next.creditCards=clone(creditCards(plan));const card={id,name:draft.name.trim(),alias:draft.alias.trim(),billingDay:Number(draft.billingDay)},index=next.creditCards.findIndex((row:any)=>row.id===id)
  if(index<0)next.creditCards.push(card);else next.creditCards[index]={...next.creditCards[index],...card}
  next.defaults[id]??=0

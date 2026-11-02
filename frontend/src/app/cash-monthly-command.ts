@@ -9,7 +9,7 @@ export function cashMonthlyEligibility(plan:any,id:string,month:string,{sourceAw
  const cards=new Set(creditCards(plan).filter((c:any)=>cashCardAccount(plan,c.id)===id).map((c:any)=>c.id))
  if(!sourceAware&&((plan.cardBilling?.reports??[]).some((r:any)=>r.dueDate.startsWith(month)&&(r.accountId===id||cards.has(r.cardId)))||(plan.details??[]).some((r:any)=>r.month===month&&r.statement&&(r.cashAccountId===id||cards.has(r.method)||cards.has(r.cardId)))))return 'לחשבון יש דוח כרטיס שמור בחודש הזה. אפשר לבדוק תיקון ידני לצד שמירת הדוח המקורי.'
  const {values}=cashAccountValues(plan,id,month)
- if(creditCards(plan).some((c:any)=>Number(values[c.id]??0)!==0&&!cards.has(c.id)))return 'יש בחשבון סכום כרטיס ללא שיוך משלם תואם. יש להשלים שיוכים בממשק הקיים לפני עריכה.'
+ if(creditCards(plan).some((c:any)=>Number(values[c.id]??0)!==0&&!cards.has(c.id)))return 'יש בחשבון סכום כרטיס ללא שיוך משלם תואם. יש להשלים שיוכים במסך שיוך כרטיסים והתחייבויות לפני עריכה.'
  return null
 }
 export function cashMonthlyFields(plan:any,id:string){

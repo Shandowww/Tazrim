@@ -8,7 +8,6 @@ import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import {legacyBudgetHref} from './navigation-query'
 import Link from './link'
 const input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-sm',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 function ExpectationsEditor({budget,base,asOf,viewer,onSaved}:{budget:BudgetState;base:ExpectationsSnapshot;asOf:string;viewer:boolean;onSaved:(next:ExpectationsSnapshot,message:string)=>void}){
@@ -30,5 +29,5 @@ export function ReportExpectationsPage({budget,fixture}:{budget:BudgetState;fixt
  if(fixture)return <p>הגדרות דוחות צפויים דורשות תקציב שנפתח בחשבון.</p>
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען מרחב…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/upload')} className="inline-flex min-h-11 items-center text-sm text-primary underline">חזרה למרכז הדוחות</Link><h1 className="text-2xl font-semibold">מתי צפוי כל דוח?</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><p className="text-sm text-muted-foreground">תזכורת מופיעה רק למקור שהופעל. יום ההגעה הוא בחודש שאחרי תקופת הדוח, בתוספת ימי החסד. חודשים חריגים נכתבים כרשימת חודשים מופרדת בפסיקים או ברווחים.</p><p className="text-sm text-muted-foreground">המועדים אינם מעלים דוחות ואינם אישור שהנתונים מלאים. הדוחות והסכומים בתקציב נשארים כפי שנשמרו.</p><ExpectationsContent key={budget.value.accountId+'/'+budget.budgetId} budget={budget} actor={budget.value} asOf={asOf}/><a href={legacyBudgetHref(search,'reports')} className="inline-flex min-h-11 items-center text-sm text-primary underline">אפשרויות נוספות בממשק הקיים</a></div>
+ return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/upload')} className="inline-flex min-h-11 items-center text-sm text-primary underline">חזרה למרכז הדוחות</Link><h1 className="text-2xl font-semibold">מתי צפוי כל דוח?</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><p className="text-sm text-muted-foreground">תזכורת מופיעה רק למקור שהופעל. יום ההגעה הוא בחודש שאחרי תקופת הדוח, בתוספת ימי החסד. חודשים חריגים נכתבים כרשימת חודשים מופרדת בפסיקים או ברווחים.</p><p className="text-sm text-muted-foreground">המועדים אינם מעלים דוחות ואינם אישור שהנתונים מלאים. הדוחות והסכומים בתקציב נשארים כפי שנשמרו.</p><ExpectationsContent key={budget.value.accountId+'/'+budget.budgetId} budget={budget} actor={budget.value} asOf={asOf}/></div>
 }

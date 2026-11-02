@@ -1,3 +1,4 @@
+import {withViewQuery} from './navigation-query.js'
 import {driveBackupActionBody} from '../../../src/drive-backup-model.js'
 import type {BudgetResponse} from './budget-api.ts'
 import {SaveConflict,SaveUncertain} from './plan-save.ts'
@@ -14,3 +15,5 @@ export async function loadDriveFiles(base:BudgetResponse,signal:AbortSignal,fetc
 export const driveDownloadHref=(base:BudgetResponse,id:string)=>{if(!/^[a-zA-Z0-9_-]{1,200}$/.test(id))throw Error('מזהה גיבוי אינו תקין.');return '/api/admin/backup/files?accountId='+encodeURIComponent(base.accountId)+'&file='+encodeURIComponent(id)}
 /** A check never repeats a mutation; unchanged evidence keeps an uncertain action locked. */
 export function driveActionObserved(previous:DriveStatus,next:DriveStatus,action:string,mode:string){if(next.running||next.accountId!==previous.accountId||next.accountEmail!==previous.accountEmail)return false;if(action==='drive-backup-run')return next.lastAttempt!==previous.lastAttempt;if(action==='drive-backup-disconnect')return !next.connected;return ['drive-backup-enable','drive-backup-disable'].includes(action)&&next.enabled===(action==='drive-backup-enable')&&next.scheduleMode===mode}
+
+export const driveConnectHref=(base:BudgetResponse,search:string)=>withViewQuery('/auth/backup-drive?returnTo=native&accountId='+encodeURIComponent(base.accountId),search)

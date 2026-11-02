@@ -80,7 +80,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const ui=reactUiResponse(request);if(ui){const h=new Headers(ui.headers);for(const [k,v]of Object.entries(headers))if(k!=='Cache-Control')h.set(k,v);return new Response(ui.body,{status:ui.status,headers:h});}
  if(path==='/auth/gmail'&&request.method==='GET')return gmail.begin(request,user);
  if(path==='/api/gmail')return gmail.handle(request,user);
- if(path==='/auth/backup-drive'&&request.method==='GET')return backup?backup.begin(user):json({error:'גיבוי חיצוני אינו מוגדר.'},503);
+ if(path==='/auth/backup-drive'&&request.method==='GET')return backup?backup.begin(user,request):json({error:'גיבוי חיצוני אינו מוגדר.'},503);
  if(path==='/api/admin/backup/files'&&request.method==='GET')return backup?backup.files(request,user):json({error:'גיבוי חיצוני אינו מוגדר.'},503);
  if(path==='/api/admin/backup')return backup?backup.handle(request,user):json({error:'גיבוי חיצוני אינו מוגדר.'},503);
  if(path==='/api/data/transactions'){

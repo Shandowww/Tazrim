@@ -11,6 +11,13 @@ export function inboxTarget(p,item){
  if(kind==='card'&&inboxCardLast4(item)){const last4=inboxCardLast4(item),matches=targets.filter(t=>t.alias===last4);if(matches.length===1)return matches[0].id;}
  return targets.length===1&&!contradicts(targets[0])?targets[0].id:'';
 }
+/** A navigation hint never replaces a detected binding or a contradicting card number. */
+export function inboxHintTarget(p,item,hint={}){
+ if(item.target)return item.target;
+ const id=item.kind==='card'?hint.cardId:item.kind==='bank'?hint.accountId:'',targets=item.kind==='card'?creditCards(p):cashAccountList(p),target=targets.find(t=>t.id===id);
+ if(!target||item.kind==='card'&&inboxCardLast4(item)&&/^\d{4}$/.test(target.alias??'')&&target.alias!==inboxCardLast4(item))return '';
+ return target.id;
+}
 export async function inboxCardProof(p,target,dueDate){const r=p.cardBilling?.reports.find(r=>r.cardId===target&&r.dueDate===dueDate);if(!r)return '';const ids=(p.details??[]).filter(e=>e.method===target&&e.statement?.dueDate===dueDate).map(e=>e.id).sort();return inboxHash(JSON.stringify([r.amount,ids]));}
 export async function inboxReceiptPresent(p,receipt){if(receipt.kind==='bank')return (p.bankImport?.batches??[]).some(b=>b.id===receipt.reference&&b.accountId===receipt.target);return !!receipt.proof&&receipt.proof===await inboxCardProof(p,receipt.target,receipt.reference);}
 export async function applyReportInbox(p,bankEntries,cardEntries,receipts,bindings,asOf){

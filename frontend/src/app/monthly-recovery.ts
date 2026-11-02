@@ -5,7 +5,9 @@ async function snapshotHash(value:unknown){const bytes=await crypto.subtle.diges
 function checkedDraft(value:unknown,base:BudgetResponse,month:string):MonthlyDraft{
  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('קובץ הטיוטה אינו תקין.')
  const d=value as MonthlyDraft,keys=Object.keys(d)
- if(keys.length!==4||keys.some(key=>!['values','actual','includesCard','includesDirect'].includes(key))||!d.values||typeof d.values!=='object'||Array.isArray(d.values)||[d.actual,d.includesCard,d.includesDirect].some(v=>typeof v!=='boolean'))throw Error('קובץ הטיוטה אינו תקין.')
+ if(keys.length<4||keys.length>7||keys.some(key=>!['values','actual','includesCard','includesDirect','otherIncomeNote','balance','offCard'].includes(key))||!d.values||typeof d.values!=='object'||Array.isArray(d.values)||[d.actual,d.includesCard,d.includesDirect].some(v=>typeof v!=='boolean'))throw Error('קובץ הטיוטה אינו תקין.')
+ if(d.otherIncomeNote!==undefined&&(typeof d.otherIncomeNote!=='string'||d.otherIncomeNote.length>120)||d.balance!==undefined&&(typeof d.balance!=='string'||d.balance.length>32))throw Error('שדות הטיוטה אינם תקינים.')
+ if(d.offCard!==undefined&&(typeof d.offCard!=='string'||d.offCard.length>32))throw Error('שדות הטיוטה אינם תקינים.')
  const expected=Object.keys(initialMonthlyDraft(base.plan,month).values)
  if(Object.keys(d.values).length!==expected.length||Object.entries(d.values).some(([key,v])=>!expected.includes(key)||typeof v!=='string'||v.length>32))throw Error('שדות הטיוטה אינם תואמים לתקציב הזה.')
  return structuredClone(d)
@@ -31,17 +33,24 @@ export async function readMonthlyRecovery(text:string,base:BudgetResponse,budget
  return checkedDraft(r.draft,base,month)
 }
 
-/** Resume only original raw inputs over an identical saved plan; never drop other edits. */
+/** Resume the original month-only draft over its exact saved revision; retain every other edit. */
 export function originalMonthlyFields(draft:any,base:BudgetResponse,budgetId:string,month:string):MonthlyDraft{
  const reason=manualMonthEligibility(base.plan,month);if(reason)throw Error(reason)
- const scope=JSON.stringify([base.accountId,budgetId]),v=draft?.value
- if(draft?.scope!==scope||draft?.box?.archived||v?.revision!==base.revision||v?.selectedMonth!==month||v?.monthlyPending||v?.monthlySalaryChanged||JSON.stringify(normalize(v?.plan))!==JSON.stringify(normalize(base.plan)))throw Error('הטיוטה כוללת גרסה, חודש או שינויים נוספים. יש להמשיך בממשק המקורי; העותק המקומי נשמר.')
- const result=initialMonthlyDraft(base.plan,month),raw=v.raw
- if(!raw||typeof raw!=='object'||Array.isArray(raw)||!Object.keys(raw).length)throw Error('אין בטיוטה שדות חודשיים להמשך עריכה.')
+ const scope=JSON.stringify([base.accountId,budgetId]),v=draft?.value,expected=structuredClone(base.plan) as any
+ if(v?.plan?.months?.[month])expected.months[month]=v.plan.months[month]
+ if(draft?.scope!==scope||draft?.box?.archived||v?.revision!==base.revision||v?.selectedMonth!==month||v?.monthlyPending&&v.monthlyPending!==month||JSON.stringify(normalize(v?.plan))!==JSON.stringify(normalize(expected)))throw Error('הטיוטה כוללת גרסה, חודש או שינויים נוספים. העותק המקומי נשמר; אפשר להוריד אותו לבדיקה בלי להחליף את התקציב.')
+ const result=initialMonthlyDraft(v.plan,month),raw=v.raw??{}
+ if(typeof raw!=='object'||Array.isArray(raw)||!Object.keys(raw).length&&JSON.stringify(normalize(v.plan))===JSON.stringify(normalize(base.plan)))throw Error('אין בטיוטה שדות חודשיים להמשך עריכה.')
  for(const [name,value]of Object.entries(raw)){
   const key=name.startsWith('month-')?name.slice(6):''
-  // Original off-card aggregation and income notes need their original controls.
-  if(!key||['variable','transfers','otherIncomeNote','offCard'].includes(key)||!Object.hasOwn(result.values,key)||typeof value!=='string'||value.length>32)throw Error('חלק משדות הטיוטה דורשים את הטופס המקורי. העותק נשמר ולא נטען חלקית.')
+  if(typeof value!=='string')throw Error('שדות הטיוטה אינם תקינים.')
+  if(key==='otherIncomeNote'&&value.length<=120){result.otherIncomeNote=value;continue}
+  if(key==='cashBalance'&&value.length<=32){result.balance=value;continue}
+  if(key==='offCard'&&value.length<=32){
+   // Preserve invalid text so it can be completed; the original aggregation owns the split.
+   result.offCard=value;continue
+  }
+  if(!key||!Object.hasOwn(result.values,key)||value.length>32)throw Error('חלק משדות הטיוטה אינם מזוהים. העותק נשמר ולא נטען חלקית.')
   result.values[key]=value
  }
  return result

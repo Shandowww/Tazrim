@@ -28,21 +28,21 @@ export async function loadHistory(budgetId:string,base:BudgetResponse,offset:num
 export async function loadBudgetExport(budgetId:string,base:BudgetResponse,signal:AbortSignal,fetcher:typeof fetch=fetch){
  const snapshot=await check(budgetId,base,signal,fetcher),plan=snapshot.value.plan
  if(snapshot.value.vault)return JSON.stringify(snapshot.value.vault,null,2)
- if(!plan||plan.format||!validatePlan(plan))throw Error('גיבוי התקציב הזה זמין בממשק הקיים בלבד.')
+ if(!plan||plan.format||!validatePlan(plan))throw Error('יש לפתוח את מסך פרטיות ושחזור כדי לייבא או לייצא תקציב מוצפן.')
  return JSON.stringify({format:'monthly-flow-v1',plan},null,2)
 }
 export interface HistorySnapshot{id:string;revision:number;before:Record<string,unknown>|null;after:Record<string,unknown>;canUndo:boolean;undoIdentityBound:boolean}
 function normalizeHistory(value:any):any{return value&&typeof value==='object'?Array.isArray(value)?value.map(normalizeHistory):Object.fromEntries(Object.keys(value).filter(k=>value[k]!==undefined).sort().map(k=>[k,normalizeHistory(value[k])])):value}
 const canonical=(value:any)=>JSON.stringify(normalizeHistory(value))
 export async function loadHistorySnapshot(budgetId:string,base:BudgetResponse,entry:HistoryEntry,signal:AbortSignal,fetcher:typeof fetch=fetch):Promise<HistorySnapshot>{
- if(!/^[a-zA-Z0-9-]{1,100}$/.test(entry.id)||!entry.snapshot||base.plan?.format)throw Error('בדיקת הגרסה הזו זמינה בממשק הקיים בלבד.')
+ if(!/^[a-zA-Z0-9-]{1,100}$/.test(entry.id)||!entry.snapshot||base.plan?.format)throw Error('יש לפתוח את מסך פרטיות ושחזור ולפתוח את התקציב לפני בדיקת הגרסה.')
  await check(budgetId,base,signal,fetcher)
  const response=await fetcher('/api/plan-history?budget='+encodeURIComponent(budgetId)+'&id='+encodeURIComponent(entry.id),{credentials:'same-origin',cache:'no-store',signal,headers:{'x-budget-account-id':base.accountId}})
  if([401,403,404].includes(response.status))throw new AccessError('העותק ההיסטורי אינו זמין לחשבון או למרחב הזה.')
  if(!response.ok)throw Error('העותק ההיסטורי לא נטען. התקציב לא שונה; אפשר לנסות שוב.')
  const value=await response.json();await check(budgetId,base,signal,fetcher)
  if(base.vault){if(!isVault(value.before)||!isVault(value.after))throw Error('אין אפשרות לפתוח את הגרסה הקודמת במפתח הנוכחי.');value.before=await revealHistoryVault(budgetId,base,value.before);value.after=await revealHistoryVault(budgetId,base,value.after);await check(budgetId,base,signal,fetcher)}
- if(value?.revision!==entry.revision||typeof value.canUndo!=='boolean'||value.before!==null&&!validatePlan(value.before)||!validatePlan(value.after)||value.before?.format||value.after?.format)throw Error('העותק אינו תקציב גלוי שניתן לאמת. יש להשתמש בממשק הקיים.')
+ if(value?.revision!==entry.revision||typeof value.canUndo!=='boolean'||value.before!==null&&!validatePlan(value.before)||!validatePlan(value.after)||value.before?.format||value.after?.format)throw Error('העותק אינו תקציב גלוי שניתן לאמת. אפשר לרענן ולנסות שוב; אם ההודעה נמשכת נדרש עדכון השרת.')
  return{id:entry.id,revision:value.revision,before:value.before,after:value.after,canUndo:value.canUndo,undoIdentityBound:value.undoIdentityBound===true}
 }
 export async function undoHistorySnapshot(budgetId:string,base:BudgetResponse,snapshot:HistorySnapshot,fetcher:typeof fetch=fetch){

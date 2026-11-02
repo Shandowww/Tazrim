@@ -25,13 +25,13 @@ export function prepareManualAccount(plan:any,id:string,draft:AccountDraft,{crea
  if(draft.opening.trim()!==''){
   if(!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(draft.openingMonth)||draft.openingMonth<plan.startMonth||draft.openingMonth>asOf)throw Error('יש לבחור חודש יתרת פתיחה מתקופת התקציב ועד החודש הנוכחי.')
   account.opening=signedCents(draft.opening)/100;account.openingMonth=draft.openingMonth
- }else if(existing?.opening!==undefined){throw Error('יתרת הפתיחה קיימת. יש להזין סכום מפורש; למחיקה או שינוי מקור יש להשתמש בממשק הקיים.')}
+ }else if(existing?.opening!==undefined){throw Error('יתרת הפתיחה קיימת. יש להזין סכום מפורש; לשינוי יתרה יש להזין סכום מפורש, כולל 0. מקור הדיווח נשאר שמור.')}
  const result=saveCashAccount(plan,account)
  const dependencies=[...plan.expenses,...(plan.loans??[]),...(plan.details??[]),...(plan.savingTransfers??[])]
- if(dependencies.some(item=>cashAssignedItem(plan,item)!==cashAssignedItem(result,item)))throw Error('הוספת החשבון משנה שיוך משלם קיים או משתמע. יש להשלים שיוכים מפורשים בממשק הקיים לפני הוספה.')
+ if(dependencies.some(item=>cashAssignedItem(plan,item)!==cashAssignedItem(result,item)))throw Error('הוספת החשבון משנה שיוך משלם קיים או משתמע. יש להשלים שיוכים מפורשים במסך שיוך כרטיסים והתחייבויות לפני הוספה.')
  for(const card of creditCards(plan)){
   const used=cents(plan.defaults[card.id]??0)!==0||Object.values(plan.months).some((record:any)=>cents(record.values[card.id]??0)!==0)||(plan.cardBilling?.reports??[]).some((row:any)=>row.cardId===card.id)
-  if(used&&cashCardAccount(plan,card.id)!==cashCardAccount(result,card.id))throw Error('הוספת החשבון משנה חשבון משלם משתמע לכרטיס. יש לשייך את הכרטיס במפורש בממשק הקיים.')
+  if(used&&cashCardAccount(plan,card.id)!==cashCardAccount(result,card.id))throw Error('הוספת החשבון משנה חשבון משלם משתמע לכרטיס. יש לשייך את הכרטיס במסך החשבון המשלם לפני הוספה.')
  }
  return result
 }

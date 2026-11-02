@@ -9,7 +9,6 @@ import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {useCreatedEditorRoute} from './use-created-editor-route'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import {legacyBudgetHref} from './navigation-query'
 import Link from './link'
 const input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 py-2 text-sm',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50',money=(n:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(n)
 function AnnotationEditor({budget,base,id,options,onSaved}:{budget:BudgetState;base:BudgetResponse;id:string;options:ReturnType<typeof periodFor>;onSaved:(message:string)=>void}){
@@ -28,5 +27,5 @@ export function DetailAnnotationPage({budget,fixture}:{budget:BudgetState;fixtur
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  let reason=budget.spaces.find(space=>space.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון עדיין אינה זמינה בשרת הזה.':''
  if(!reason)try{annotationSource(budget.value.plan,id,options)}catch(e){reason=e instanceof Error?e.message:'הרשומה אינה זמינה.'}
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/categories')} className="text-sm text-primary underline">חזרה לפירוט</Link><h1 className="text-2xl font-semibold">סיווג, פיצול ותגיות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(space=>space.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AnnotationEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} options={options} onSaved={setMessage}/>}<a className="inline-flex min-h-11 items-center text-sm text-primary underline" href={legacyBudgetHref(search,'details')}>כל אפשרויות הפירוט בממשק הקיים</a></div>
+ return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/categories')} className="text-sm text-primary underline">חזרה לפירוט</Link><h1 className="text-2xl font-semibold">סיווג, פיצול ותגיות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(space=>space.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AnnotationEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} options={options} onSaved={setMessage}/>}</div>
 }

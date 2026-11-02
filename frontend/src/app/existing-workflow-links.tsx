@@ -1,5 +1,5 @@
 import {useLocation} from 'react-router-dom'
-import {legacyBudgetHref,withViewQuery} from './navigation-query'
+import {withViewQuery} from './navigation-query'
 import Link from './link'
 const nativeWorkflows=[
  ['/settings/access','ניהול כניסה לשרת · למנהל השרת'],
@@ -29,21 +29,7 @@ const nativeWorkflows=[
  ['/accounts/assignments','שיוך כרטיסים והתחייבויות לחשבונות'],
  ['/card-setup','פרטי הכרטיסים'],
 ] as const
-const workflows=[
- ['admin','ניהול גישה לשרת · למנהל בלבד, בממשק הקיים'],
- ['migration','סקירת מעבר חשבון וביצוע מוגן בממשק הקיים'],
- ['reports','אפשרויות נוספות במרכז הדוחות'],
- ['report-history','תיקונים וניהול היסטוריית המקור'],
- ['accounts','שיוך פריטים ואפשרויות נוספות לחשבונות'],
- ['savings','אפשרויות חיסכון נוספות'],
- ['backups','גיבוי וייבוא תקציב'],
- ['overview','תמונה כוללת, התאמות ומעברי חשבונות'],
- ['details','מילון קטגוריות ואפשרויות פירוט נוספות'],
- ['connections','Apple Pay וחיבורים נוספים'],
- ['gmail','סינון דוחות וחיבור Gmail בממשק הקיים'],
- ['appearance','סגנון וצבעי הממשק הקיים'],
-] as const
 export function ExistingWorkflowLinks(){
  const {search}=useLocation()
- return <><section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">ניהול ודיווחים</h2><p className="text-sm text-muted-foreground">הפעולות נפתחות במרחב ובתקופה שנבחרו. הרשאת צפייה ועריכות שטרם נשמרו נשמרות גם במעבר.</p><ul className="divide-y">{nativeWorkflows.map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search)}>{label}</Link></li>)}</ul></section><details className="surface space-y-3 rounded-xl p-4"><summary className="min-h-11 cursor-pointer py-2 font-semibold">תצוגה קודמת</summary><p className="text-sm text-muted-foreground">קישורים לתצוגה הקודמת, עם אותו מרחב ואותה תקופה.</p><ul className="divide-y">{workflows.map(([view,label])=><li key={view}><a className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={legacyBudgetHref(search,view)}>{label}</a></li>)}</ul></details></>
+ return <><section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">ניהול ודיווחים</h2><p className="text-sm text-muted-foreground">הפעולות נפתחות במרחב ובתקופה שנבחרו. הרשאת צפייה ועריכות שטרם נשמרו נשמרות גם במעבר.</p><ul className="divide-y">{nativeWorkflows.map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search)}>{label}</Link></li>)}</ul></section></>
 }

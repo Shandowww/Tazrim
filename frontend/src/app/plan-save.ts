@@ -27,7 +27,7 @@ async function runWirePlan(input:{budgetId:string;base:BudgetResponse;plan:Recor
  const signal=new AbortController().signal
  const fresh=await loadBudgetSnapshot(budgetId,signal,fetcher)
  if(fresh.value.accountId!==base.accountId||fresh.value.accountEmail!==base.accountEmail)throw new AccessError('החשבון השתנה. יש לחזור לחשבון המקורי לפני שמירת הטיוטה.')
- if(fresh.value.writeIdentityBound!==true)throw Error('השרת עדיין לא תומך בשמירה המוגנת של התצוגה החדשה. יש להשתמש בממשק הקיים.')
+ if(fresh.value.writeIdentityBound!==true)throw Error('השרת עדיין לא תומך בשמירה המוגנת של התצוגה החדשה. אפשר לרענן ולנסות שוב; אם ההודעה נמשכת נדרש עדכון השרת.')
  if(fresh.spaces.find(s=>s.id===budgetId)?.role==='viewer')throw new WritePermissionError('התקציב פתוח כעת לצפייה בלבד. הטיוטה לא נשלחה לשמירה.')
  // An explicit retry can acknowledge a committed-but-lost receipt; it never overwrites it.
  if(fresh.value.revision===base.revision+1&&canonicalPlan(fresh.value.vault??fresh.value.plan)===canonicalPlan(wire))return {...fresh,recovered:true}

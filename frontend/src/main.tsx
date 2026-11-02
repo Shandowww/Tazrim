@@ -32,7 +32,7 @@ import { AppearanceContext } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoSummary, demoBankSummary, demoCardSummary } from './app/demo-fixture'
 import { budgetDashboard, budgetNavigation } from './app/budget-adapter'
-import { legacyBudgetHref, withViewQuery } from './app/navigation-query'
+import { withViewQuery } from './app/navigation-query'
 import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
 import { installPullRefresh } from './app/pull-refresh'
 import { useBudget, type BudgetResponse } from './app/use-budget'
@@ -123,18 +123,17 @@ function jerusalemMonth() {
 
 function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<typeof useBudget> }) {
   const { search: locationSearch } = useLocation()
-  const editorHref = legacyBudgetHref(locationSearch)
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען נתונים…</section>
-  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} <a className="text-primary underline" href={editorHref}>פתיחת הממשק הקיים</a></section>
+  if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message} </section>
   if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/upload',locationSearch)}>העלאת דוחות והתחלה</Link><Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/start',locationSearch)}>הגדרה ידנית</Link><Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/settings/security',locationSearch)}>יש לי גיבוי לייבוא</Link></section>
-  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. <a className="text-primary underline" href={editorHref}>פתיחה מאובטחת בממשק הקיים</a></section>
+  if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. </section>
   if (!fixture && budget.status === 'ready') {
     const search = new URLSearchParams(window.location.search)
     const year = /^20\d{2}$/.test(search.get('year') || '') ? search.get('year')! : jerusalemMonth().slice(0, 4)
     const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(search.get('month') || '') ? String(Number(search.get('month'))).padStart(2, '0') : ''
     let view: ReturnType<typeof budgetDashboard>
     try { view = budgetDashboard(budget.value.plan, { year, month, asOf: jerusalemMonth() }) }
-    catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. <a className="text-primary underline" href={editorHref}>פתיחת הממשק הקיים</a></section> }
+    catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. </section> }
     const accountCount = budgetNavigation(budget.value.plan).filter(account => account.kind === 'BANK').length
     return <div className="mx-auto max-w-7xl space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>{isUnconfiguredBudget(budget.value.plan)&&<section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">מתחילים מהדוחות שלך</h2><Link href={withViewQuery('/upload',search)} className="inline-flex min-h-11 items-center text-primary underline">העלאת דוחות והתחלה</Link><Link href={withViewQuery('/start',search)} className="inline-flex min-h-11 items-center px-3 text-primary underline">הגדרה ידנית</Link></section>}

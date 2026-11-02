@@ -19,6 +19,6 @@ test('Unsupported account/import/source scopes, future actuals and injected fiel
  const p=base(),d=initialMonthlyDraft(p,'2026-10');d.actual=true;assert.throws(()=>prepareMonthlyReport(p,'2026-11',d,'2026-10'),/עתידי/)
  const extra=clone(d);extra.values.injected='3';assert.throws(()=>prepareMonthlyReport(p,'2026-10',extra,'2026-10'));assert.throws(()=>prepareMonthlyReport(p,'2026-10',d,'bad'))
  const account=base();account.cashPlanning={accounts:[{id:'a',label:'בנק',buffer:0}],months:{},cardAccounts:{},transfers:[]};assert.match(manualMonthEligibility(account,'2026-10'),/חשבון/)
- const anchored=base();anchored.months['2026-10']={values:zero(),actual:true,includesPlannedCard:false,cashReport:{balance:1,net:0}};assert.match(manualMonthEligibility(anchored,'2026-10'),/מקורות/)
+ const anchored=base();anchored.months['2026-10']={values:zero(),actual:true,includesPlannedCard:false,cashReport:{balance:1,net:0}};assert.equal(manualMonthEligibility(anchored,'2026-10'),null)
  assert.equal(p.months['2026-10'],undefined)
 })

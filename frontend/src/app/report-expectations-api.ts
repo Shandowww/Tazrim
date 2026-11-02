@@ -19,7 +19,7 @@ export async function loadExpectations(budgetId:string,actor:Pick<BudgetResponse
  if(response.status===401||response.status===403||response.status===404)throw new AccessError('החשבון או המרחב אינם זמינים כרגע.')
  if(!response.ok)throw Error('לא ניתן לטעון את הגדרות הדוחות. אפשר לנסות שוב.')
  const actions=await response.json() as ActionsResponse
- if(actions.actionIdentityBound!==true)throw Error('השרת עדיין לא תומך בשמירת הגדרות המוגנת לחשבון. יש להשתמש בממשק הקיים.')
+ if(actions.actionIdentityBound!==true)throw Error('השרת עדיין לא תומך בשמירת הגדרות המוגנת לחשבון. אפשר לרענן ולנסות שוב; אם ההודעה נמשכת נדרש עדכון השרת.')
  if(actions.accountId!==actor.accountId||actions.accountEmail!==actor.accountEmail||actions.budgetId!==budgetId)throw new AccessError('החשבון השתנה בזמן טעינת ההגדרות.')
  if(!Number.isSafeInteger(actions.revision)||actions.revision<0||!Array.isArray(actions.expectations))throw Error('תגובת ההגדרות אינה תקינה. יש לנסות לרענן.')
  return{budget,actions}

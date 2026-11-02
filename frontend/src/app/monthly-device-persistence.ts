@@ -4,10 +4,14 @@ import {manualMonthEligibility,initialMonthlyDraft,prepareMonthlyReport,type Mon
 import type {BudgetResponse} from './budget-api.ts'
 export function originalMonthlyPayload(base:BudgetResponse,month:string,draft:MonthlyDraft,asOf:string){
  const reason=manualMonthEligibility(base.plan,month);if(reason)throw Error(reason);const baseline=initialMonthlyDraft(base.plan,month);if(!draft?.values||Object.keys(draft.values).sort().join()!==Object.keys(baseline.values).sort().join()||Object.values(draft.values).some(v=>typeof v!=='string'||v.length>32)||[draft.actual,draft.includesCard,draft.includesDirect].some(v=>typeof v!=='boolean'))throw Error('יש לבדוק את שדות הטיוטה.')
+ if(draft.otherIncomeNote!==undefined&&(typeof draft.otherIncomeNote!=='string'||draft.otherIncomeNote.length>120)||draft.balance!==undefined&&(typeof draft.balance!=='string'||draft.balance.length>32)||draft.offCard!==undefined&&(typeof draft.offCard!=='string'||draft.offCard.length>32))throw Error('יש לבדוק את שדות הטיוטה.')
  let plan=base.plan,raw:Record<string,string>={}
  try{plan=prepareMonthlyReport(base.plan,month,draft,asOf)}catch{
   const initial=initialMonthlyDraft(base.plan,month)
   if(draft.actual!==initial.actual||draft.includesCard!==initial.includesCard||draft.includesDirect!==initial.includesDirect)throw Error('לטיוטה הזו יש להוריד גיבוי לקובץ לפני יציאה.')
+  if(draft.otherIncomeNote!==initial.otherIncomeNote&&draft.otherIncomeNote!==undefined)raw['month-otherIncomeNote']=draft.otherIncomeNote
+  if(draft.balance!==initial.balance&&draft.balance!==undefined)raw['month-cashBalance']=draft.balance
+  if(draft.offCard!==undefined)raw['month-offCard']=draft.offCard
   for(const [key,value]of Object.entries(draft.values)){if(value===initial.values[key])continue;if(!Object.hasOwn(initial.values,key)||['variable','transfers'].includes(key)||typeof value!=='string'||value.length>32)throw Error('לטיוטה הזו יש להוריד גיבוי לקובץ לפני יציאה.');raw['month-'+key]=value}
  }
  return{plan,revision:base.revision,selectedMonth:month,monthlyPending:'',monthlySalaryChanged:false,tab:'monthly',raw}

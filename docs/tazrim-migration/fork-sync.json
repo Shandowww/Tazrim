@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "9aedd5c90b5a26e6978df963f66bc0e1a803e5ae",
+  "sourceCommit": "5acbeac6f77add3bcdb40682198205dd208ce1c4",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Application54633e5 is verified live on the existing server. Real original/native layout switching, guarded scope/period retention and device bare-root preference are connected; explicit native routes remain native. Bell keeps action/preference state mounted while portaling to the viewport, with fixed visible Close, outside and Escape dismissal; original bell fixed too. Build/typecheck,1116 regressions and15 core checks pass.386 prior source files matched; fresh verified backup, isolated financial/all-record/access/HTTP/source-decryption checks and rollback preceded activation. Live runtime hashes/health/auth/default and preferred root/deep routes passed; authoritative records/settings/keys/parking unchanged. Read-only audit confirms one Budgit server and one older active Sites copy, separate unsynced storage; historic wife project inaccessible. No Site/audience change. See release-layout-bell-2026-11-01.json. Existing device/provider limits remain; independent history/notices retained.",
+  "status": "Native-only navigation audit implemented and tested; publication preparation. Only Settings switches appearances. Native task routing, original monthly fields/draft recovery and Drive connection/consent return connected; no parallel financial engine. Existing Apple Pay scope exclusion retained. Exact build/typecheck,1124 regressions,15 checks and bounded41-screen390px no-bridge/no-overflow browser acceptance pass. Production remains54633e5 pending fresh release gates; Sites unchanged.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1116,
+    "regressionTests": 1124,
     "coreChecks": 15,
-    "release": "54633e5 live, matched runtime hashes, healthy/auth/routes/preferred root; preserved records/keys/settings/parking.",
-    "browser": "Actual-layout roundtrip, remembered bare-root, native/original Close, desktop outside/Escape,18-item390px list with Close visible after scrolling. No physical iPhone claim."
+    "browser": "41 native screens at390px, Settings selector, scoped notification navigation, viewer refusal, new monthly fields/save and refresh/stay draft guard; synthetic data only.",
+    "release": "Not activated yet; fresh backup/preflight/rollback/runtime gates required."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "cd0ee85b8b0edbb117ad332d648136c14a6c172f"
+  "productionApplicationCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d"
 }

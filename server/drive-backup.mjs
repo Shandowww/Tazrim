@@ -7,6 +7,9 @@ const SCOPE='https://www.googleapis.com/auth/drive.appdata',digest=x=>createHash
 const cookie=(value,age=600)=>`__Host-mf_drive=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${age}`;
 const json=(v,status=200)=>Response.json(v,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const redirect=(url,value)=>new Response(null,{status:303,headers:{Location:url,'Cache-Control':'no-store',...(value!==undefined?{'Set-Cookie':cookie(value,value?600:0)}:{})}});
+// OAuth return context stays in the existing pending row, never in a provider-visible state URL.
+const nativeDriveContext=value=>{const q=new URLSearchParams(),budget=value?.budget;if(typeof budget==='string'&&/^[\w:-]{1,100}$/.test(budget))q.set('budget',budget);else q.set('budget','personal');if(/^20\d{2}$/.test(value?.year??'')){q.set('year',value.year);if(/^(?:0?[1-9]|1[0-2])$/.test(value?.month??''))q.set('month',String(Number(value.month)));}return Object.fromEntries(q);};
+const driveReturn=(context,result)=>{if(!context)return '/?driveBackup='+result;const q=new URLSearchParams(nativeDriveContext(context));q.set('driveBackup',result);return '/next/settings/drive?'+q;};
 // Civil dates keep the 23:59 cutoff correct through Israeli daylight-saving changes.
 export function backupCutoffDay(timestamp){
  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(timestamp)).map(p=>[p.type,p.value]));
@@ -68,24 +71,29 @@ export function createDriveBackup({db,origin,clientId,clientSecret,admins,source
   }catch(error){const message=backupFailureMessage(error,stage);db.prepare('UPDATE drive_backup_connections SET error=? WHERE user_id=?').run(message,user.id);throw Error(message);}
   finally{if(archive)await rm(archive.file,{force:true});running=false;}
  }
- async function begin(user){
+ async function begin(user,request){
+  const query=request?new URL(request.url).searchParams:null;if(query?.has('accountId')&&query.get('accountId')!==user.id)return json({error:'החשבון השתנה. יש לטעון מחדש.'},403);
+  const context=query?.get('returnTo')==='native'?nativeDriveContext(Object.fromEntries(query)):null;
   if(!allowed(user))return json({error:'נדרשת הרשאת מנהל.'},403);if(!clientId||!clientSecret||!existsSync(publicKeyFile))return json({error:'יש להשלים את הגדרת מפתח השחזור לפני חיבור Drive.'},503);
   db.prepare('DELETE FROM drive_backup_pending WHERE expires<=?').run(now());const state='dbk.'+randomBytes(32).toString('base64url'),nonce=randomBytes(32).toString('base64url'),oauth=oauthFactory(),pkce=await oauth.generateCodeVerifierAsync();
-  db.prepare('INSERT INTO drive_backup_pending VALUES(?,?,?,?,?)').run(digest(state),user.id,pkce.codeVerifier,nonce,now()+600000);
+  db.prepare('INSERT INTO drive_backup_pending VALUES(?,?,?,?,?)').run(digest(state),user.id,pkce.codeVerifier,context?JSON.stringify({nonce,nativeReturn:context}):nonce,now()+600000);
   return redirect(oauth.generateAuthUrl({scope:['openid','email',SCOPE],state,nonce,access_type:'offline',prompt:'consent',code_challenge:pkce.codeChallenge,code_challenge_method:'S256',login_hint:user.email}),state);
  }
  async function callback(request,user){
   const url=new URL(request.url),state=url.searchParams.get('state'),cookies=Object.fromEntries((request.headers.get('cookie')??'').split(';').map(x=>x.trim().split('=')));
   if(!allowed(user)||!state||cookies['__Host-mf_drive']!==state)return json({error:'חיבור הגיבוי לא אומת. התחילו מחדש מתוך האפליקציה.'},403);
   const pending=db.prepare('DELETE FROM drive_backup_pending WHERE hash=? AND user_id=? AND expires>? RETURNING *').get(digest(state),user.id,now());
-  if(!pending||!url.searchParams.get('code'))return redirect('/?driveBackup=failed','');
+  if(!pending)return json({error:'בקשת החיבור פגה. התחילו מחדש מתוך הגדרות הגיבוי.'},403);
+  let nonce=pending.nonce,context=null;
+  if(nonce.startsWith('{')){try{const value=JSON.parse(nonce);if(typeof value.nonce!=='string'||!value.nativeReturn||typeof value.nativeReturn!=='object')throw Error();nonce=value.nonce;context=nativeDriveContext(value.nativeReturn);}catch{return json({error:'בקשת החיבור אינה תקינה. התחילו מחדש.'},403);}}
+  if(!url.searchParams.get('code'))return redirect(driveReturn(context,'failed'),'');
   try{
    const oauth=oauthFactory(),{tokens}=await oauth.getToken({code:url.searchParams.get('code'),codeVerifier:pending.verifier});const ticket=await oauth.verifyIdToken({idToken:tokens.id_token,audience:clientId}),identity=ticket.getPayload();
-   if(identity?.email_verified!==true||identity.email?.toLowerCase()!==user.email.toLowerCase()||identity.nonce!==pending.nonce||!tokens.scope?.split(' ').includes(SCOPE))throw Error('Wrong identity or scope');
+   if(identity?.email_verified!==true||identity.email?.toLowerCase()!==user.email.toLowerCase()||identity.nonce!==nonce||!tokens.scope?.split(' ').includes(SCOPE))throw Error('Wrong identity or scope');
    const previous=db.prepare('SELECT credentials FROM drive_backup_connections WHERE user_id=?').get(user.id),refresh=tokens.refresh_token||(previous?open(previous.credentials,user.id).refresh_token:null);if(!refresh)throw Error('Offline permission required');
    db.prepare('INSERT INTO drive_backup_connections(user_id,email,credentials,schedule_mode) VALUES(?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET credentials=excluded.credentials,email=excluded.email,error=NULL').run(user.id,user.email,seal({refresh_token:refresh},user.id),'changes-nightly');
-   return redirect('/?driveBackup=connected','');
-  }catch{return redirect('/?driveBackup=failed','');}
+   return redirect(driveReturn(context,'connected'),'');
+  }catch{return redirect(driveReturn(context,'failed'),'');}
  }
  async function files(request,user){
   if(!allowed(user))return json({error:'נדרשת הרשאת מנהל.'},403);

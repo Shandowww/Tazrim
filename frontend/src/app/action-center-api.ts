@@ -1,6 +1,5 @@
 import {actionIssues,actionIssueVisible,actionPreferencePayload,validActionTarget} from '../../../src/action-center-model.js'
 import {validatePlan} from '../../../src/budget.js'
-import {legacyActionCenterHref} from '../../../src/interface-destination.js'
 import {loadExpectations,type ExpectationsSnapshot,type ActionIntegrations} from './report-expectations-api.ts'
 import {AccessError,loadBudgetSnapshot} from './budget-api.ts'
 import {SaveConflict,SaveUncertain} from './plan-save.ts'
@@ -21,13 +20,21 @@ export function reportActionDestination(search:string,issue:ActionIssue){
  if(issue.target.screen==='notice'&&issue.target.noticeId)return{href:withViewQuery('/settings/gmail/notices/'+encodeURIComponent(issue.target.noticeId),search),native:true}
  if(issue.target.screen==='backup')return{href:withViewQuery('/settings/drive',search),native:true}
  if(issue.target.screen==='report'&&/^[a-f0-9-]{36}$/.test(issue.target.reportId??''))return{href:withViewQuery('/upload/'+encodeURIComponent(issue.target.reportId!)+'/group',search),native:true}
- return{href:legacyActionCenterHref(search,issue.key),native:false}
+ if(issue.target.screen==='upload'){
+  const t=issue.target,query=new URLSearchParams()
+  if(t.month){query.set('year',t.month.slice(0,4));query.set('month',String(Number(t.month.slice(5))))}
+  if(['bank','card'].includes(t.kind??'')&&t.target){query.set('kind',t.kind!);query.set('target',t.target)}
+  return{href:withViewQuery('/upload?'+query,search),native:true}
+ }
+ if(issue.target.screen==='unlock')return{href:withViewQuery('/settings/security',search),native:true}
+ if(issue.target.screen==='save')return{href:withViewQuery('/monthly',search),native:true}
+ throw Error('יעד הפעולה אינו זמין. יש לרענן את רשימת הפעולות.')
 }
 const preference=(snapshot:ExpectationsSnapshot,key:string)=>Object.hasOwn(snapshot.actions.preferences,key)?snapshot.actions.preferences[key]:null
 const equal=(a:any,b:any)=>a===null||b===null?a===b:a.evidence===b.evidence&&a.until===b.until
 export async function saveActionPreference(input:{budgetId:string;base:ExpectationsSnapshot;attempt:PreferenceAttempt;clock:ActionClock},fetcher:typeof fetch=fetch){
  const {budgetId,base,attempt,clock}=input,signal=new AbortController().signal,fresh=await (base.integrations?loadActionSnapshot:loadExpectations)(budgetId,base.budget.value,signal,fetcher)
- if(fresh.actions.actionPreferenceCAS!==true)throw Error('השרת עדיין לא תומך בעדכון מוגן של תזכורות. אפשר להשתמש בממשק הקיים.')
+ if(fresh.actions.actionPreferenceCAS!==true)throw Error('השרת עדיין לא תומך בעדכון מוגן של תזכורות. אפשר לרענן ולנסות שוב; אם ההודעה נמשכת נדרש עדכון השרת.')
  const issue=reportActionFacts(fresh,clock).facts.find(i=>i.key===attempt.issue.key&&i.evidence===attempt.issue.evidence)
  if(!issue||!['read','snooze'].includes(attempt.action)||!Number.isSafeInteger(attempt.until)||attempt.action==='read'&&attempt.until!==0)throw new SaveConflict('הפעולה השתנתה או כבר טופלה. יש לרענן את הרשימה.')
  const intended={evidence:issue.evidence,until:attempt.until},current=preference(fresh,issue.key)
