@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {monthAt,monthlyValues} from '../../../src/budget.js'
 import {initialSavingsScheduleDraft,prepareSavingsSchedule,type SavingsScheduleDraft} from './savings-schedule-command'
@@ -22,5 +23,5 @@ export function SavingsSchedulePage({budget,fixture}:{budget:BudgetState;fixture
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען תכנון…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const reason=!budget.value.plan||budget.value.plan.format?'יש לפתוח תקציב רגיל לעריכת התכנון.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון עדיין אינה זמינה בשרת הזה.':''
- return <div className="household-page"><h1 className="text-2xl font-semibold">הפקדות חודשיות מתוכננות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<ScheduleEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} asOf={month} onSaved={setMessage}/>}</div>
+ return <div className="household-page"><PageHeading className="text-2xl font-semibold">הפקדות חודשיות מתוכננות</PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<ScheduleEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} asOf={month} onSaved={setMessage}/>}</div>
 }

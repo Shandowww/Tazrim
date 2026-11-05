@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useCreatedEditorRoute} from './use-created-editor-route'
 import {useLocation,useParams} from 'react-router-dom'
@@ -38,5 +39,5 @@ export function AccountPage({create=false,fixture,budget}:{create?:boolean;fixtu
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען חשבון…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>
  const reason=budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת עדיין אינה זמינה בשרת הזה.':manualAccountEligibility(budget.value.plan,create&&!completedId?'':id)
- return <div className="mx-auto max-w-3xl space-y-5"><h1 className="text-2xl font-semibold">{create&&!completedId?'הוספת חשבון בנק':'עריכת חשבון בנק'}</h1><p className="text-sm text-muted-foreground"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:<AccountEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} id={id} create={create&&!completedId} budget={budget} base={budget.value} onSaved={value=>{setMessage(value);if(value&&create)setCompletedId(id)}} />}</div>
+ return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">{create&&!completedId?'הוספת חשבון בנק':'עריכת חשבון בנק'}</PageHeading><p className="text-sm text-muted-foreground"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:<AccountEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} id={id} create={create&&!completedId} budget={budget} base={budget.value} onSaved={value=>{setMessage(value);if(value&&create)setCompletedId(id)}} />}</div>
 }

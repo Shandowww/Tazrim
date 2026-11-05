@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import { useLocation, useParams } from 'react-router-dom'
 import Link from './link'
 import BackLink from './back-link'
@@ -55,7 +56,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="min-w-0 flex-1">
 
-        <h1 className="text-2xl font-semibold tracking-tight [overflow-wrap:anywhere]">{selected?.displayName || title}</h1>
+        <PageHeading className="text-2xl font-semibold tracking-tight [overflow-wrap:anywhere]">{selected?.displayName || title}</PageHeading>
         {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
       </div>
     </div>

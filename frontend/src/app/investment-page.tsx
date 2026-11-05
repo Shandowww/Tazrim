@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import {investmentDepositsFor,investmentHistoryFor} from '../../../src/budget.js'
@@ -34,5 +35,5 @@ export function InvestmentPage({budget,fixture}:{budget:BudgetState;fixture:bool
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען נתוני השקעה…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan as any,viewer=budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'
- return <div className="household-page"><h1 className="text-2xl font-semibold">סימולציית צמיחת השקעות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{!plan||plan.format?<p role="alert">יש לפתוח את התקציב לפני שימוש בסימולציה.</p>:<InvestmentEditor key={budget.value.accountId+'/'+budget.budgetId} budget={budget} initialBase={budget.value} asOf={asOf} viewer={viewer}/>}</div>
+ return <div className="household-page"><PageHeading className="text-2xl font-semibold">סימולציית צמיחת השקעות</PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{!plan||plan.format?<p role="alert">יש לפתוח את התקציב לפני שימוש בסימולציה.</p>:<InvestmentEditor key={budget.value.accountId+'/'+budget.budgetId} budget={budget} initialBase={budget.value} asOf={asOf} viewer={viewer}/>}</div>
 }

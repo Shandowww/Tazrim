@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useParams} from 'react-router-dom'
 import {goalDepositImpact,prepareGoalDeposit} from './savings-deposit-command'
@@ -30,5 +31,5 @@ export function SavingsBalancePage({mode,fixture,budget}:{mode:Mode;fixture:bool
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  let reason:string|null=budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת אינה זמינה בשרת הזה.':null
  try{if(!reason){savingsBalanceEligibility(budget.value.plan,today().slice(0,7),mode!=='accounts');if(['remove','deposit'].includes(mode)&&!removed&&!(budget.value.plan?.savingsGoals as any)?.items.some((g:any)=>g.id===id))throw Error('המטרה אינה זמינה במרחב הזה.')}}catch(e){reason=e instanceof Error?e.message:'נתוני החיסכון אינם זמינים.'}
- return <div className="household-page"><h1 className="text-2xl font-semibold">{mode==='accounts'?'יתרות החסכונות':mode==='allocation'?'חלוקה בין מטרות':mode==='returns'?'אופן חישוב צמיחה משוערת':mode==='deposit'?'דיווח הפקדה למטרה':'הסרת מטרה'}</h1>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface rounded-xl p-4"><p>{reason}</p></section>:removed?<p role="status">{message}</p>:<Editor key={budget.budgetId+'/'+budget.value.accountId+'/'+budget.value.revision+'/'+mode+'/'+id} mode={mode} budget={budget} base={budget.value} id={id} onSaved={s=>{setMessage(s);if(s&&mode==='remove')setRemoved(true)}}/>}</div>
+ return <div className="household-page"><PageHeading className="text-2xl font-semibold">{mode==='accounts'?'יתרות החסכונות':mode==='allocation'?'חלוקה בין מטרות':mode==='returns'?'אופן חישוב צמיחה משוערת':mode==='deposit'?'דיווח הפקדה למטרה':'הסרת מטרה'}</PageHeading>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface rounded-xl p-4"><p>{reason}</p></section>:removed?<p role="status">{message}</p>:<Editor key={budget.budgetId+'/'+budget.value.accountId+'/'+budget.value.revision+'/'+mode+'/'+id} mode={mode} budget={budget} base={budget.value} id={id} onSaved={s=>{setMessage(s);if(s&&mode==='remove')setRemoved(true)}}/>}</div>
 }

@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {ScenarioComparison} from './scenario-comparison'
 import {useRef,useState} from 'react'
 import {cashAccountList,scenarioAssessment,validatePlan} from '../../../src/budget.js'
@@ -33,5 +34,5 @@ export function ScenarioPage({fixture,budget}:{fixture:boolean;budget:BudgetStat
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען תכנון…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan,reason=!plan||plan.format||!validatePlan(plan)?'התקציב אינו זמין לניסוי בתצוגה הזו.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת אינה זמינה בשרת הזה.':null
- return <div className="mx-auto max-w-3xl space-y-5"><h1 className="text-2xl font-semibold">מחשבון רכישה</h1><Link href={href('/income')} className="inline-flex min-h-11 items-center text-primary underline">הכנסות עתידיות והערכות</Link>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface space-y-3 rounded-xl p-4"><p>{reason}</p><BackLink href={href('/plans')}>חזרה לתכנון</BackLink></section>:<Editor key={budget.budgetId+'/'+budget.value.accountId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">מחשבון רכישה</PageHeading><Link href={href('/income')} className="inline-flex min-h-11 items-center text-primary underline">הכנסות עתידיות והערכות</Link>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface space-y-3 rounded-xl p-4"><p>{reason}</p><BackLink href={href('/plans')}>חזרה לתכנון</BackLink></section>:<Editor key={budget.budgetId+'/'+budget.value.accountId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
 }

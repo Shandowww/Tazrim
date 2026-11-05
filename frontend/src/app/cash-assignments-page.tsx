@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {cashAccountList,creditCards,cashPayerCandidates} from '../../../src/budget.js'
 import {assignmentGroups,initialCashAssignmentsDraft,prepareCashAssignments,type AssignmentGroup,type CashAssignmentsDraft} from './cash-assignments-command'
@@ -22,5 +23,5 @@ export function CashAssignmentsPage({budget,fixture}:{budget:BudgetState;fixture
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען שיוכי חשבונות…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan as any,reason=!plan||plan.format?'יש לפתוח תקציב רגיל.':!cashAccountList(plan).length?'יש להוסיף תחילה חשבון במרחב הזה.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון אינה זמינה בשרת הזה.':''
- return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">שיוך כרטיסים והתחייבויות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AssignmentsEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-4"><PageHeading className="text-2xl font-semibold">שיוך כרטיסים והתחייבויות</PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AssignmentsEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
 }

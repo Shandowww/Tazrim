@@ -1,3 +1,4 @@
+import {PageHeading} from './app/page-heading'
 import {ChequesPage} from './app/cheques-page'
 import {IncomePlanningPage} from './app/income-planning-page'
 import {HouseholdAccountsPage} from './app/household-accounts'
@@ -17,11 +18,9 @@ import { StrictMode, Suspense, lazy, useCallback, useEffect, useRef, useState } 
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate, ScrollRestoration, type Location } from 'react-router-dom'
-import { RefreshCw, Wallet } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { Sidebar } from './tazrim/components/layout/sidebar'
 import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
-import { PeriodPicker } from './tazrim/components/layout/period-picker'
-import type { Period } from './tazrim/lib/period'
 import { AppearanceContext } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoHouseholdPlan } from './app/demo-fixture'
@@ -90,20 +89,9 @@ function useFixtureMode() {
 }
 
 function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
-  const { pathname, search, state } = useLocation()
+  const { pathname, search } = useLocation()
   const navigate = useNavigate()
   const guard = useDraftGuard()
-  const params = new URLSearchParams(search)
-  const year = /^20\d{2}$/.test(params.get('year') || '') ? Number(params.get('year')) : Number(jerusalemMonth().slice(0, 4))
-  const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(params.get('month') || '') ? Number(params.get('month')) : undefined
-  function selectPeriod(next: Period) {
-    if (next.year < 1900 || next.year > 2999) return
-    const query = new URLSearchParams(search)
-    query.set('year', String(next.year))
-    if (next.month) query.set('month', String(next.month))
-    else query.delete('month')
-    navigate(pathname + `?${query}`,{state,preventScrollReset:true})
-  }
   function selectBudget(id: string) {
     if(budget.status!=='ready'||id===budget.budgetId||!budget.spaces.some(space=>space.id===id))return
     navigate(householdSpaceHref(pathname,search,id))
@@ -111,12 +99,12 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
   return (
     <header className="household-header sticky top-0 z-30 border-b">
       <div className="household-topbar">
-        {pathname==='/'?<div className="household-brand"><span><Wallet size={21} aria-hidden/></span><strong dir="ltr">Budgit</strong></div>:<div className="household-period"><PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod}/></div>}
+      {budget.status==='ready'&&(budget.spaces.length===2?<div className="household-space-switch" role="group" aria-label="מרחב תקציב">{budget.spaces.map(space=><button type="button" key={space.id} aria-pressed={budget.budgetId===space.id} aria-label={space.name+(space.role==='viewer'?' · צפייה בלבד':'')} title={space.name} onClick={()=>selectBudget(space.id)}><span><span className="household-space-short">{space.id==='personal'?'אישי':'משותף'}</span><span className="household-space-full">{space.name}</span></span>{space.role==='viewer'&&<small>צפייה בלבד</small>}</button>)}</div>:budget.spaces.length>2?<label className="household-space-select"><span className="sr-only">מרחב תקציב</span><select value={budget.budgetId} onChange={event=>selectBudget(event.target.value)}>{budget.spaces.map(space=><option key={space.id} value={space.id}>{space.name}{space.role==='viewer'?' · צפייה בלבד':''}</option>)}</select></label>:<div className="household-space-name">{budget.spaces[0]?.name}{budget.spaces[0]?.role==='viewer'&&' · צפייה בלבד'}</div>)}
+        {budget.status!=='ready'&&<div className="household-space-name" role="status">{budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
         <div className="household-header-actions"><GlobalActionCenter budget={budget}/>
           <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
         </div>
       </div>
-      {budget.status==='ready'&&(budget.spaces.length===2?<div className="household-space-switch" role="group" aria-label="מרחב תקציב">{budget.spaces.map(space=><button type="button" key={space.id} aria-pressed={budget.budgetId===space.id} onClick={()=>selectBudget(space.id)}><span>{space.name}</span>{space.role==='viewer'&&<small>צפייה בלבד</small>}</button>)}</div>:budget.spaces.length>2?<label className="household-space-select"><span className="sr-only">מרחב תקציב</span><select value={budget.budgetId} onChange={event=>selectBudget(event.target.value)}>{budget.spaces.map(space=><option key={space.id} value={space.id}>{space.name}{space.role==='viewer'?' · צפייה בלבד':''}</option>)}</select></label>:<div className="household-space-name">{budget.spaces[0]?.name}{budget.spaces[0]?.role==='viewer'&&' · צפייה בלבד'}</div>)}
     </header>
   )
 }
@@ -141,7 +129,7 @@ function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<t
 
 function PendingPage({ title }: { title: string }) {
   const fixture = useFixtureMode()
-  return <div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">{title}</h1><section className="surface rounded-xl p-6 text-muted-foreground">{fixture ? 'מסך פיתוח עם נתוני דוגמה. חיבור Budgit עדיין בעבודה.' : 'ממתין לחיבור לנתוני Budgit.'}</section></div>
+  return <div className="mx-auto max-w-7xl space-y-4"><PageHeading className="text-2xl font-semibold">{title}</PageHeading><section className="surface rounded-xl p-6 text-muted-foreground">{fixture ? 'מסך פיתוח עם נתוני דוגמה. חיבור Budgit עדיין בעבודה.' : 'ממתין לחיבור לנתוני Budgit.'}</section></div>
 }
 
 function App() {
@@ -202,7 +190,7 @@ function App() {
             {!accountChanged&&<HouseholdBack/>}<div className="household-screen"><PageLoadBoundary resetKey={routeScopeKey+pathname+search}><Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
             {accountChanged ? <section className="household-page" role="status">מעדכנים את החשבון…</section> : !fixture && budget.status==='error' ? (
               <section className="household-page">
-                <h1>התקציב לא זמין</h1>
+                <PageHeading>התקציב לא זמין</PageHeading>
                 <div className="surface space-y-3 p-4">
                   <p role="alert">{budget.message}</p>
                   <div className="flex flex-wrap gap-2">
@@ -305,7 +293,7 @@ function App() {
               <Route path="/goals" element={<ComparisonGoalsPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/start" element={<OnboardingPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings/profile" element={<ProfilePage key={budgetId} fixture={fixture} budget={budget}/>} />
-              <Route path="/settings" element={<div className="household-page"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1>{!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}<InterfaceModeSelector/><InterfaceLayoutSetting/><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
+              <Route path="/settings" element={<div className="household-page"><PageHeading className="text-2xl font-semibold">הגדרות אפליקציה</PageHeading>{!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}<InterfaceModeSelector/><InterfaceLayoutSetting/><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
             </Routes></InterfaceModeBoundary>}

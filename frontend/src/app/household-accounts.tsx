@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useEffect,useLayoutEffect,useRef} from 'react'
 import {flushSync} from 'react-dom'
 import {useLocation,useNavigate} from 'react-router-dom'
@@ -78,7 +79,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
  </div>
  const peeks=selected&&view.cards.length>1?[{id:nextWalletCard(view.cards,selected.id,-1),side:'right'},...(view.cards.length>2?[{id:nextWalletCard(view.cards,selected.id,1),side:'left'}]:[])]:[]
  const coverage=selected?cardDetailCoverage(selected):null
- return <div className="household-page household-accounts"><div className="household-title"><h1>החשבונות והכרטיסים</h1>{!viewer&&<Link className="household-update" href={href('/accounts/new')}>הוספת חשבון</Link>}</div>
+ return <div className="household-page household-accounts"><div className="household-title"><PageHeading>החשבונות והכרטיסים</PageHeading>{!viewer&&<Link className="household-update" href={href('/accounts/new')}>הוספת חשבון</Link>}</div>
  <section className="household-bank-list" aria-label="חשבונות בנק">{view.banks.map(bank=><article className="surface household-bank" key={bank.id}><div className="household-bank-heading"><ProviderLogo provider={bank.provider}/><div><h2><bdi>{bank.displayName}</bdi></h2>{!hasProviderLogo(bank.provider)&&bank.provider&&<p><bdi>{bank.provider}</bdi></p>}</div></div><div className="household-bank-balance"><span>{bank.balance?<>יתרה ל־<bdi dir="ltr">{bank.balance.date.split('-').reverse().join('.')}</bdi></>:'יתרה לא דווחה בתקופה'}</span><strong><bdi>{money(bank.balance?.value??null)}</bdi></strong></div><details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('banks',bank.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></article>)}{!view.banks.length&&<p className="surface household-empty">עדיין אין חשבונות בנק במרחב.</p>}</section>
  <section className="household-wallet" aria-roledescription="קרוסלה" aria-label="כרטיסי אשראי">
   <div className="household-title"><h2>כרטיסי האשראי</h2><span>{selected?index+1+' מתוך '+view.cards.length:'אין כרטיסים'}</span></div>

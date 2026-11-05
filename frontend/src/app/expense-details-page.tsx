@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {householdLinkState} from './household-model'
 import {householdCategory} from './household-categories'
 import {periodFor} from './detail-period'
@@ -40,7 +41,7 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
     const raw = source.source, statement = raw.statement
     return <div className="mx-auto max-w-5xl space-y-5">
 
-      <h1 className="text-2xl font-semibold">הרשומה המקורית שנשמרה</h1>{!fixture&&budget.status==='ready'&&budget.spaces.find(space=>space.id===budget.budgetId)?.role!=='viewer'&&<Link className="inline-flex min-h-11 items-center text-sm text-primary underline" href={href('/details/'+encodeURIComponent(raw.id)+'/annotate')}>סיווג, פיצול ותגיות</Link>}
+      <PageHeading className="text-2xl font-semibold">הרשומה המקורית שנשמרה</PageHeading>{!fixture&&budget.status==='ready'&&budget.spaces.find(space=>space.id===budget.budgetId)?.role!=='viewer'&&<Link className="inline-flex min-h-11 items-center text-sm text-primary underline" href={href('/details/'+encodeURIComponent(raw.id)+'/annotate')}>סיווג, פיצול ותגיות</Link>}
       {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
     {typeof state?.setupSavedMessage==='string'&&(!state?.setupSavedScope||budget.status==='ready'&&state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId)&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
       <section className="surface rounded-xl p-5 space-y-3"><h2 className="font-semibold"><bdi>{raw.name}</bdi></h2>
@@ -63,7 +64,7 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const data = new FormData(event.currentTarget); navigate(href('/' + mode, { query: String(data.get('query') || '').trim() || null, page: null }),{state:householdLinkState(location,'/'+mode)}) }
   const searchControls=<details className="surface rounded-xl p-4" open={mode==='search'||!!options.query}><summary className="min-h-11 cursor-pointer text-sm">חיפוש לפי בית עסק</summary><p className="mt-3 text-sm text-muted-foreground">החיפוש בפירוט שנפרע במרחב ובתקופת החיוב שנבחרו, לפי שם בית העסק המוצג. הוא אינו מחפש בכל תנועות הבנק או בקבצים.</p><form key={(fixture?'demo':budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:budget.budgetId) + '/' + options.query} onSubmit={submit} className="mt-3 flex flex-wrap gap-3"><label className="flex-1 min-w-0 text-sm">שם בית עסק<input name="query" type="search" maxLength={80} defaultValue={options.query} className="mt-1 min-h-11 w-full rounded-lg border bg-card px-3 py-2" /></label><button className="self-end min-h-11 rounded-lg border px-4 py-2 text-sm" type="submit">חיפוש</button></form></details>
   return <div className="mx-auto max-w-7xl space-y-5">
-    <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold">{mode === 'search' ? 'חיפוש בפירוט שנפרע' : 'קטגוריות ופירוט'}</h1><Link className="inline-flex min-h-11 items-center text-primary underline text-sm" href={href(mode === 'search' ? '/categories' : '/search', { page: null })}>{mode === 'search' ? 'פתיחת הקטגוריות' : 'חיפוש בפירוט'}</Link></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><PageHeading className="text-2xl font-semibold">{mode === 'search' ? 'חיפוש בפירוט שנפרע' : 'קטגוריות ופירוט'}</PageHeading><Link className="inline-flex min-h-11 items-center text-primary underline text-sm" href={href(mode === 'search' ? '/categories' : '/search', { page: null })}>{mode === 'search' ? 'פתיחת הקטגוריות' : 'חיפוש בפירוט'}</Link></div>
     {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
     {typeof state?.setupSavedMessage==='string'&&(!state?.setupSavedScope||budget.status==='ready'&&state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId)&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
     {(options.category || options.account || options.card) && <div className="text-sm">מסננים פעילים: <bdi>{options.category || ''}</bdi>{options.account && ' · חשבון נבחר'}{options.card && ' · כרטיס נבחר'} · <Link className="inline-flex min-h-11 items-center text-primary underline" href={href('/' + mode, { category: null, account: null, card: null, page: null })}>ניקוי מסננים</Link></div>}

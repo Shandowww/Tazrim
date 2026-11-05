@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useEffect,useRef,useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import {reportExpectationEntities} from '../../../src/budget.js'
@@ -27,5 +28,5 @@ export function ReportExpectationsPage({budget,fixture}:{budget:BudgetState;fixt
  if(fixture)return <p>הגדרות דוחות צפויים דורשות תקציב שנפתח בחשבון.</p>
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען מרחב…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
- return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">מתי צפוי כל דוח?</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><p className="text-sm text-muted-foreground">תזכורת מופיעה רק למקור שהופעל. יום ההגעה הוא בחודש שאחרי תקופת הדוח, בתוספת ימי החסד. חודשים חריגים נכתבים כרשימת חודשים מופרדת בפסיקים או ברווחים.</p><p className="text-sm text-muted-foreground">המועדים אינם מעלים דוחות ואינם אישור שהנתונים מלאים. הדוחות והסכומים בתקציב נשארים כפי שנשמרו.</p><ExpectationsContent key={budget.value.accountId+'/'+budget.budgetId} budget={budget} actor={budget.value} asOf={asOf}/></div>
+ return <div className="mx-auto max-w-3xl space-y-4"><PageHeading className="text-2xl font-semibold">מתי צפוי כל דוח?</PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><p className="text-sm text-muted-foreground">תזכורת מופיעה רק למקור שהופעל. יום ההגעה הוא בחודש שאחרי תקופת הדוח, בתוספת ימי החסד. חודשים חריגים נכתבים כרשימת חודשים מופרדת בפסיקים או ברווחים.</p><p className="text-sm text-muted-foreground">המועדים אינם מעלים דוחות ואינם אישור שהנתונים מלאים. הדוחות והסכומים בתקציב נשארים כפי שנשמרו.</p><ExpectationsContent key={budget.value.accountId+'/'+budget.budgetId} budget={budget} actor={budget.value} asOf={asOf}/></div>
 }

@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useLocation,useParams} from 'react-router-dom'
 import {detailCategories} from '../../../src/budget.js'
@@ -25,5 +26,5 @@ export function DetailAnnotationPage({budget,fixture}:{budget:BudgetState;fixtur
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  let reason=budget.spaces.find(space=>space.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון עדיין אינה זמינה בשרת הזה.':''
  if(!reason)try{annotationSource(budget.value.plan,id,options)}catch(e){reason=e instanceof Error?e.message:'הרשומה אינה זמינה.'}
- return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">סיווג, פיצול ותגיות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(space=>space.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AnnotationEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} options={options} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-4"><PageHeading className="text-2xl font-semibold">סיווג, פיצול ותגיות</PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(space=>space.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AnnotationEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} options={options} onSaved={setMessage}/>}</div>
 }

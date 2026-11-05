@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {reportStorageDisclosure} from '../../../src/report-inbox-controller.js'
 import {useEffect,useRef,useState} from 'react'
 import {useLocation,useParams} from 'react-router-dom'
@@ -37,5 +38,5 @@ export function ReportGroupPage({budget,fixture}:{budget:BudgetState;fixture:boo
  if(fixture)return <p>קבוצות דוחות אינן זמינות בדוגמה.</p>
  if(budget.status==='loading')return <p role="status">טוען חשבון…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
- return <div className="household-page household-report-page"><h1 className="text-2xl font-semibold">{reimport?'בדיקה מחודשת של מקור שמור':'בדיקת קבוצת דוחות'}</h1>{viewer?<p>המרחב פתוח לצפייה בלבד. קליטת דוחות דורשת הרשאת עריכה.</p>:done?<p role="status">{done}</p>:<>{loading&&<p role="status">טוען מקורות והחלטות שמורות…</p>}{error&&<p role="alert">{error}</p>}{data&&<GroupEditor budget={budget} base={budget.value} initial={data} onDone={setDone}/>}</>}</div>
+ return <div className="household-page household-report-page"><PageHeading className="text-2xl font-semibold">{reimport?'בדיקה מחודשת של מקור שמור':'בדיקת קבוצת דוחות'}</PageHeading>{viewer?<p>המרחב פתוח לצפייה בלבד. קליטת דוחות דורשת הרשאת עריכה.</p>:done?<p role="status">{done}</p>:<>{loading&&<p role="status">טוען מקורות והחלטות שמורות…</p>}{error&&<p role="alert">{error}</p>}{data&&<GroupEditor budget={budget} base={budget.value} initial={data} onDone={setDone}/>}</>}</div>
 }

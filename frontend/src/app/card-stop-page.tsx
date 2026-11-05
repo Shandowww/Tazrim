@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useLocation,useParams} from 'react-router-dom'
 import {creditCards,activeCards} from '../../../src/budget.js'
@@ -24,5 +25,5 @@ export function CardStopPage({budget,fixture}:{budget:BudgetState;fixture:boolea
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען פרטי כרטיס…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan as any,card=plan&&!plan.format?creditCards(plan).find((c:any)=>c.id===id):null,reason=!card?'הכרטיס אינו זמין במרחב הזה.':!activeCards(plan,month).some((c:any)=>c.id===id)?'הערכות הכרטיס כבר הופסקו בחודש שנבחר.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון אינה זמינה בשרת הזה.':''
- return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">הפסקת הערכות · <bdi>{card?.name}</bdi></h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert">{reason}</p>:<StopEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} month={month} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-4"><PageHeading className="text-2xl font-semibold">הפסקת הערכות · <bdi>{card?.name}</bdi></PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert">{reason}</p>:<StopEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} month={month} onSaved={setMessage}/>}</div>
 }

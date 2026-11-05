@@ -1,3 +1,4 @@
+import {PageHeading} from './page-heading'
 import {StatementNoticeUpdates} from './statement-notice-updates'
 import {useEffect,useRef,useState} from 'react'
 import {useLocation} from 'react-router-dom'
@@ -27,5 +28,5 @@ export function ActionCenterPage({budget,fixture}:{budget:BudgetState;fixture:bo
  if(fixture)return <p>רשימת לטיפול דורשת תקציב שנפתח בחשבון.</p>
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען מרחב…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
- return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">לטיפול</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><p className="text-sm text-muted-foreground">דוחות שמורים, דוחות צפויים ותזכורות אישיות במרחב הנבחר. בדיקות Gmail ועדכוני בנק פרטיים לחשבון המחובר; גיבוי חיצוני מוצג למנהל השרת בלבד. כשל בבדיקת חיבור אינו אישור שהכול הושלם. הודעות שמירה ועריכות פתוחות נשארות במסך שבו נערכו.</p><ActionList key={budget.value.accountId+'/'+budget.budgetId} budget={budget} actor={budget.value}/></div>
+ return <div className="mx-auto max-w-3xl space-y-4"><PageHeading className="text-2xl font-semibold">לטיפול</PageHeading><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p><p className="text-sm text-muted-foreground">דוחות שמורים, דוחות צפויים ותזכורות אישיות במרחב הנבחר. בדיקות Gmail ועדכוני בנק פרטיים לחשבון המחובר; גיבוי חיצוני מוצג למנהל השרת בלבד. כשל בבדיקת חיבור אינו אישור שהכול הושלם. הודעות שמירה ועריכות פתוחות נשארות במסך שבו נערכו.</p><ActionList key={budget.value.accountId+'/'+budget.budgetId} budget={budget} actor={budget.value}/></div>
 }

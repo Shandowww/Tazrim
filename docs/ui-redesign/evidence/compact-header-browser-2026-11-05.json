@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-05",
+  "build": true,
+  "typecheck": true,
+  "regressions": 1165,
+  "coreChecks": 15,
+  "browser": "Synthetic Chrome",
+  "checks": {
+    "320": {
+      "headerHeight": 61,
+      "oneRow": true,
+      "brandRemoved": true,
+      "touchTargets44": true,
+      "scopeSwitchWorks": true,
+      "pagePeriods": true,
+      "noOverflow": true
+    },
+    "390": {
+      "headerHeight": 61,
+      "oneRow": true,
+      "brandRemoved": true,
+      "touchTargets44": true,
+      "scopeSwitchWorks": true,
+      "pagePeriods": true,
+      "noOverflow": true
+    },
+    "430": {
+      "headerHeight": 61,
+      "oneRow": true,
+      "brandRemoved": true,
+      "touchTargets44": true,
+      "scopeSwitchWorks": true,
+      "pagePeriods": true,
+      "noOverflow": true
+    },
+    "1440": {
+      "headerHeight": 61,
+      "oneRow": true,
+      "brandRemoved": true,
+      "touchTargets44": true,
+      "scopeSwitchWorks": true,
+      "pagePeriods": true,
+      "noOverflow": true
+    },
+    "periodArrowsAndPicker": true,
+    "monthScopeRefreshDraftGuards": true,
+    "bellWorks": true,
+    "viewerIdentity": true,
+    "singleSpace": true,
+    "multipleSpaces": true,
+    "financialUnchanged": true
+  },
+  "physicalIPhoneRetested": false
+}
