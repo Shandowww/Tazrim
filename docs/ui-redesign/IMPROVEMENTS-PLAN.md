@@ -1,6 +1,6 @@
 # Next improvements — 2026-11-05
 
-Status: implemented in the household source branch; final release verification is in progress.
+Status: implemented and published to the existing server. Application `e6df93ee568be21a5958b268e485276d2ca77b7c` is verified live; see `evidence/release-improvements-2026-11-05.json`. Physical iPhone acceptance of the new controls remains unverified.
 
 ## 1. Familiar pull-to-refresh indicator
 

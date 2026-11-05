@@ -1,0 +1,181 @@
+{
+  "date": "2026-11-05",
+  "status": "published-and-verified",
+  "productionURL": "https://budgit.duckdns.org/next",
+  "applicationSource": {
+    "commit": "e6df93ee568be21a5958b268e485276d2ca77b7c",
+    "branch": "codex/budgit-household-ui",
+    "previousProductionCommit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6",
+    "priorSourceFilesVerified": 815,
+    "financialEngineSourceUnchanged": true
+  },
+  "features": [
+    "Circular refresh in both interfaces with existing gesture/draft guards",
+    "Basic / Advanced / Expert presentation modes per actor per device",
+    "Encrypted source-linked issuer notices with quiet updates, original-source access and personal read/snooze state"
+  ],
+  "sourceBackup": {
+    "budgitViaSSH": true,
+    "tazrimSnapshot": "4ce4d2417b74a87a1954910d4ee11fca8f00d9c1",
+    "tazrimBranch": "codex/budgit-react-frontend",
+    "independentHistoryAndLicensesPreserved": true,
+    "sourcePathsCompared": 827
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "regressions": 1162,
+    "coreChecks": 15,
+    "diffCheck": "passed",
+    "browser": {
+      "existingDefault": "expert",
+      "basicMenu": true,
+      "advancedMonthly": true,
+      "dirtyModeGuard": true,
+      "scopeChoice": true,
+      "newDefault": "basic",
+      "viewerBasic": true,
+      "actorChoice": true,
+      "csvWorkerScan": true,
+      "pdfWorker": true,
+      "xlsxWorker": true,
+      "quietUpdatesRead": true,
+      "circularPullCancel": true,
+      "320-light": true,
+      "320-dark": true,
+      "390-light": true,
+      "390-dark": true,
+      "1440-light": true,
+      "1440-dark": true,
+      "privateIsolation": true,
+      "viewerNoScan": true,
+      "financialUnchanged": true
+    },
+    "unitContracts": [
+      "Five notice categories, explicit valid dates/amounts and original Hebrew text/page",
+      "Bounded documents and transaction-row exclusion",
+      "Actual Hebrew PDF bytes through existing PDF.js reader",
+      "Conservative issuer/account/email overlap detection",
+      "Encrypted independent CAS scans and idempotent retry",
+      "Failed rescans preserve prior notices",
+      "Archive/reactivation/delete lifecycle",
+      "Actor/space isolation, viewer write refusal and permission downgrade during body read"
+    ]
+  },
+  "artifact": {
+    "image": "sha256:a32d4ffdf2433e8d2ba0e54d18c2fe63bcd05cf27bde1c203ce4d3e34324852d",
+    "sourceArchiveSha256": "0d3b420f402f22b5cfbaecf41a4ebcfd8b28909a4f423dd2f941c5abff651009",
+    "sixCandidateHashesMatchValidatedLocalBuild": true
+  },
+  "backup": {
+    "createdAt": "2026-11-05T09:06:11.443Z",
+    "sha256": "70bd66a6c7ae7ca7157c6ca9766b742a089938ac390a0aa333bfcaee75676885",
+    "consistentSQLite": true,
+    "integrityVerified": true,
+    "permissions": "0600"
+  },
+  "isolatedGates": {
+    "networkDisabled": true,
+    "financial": "passed",
+    "allExistingRecords": "preserved",
+    "accessHTTPDecryption": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "a981094f895b99d5d23eb0fd9883e106b433e1fc505ea3ca49dc6551766897d1",
+      "reactHTMLSha256": "cd50a6f408be2b1952b10590235f8d9914552e03c26e3829482d887e6111f1b0"
+    },
+    "candidateStartup": "passed",
+    "rollbackFinancial": "passed",
+    "rollbackAccess": "passed",
+    "rollbackChecker": "Previous-version checker used for the prior image; the candidate checker additionally requires the new notice API."
+  },
+  "runtime": {
+    "healthy": true,
+    "imageMatches": true,
+    "sha256": {
+      "server/app.mjs": "2b7bc23eba1c5d8a7149fa595fe341a75d31be33938295619ce84bd6bcf97ce6",
+      "server/statement-notices.mjs": "e0cfbcb2f2e98d73ed9d3e445201b98651fe0a472c173e56c331254905db4d25",
+      "dist/server/statement-notices.mjs": "0152b031be1c19eb9047917c9ef4994d4c94ebb059bbf853b46bba5a5772af9c",
+      "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+      "dist/index.html": "a981094f895b99d5d23eb0fd9883e106b433e1fc505ea3ca49dc6551766897d1",
+      "dist/frontend/index.html": "cd50a6f408be2b1952b10590235f8d9914552e03c26e3829482d887e6111f1b0"
+    },
+    "publicChecks": {
+      "checkedAt": "2026-11-05T09:08:05.762Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "automaticProductionHistoricalScans": 0
+  },
+  "preservation": {
+    "existingAuthoritativeTablesPreserved": 41,
+    "integrity": true,
+    "foreignKeys": true,
+    "configurationAndEncryptionKeysUnchanged": true,
+    "adjacentParkingAndProxyUnchanged": true,
+    "comparisonExceptions": [
+      "Existing derived financial/backup caches",
+      "reference_interest cache",
+      "drive_backup_connections.last_attempt only"
+    ],
+    "financialRecordsSourcesAccessAndBackupCredentialsPreserved": true,
+    "sitesAndPaidResourcesUnchanged": true
+  },
+  "rollback": {
+    "previousImage": "sha256:680dfd29ca6e937d42f6daa15c8d2d8c431ba3ff773e6dab059f7d031d8ba99f",
+    "imageAndSourceRetained": true,
+    "candidateDatabaseCompatibilityVerified": true,
+    "databaseNeverRestoredOrOverwritten": true
+  },
+  "cleanup": {
+    "taskOwnedSyntheticPreviewStopped": true,
+    "taskOwnedHeadlessBrowserStopped": true,
+    "unrelatedTunnelsUntouched": true
+  },
+  "limitations": [
+    "No fresh physical iPhone Safari acceptance for these new controls; automated Chrome touch/layout checks are recorded separately.",
+    "Readable-text PDF/CSV/Excel extraction is heuristic and requires review against the original. Scanned images/OCR and universal issuer-layout coverage are not claimed.",
+    "Historical or externally delivered sources require an explicit scan under issuer updates. New manual uploads scan after successful source storage.",
+    "No new push-notification capability or real provider-consent/Face ID acceptance is claimed."
+  ],
+  "userAction": "Reload Safari or reopen the home-screen app. Select the interface mode in the header or Settings; open issuer updates under More or the notification center."
+}
+

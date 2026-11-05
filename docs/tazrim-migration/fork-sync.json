@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "e6df93ee568be21a5958b268e485276d2ca77b7c",
+  "sourceCommit": "10745d59f850718400392dd09c74a26e38d83cfe",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Circular refresh, Basic/Advanced/Expert modes and encrypted source-linked issuer notices implemented and validated; publication gates in progress.",
+  "status": "Circular refresh, interface modes and encrypted issuer notices published and verified on the existing server; final release documentation included.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1162,
     "coreChecks": 15,
     "browser": "Synthetic Chrome: mode defaults, remembered actor/space choice, dirty switches, PDF/CSV/XLSX text workers, quiet updates/read state, touch pull/cancel, 320/390/1440 Light/Dark/reduced-motion and viewer/isolation; financial hashes unchanged.",
-    "release": "New application not activated yet. Existing server release gates in progress."
+    "release": "Fresh verified SQLite backup, isolated financial/access/HTTP/13-source-decryption/startup and rollback gates passed. Six runtime/local hashes, health/auth/routes/manifest, 41 existing authoritative tables, keys and adjacent services verified. See docs/ui-redesign/evidence/release-improvements-2026-11-05.json."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6"
+  "productionApplicationCommit": "e6df93ee568be21a5958b268e485276d2ca77b7c"
 }

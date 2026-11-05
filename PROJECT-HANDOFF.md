@@ -1,5 +1,13 @@
 # Monthly Flow — project handoff
 
+## Interface modes and issuer notices published — 2026-11-05
+
+Application `e6df93ee568be21a5958b268e485276d2ca77b7c` is verified live at https://budgit.duckdns.org/next. Circular pull refresh retains the existing upper-screen and draft guards in both interfaces. Basic / Advanced / Expert modes filter the shared routes/actions, remember the choice per actor/device and preserve existing users in Expert. Local readable PDF/CSV/Excel text extraction adds encrypted source-linked issuer notices, with attention versus quiet updates, personal read/snooze state, source access and explicit historical-source scanning. Extraction never changes financial records; failed retries preserve prior notices.
+
+Build/typecheck, 1,162 regressions and 15 core checks pass. Synthetic 320/390/1440 Light/Dark/reduced-motion, touch pull/cancel, mode defaults/drafts/actor-space persistence, PDF/CSV/XLSX workers, read state, viewer refusal and financial-hash preservation passed. All 815 prior source files matched. Fresh verified SQLite backup, isolated financial/access/HTTP/13-source-decryption/startup gates and prior-image compatibility preceded activation. Six validated-build/runtime hashes, health, login/root/deep routes/manifest, all 41 existing authoritative tables, keys and adjacent parking/proxy services passed. Both SSH Git destinations retain source backups and independent Tazrim history/licenses. Task-owned preview/browser stopped.
+
+Current source remains `codex/budgit-household-ui` in `/Users/talshandor/Documents/personal-projects/monthly-flow/work/budgit-household-ui`; preserve unrelated outer/older checkout work. Evidence: `docs/ui-redesign/evidence/release-improvements-2026-11-05.json`; policy: `docs/ui-redesign/IMPROVEMENTS-PLAN.md`. Reload the app. Fresh physical iPhone acceptance remains unverified for these new controls; scanned/OCR documents and universal issuer-layout coverage are unsupported. Historical/external reports use explicit scan; new manual uploads scan automatically. No production financial edits, hosting upgrade or Sites changes.
+
 ## Household redesign published — 2026-11-05
 
 Tal accepted the updated iPhone preview. Application `b340ebf6d9306cd4704947683b2f91cc4bf8bfe6` is verified live at https://budgit.duckdns.org/next, with smoother card dragging, refresh gestures starting only in the upper screen area, persistent mobile navigation, the first chart month on the right and grouped money entry. Identical preview goals were duplicated synthetic fixtures; budget data remains separately scoped.
