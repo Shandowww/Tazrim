@@ -1,0 +1,119 @@
+{
+  "puts": 0,
+  "private": [
+    {
+      "user_id": "alice",
+      "revision": 1
+    },
+    {
+      "user_id": "bob",
+      "revision": 1
+    },
+    {
+      "user_id": "cards0",
+      "revision": 1
+    },
+    {
+      "user_id": "cards1",
+      "revision": 1
+    },
+    {
+      "user_id": "cards2",
+      "revision": 1
+    },
+    {
+      "user_id": "cards30",
+      "revision": 1
+    },
+    {
+      "user_id": "empty",
+      "revision": 1
+    }
+  ],
+  "shared": [
+    {
+      "id": "c92e93f2-53f7-4a83-b80d-b29cb70d085d",
+      "revision": 1
+    }
+  ],
+  "initialHashes": {
+    "private": [
+      {
+        "id": "alice",
+        "sha256": "a4cbaf400ba0134db325a3e870adca1becee21269578468e07ac63f1554565f6"
+      },
+      {
+        "id": "bob",
+        "sha256": "a4cbaf400ba0134db325a3e870adca1becee21269578468e07ac63f1554565f6"
+      },
+      {
+        "id": "cards0",
+        "sha256": "1e4d31b5e6296d94aada304b308b855544caf0cb29eada4d38aba6b50027e5e7"
+      },
+      {
+        "id": "cards1",
+        "sha256": "77c87838b936fdb2bec767ffc3d47bb81ddebfc07f130ded57803eaed03b229a"
+      },
+      {
+        "id": "cards2",
+        "sha256": "02f98bf726a25335f41afc02e4b34db60b984e5800aef1ecb50c48dd79ca887e"
+      },
+      {
+        "id": "cards30",
+        "sha256": "da355d4801818f82242af4e727d6d7b9ab3d7be24f738f855ecd1ec08e4e4ade"
+      },
+      {
+        "id": "empty",
+        "sha256": "6d9565b643871c318ac61a7cb6bfe80d3a680530c07fc5805750fdffb2dea37b"
+      }
+    ],
+    "shared": [
+      {
+        "id": "c92e93f2-53f7-4a83-b80d-b29cb70d085d",
+        "sha256": "a4cbaf400ba0134db325a3e870adca1becee21269578468e07ac63f1554565f6"
+      }
+    ]
+  },
+  "currentHashes": {
+    "private": [
+      {
+        "id": "alice",
+        "sha256": "a4cbaf400ba0134db325a3e870adca1becee21269578468e07ac63f1554565f6"
+      },
+      {
+        "id": "bob",
+        "sha256": "a4cbaf400ba0134db325a3e870adca1becee21269578468e07ac63f1554565f6"
+      },
+      {
+        "id": "cards0",
+        "sha256": "1e4d31b5e6296d94aada304b308b855544caf0cb29eada4d38aba6b50027e5e7"
+      },
+      {
+        "id": "cards1",
+        "sha256": "77c87838b936fdb2bec767ffc3d47bb81ddebfc07f130ded57803eaed03b229a"
+      },
+      {
+        "id": "cards2",
+        "sha256": "02f98bf726a25335f41afc02e4b34db60b984e5800aef1ecb50c48dd79ca887e"
+      },
+      {
+        "id": "cards30",
+        "sha256": "da355d4801818f82242af4e727d6d7b9ab3d7be24f738f855ecd1ec08e4e4ade"
+      },
+      {
+        "id": "empty",
+        "sha256": "6d9565b643871c318ac61a7cb6bfe80d3a680530c07fc5805750fdffb2dea37b"
+      }
+    ],
+    "shared": [
+      {
+        "id": "c92e93f2-53f7-4a83-b80d-b29cb70d085d",
+        "sha256": "a4cbaf400ba0134db325a3e870adca1becee21269578468e07ac63f1554565f6"
+      }
+    ]
+  },
+  "financialBytesUnchanged": true,
+  "methods": [
+    "GET"
+  ]
+}

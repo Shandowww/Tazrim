@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-05",
+  "acceptedApplicationCommit": "d67cf22",
+  "previousApplicationCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d",
+  "previousRuntimeImage": "sha256:61f67298fc2bb06d6593ba78a5e34716b6caf64f36ba44a531749eb243230b8b",
+  "previousRuntimeHealthy": true,
+  "priorTrackedSourceFilesVerified": 702,
+  "priorTrackedSourceMismatches": 0,
+  "acceptedApplicationDiff": "220 files changed, 5109 insertions, 413 deletions",
+  "originalBudgetEngineUnchanged": true,
+  "backendDiffScope": "Native Drive consent return context, Gmail native return and original report classification compatibility; no parallel financial engine or database schema change",
+  "finalApplicationValidation": {
+    "buildAndTypecheck": "passed",
+    "regressions": 1153,
+    "coreChecks": 15,
+    "diffCheck": "passed"
+  },
+  "productionMutationAtSourceReview": false
+}

@@ -1,0 +1,124 @@
+{
+  "date": "2026-11-05",
+  "environment": "isolated synthetic SQLite service; Chrome at 390×844",
+  "failedSaves": [
+    {
+      "path": "/next/details/new",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    },
+    {
+      "path": "/next/details/demo-pending/edit",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    },
+    {
+      "path": "/next/details/demo-pending/clear",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    },
+    {
+      "path": "/next/details/demo-pending/delete",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    },
+    {
+      "path": "/next/loans/new",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    },
+    {
+      "path": "/next/loans/demo-loan/edit",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    },
+    {
+      "path": "/next/loans/demo-loan/remove",
+      "putAttempts": 1,
+      "errorVisible": true,
+      "draftRetained": true,
+      "backDialogOpened": true,
+      "stayPreservedPath": true,
+      "financialHashesUnchanged": true
+    }
+  ],
+  "failedSaveTotalPutAttempts": 7,
+  "financialHashesUnchanged": true,
+  "entries": [
+    {
+      "origin": "/next/",
+      "target": "/checks",
+      "linkPresent": true,
+      "opened": "/next/checks",
+      "back": "/next",
+      "periodRetained": true
+    },
+    {
+      "origin": "/next/",
+      "target": "/loans",
+      "linkPresent": true,
+      "opened": "/next/loans",
+      "back": "/next",
+      "periodRetained": true
+    },
+    {
+      "origin": "/next/more",
+      "target": "/checks",
+      "linkPresent": true,
+      "opened": "/next/checks",
+      "back": "/next/more",
+      "periodRetained": true
+    },
+    {
+      "origin": "/next/more",
+      "target": "/loans",
+      "linkPresent": true,
+      "opened": "/next/loans",
+      "back": "/next/more",
+      "periodRetained": true
+    }
+  ],
+  "viewerEvidence": "docs/ui-redesign/evidence/form-viewer-acceptance-2026-11-05.json",
+  "finding": "Seven cheque and loan change forms plus the loan payment matcher retained their draft after a synthetic 503 before save, displayed an actionable uncertain-result error, and offered a guarded Back dialog whose Stay action kept the path and inputs. Home and More both opened cheque and loan lists and returned to their origin with period context.",
+  "remainingForItem5_7": "None within synthetic browser and service acceptance; physical iPhone acceptance remains under 9.5.",
+  "localAudits": [
+    "work/ui-redesign/form-failure-result.json",
+    "work/ui-redesign/form-entry-result.json",
+    "work/ui-redesign/loan-payment-failure-result.json"
+  ],
+  "loanPaymentBrowserCheck": {
+    "fixture": "second isolated SQLite service seeded with a real synthetic bank import and matching loan",
+    "path": "/next/loans/loan/payments",
+    "candidateButtonPresent": true,
+    "putAttempts": 1,
+    "errorVisible": true,
+    "draftRetained": true,
+    "backDialogOpened": true,
+    "stayPreservedPath": true,
+    "financialHashesUnchanged": true
+  }
+}

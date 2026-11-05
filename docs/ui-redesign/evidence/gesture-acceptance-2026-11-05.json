@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-05",
+  "environment": "isolated synthetic SQLite preview; headless Chrome CDP touch emulation, 390×844, prefers-reduced-motion: reduce",
+  "gesture": {
+    "initialCard": "1234",
+    "afterHorizontalCard": "1158",
+    "horizontalDistancePx": 120,
+    "startScrollY": 0,
+    "afterHorizontalScrollY": 0,
+    "apiResourceCountBefore": 11,
+    "apiResourceCountAfterHorizontal": 11,
+    "timeOriginUnchanged": true,
+    "afterVerticalCard": "1158",
+    "afterVerticalScrollY": 491,
+    "selectedCardTransition": "0s",
+    "selectedCardAnimation": "0s"
+  },
+  "relatedEvidence": [
+    "docs/ui-redesign/evidence/edge-states-2026-11-04.json",
+    "docs/ui-redesign/EXECUTION-STATUS.md:200",
+    "test/household-accounts.test.mjs"
+  ],
+  "finding": "A browser-dispatched horizontal touch gesture selected the next card at the top of the page without initiating refresh or scrolling. A vertical gesture scrolled and did not select another card. The emulated reduced-motion state had zero transition and animation duration on the selected card. Existing synthetic checks cover 0/1/2/30 card counts, arrow/dot/keyboard selection, per-space remembered selection and removed/foreign card fallback.",
+  "limits": [
+    "CDP touch emulation does not establish Safari or physical iPhone gesture acceptance.",
+    "Physical touch and safe area acceptance remains under 9.5."
+  ],
+  "audit": "work/ui-redesign/gesture-acceptance.mjs"
+}

@@ -31,6 +31,7 @@ const matches = (text: string | undefined, terms: string[]) =>
   !!text && terms.some(t => text.toLowerCase().includes(t.toLowerCase()))
 
 interface Props {
+  categoryColors?: Record<string,string>
   results: SearchResult[]
   terms: string[]
   /** Index of the keyboard-highlighted row (command dialog) */
@@ -45,7 +46,7 @@ interface Props {
 }
 
 /** Search hits: description, date, account, category chip and signed amount; each row links to its account page. */
-export function SearchResultList({ results, terms, activeIndex, onNavigate, onHover, compact, idPrefix = 'search-result', actions }: Props) {
+export function SearchResultList({ categoryColors,results, terms, activeIndex, onNavigate, onHover, compact, idPrefix = 'search-result', actions }: Props) {
   const { search, pathname } = useLocation()
   return (
     <ul className="flex flex-col divide-y divide-border/60" role={activeIndex !== undefined ? 'listbox' : undefined}>
@@ -92,8 +93,8 @@ export function SearchResultList({ results, terms, activeIndex, onNavigate, onHo
                   <span aria-hidden className="sm:hidden">·</span>
                   <span className="truncate sm:hidden">{r.accountName}</span>
                   {r.category && (
-                    <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
-                      {r.category}
+                    <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground" style={categoryColors?.[r.category]?{backgroundColor:`color-mix(in srgb, ${categoryColors[r.category]} 14%, transparent)`}:undefined}>
+                      {categoryColors?.[r.category]&&<i aria-hidden style={{display:'inline-block',width:7,height:7,borderRadius:'50%',marginInlineEnd:5,background:categoryColors[r.category]}}/>}{r.category}
                     </span>
                   )}
                   {r.recurringLabel && (

@@ -1,0 +1,672 @@
+{
+  "date": "2026-11-04",
+  "base": "aa15491",
+  "scope": "Disposable in-memory service; valid synthetic plans for 0/1/2/30 cards and an empty bank/card plan",
+  "layout": [
+    {
+      "colorScheme": "light",
+      "bank": [
+        {
+          "scroll": 152,
+          "width": 152
+        },
+        {
+          "scroll": 152,
+          "width": 152
+        }
+      ],
+      "client": 305,
+      "dark": false,
+      "detail": [
+        {
+          "scroll": 239,
+          "width": 239
+        }
+      ],
+      "face": {
+        "height": 174,
+        "scroll": 174
+      },
+      "railHeight": 55,
+      "railWidth": 177,
+      "scroll": 305,
+      "width": 320
+    },
+    {
+      "colorScheme": "light",
+      "bank": [
+        {
+          "scroll": 205,
+          "width": 205
+        },
+        {
+          "scroll": 205,
+          "width": 205
+        }
+      ],
+      "client": 375,
+      "dark": false,
+      "detail": [
+        {
+          "scroll": 309,
+          "width": 309
+        }
+      ],
+      "face": {
+        "height": 174,
+        "scroll": 174
+      },
+      "railHeight": 55,
+      "railWidth": 220,
+      "scroll": 375,
+      "width": 390
+    },
+    {
+      "colorScheme": "light",
+      "bank": [
+        {
+          "scroll": 236,
+          "width": 236
+        },
+        {
+          "scroll": 236,
+          "width": 236
+        }
+      ],
+      "client": 415,
+      "dark": false,
+      "detail": [
+        {
+          "scroll": 349,
+          "width": 349
+        }
+      ],
+      "face": {
+        "height": 192,
+        "scroll": 192
+      },
+      "railHeight": 55,
+      "railWidth": 220,
+      "scroll": 415,
+      "width": 430
+    },
+    {
+      "colorScheme": "light",
+      "bank": [
+        {
+          "scroll": 226,
+          "width": 226
+        },
+        {
+          "scroll": 226,
+          "width": 226
+        }
+      ],
+      "client": 1265,
+      "dark": false,
+      "detail": [
+        {
+          "scroll": 422,
+          "width": 422
+        }
+      ],
+      "face": {
+        "height": 202,
+        "scroll": 202
+      },
+      "railHeight": 55,
+      "railWidth": 220,
+      "scroll": 1265,
+      "width": 1280
+    },
+    {
+      "colorScheme": "dark",
+      "bank": [
+        {
+          "scroll": 152,
+          "width": 152
+        },
+        {
+          "scroll": 152,
+          "width": 152
+        }
+      ],
+      "client": 305,
+      "dark": true,
+      "detail": [
+        {
+          "scroll": 239,
+          "width": 239
+        }
+      ],
+      "face": {
+        "height": 174,
+        "scroll": 174
+      },
+      "railHeight": 55,
+      "railWidth": 177,
+      "scroll": 305,
+      "width": 320
+    },
+    {
+      "colorScheme": "dark",
+      "bank": [
+        {
+          "scroll": 205,
+          "width": 205
+        },
+        {
+          "scroll": 205,
+          "width": 205
+        }
+      ],
+      "client": 375,
+      "dark": true,
+      "detail": [
+        {
+          "scroll": 309,
+          "width": 309
+        }
+      ],
+      "face": {
+        "height": 174,
+        "scroll": 174
+      },
+      "railHeight": 55,
+      "railWidth": 220,
+      "scroll": 375,
+      "width": 390
+    },
+    {
+      "colorScheme": "dark",
+      "bank": [
+        {
+          "scroll": 236,
+          "width": 236
+        },
+        {
+          "scroll": 236,
+          "width": 236
+        }
+      ],
+      "client": 415,
+      "dark": true,
+      "detail": [
+        {
+          "scroll": 349,
+          "width": 349
+        }
+      ],
+      "face": {
+        "height": 192,
+        "scroll": 192
+      },
+      "railHeight": 55,
+      "railWidth": 220,
+      "scroll": 415,
+      "width": 430
+    },
+    {
+      "colorScheme": "dark",
+      "bank": [
+        {
+          "scroll": 226,
+          "width": 226
+        },
+        {
+          "scroll": 226,
+          "width": 226
+        }
+      ],
+      "client": 1265,
+      "dark": true,
+      "detail": [
+        {
+          "scroll": 422,
+          "width": 422
+        }
+      ],
+      "face": {
+        "height": 202,
+        "scroll": 202
+      },
+      "railHeight": 55,
+      "railWidth": 220,
+      "scroll": 1265,
+      "width": 1280
+    }
+  ],
+  "cardCounts": [
+    {
+      "user": "cards0",
+      "arrows": [],
+      "banks": 2,
+      "client": 305,
+      "count": "כרטיסי האשראי\nאין כרטיסים",
+      "detail": null,
+      "dots": [],
+      "empty": [],
+      "peeks": 0,
+      "railHeight": null,
+      "scroll": 305,
+      "selected": null
+    },
+    {
+      "user": "cards1",
+      "arrows": [
+        {
+          "disabled": true,
+          "h": 44,
+          "w": 44
+        },
+        {
+          "disabled": true,
+          "h": 44,
+          "w": 44
+        }
+      ],
+      "banks": 2,
+      "client": 305,
+      "count": "כרטיסי האשראי\n1 מתוך 1",
+      "detail": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות · 1234\n‏90.99 ‏₪\n\n2026-10\n\nקניות\n‏‎-10.02 ‏₪\nמזון\n‏101.01 ‏₪\nפרטים ופעולות",
+      "dots": [
+        {
+          "h": 44,
+          "label": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+          "pressed": "true",
+          "w": 44
+        }
+      ],
+      "empty": [],
+      "peeks": 0,
+      "railHeight": 44,
+      "scroll": 305,
+      "selected": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234"
+    },
+    {
+      "user": "cards2",
+      "arrows": [
+        {
+          "disabled": false,
+          "h": 44,
+          "w": 44
+        },
+        {
+          "disabled": false,
+          "h": 44,
+          "w": 44
+        }
+      ],
+      "banks": 2,
+      "client": 305,
+      "count": "כרטיסי האשראי\n1 מתוך 2",
+      "detail": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות · 1234\n‏90.99 ‏₪\n\n2026-10\n\nקניות\n‏‎-10.02 ‏₪\nמזון\n‏101.01 ‏₪\nפרטים ופעולות",
+      "dots": [
+        {
+          "h": 44,
+          "label": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+          "pressed": "true",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת קניות אונליין 8046",
+          "pressed": "false",
+          "w": 44
+        }
+      ],
+      "empty": [],
+      "peeks": 1,
+      "railHeight": 44,
+      "scroll": 305,
+      "selected": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234"
+    },
+    {
+      "user": "cards30",
+      "arrows": [
+        {
+          "disabled": false,
+          "h": 44,
+          "w": 44
+        },
+        {
+          "disabled": false,
+          "h": 44,
+          "w": 44
+        }
+      ],
+      "banks": 2,
+      "client": 305,
+      "count": "כרטיסי האשראי\n1 מתוך 30",
+      "detail": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות · 1234\n‏90.99 ‏₪\n\n2026-10\n\nקניות\n‏‎-10.02 ‏₪\nמזון\n‏101.01 ‏₪\nפרטים ופעולות",
+      "dots": [
+        {
+          "h": 44,
+          "label": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+          "pressed": "true",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת קניות אונליין 8046",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת מנויים לבית 1158",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 4 2003",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 5 2004",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 6 2005",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 7 2006",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 8 2007",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 9 2008",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 10 2009",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 11 2010",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 12 2011",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 13 2012",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 14 2013",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 15 2014",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 16 2015",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 17 2016",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 18 2017",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 19 2018",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 20 2019",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 21 2020",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 22 2021",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 23 2022",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 24 2023",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 25 2024",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 26 2025",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 27 2026",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 28 2027",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 29 2028",
+          "pressed": "false",
+          "w": 44
+        },
+        {
+          "h": 44,
+          "label": "הצגת כרטיס בדיקה 30 2029",
+          "pressed": "false",
+          "w": 44
+        }
+      ],
+      "empty": [],
+      "peeks": 2,
+      "railHeight": 55,
+      "scroll": 305,
+      "selected": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234"
+    },
+    {
+      "user": "empty",
+      "arrows": [],
+      "banks": 0,
+      "client": 320,
+      "count": "כרטיסי האשראי\nאין כרטיסים",
+      "detail": null,
+      "dots": [],
+      "empty": [
+        "עדיין אין חשבונות בנק במרחב."
+      ],
+      "peeks": 0,
+      "railHeight": null,
+      "scroll": 320,
+      "selected": null
+    }
+  ],
+  "railActions": [
+    {
+      "label": "Initial first card",
+      "client": 305,
+      "count": "כרטיסי האשראי\n1 מתוך 30",
+      "detail": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות · 1234",
+      "focus": null,
+      "railHeight": 55,
+      "railLeft": 0,
+      "railWidth": 177,
+      "scroll": 305,
+      "selected": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+      "selectedVisible": true,
+      "width": 320,
+      "y": 395.5
+    },
+    {
+      "label": "Previous wraps from first to 30",
+      "client": 305,
+      "count": "כרטיסי האשראי\n30 מתוך 30",
+      "detail": "כרטיס בדיקה 30 · 2029",
+      "focus": "הכרטיס הקודם",
+      "railHeight": 55,
+      "railLeft": -1143,
+      "railWidth": 177,
+      "scroll": 305,
+      "selected": "הצגת כרטיס בדיקה 30 2029",
+      "selectedVisible": true,
+      "width": 320,
+      "y": 395.5
+    },
+    {
+      "label": "Next wraps from 30 to first",
+      "client": 305,
+      "count": "כרטיסי האשראי\n1 מתוך 30",
+      "detail": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות · 1234",
+      "focus": "הכרטיס הבא",
+      "railHeight": 55,
+      "railLeft": 0,
+      "railWidth": 177,
+      "scroll": 305,
+      "selected": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+      "selectedVisible": true,
+      "width": 320,
+      "y": 395.5
+    },
+    {
+      "label": "Keyboard selects 30 and focus follows",
+      "client": 305,
+      "count": "כרטיסי האשראי\n30 מתוך 30",
+      "detail": "כרטיס בדיקה 30 · 2029",
+      "focus": "הצגת כרטיס בדיקה 30 2029",
+      "railHeight": 55,
+      "railLeft": -1143,
+      "railWidth": 177,
+      "scroll": 305,
+      "selected": "הצגת כרטיס בדיקה 30 2029",
+      "selectedVisible": true,
+      "width": 320,
+      "y": 395.5
+    },
+    {
+      "label": "Keyboard returns to first and focus follows",
+      "client": 305,
+      "count": "כרטיסי האשראי\n1 מתוך 30",
+      "detail": "כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות · 1234",
+      "focus": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+      "railHeight": 55,
+      "railLeft": 0,
+      "railWidth": 177,
+      "scroll": 305,
+      "selected": "הצגת כרטיס הוצאות הבית והילדים לטיולים ולקניות חודשיות 1234",
+      "selectedVisible": true,
+      "width": 320,
+      "y": 395.5
+    }
+  ],
+  "appearance": [
+    {
+      "label": "Explicit light while system dark",
+      "dark": false,
+      "stored": "light",
+      "systemDark": true
+    },
+    {
+      "label": "Light survives reload",
+      "dark": false,
+      "stored": "light",
+      "systemDark": true
+    },
+    {
+      "label": "Explicit dark while system light",
+      "dark": true,
+      "stored": "dark",
+      "systemDark": false
+    },
+    {
+      "label": "Return to system light",
+      "dark": false,
+      "stored": "system",
+      "systemDark": false
+    },
+    {
+      "label": "Live system dark",
+      "dark": true,
+      "stored": "system",
+      "systemDark": true
+    },
+    {
+      "label": "Live system light",
+      "dark": false,
+      "stored": "system",
+      "systemDark": false
+    }
+  ],
+  "appearanceSelectAfterFix": {
+    "height": 44,
+    "source": "Measured on settings after the long-label-select-build, before the wallet-only change"
+  },
+  "limitations": [
+    "Desktop Chromium CSS viewports, not a physical iPhone.",
+    "Appearance media emulation; actual device OS changes remain untested.",
+    "Physical swipe/pull-down/safe-area/reduced-motion acceptance remains open."
+  ],
+  "applicationCommit": "90af8ba"
+}

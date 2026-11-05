@@ -1,0 +1,203 @@
+{
+  "date": "2026-11-04",
+  "applicationCommit": "9cc00be",
+  "baselineCommit": "5acbeac",
+  "fixture": "Demo household with one additional planned transfer and a 600.01 ILS three-payment card purchase",
+  "baselineBudgetModelSha256": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+  "currentBudgetModelSha256": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+  "forecastExactMatch": true,
+  "accountForecastExactMatch": true,
+  "forecast": [
+    {
+      "month": "2026-10",
+      "income": 15000,
+      "incomingTransfers": 0,
+      "outgoingTransfers": 0,
+      "spending": 3440.99,
+      "saving": 0,
+      "planned": 35,
+      "net": 11524.01,
+      "balance": 69319.06,
+      "actual": true
+    },
+    {
+      "month": "2026-11",
+      "income": 15000,
+      "incomingTransfers": 0,
+      "outgoingTransfers": 0,
+      "spending": 3790.99,
+      "saving": 0,
+      "planned": 200,
+      "net": 11009.01,
+      "balance": 80328.07,
+      "actual": false
+    },
+    {
+      "month": "2026-12",
+      "income": 15000,
+      "incomingTransfers": 0,
+      "outgoingTransfers": 0,
+      "spending": 3790.99,
+      "saving": 0,
+      "planned": 200,
+      "net": 11009.01,
+      "balance": 91337.08,
+      "actual": false
+    },
+    {
+      "month": "2027-01",
+      "income": 15000,
+      "incomingTransfers": 0,
+      "outgoingTransfers": 0,
+      "spending": 3790.99,
+      "saving": 0,
+      "planned": 200.01,
+      "net": 11009,
+      "balance": 102346.08,
+      "actual": false
+    }
+  ],
+  "accountForecast": {
+    "sample-bank-1": [
+      {
+        "month": "2026-11",
+        "balance": 14335.56,
+        "planned": 200,
+        "issues": []
+      },
+      {
+        "month": "2026-12",
+        "balance": 21094.57,
+        "planned": 200,
+        "issues": []
+      },
+      {
+        "month": "2027-01",
+        "balance": 27853.57,
+        "planned": 200.01,
+        "issues": []
+      }
+    ],
+    "sample-bank-2": [
+      {
+        "month": "2026-11",
+        "balance": 7623.45,
+        "planned": 0,
+        "issues": []
+      },
+      {
+        "month": "2026-12",
+        "balance": 11873.45,
+        "planned": 0,
+        "issues": []
+      },
+      {
+        "month": "2027-01",
+        "balance": 16123.45,
+        "planned": 0,
+        "issues": []
+      }
+    ]
+  },
+  "installmentPayments": [
+    {
+      "month": "2026-11",
+      "amount": 200
+    },
+    {
+      "month": "2026-12",
+      "amount": 200
+    },
+    {
+      "month": "2027-01",
+      "amount": 200.01
+    }
+  ],
+  "transfer": {
+    "id": "qa-transfer",
+    "from": "sample-bank-1",
+    "to": "sample-bank-2",
+    "month": "2026-11",
+    "amount": 123.45,
+    "status": "planned"
+  },
+  "reportedOctober": {
+    "salary": 15000,
+    "card1": 90.99,
+    "card2": 600,
+    "cardHome": 250,
+    "bankBalances": {
+      "sample-bank-1": {
+        "balance": 7700,
+        "date": "2026-10-28"
+      },
+      "sample-bank-2": {
+        "balance": 3250,
+        "date": "2026-10-28"
+      }
+    }
+  },
+  "pendingCheque": {
+    "amount": 35,
+    "status": "pending"
+  },
+  "loan": {
+    "monthly": 350,
+    "months": 24,
+    "from": "2026-05"
+  },
+  "savings": {
+    "balance": 500000,
+    "allocated": [
+      {
+        "id": "house",
+        "amount": 400000
+      },
+      {
+        "id": "holiday",
+        "amount": 50000
+      },
+      {
+        "id": "furniture",
+        "amount": 20000
+      },
+      {
+        "id": "child",
+        "amount": 30000
+      }
+    ]
+  },
+  "browserAudit": {
+    "visited": [
+      "home",
+      "accounts",
+      "categories",
+      "checks",
+      "loans",
+      "savings",
+      "transfers",
+      "scenario",
+      "planned-items"
+    ],
+    "financialWrites": 0,
+    "privatePlanCount": 7,
+    "sharedPlanCount": 1,
+    "allPlanRevisionsOne": true,
+    "allStoredFinancialHashesUnchanged": true,
+    "sourceRevisions": [
+      {
+        "revision": 1,
+        "state": "received"
+      },
+      {
+        "revision": 1,
+        "state": "received"
+      }
+    ],
+    "commits": 0
+  },
+  "limits": [
+    "Synthetic fixture and desktop browser",
+    "Read-only UI parity does not replace real-provider or physical-iPhone acceptance"
+  ]
+}

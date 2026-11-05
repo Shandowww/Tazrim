@@ -7,8 +7,6 @@ import {savePreparedPlan,SaveConflict,SaveUncertain,WritePermissionError} from '
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
-import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import Link from './link'
 const input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-sm tabular-nums',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 const money=(n:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0}).format(n)
 type Projection=ReturnType<typeof prepareInvestmentProjection>
@@ -31,10 +29,10 @@ function InvestmentEditor({budget,initialBase,asOf,viewer}:{budget:BudgetState;i
  {dirty&&<div className="flex flex-wrap gap-3"><p role="status" className="w-full text-sm">{goalSelected?'עדכון היעד עדיין לא נשמר.':'ההנחות שונו במכשיר הזה בלבד. הסימולציה אינה נשמרת בתקציב.'}</p><button className={button} disabled={busy||attempted} onClick={discard}>ביטול השינויים</button></div>}</div>
 }
 export function InvestmentPage({budget,fixture}:{budget:BudgetState;fixture:boolean}){
- const {search}=useLocation(),href=usePeriodHref(),{asOf}=periodFor(search)
+ const {search}=useLocation(),{asOf}=periodFor(search)
  if(fixture)return <p>סימולציית השקעות זמינה עם תקציב שנפתח בחשבון.</p>
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען נתוני השקעה…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan as any,viewer=budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/savings')} className="inline-flex min-h-11 items-center text-sm text-primary underline">חזרה לחיסכון ומטרות</Link><h1 className="text-2xl font-semibold">סימולציית צמיחת השקעות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{!plan||plan.format?<p role="alert">יש לפתוח את התקציב לפני שימוש בסימולציה.</p>:<InvestmentEditor key={budget.value.accountId+'/'+budget.budgetId} budget={budget} initialBase={budget.value} asOf={asOf} viewer={viewer}/>}</div>
+ return <div className="household-page"><h1 className="text-2xl font-semibold">סימולציית צמיחת השקעות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{!plan||plan.format?<p role="alert">יש לפתוח את התקציב לפני שימוש בסימולציה.</p>:<InvestmentEditor key={budget.value.accountId+'/'+budget.budgetId} budget={budget} initialBase={budget.value} asOf={asOf} viewer={viewer}/>}</div>
 }

@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-04",
+  "sourceCommit": "a515267",
+  "environment": "Disposable localhost service with in-memory SQLite and synthetic plans; desktop browser at 390x844.",
+  "checks": {
+    "emptyUser": {
+      "accounts": "No banks or cards; add actions visible; no horizontal overflow.",
+      "home": "No reported months; missing figures labeled חסר; no fabricated financial totals."
+    },
+    "manyCards": {
+      "count": 30,
+      "accounts": "All cards available in a one-row selector; no horizontal overflow at 390px."
+    },
+    "edgeUser": {
+      "validPlan": true,
+      "zeroSalary": "Home shows ₪0 actual income for October 2026, not חסר.",
+      "negativeBalance": "First bank shows -₪25.01 with 28.10.2026 date.",
+      "missingBalanceDate": "Second bank says balance not reported in period and אין דיווח; no invented date or amount.",
+      "longBankName": "Wrapped within viewport without horizontal overflow.",
+      "otherBanks": 2
+    },
+    "planLoadFailure": {
+      "injection": "GET /api/plan?budget=personal -> 503",
+      "result": "Budget unavailable with retry action; retry after restoring service loaded same October home."
+    },
+    "reportListFailure": {
+      "injection": "GET /api/reports?budget=personal -> 503",
+      "result": "Report inbox load error says stored data unchanged; no fake source rows."
+    },
+    "missingSource": {
+      "route": "/next/upload/00000000-0000-4000-8000-000000000000/review",
+      "result": "Report or space unavailable to this account; retry action; no source name or editing controls."
+    },
+    "saveFailure": "Previously checked with a synthetic failed PUT in workflow-acceptance-2026-11-04.json: old plan retained and draft preserved."
+  },
+  "persistence": {
+    "financialPuts": 0,
+    "reportCommits": 0,
+    "allPlanHashesUnchanged": true,
+    "allRevisionsOne": true
+  },
+  "limits": [
+    "No physical iPhone or real provider file acceptance.",
+    "A failed first load cannot demonstrate preservation of previously loaded data; prior protected refresh acceptance covers that path."
+  ]
+}

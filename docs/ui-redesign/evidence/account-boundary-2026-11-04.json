@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-04",
+  "environment": "Disposable in-memory SQLite service, Alice and Bob private budgets plus shared viewer, desktop Chromium at 390px",
+  "draft": {
+    "alicePrivateTextEntered": true,
+    "refreshPromptedForUnsavedEdit": true,
+    "stayPreservedTextAndRoute": true,
+    "explicitDiscardClearedOldAccountView": true,
+    "retryOpenedBobWithoutAliceTextOrSource": true
+  },
+  "selection": {
+    "aliceSelectedCardLastFour": "8046",
+    "aliceUrlIncluded": "walletCard=card2",
+    "accountChangeClearedPreviousCardFromView": true,
+    "bobRetryUrlHasNoWalletCard": true,
+    "bobSelectedDefaultCardLastFour": "1234"
+  },
+  "financialPutCount": 0,
+  "privatePlanCount": 7,
+  "sharedPlanCount": 1,
+  "eachPlanRevision": 1,
+  "allFinancialHashesUnchanged": true,
+  "relatedEvidence": ["permission-concurrency-2026-11-04.json", "report-acceptance-2026-11-04.json"],
+  "limit": "Synthetic users and desktop browser; no multi-device or physical iPhone claim"
+}

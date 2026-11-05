@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { loadBudgetSnapshot } from '../frontend/src/app/use-budget.ts'
+import { AccessError } from '../frontend/src/app/budget-api.ts'
 
 const shared = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const space = { id: shared, name: 'משפחה', role: 'viewer', revision: 4, scope: 'budget:' + shared }
@@ -26,6 +27,21 @@ test('space load checks access before plan fetch and retains role/identity', asy
 test('space load rejects an identity change between list and plan responses', async () => {
   const fetcher = async url => Response.json(url === '/api/budgets' ? list : { ...plan, accountId: 'bob' })
   await assert.rejects(loadBudgetSnapshot(shared, new AbortController().signal, fetcher), /החשבון השתנה/)
+})
+
+test('refresh rejects a changed account before reading its plan', async () => {
+  const calls = []
+  const fetcher = async url => {
+    calls.push(url)
+    return Response.json(url === '/api/budgets' ? { ...list, accountId: 'bob', accountEmail: 'bob@example.test' } : plan)
+  }
+  await assert.rejects(loadBudgetSnapshot('personal', new AbortController().signal, fetcher, 'alice'), error => error instanceof AccessError && /החשבון השתנה/.test(error.message))
+  assert.deepEqual(calls, ['/api/budgets'])
+})
+
+test('same-account refresh keeps a transient plan failure distinct from lost access', async () => {
+  const fetcher = async url => url === '/api/budgets' ? Response.json(list) : Response.json({ error: 'temporary' }, { status: 503 })
+  await assert.rejects(loadBudgetSnapshot('personal', new AbortController().signal, fetcher, 'alice'), error => !(error instanceof AccessError) && /לנסות לרענן/.test(error.message))
 })
 
 test('Malformed identity/revision and a missing shared-space identity cannot become an editable snapshot', async () => {

@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-05",
+  "candidateCommit": "e589975c295a7f6fd69fcd20acaf8492c92b0859",
+  "preview": "temporary HTTPS tunnel to a localhost-only synthetic SQLite service",
+  "previewExpiryHours": 24,
+  "unauthedAccessStatus": 403,
+  "authenticatedEntryStatus": 302,
+  "authenticatedPageStatus": 200,
+  "secureCookie": true,
+  "desktopChromeSecureContext": true,
+  "desktopChromeRandomUUIDAvailable": true,
+  "syntheticOnly": true,
+  "realRecordsTouched": false,
+  "physicalIPhoneAcceptance": "pending user results",
+  "checklist": "docs/ui-redesign/IPHONE-ACCEPTANCE.md",
+  "limits": [
+    "Tunnel uptime and Mac wake state affect availability.",
+    "A secure context in desktop Chrome does not verify Safari behavior.",
+    "Temporary entry token and public tunnel URL are intentionally excluded from tracked evidence."
+  ]
+}

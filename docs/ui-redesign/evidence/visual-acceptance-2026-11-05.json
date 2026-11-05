@@ -1,0 +1,119 @@
+{
+  "date": "2026-11-05",
+  "source": "Current isolated UI checkout after goals ordering and report copy correction; approved frozen reference SHA-256 1f28702fd94e02409bb0ca72c68201bc2700b16ec67f482818cfed78fc8e9912",
+  "environment": "Synthetic Alice plan and frozen reference, 390×844 desktop Chromium; System appearance emulated as Light/Dark. Reference includes its demo chrome and product uses full viewport.",
+  "screenshots": {
+    "home": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-home-light-390.png",
+        "product": "visual-2026-11-05/product-home-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-home-dark-390.png",
+        "product": "visual-2026-11-05/product-home-dark-390.png"
+      }
+    },
+    "accounts": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-accounts-light-390.png",
+        "product": "visual-2026-11-05/product-accounts-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-accounts-dark-390.png",
+        "product": "visual-2026-11-05/product-accounts-dark-390.png"
+      }
+    },
+    "categories": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-categories-light-390.png",
+        "product": "visual-2026-11-05/product-categories-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-categories-dark-390.png",
+        "product": "visual-2026-11-05/product-categories-dark-390.png"
+      }
+    },
+    "calculator": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-calculator-light-390.png",
+        "product": "visual-2026-11-05/product-calculator-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-calculator-dark-390.png",
+        "product": "visual-2026-11-05/product-calculator-dark-390.png"
+      }
+    },
+    "checks": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-checks-light-390.png",
+        "product": "visual-2026-11-05/product-checks-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-checks-dark-390.png",
+        "product": "visual-2026-11-05/product-checks-dark-390.png"
+      }
+    },
+    "loans": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-loans-light-390.png",
+        "product": "visual-2026-11-05/product-loans-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-loans-dark-390.png",
+        "product": "visual-2026-11-05/product-loans-dark-390.png"
+      }
+    },
+    "goals": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-goals-light-390.png",
+        "product": "visual-2026-11-05/product-goals-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-goals-dark-390.png",
+        "product": "visual-2026-11-05/product-goals-dark-390.png"
+      }
+    },
+    "reports": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-upload-light-390.png",
+        "product": "visual-2026-11-05/product-reports-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-upload-dark-390.png",
+        "product": "visual-2026-11-05/product-reports-dark-390.png"
+      }
+    },
+    "more": {
+      "light": {
+        "reference": "visual-2026-11-05/reference-more-light-390.png",
+        "product": "visual-2026-11-05/product-more-light-390.png"
+      },
+      "dark": {
+        "reference": "visual-2026-11-05/reference-more-dark-390.png",
+        "product": "visual-2026-11-05/product-more-dark-390.png"
+      }
+    }
+  },
+  "review": {
+    "home": "Same short heading, six reported months, chart with monthly summary, category entry and three actions.",
+    "accounts": "Same bank/card hierarchy and wallet palette; product shows a second real bank and original detail/actions.",
+    "categories": "Data-derived summary, category colors and chart; financial coverage explanation remains visible, with management links below results.",
+    "calculator": "Product starts with explicit Add rather than the reference’s prefilled sample; up to 12 real purchases, draft protection and original forecast are retained.",
+    "checks": "Original three status groups remain visible, including empty groups, and the cheque action is available.",
+    "loans": "Scheduled remaining repayments and identified report payments remain distinct; next/management actions are present.",
+    "goals": "Goal carousel now precedes the savings balance, matching the reference focus; the original artwork and all savings actions remain.",
+    "reports": "Real source library and guarded import replace the prototype sample picker; upload and history actions are available.",
+    "more": "Same four-entry navigation language; additional original features remain in grouped menus."
+  },
+  "finding": "No material missing destination or old-style surface found in the nine top viewports. Product-specific financial descriptions and extra actions are retained.",
+  "limits": [
+    "Synthetic data and desktop Chromium at phone dimensions; not a physical iPhone or touch test.",
+    "The frozen reference is a concept with demo values and phone frame; exact pixel matching is not a correctness goal.",
+    "Full scroll depth and every nested form are outside this nine-screen screenshot sweep."
+  ],
+  "financialPersistence": {
+    "financialPuts": 0,
+    "reportCommits": 0,
+    "allFinancialHashesUnchanged": true
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-05",
+  "sourceBranch": "codex/budgit-household-ui",
+  "acceptedApplicationCommit": "d67cf22",
+  "userAcceptance": "Looks good; In that case I think we are good to mark this as done",
+  "acceptanceStatus": "accepted by user; device model and OS version not provided",
+  "userReported": {
+    "cheques": "pass",
+    "appearance": "pass",
+    "cardAndFormUse": "generally working; refinements requested",
+    "personalShared": "appeared identical in initial synthetic fixture",
+    "iPhoneModel": "not provided",
+    "iOSVersion": "not provided"
+  },
+  "changes": [
+    "distinct fictional personal and shared preview plans",
+    "first month of six-month Hebrew chart on the right",
+    "animated card drag and settle, with reduced-motion override",
+    "grouped amount typing in cheque, loan and scenario fields",
+    "pull refresh starts only within upper viewport quarter, capped at 180px",
+    "bottom navigation visible on nested app pages"
+  ],
+  "checks": {
+    "buildAndTypecheck": "pass",
+    "regressions": "1153/1153",
+    "core": "15/15",
+    "diffCheck": "pass",
+    "chrome390": {
+      "personalBank": "חשבון אישי של טל · בדיקה",
+      "sharedBank": "חשבון משותף של טל ולינוי · בדיקה",
+      "nestedChequeFormNavigation": "visible; More section current; no horizontal overflow",
+      "horizontalCardSwipe": "selected card changed without API request or page reload",
+      "verticalCardSwipe": "page scrolled 475px; selection unchanged",
+      "reducedMotion": "card transition 0s"
+    },
+    "pullGestureContract": "top-area pull refreshes; lower-screen start does not prevent scrolling or refresh",
+    "httpsPreview": "unauthenticated 403, entry 302, page 200"
+  },
+  "limits": [
+    "Chrome touch emulation does not establish physical Safari acceptance.",
+    "User acceptance was received after the updated preview; device model, OS version and physical Reduce Motion status remain unspecified.",
+    "The synthetic fixture is isolated from production records.",
+    "Production publication, fresh verified backup and isolated preflight remain pending."
+  ]
+}

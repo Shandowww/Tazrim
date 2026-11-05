@@ -28,6 +28,15 @@ test('React preview is authenticated, keeps private responses uncached, and leav
   assert.match(r.headers.get('Content-Security-Policy'), /script-src 'self'/)
   assert.match(await r.text(), /<title>Budgit<\/title>/)
 
+  for(const path of ['/next/accounts','/next/checks','/next/income','/next/more']){
+    const anonymous=await request(path+'?year=2026&month=10')
+    assert.match(await anonymous.text(),/כניסה עם Google/)
+    const authenticated=await request(path+'?year=2026&month=10',{cookie})
+    assert.equal(authenticated.status,200)
+    assert.equal(authenticated.headers.get('Cache-Control'),'no-store')
+    assert.match(await authenticated.text(),/<title>Budgit<\/title>/)
+  }
+
   const asset = readFileSync('dist/frontend/.vite/manifest.json', 'utf8')
   const file = JSON.parse(asset)['index.html'].file
   r = await request('/ui-assets/' + file, { cookie })

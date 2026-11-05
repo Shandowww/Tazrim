@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-04",
+  "applicationCommit": "a515267",
+  "environment": "Disposable in-memory SQLite service; synthetic Alice, Bob and shared viewer; desktop Chromium",
+  "card": {
+    "savedProgressAndReload": true,
+    "backupDownloadedBeforeCommit": true,
+    "atomicCommitCount": 1,
+    "observedCardTotalCents": 10001,
+    "otherPrivateAndSharedRevisionsUnchanged": true
+  },
+  "mixedBankCard": {
+    "lostProgressResponse": "Both sources ready at revision 2; financial revisions 1/1/1; zero commits; all financial hashes unchanged",
+    "lostCommitResponse": "Alice revision 2, Bob and shared revision 1; both sources committed at revision 4; one commit",
+    "sameActionRetry": "Recognized the existing commit without replay",
+    "sameBankFileReupload": "No duplicate source"
+  },
+  "separateBank": {
+    "progressSavedAndReloaded": true,
+    "backupAndExplicitConfirmation": true,
+    "coverage": "partial",
+    "finalPrivateRevisions": { "alice": 2, "bob": 2 },
+    "finalSharedRevision": 1,
+    "finalCommitCount": 2
+  },
+  "accessAndEncryption": {
+    "sharedViewerUploadAndCommitControlsAbsent": true,
+    "foreignPrivateSourceDirectRoute": "Unavailable to this account; no source name or save controls",
+    "lockedReportNameAndAmountHidden": true,
+    "wrongPassword": "Actionable error; report name and amount remained hidden",
+    "correctPassword": "Returned to the same report review",
+    "encryptedPrivateRevisions": { "alice": 1, "bob": 2 },
+    "sharedRevision": 1,
+    "aliceAndSharedFinancialHashesUnchanged": true
+  },
+  "limits": [
+    "Synthetic statements and browser viewport; no real provider or physical iPhone acceptance",
+    "The encryption run is separate from the mixed-report run",
+    "No production, Sites or real-record mutation"
+  ]
+}

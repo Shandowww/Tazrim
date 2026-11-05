@@ -12,7 +12,7 @@ const money=(n:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency
 const control='flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring'
 
 /** Original savings presentation: one goal, filling artwork, wrapped arrows and swipe. */
-export function SavingsGoalCarousel({goals,asOf,confirmed}:{goals:Goal[];asOf:string;confirmed:boolean}){
+export function SavingsGoalCarousel({goals,asOf,confirmed,readOnly=false}:{goals:Goal[];asOf:string;confirmed:boolean;readOnly?:boolean}){
  const [selected,setSelected]=useState(goals[0]?.id??'')
  const touch=useRef<{id:number;x:number;y:number}|null>(null)
  const guard=useDraftGuard(),href=usePeriodHref()
@@ -31,14 +31,14 @@ export function SavingsGoalCarousel({goals,asOf,confirmed}:{goals:Goal[];asOf:st
   // Same threshold and RTL direction as the original data-sg-swipe gesture.
   if(Math.abs(dx)>=60&&Math.abs(dx)>=Math.abs(dy)*1.4)choose(index+(dx>0?1:-1))
  }
- if(!goal)return <section className="surface rounded-2xl p-6 text-sm">עדיין אין מטרות. אפשר להוסיף את המטרה הראשונה.</section>
+ if(!goal)return <section className="surface rounded-2xl p-6 text-sm">עדיין אין מטרות.{!readOnly&&' אפשר להוסיף את המטרה הראשונה.'}</section>
  const projection=savingsProjection(goal.current,goal.target,0,goal.monthly,asOf,true)
  return <section className="surface min-w-0 space-y-4 rounded-3xl p-4 sm:p-6" role="region" aria-roledescription="קרוסלה" aria-label="מטרות החיסכון" tabIndex={0}
   style={{touchAction:'pan-y pinch-zoom'}} onPointerDown={start} onPointerUp={end} onPointerCancel={()=>{touch.current=null}} onLostPointerCapture={()=>{touch.current=null}}
   onKeyDown={event=>{if(event.target!==event.currentTarget)return;if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();choose(index+(event.key==='ArrowRight'?1:-1))}}}>
   <div className="flex min-w-0 items-center justify-between gap-3">
    <h2 className="min-w-0 text-xl font-semibold [overflow-wrap:anywhere]"><bdi>{goal.name}</bdi></h2>
-   <p role="status" aria-live="polite" aria-atomic="true" className="shrink-0 text-xs text-muted-foreground">{index+1} מתוך {goals.length} מטרות</p>
+   <p role="status" aria-live="polite" aria-atomic="true" className="shrink-0 text-xs text-muted-foreground">{goals.length===1?'מטרה אחת':`${index+1} מתוך ${goals.length} מטרות`}</p>
   </div>
   <div className="flex min-w-0 items-center gap-1 sm:gap-4">
    {goals.length>1&&<button type="button" className={control} aria-label="המטרה הבאה" onClick={()=>choose(index+1)}><ChevronRight aria-hidden className="h-5 w-5"/></button>}
@@ -49,10 +49,10 @@ export function SavingsGoalCarousel({goals,asOf,confirmed}:{goals:Goal[];asOf:st
   <p className="text-center text-sm text-muted-foreground">קצב מתוכנן: <bdi>{money(goal.monthly)}</bdi> בחודש. {projection?.count===0?'הסכום המשויך כבר מכסה את היעד.':projection?.month?<>מועד הגעה משוער: <bdi dir="ltr">{projection.month}</bdi></>:'אין מועד הגעה לפי הקצב הזה.'}</p>
   <p className="text-center text-sm text-muted-foreground">{savingsIconLabels[goal.icon]}{goal.deadline?<> · יעד לתאריך <bdi dir="ltr">{goal.deadline}</bdi></>:null}</p>
   {goals.length>1&&<nav aria-label="בחירת מטרת חיסכון" className="max-w-full overflow-x-auto"><div className="mx-auto flex w-max gap-1">{goals.map((item,i)=><button key={item.id} type="button" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring" aria-label={'הצגת המטרה '+item.name} aria-pressed={i===index} onClick={()=>choose(i)}><span aria-hidden className={'h-2 rounded-full bg-primary motion-reduce:transition-none '+(i===index?'w-6':'w-2 opacity-30')}/></button>)}</div></nav>}
-  <nav aria-label={'פעולות עבור '+goal.name} className="grid gap-2 sm:grid-cols-3">
+  {!readOnly&&<nav aria-label={'פעולות עבור '+goal.name} className="grid gap-2 sm:grid-cols-3">
    <Link className="flex min-h-11 items-center justify-center rounded-xl border px-3 text-sm text-primary" href={href('/savings/'+encodeURIComponent(goal.id)+'/edit')}>עריכת מטרה</Link>
    <Link className="flex min-h-11 items-center justify-center rounded-xl border px-3 text-sm text-primary" href={href('/savings/'+encodeURIComponent(goal.id)+'/deposit')}>דיווח הפקדה</Link>
    <Link className="flex min-h-11 items-center justify-center rounded-xl border px-3 text-sm text-destructive" href={href('/savings/'+encodeURIComponent(goal.id)+'/remove')}>הסרת מטרה</Link>
-  </nav>
+  </nav>}
  </section>
 }

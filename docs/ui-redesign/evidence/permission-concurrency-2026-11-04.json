@@ -1,0 +1,125 @@
+{
+  "date": "2026-11-04",
+  "base": "2871c3b",
+  "concurrency": {
+    "revision": 5,
+    "buffer": 1,
+    "storedItems": [
+      {
+        "amount": 1200.01,
+        "cashAccountId": "sample-bank-1",
+        "fees": 0,
+        "firstMonth": "2027-01",
+        "id": "b8a9965f-2831-4e87-83f0-166abf728866",
+        "kind": "income",
+        "name": "הכנסה צפויה סינתטית",
+        "payments": 1,
+        "source": "direct"
+      },
+      {
+        "amount": 600.01,
+        "cardId": "card1",
+        "cashAccountId": "sample-bank-1",
+        "fees": 0,
+        "firstMonth": "2027-01",
+        "id": "3cb636b3-02ab-45dc-984a-57b41f8c0cb8",
+        "kind": "expense",
+        "name": "רכישת קבלה סינתטית",
+        "payments": 3,
+        "source": "card"
+      }
+    ],
+    "draft": [
+      "טיוטת תחרות סינתטית",
+      "100",
+      "2026-11",
+      "1",
+      "1"
+    ],
+    "saveDisabled": true
+  },
+  "downgrade": {
+    "actor": "bob",
+    "alerts": [
+      "התקציב פתוח כעת לצפייה בלבד. הטיוטה לא נשלחה לשמירה.",
+      "השינויים במכשיר טרם נשמרוהתקציב פתוח כעת לצפייה בלבד. הטיוטה לא נשלחה לשמירה.סגירה וחזרה לשמירהניסיון שמירת השינויים"
+    ],
+    "draft": [
+      "טיוטת הרשאה סינתטית",
+      "88.88",
+      "12",
+      "2026-11"
+    ],
+    "loans": [
+      {
+        "cashAccountId": "sample-bank-1",
+        "from": "2026-05",
+        "id": "demo-loan",
+        "monthly": 350,
+        "months": 24,
+        "name": "הלוואה לריהוט"
+      }
+    ],
+    "revision": 1,
+    "role": "viewer"
+  },
+  "revocation": {
+    "actor": "bob",
+    "inputs": 0,
+    "page": "חזרה\nהתקציב לא זמין\n\nהתקציב אינו זמין לחשבון הזה.\n\nניסיון חוזר\nלתקציב האישי",
+    "readStatus": 404,
+    "sharedStillListed": false
+  },
+  "personalReturn": {
+    "accountId": "bob",
+    "expenses": [],
+    "loanNames": [
+      "הלוואה לריהוט"
+    ],
+    "privateAliceNameVisible": false,
+    "revision": 1,
+    "url": "http://localhost:5186/next/loans?year=2026&month=11"
+  },
+  "preservation": {
+    "financialRevisions": {
+      "personal": [
+        {
+          "user_id": "alice",
+          "revision": 5
+        },
+        {
+          "user_id": "bob",
+          "revision": 1
+        },
+        {
+          "user_id": "cards0",
+          "revision": 1
+        },
+        {
+          "user_id": "cards1",
+          "revision": 1
+        },
+        {
+          "user_id": "cards2",
+          "revision": 1
+        },
+        {
+          "user_id": "cards30",
+          "revision": 1
+        },
+        {
+          "user_id": "empty",
+          "revision": 1
+        }
+      ],
+      "shared": [
+        {
+          "id": "0d69d0ac-b56d-4053-bb7f-1f0b0c303363",
+          "revision": 1
+        }
+      ]
+    },
+    "sharedBytesUnchanged": true,
+    "otherPrivateBytesUnchanged": true
+  }
+}

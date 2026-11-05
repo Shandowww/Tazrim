@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-05",
+  "environment": "isolated synthetic SQLite service; Chrome at 390×844",
+  "directRoutesChecked": 89,
+  "routesWithShellBack": 89,
+  "routesReturningToExpectedParent": 89,
+  "routesRetainingYearAndMonth": 89,
+  "draftDialogsUnexpected": 0,
+  "relatedEvidence": [
+    "docs/ui-redesign/EXECUTION-STATUS.md:160",
+    "docs/ui-redesign/evidence/form-failure-acceptance-2026-11-05.json",
+    "test/household-home.test.mjs"
+  ],
+  "interpretation": "All 89 nested registered routes opened directly and returned through shell Back to their intended parent with year/month intact. Earlier connected browser checks covered in-app trails, selected card, space and month, scroll restoration, browser Back/Forward, and draft protection; the cheque and loan forms additionally preserved drafts on Back after failed saves.",
+  "limits": [
+    "The direct route sweep used synthetic data and desktop Chrome at phone dimensions.",
+    "Physical Safari/iPhone navigation, keyboard, safe area and touch acceptance remain under 1.7 and 9.5."
+  ],
+  "localAudit": "work/ui-redesign/back-route-audit.json"
+}

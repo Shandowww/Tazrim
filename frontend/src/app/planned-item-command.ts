@@ -6,9 +6,9 @@ export function plannedItemEligibility(plan:any,id:string,create=false){
  if(!create&&!plan.expenses.some((e:any)=>e.id===id))return 'הפריט אינו זמין במרחב הזה.'
  return null
 }
-export function initialPlannedItemDraft(plan:any,id:string,month:string):PlannedItemDraft{
+export function initialPlannedItemDraft(plan:any,id:string,month:string,kind=''):PlannedItemDraft{
  const e=plan.expenses.find((e:any)=>e.id===id)
- return {name:e?.name??'',amount:e?String(e.amount):'',fees:String(e?.fees??0),firstMonth:e?.firstMonth??(month>=plan.startMonth?month:plan.startMonth),payments:String(e?.payments??1),source:e?.source??'direct',kind:e?.kind??'expense',cashAccountId:e?cashAssignedItem(plan,e)??'':'',cardId:e?.cardId??''}
+ return {name:e?.name??'',amount:e?String(e.amount):'',fees:String(e?.fees??0),firstMonth:e?.firstMonth??(month>=plan.startMonth?month:plan.startMonth),payments:String(e?.payments??1),source:e?.source??'direct',kind:e?.kind??(kind==='income'?'income':'expense'),cashAccountId:e?cashAssignedItem(plan,e)??'':'',cardId:e?.cardId??''}
 }
 export function plannedItemDraftFingerprint(d:PlannedItemDraft){
  const amount=(v:string)=>{try{return moneyInputCents(v)}catch{return{invalid:v}}}

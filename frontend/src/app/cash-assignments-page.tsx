@@ -7,7 +7,6 @@ import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {useCreatedEditorRoute} from './use-created-editor-route'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import Link from './link'
 const button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50',groupLabels:Record<AssignmentGroup,string>={cards:'כרטיסים',items:'פריטים מתוכננים ללא שיוך',loans:'הלוואות ללא שיוך',details:'צ׳קים נפרדים ללא שיוך',savings:'בקשות העברה לחיסכון ללא שיוך'}
 function AssignmentsEditor({budget,base,onSaved}:{budget:BudgetState;base:BudgetResponse;onSaved:(message:string)=>void}){
  const [baseline]=useState(()=>initialCashAssignmentsDraft(base.plan)),[draft,setDraft]=useState<CashAssignmentsDraft>(baseline),[busy,setBusy]=useState(false),[attempted,setAttempted]=useState(false),[blocked,setBlocked]=useState(false),[error,setError]=useState(''),flight=useRef(false),guard=useDraftGuard(),dirty=attempted||JSON.stringify(draft)!==JSON.stringify(baseline),accounts=cashAccountList(base.plan),eligible=cashPayerCandidates(base.plan)
@@ -23,5 +22,5 @@ export function CashAssignmentsPage({budget,fixture}:{budget:BudgetState;fixture
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען שיוכי חשבונות…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan as any,reason=!plan||plan.format?'יש לפתוח תקציב רגיל.':!cashAccountList(plan).length?'יש להוסיף תחילה חשבון במרחב הזה.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון אינה זמינה בשרת הזה.':''
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/banks')} className="inline-flex min-h-11 items-center text-sm text-primary underline">חזרה לחשבונות</Link><h1 className="text-2xl font-semibold">שיוך כרטיסים והתחייבויות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AssignmentsEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">שיוך כרטיסים והתחייבויות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<AssignmentsEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
 }

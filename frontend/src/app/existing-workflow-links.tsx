@@ -29,7 +29,14 @@ const nativeWorkflows=[
  ['/accounts/assignments','שיוך כרטיסים והתחייבויות לחשבונות'],
  ['/card-setup','פרטי הכרטיסים'],
 ] as const
+const groups=[
+ {label:'דוחות וניתוח',paths:['/analysis','/actions','/upload','/upload/history','/settings/report-expectations','/categories/manage','/categories/limits','/details/manage']},
+ {label:'תכנון וחיסכון',paths:['/goals','/settings/forecast','/investment','/savings/schedule','/savings/transfers']},
+ {label:'חשבונות ומרחבים',paths:['/overview','/overview/migration','/accounts/transfers','/accounts/assignments','/card-setup','/start']},
+ {label:'פרטיות וגיבוי',paths:['/settings/security','/settings/device-draft','/settings/drive','/settings/gmail']},
+ {label:'פרופיל וחיבורים נוספים',paths:['/settings/profile','/settings/access','/settings/wallet']},
+]
 export function ExistingWorkflowLinks(){
  const {search}=useLocation()
- return <><section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">ניהול ודיווחים</h2><p className="text-sm text-muted-foreground">הפעולות נפתחות במרחב ובתקופה שנבחרו. הרשאת צפייה ועריכות שטרם נשמרו נשמרות גם במעבר.</p><ul className="divide-y">{nativeWorkflows.map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search)}>{label}</Link></li>)}</ul></section></>
+ return <section className="surface household-bank"><h2 className="font-semibold">ניהול והגדרות נוספות</h2>{groups.map(group=><details key={group.label}><summary className="min-h-11 py-3 text-sm">{group.label}</summary><ul className="divide-y">{nativeWorkflows.filter(([path])=>group.paths.includes(path)).map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search,import.meta.env.DEV)}>{label}</Link></li>)}</ul></details>)}</section>
 }

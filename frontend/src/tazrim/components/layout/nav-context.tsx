@@ -6,11 +6,9 @@ import {
   CreditCard,
   LayoutDashboard,
   Info,
-  Repeat,
+  Ellipsis,
+  Target,
   Settings,
-  Tag,
-  Upload,
-  Search,
   type LucideIcon,
 } from 'lucide-react'
 import type { PagedAccountKind } from '@/lib/accounts/routes'
@@ -61,16 +59,10 @@ export const SECTION_ITEMS: Record<NavSectionKey, NavSectionItem> = {
 }
 
 export const MAIN_NAV: NavItem[] = [
-  { type: 'link', href: '/', label: 'לוח בקרה', icon: LayoutDashboard },
-  SECTION_ITEMS.banks,
-  SECTION_ITEMS.cards,
-  { type: 'link', href: '/savings', label: 'חיסכון ומטרות', icon: Tag },
-  { type: 'link', href: '/plans', label: 'פריטים מתוכננים', icon: Tag },
-  { type: 'link', href: '/monthly', label: 'דיווח חודשי', icon: Tag },
-  { type: 'link', href: '/search', label: 'חיפוש בפירוט', icon: Search },
-  { type: 'link', href: '/recurring', label: 'חיובים קבועים', icon: Repeat },
-  { type: 'link', href: '/upload', label: 'העלאת קבצים', icon: Upload },
-  { type: 'link', href: '/categories', label: 'קטגוריות', icon: Tag },
+  { type: 'link', href: '/', label: 'תמונה כללית', icon: LayoutDashboard },
+  { type: 'link', href: '/accounts', label: 'חשבונות', icon: Building2 },
+  { type: 'link', href: '/savings', label: 'מטרות', icon: Target },
+  { type: 'link', href: '/more', label: 'עוד', icon: Ellipsis },
 ]
 
 export const SETTINGS_NAV: NavLinkItem = { type: 'link', href: '/settings', label: 'הגדרות', icon: Settings }

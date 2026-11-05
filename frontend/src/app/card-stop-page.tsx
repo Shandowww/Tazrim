@@ -9,7 +9,6 @@ import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {useCreatedEditorRoute} from './use-created-editor-route'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import Link from './link'
 const button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 function StopEditor({budget,base,id,month,onSaved}:{budget:BudgetState;base:BudgetResponse;id:string;month:string;onSaved:(message:string)=>void}){
  const [confirmed,setConfirmed]=useState(false),[busy,setBusy]=useState(false),[attempted,setAttempted]=useState(false),[blocked,setBlocked]=useState(false),[error,setError]=useState(''),flight=useRef(false),guard=useDraftGuard(),dirty=confirmed||attempted,plan=base.plan as any,estimates=Object.entries(plan.months).filter(([m,r]:[string,any])=>m>=month&&!r.actual).length,actuals=Object.values(plan.months).filter((r:any)=>r.actual).length
@@ -25,5 +24,5 @@ export function CardStopPage({budget,fixture}:{budget:BudgetState;fixture:boolea
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען פרטי כרטיס…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan as any,card=plan&&!plan.format?creditCards(plan).find((c:any)=>c.id===id):null,reason=!card?'הכרטיס אינו זמין במרחב הזה.':!activeCards(plan,month).some((c:any)=>c.id===id)?'הערכות הכרטיס כבר הופסקו בחודש שנבחר.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון אינה זמינה בשרת הזה.':''
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/card-setup/'+encodeURIComponent(id))} className="inline-flex min-h-11 items-center text-sm text-primary underline">חזרה לפרטי הכרטיס</Link><h1 className="text-2xl font-semibold">הפסקת הערכות · <bdi>{card?.name}</bdi></h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert">{reason}</p>:<StopEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} month={month} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-4"><h1 className="text-2xl font-semibold">הפסקת הערכות · <bdi>{card?.name}</bdi></h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert">{reason}</p>:<StopEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} month={month} onSaved={setMessage}/>}</div>
 }

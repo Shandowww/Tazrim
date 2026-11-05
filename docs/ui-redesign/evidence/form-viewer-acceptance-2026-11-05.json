@@ -1,0 +1,76 @@
+{
+  "date": "2026-11-05",
+  "environment": "isolated synthetic shared space; Bob as viewer; Chrome 390×844",
+  "routes": [
+    {
+      "path": "/details/new",
+      "heading": "הוספת צ׳ק או פירוט",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/details/demo-pending/edit",
+      "heading": "עריכת הרשומה",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/details/demo-pending/clear",
+      "heading": "סימון צ׳ק כנפרע",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/details/demo-pending/delete",
+      "heading": "מחיקת הרשומה",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/loans/new",
+      "heading": "הוספת הלוואה לתכנון",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/loans/demo-loan/edit",
+      "heading": "עריכת תכנון הלוואה",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/loans/demo-loan/remove",
+      "heading": "הסרה מתכנון ההלוואות",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    },
+    {
+      "path": "/loans/demo-loan/payments",
+      "heading": "מעקב תשלומי הלוואה · הלוואה לריהוט",
+      "enabledFields": 0,
+      "enabledSubmitButtons": [],
+      "horizontalOverflow": 0,
+      "viewerMessage": true
+    }
+  ],
+  "financialPutsBefore": 0,
+  "financialPutsAfter": 0,
+  "financialHashesUnchanged": true,
+  "finding": "All eight cheque and loan routes displayed viewer-safe state without editable fields or enabled submit controls.",
+  "remainingForItem5_7": "Open routes from both entry points, test Back and dirty drafts, and exercise failed saves for each create/edit/clear/delete/remove form.",
+  "localAudit": "work/ui-redesign/form-viewer-result.json"
+}

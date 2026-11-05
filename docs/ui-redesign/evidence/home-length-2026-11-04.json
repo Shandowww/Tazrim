@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-04",
+  "viewport": { "width": 390, "height": 844 },
+  "fixture": "Alice synthetic household plan from demoHouseholdPlan, October 2026; both UIs read the same disposable service",
+  "baselineCommit": "5acbeac6f77add3bcdb40682198205dd208ce1c4",
+  "newUiCommit": "a515267",
+  "baseline": { "documentHeightPx": 1951, "mainHeightPx": 1895, "horizontalOverflowPx": 0 },
+  "newUi": { "documentHeightPx": 906, "mainHeightPx": 779, "horizontalOverflowPx": 0 },
+  "documentHeightReductionPx": 1045,
+  "documentHeightReductionPercent": 53.6,
+  "lightReferenceComparison": "Short heading, six-month chart with monthly totals, spending detail entry and exactly three home shortcuts follow the approved structure",
+  "darkComparison": "Complete in a fresh browser tab: app followed dark device appearance; frozen reference rendered with color-scheme: dark on its browser wrapper only; heading, chart, monthly summary, spending entry and three shortcuts align structurally",
+  "darkScreenshots": ["home-current-dark-length-390.png", "home-reference-dark-390.png"],
+  "minimumHomeActionWidthPx": 50,
+  "minimumHomeActionHeightPx": 44,
+  "financialWritesDuringComparison": 0,
+  "limit": "Desktop Chromium at 390px, not physical iPhone or Safari"
+}

@@ -16,10 +16,11 @@ export function useBudget(budgetId: string, enabled = true): BudgetState {
   useEffect(() => {
     if (!enabled) return
     const controller = new AbortController()
+    const expectedAccountId = state.budgetId === budgetId && state.status === 'ready' ? state.value.accountId : undefined
     setState(previous => previous.budgetId === budgetId && previous.status === 'ready' ? previous : { status: 'loading', budgetId })
     setRefreshError(null)
     async function load() {
-      const snapshot = await loadBudgetSnapshot(budgetId, controller.signal)
+      const snapshot = await loadBudgetSnapshot(budgetId, controller.signal, fetch, expectedAccountId)
       if (!controller.signal.aborted) {
         setState({ status: 'ready', budgetId, ...snapshot })
         setRefreshPending(false)

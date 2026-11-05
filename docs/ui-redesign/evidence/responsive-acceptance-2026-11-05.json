@@ -1,0 +1,521 @@
+{
+  "date": "2026-11-05",
+  "environment": "Disposable localhost service, synthetic Alice plan, headless desktop Chromium with 320/430/1280 CSS-pixel viewports and emulated reduced motion.",
+  "routeCount": 9,
+  "widths": [
+    320,
+    430,
+    1280
+  ],
+  "cases": 27,
+  "allRoutesOverflowFree": true,
+  "smallTargets": {
+    "320": {
+      "reports": [
+        {
+          "tag": "INPUT",
+          "text": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "text": "",
+          "w": 13,
+          "h": 13
+        }
+      ]
+    },
+    "430": {
+      "reports": [
+        {
+          "tag": "INPUT",
+          "text": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "text": "",
+          "w": 13,
+          "h": 13
+        }
+      ]
+    },
+    "1280": {
+      "home": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "accounts": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "categories": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "calculator": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "checks": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "loans": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "goals": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ],
+      "reports": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "INPUT",
+          "text": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "text": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "more": [
+        {
+          "tag": "BUTTON",
+          "text": "כווץ תפריט",
+          "w": 40,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "Budgit · לוח בקרה",
+          "w": 92,
+          "h": 28
+        },
+        {
+          "tag": "A",
+          "text": "תמונה כללית",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "חשבונות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "מטרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עוד",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "הגדרות",
+          "w": 199,
+          "h": 40
+        },
+        {
+          "tag": "A",
+          "text": "עזרה",
+          "w": 199,
+          "h": 40
+        }
+      ]
+    }
+  },
+  "touchTargetInterpretation": "At 320 and 430, only native 13px checkboxes are geometrically smaller than 44px; both are wrapped in 44px minimum-height labels. A 42px chart-month link at 320 and a 17px calculator return link were enlarged and passed the repeated sweep. Desktop sidebar controls may be 40px and are tracked separately from phone touch targets.",
+  "systemAppearance": "Earlier browser media-emulation check confirmed System follows changes immediately; explicit Light/Dark persists independently. See EXECUTION-STATUS.md, section שמות ארוכים, ריבוי כרטיסים ומראה מערכת.",
+  "safeArea": "The shell uses env(safe-area-inset-top/bottom); physical Safari/iPhone verification remains open.",
+  "keyboard": "Earlier browser card arrows/dots/keyboard and navigation Back/Forward checks passed; full keyboard audit across nested forms remains open.",
+  "financialPersistence": {
+    "puts": 0,
+    "hashesUnchanged": true
+  },
+  "limits": [
+    "Desktop browser emulation does not verify physical iPhone safe areas, touch gesture arbitration, or keyboard behavior in Safari."
+  ]
+}

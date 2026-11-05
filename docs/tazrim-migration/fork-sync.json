@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
-  "sourceBranch": "codex/tazrim-react-frontend",
-  "sourceCommit": "5acbeac6f77add3bcdb40682198205dd208ce1c4",
+  "sourceBranch": "codex/budgit-household-ui",
+  "sourceCommit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Native-only navigation audit implemented and tested; publication preparation. Only Settings switches appearances. Native task routing, original monthly fields/draft recovery and Drive connection/consent return connected; no parallel financial engine. Existing Apple Pay scope exclusion retained. Exact build/typecheck,1124 regressions,15 checks and bounded41-screen390px no-bridge/no-overflow browser acceptance pass. Production remains54633e5 pending fresh release gates; Sites unchanged.",
+  "status": "Household redesign accepted by Tal after iPhone preview feedback on 2026-11-05. All existing workflows retained; top-area refresh, persistent mobile navigation, RTL chart, grouped amount entry and smooth card drag included. Production remains 54633e5 pending fresh isolated release gates.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1124,
+    "regressionTests": 1153,
     "coreChecks": 15,
-    "browser": "41 native screens at390px, Settings selector, scoped notification navigation, viewer refusal, new monthly fields/save and refresh/stay draft guard; synthetic data only.",
-    "release": "Not activated yet; fresh backup/preflight/rollback/runtime gates required."
+    "browser": "93-route text audit, reference comparison, 320/390/430/1280 responsive checks, scoped synthetic workflows and user iPhone acceptance; see docs/ui-redesign evidence.",
+    "release": "User acceptance complete; fresh backup/preflight/rollback/runtime gates in progress."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d"

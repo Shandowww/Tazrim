@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-04",
+  "phase": "Read-only main-screen/reference/baseline/category UI acceptance",
+  "writes": 0,
+  "allFinancialBytesUnchanged": true,
+  "privateRevisions": [
+    {
+      "user_id": "alice",
+      "revision": 1
+    },
+    {
+      "user_id": "bob",
+      "revision": 1
+    },
+    {
+      "user_id": "cards0",
+      "revision": 1
+    },
+    {
+      "user_id": "cards1",
+      "revision": 1
+    },
+    {
+      "user_id": "cards2",
+      "revision": 1
+    },
+    {
+      "user_id": "cards30",
+      "revision": 1
+    },
+    {
+      "user_id": "empty",
+      "revision": 1
+    }
+  ],
+  "sharedRevisions": [
+    {
+      "id": "822050fd-3443-4b2a-80a0-456ab16ecfd4",
+      "revision": 1
+    }
+  ]
+}

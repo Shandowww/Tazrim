@@ -7,7 +7,6 @@ import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {useCreatedEditorRoute} from './use-created-editor-route'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-import Link from './link'
 const input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-sm tabular-nums',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 function ScheduleEditor({budget,base,asOf,onSaved}:{budget:BudgetState;base:BudgetResponse;asOf:string;onSaved:(message:string)=>void}){
  const [baseline]=useState(()=>initialSavingsScheduleDraft(base.plan,asOf)),[draft,setDraft]=useState<SavingsScheduleDraft>(baseline),[busy,setBusy]=useState(false),[attempted,setAttempted]=useState(false),[blocked,setBlocked]=useState(false),[error,setError]=useState(''),flight=useRef(false),guard=useDraftGuard(),dirty=attempted||JSON.stringify(draft)!==JSON.stringify(baseline),current=monthlyValues(base.plan,/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(draft.from)?draft.from:baseline.from)
@@ -23,5 +22,5 @@ export function SavingsSchedulePage({budget,fixture}:{budget:BudgetState;fixture
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען תכנון…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const reason=!budget.value.plan||budget.value.plan.format?'יש לפתוח תקציב רגיל לעריכת התכנון.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'המרחב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת לחשבון עדיין אינה זמינה בשרת הזה.':''
- return <div className="mx-auto max-w-3xl space-y-4"><Link href={href('/savings')} className="text-sm text-primary underline">חזרה לחיסכון</Link><h1 className="text-2xl font-semibold">הפקדות חודשיות מתוכננות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<ScheduleEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} asOf={month} onSaved={setMessage}/>}</div>
+ return <div className="household-page"><h1 className="text-2xl font-semibold">הפקדות חודשיות מתוכננות</h1><p className="break-words text-sm"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message?<p role="status">{message}</p>:reason?<p role="alert" className="surface rounded-xl p-4">{reason}</p>:<ScheduleEditor key={budget.value.accountId+'/'+budget.budgetId+'/'+budget.value.revision} budget={budget} base={budget.value} asOf={month} onSaved={setMessage}/>}</div>
 }

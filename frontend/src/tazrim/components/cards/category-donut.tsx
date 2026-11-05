@@ -1,3 +1,4 @@
+import {householdLinkState} from '../../../app/household-model'
 'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
@@ -39,7 +40,7 @@ function CategoryDonutInner({
   categoryHrefs,
 }: Props) {
   const navigate = useNavigate()
-  const { search } = useLocation()
+  const { search,state,pathname } = useLocation()
   const params = new URLSearchParams(search)
   // Entrance on the shared page beat (ENG-67)
   const anim = useChartAnimation()
@@ -54,7 +55,7 @@ function CategoryDonutInner({
     // A page without a table of its own (/cards) opens the category's transactions instead
     const href = categoryHrefs?.[entry.name]
     if (categoryHrefs) {
-      if (href) navigate(href)
+      if (href) navigate(href,{state:householdLinkState({pathname,search,state},href)})
       return
     }
     const sp = new URLSearchParams(params.toString())
@@ -63,7 +64,7 @@ function CategoryDonutInner({
     } else {
       sp.set('category', entry.name)
     }
-    navigate(`${pagePath}?${sp.toString()}`)
+    navigate(`${pagePath}?${sp.toString()}`,{state})
   }
 
   return (
@@ -71,7 +72,6 @@ function CategoryDonutInner({
       <div className="mb-5 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <ChartHeader
           title={title}
-          subtitle={categoryHrefs ? 'לחיצה על קטגוריה פותחת את העסקאות שלה' : 'לחיצה על קטגוריה מסננת'}
           className="mb-0"
         />
       </div>
@@ -117,7 +117,8 @@ function CategoryDonutInner({
               <button
                 key={entry.name}
                 onClick={() => handleClick(entry)}
-                className="grid w-full grid-cols-[minmax(0,1fr)_4.5rem_5.5rem] items-center gap-x-2 sm:grid-cols-[minmax(0,1fr)_5.5rem_6.5rem] rounded-md px-1.5 py-1 text-start text-sm transition-colors hover:bg-muted"
+                type="button"
+                className={`grid min-h-11 w-full ${stats ? 'grid-cols-[minmax(0,1fr)_4.5rem_5.5rem] sm:grid-cols-[minmax(0,1fr)_5.5rem_6.5rem]' : 'grid-cols-[minmax(0,1fr)_auto]'} items-center gap-x-2 rounded-md px-1.5 py-1 text-start text-sm transition-colors hover:bg-muted`}
                 style={{ opacity: selectedCategory && selectedCategory !== entry.name ? 0.4 : 1 }}
               >
                 <span className="flex min-w-0 items-center gap-2">
@@ -128,12 +129,12 @@ function CategoryDonutInner({
                   />
                   <span className="truncate text-foreground">{entry.name}</span>
                 </span>
-                <span
+                {stats && <span
                   className="whitespace-nowrap text-center text-xs tabular-nums text-muted-foreground"
                   title={count !== undefined ? 'מספר רשומות מפורטות' : undefined}
                 >
                   {count !== undefined && <RollingNumber value={count} format="integer" />}
-                </span>
+                </span>}
                 <RollingNumber
                   value={entry.value}
                   format="currencyExact"

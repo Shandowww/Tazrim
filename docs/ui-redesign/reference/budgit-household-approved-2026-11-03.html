@@ -1,0 +1,465 @@
+<div id="budgit-household-prototype" class="viz-dotted-background" dir="rtl">
+  <div class="bp-demo">
+    <span>אב־טיפוס · נתונים מדומים</span>
+    <label>תצוגה של <select id="bp-person" aria-label="בחירת דמות לבדיקת האב־טיפוס"><option value="tal">טל</option><option value="linoy">לינוי</option></select></label>
+  </div>
+  <section class="bp-phone" aria-label="Budgit · אב־טיפוס לשימוש יומיומי">
+    <header class="bp-header">
+      <div class="bp-brand"><span class="bp-mark"><i data-lucide="wallet" aria-hidden="true"></i></span><span dir="ltr">Budgit</span></div>
+      <button type="button" class="bp-icon cursor-interaction" data-action="refresh" aria-label="רענון נתוני הדוגמה"><i data-lucide="refresh-cw" aria-hidden="true"></i></button>
+    </header>
+    <div class="bp-context">
+      <div class="bp-switch" role="group" aria-label="בחירת מרחב"><button type="button" data-scope="personal" aria-pressed="true" class="cursor-interaction">האישי שלי</button><button type="button" data-scope="shared" aria-pressed="false" class="cursor-interaction">המשותף שלנו</button></div>
+    </div>
+    <main id="bp-content"></main>
+    <p id="bp-notice" class="bp-notice" role="status" aria-live="polite" hidden></p>
+    <p id="bp-selection-announcement" class="bp-sr-only" role="status" aria-live="polite"></p>
+    <nav class="bp-navigation" aria-label="ניווט ראשי">
+      <button type="button" data-page="home" class="cursor-interaction" aria-current="page"><i data-lucide="house" aria-hidden="true"></i><span>תמונה כללית</span></button>
+      <button type="button" data-page="accounts" class="cursor-interaction"><i data-lucide="landmark" aria-hidden="true"></i><span>חשבונות</span></button>
+      <button type="button" data-page="goals" class="cursor-interaction"><i data-lucide="target" aria-hidden="true"></i><span>מטרות</span></button>
+      <button type="button" data-page="more" class="cursor-interaction"><i data-lucide="ellipsis" aria-hidden="true"></i><span>עוד</span></button>
+    </nav>
+    <div id="bp-overlay" class="bp-overlay" hidden></div>
+  </section>
+</div>
+<style>
+#budgit-household-prototype{padding:16px 8px 24px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+#budgit-household-prototype *{box-sizing:border-box}
+#budgit-household-prototype .bp-demo{max-width:430px;margin:0 auto 12px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:light-dark(#566477,#b4bfcd)}
+#budgit-household-prototype .bp-demo label{display:flex;align-items:center;gap:6px}
+#budgit-household-prototype .bp-demo select{background:light-dark(#fff,#1c2533);color:light-dark(#182334,#edf3fa);border:1px solid light-dark(#d6dfe9,#3b4758);border-radius:9px;min-height:44px;font:inherit;padding:0 10px}
+#budgit-household-prototype .bp-phone{--bp-bg:light-dark(#f4f7fb,#101824);--bp-surface:light-dark(#ffffff,#1b2636);--bp-text:light-dark(#172433,#eff4fb);--bp-muted:light-dark(#5d6e84,#b2bed0);--bp-line:light-dark(#dce4ee,#35445a);--bp-accent:light-dark(#167da8,#6ec7e9);--bp-fill:light-dark(#e6f2f8,#223e50);--bp-good:light-dark(#248060,#75cfac);--bp-bad:light-dark(#b83936,#ffaaa2);--bp-gap:18px;max-width:430px;margin:auto;background:var(--bp-bg);color:var(--bp-text);border:1px solid var(--bp-line);border-radius:28px;overflow:hidden;position:relative;box-shadow:0 14px 45px light-dark(#26364918,#00000035);font-size:15px;line-height:1.5;isolation:isolate}
+#budgit-household-prototype .bp-phone:before{content:"";position:absolute;z-index:-1;inset:120px -75px auto auto;width:260px;height:260px;border:28px solid light-dark(#eeeafa,#23283e);border-radius:38% 62% 65% 35%;transform:rotate(24deg);pointer-events:none}
+#budgit-household-prototype button,#budgit-household-prototype input,#budgit-household-prototype select{font:inherit}
+#budgit-household-prototype button{touch-action:manipulation}
+#budgit-household-prototype .bp-phone button{color:inherit}
+#budgit-household-prototype .bp-phone h1,#budgit-household-prototype .bp-phone h2,#budgit-household-prototype .bp-phone h3,#budgit-household-prototype .bp-phone p{margin:0}
+#budgit-household-prototype .bp-phone h1{font-size:24px;line-height:1.25;font-weight:650;letter-spacing:-.5px}
+#budgit-household-prototype .bp-phone h2{font-size:17px;font-weight:650;line-height:1.4}
+#budgit-household-prototype .bp-phone h3{font-size:15px;font-weight:600}
+#budgit-household-prototype bdi{font-variant-numeric:tabular-nums;white-space:nowrap}
+#budgit-household-prototype .bp-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--bp-surface);border-bottom:1px solid var(--bp-line)}
+#budgit-household-prototype .bp-brand{display:flex;gap:9px;align-items:center;font-weight:650;font-size:18px}
+#budgit-household-prototype .bp-mark{display:grid;place-items:center;width:32px;height:32px;background:var(--bp-fill);color:var(--bp-accent);border-radius:10px}
+#budgit-household-prototype .bp-icon{border:0;background:transparent;display:grid;place-items:center;width:44px;height:44px;border-radius:12px}
+#budgit-household-prototype .bp-icon:hover{background:var(--bp-fill)}
+#budgit-household-prototype .bp-context{padding:16px 20px 0}
+#budgit-household-prototype .bp-switch{display:flex;padding:4px;border-radius:14px;background:light-dark(#e5ebf2,#202d3e);gap:4px}
+#budgit-household-prototype .bp-switch button{flex:1;min-width:0;border:0;border-radius:10px;background:transparent;min-height:44px;font-weight:500}
+#budgit-household-prototype .bp-switch button[aria-pressed=true]{background:var(--bp-surface);color:var(--bp-accent);box-shadow:0 2px 5px light-dark(#293b5310,#00000022)}
+#budgit-household-prototype .bp-caption{color:var(--bp-muted);font-size:12px}
+#budgit-household-prototype #bp-content{padding:20px;display:grid;gap:var(--bp-gap);min-height:520px;align-content:start}
+#budgit-household-prototype .bp-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#budgit-household-prototype .bp-title p{font-size:13px;color:var(--bp-muted);margin-top:4px}
+#budgit-household-prototype .bp-pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;background:var(--bp-fill);color:var(--bp-accent);padding:5px 9px;font-size:12px}
+#budgit-household-prototype .bp-card{background:var(--bp-surface);border:1px solid var(--bp-line);border-radius:18px;padding:18px;box-shadow:0 4px 10px light-dark(#27395506,#0000000c)}
+#budgit-household-prototype .bp-hero{text-align:center;padding:20px 18px 16px}
+#budgit-household-prototype .bp-value{font-size:38px;line-height:1.35;font-weight:650;letter-spacing:-1px;display:block;margin:4px 0}
+#budgit-household-prototype .bp-hero .bp-bottomline{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--bp-line);margin-top:16px;padding-top:12px;font-size:13px}
+#budgit-household-prototype .bp-bottomline bdi{font-weight:600}
+#budgit-household-prototype .bp-cta{width:100%;min-height:48px;border:0;border-radius:13px;background:var(--bp-accent);color:light-dark(#fff,#102634)!important;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;font-weight:600}
+#budgit-household-prototype .bp-secondary{background:var(--bp-surface);border:1px solid var(--bp-line);border-radius:12px;min-height:44px;padding:9px 12px}
+#budgit-household-prototype .bp-plain{border:0;background:transparent;min-height:44px;color:var(--bp-accent)!important;padding:6px 0;font-size:13px}
+#budgit-household-prototype .bp-sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+#budgit-household-prototype .bp-row{display:flex;align-items:center;gap:12px;padding:12px 0;min-width:0}
+#budgit-household-prototype .bp-row+.bp-row{border-top:1px solid var(--bp-line)}
+#budgit-household-prototype .bp-row-body{flex:1;min-width:0}
+#budgit-household-prototype .bp-row-body p{color:var(--bp-muted);font-size:12px;margin-top:2px}
+#budgit-household-prototype .bp-row-amount{font-weight:600;font-size:14px}
+#budgit-household-prototype .bp-date{width:38px;flex-shrink:0;text-align:center;color:var(--bp-muted);font-size:12px;background:var(--bp-bg);border-radius:10px;padding:5px}
+#budgit-household-prototype .bp-date strong{display:block;font-size:17px;color:var(--bp-text);font-weight:600}
+#budgit-household-prototype .bp-good{color:var(--bp-good)}
+#budgit-household-prototype .bp-muted{color:var(--bp-muted)}
+#budgit-household-prototype .bp-navigation{display:flex;margin:4px 14px 14px;padding:6px;background:var(--bp-surface);border:1px solid var(--bp-line);border-radius:24px;box-shadow:0 5px 20px light-dark(#24394f10,#00000030)}
+#budgit-household-prototype .bp-navigation button{flex:1;min-width:0;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:56px;border-radius:18px;font-size:11px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-navigation button[aria-current=page]{background:var(--bp-fill);color:var(--bp-accent)}
+#budgit-household-prototype .bp-navigation svg{width:21px;height:21px}
+#budgit-household-prototype .bp-chart{margin-top:12px;display:flex;align-items:flex-end;gap:14px;direction:ltr;height:90px}
+#budgit-household-prototype .bp-chart-col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%;font-size:11px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-bar{width:100%;max-width:48px;min-height:4px;border-radius:6px 6px 2px 2px;background:var(--bp-accent);opacity:.55}
+#budgit-household-prototype .bp-chart-col:last-child .bp-bar{opacity:1}
+#budgit-household-prototype .bp-meter{height:9px;border-radius:9px;background:var(--bp-bg);margin:14px 0 8px;overflow:hidden}
+#budgit-household-prototype .bp-meter span{display:block;height:100%;border-radius:inherit;background:var(--bp-accent)}
+#budgit-household-prototype .bp-goal-numbers{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+#budgit-household-prototype .bp-menu{padding:4px 16px}
+#budgit-household-prototype .bp-menu button{background:transparent;border:0;display:flex;width:100%;text-align:start;align-items:center;gap:10px;min-height:54px;padding:10px 0}
+#budgit-household-prototype .bp-menu button+button{border-top:1px solid var(--bp-line)}
+#budgit-household-prototype .bp-menu button span{flex:1}
+#budgit-household-prototype .bp-field{display:grid;gap:6px;margin:16px 0;font-size:14px}
+#budgit-household-prototype .bp-field select{border:1px solid var(--bp-line);background:var(--bp-bg);color:var(--bp-text);border-radius:10px;padding:10px;min-height:46px;max-width:100%;width:100%}
+#budgit-household-prototype .bp-drop{border:1px dashed var(--bp-line);background:var(--bp-surface);padding:26px 16px;text-align:center;border-radius:18px;display:grid;gap:14px;justify-items:center}
+#budgit-household-prototype .bp-drop>svg{color:var(--bp-accent);width:30px;height:30px}
+#budgit-household-prototype .bp-notice{margin:0 20px 14px;padding:12px;border-radius:12px;background:var(--bp-fill);font-size:13px;color:var(--bp-text)}
+#budgit-household-prototype .bp-overlay{position:absolute;inset:0;background:#0a162c70;z-index:5;display:flex;align-items:flex-start;justify-content:center;padding:90px 16px 20px}
+#budgit-household-prototype .bp-dialog{width:100%;border:1px solid var(--bp-line);border-radius:20px;background:var(--bp-surface);padding:20px;box-shadow:0 12px 40px #00000030;display:grid;gap:16px}
+#budgit-household-prototype .bp-dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
+#budgit-household-prototype .bp-dialog-actions button{flex:1;min-width:100px}
+#budgit-household-prototype .bp-phone [hidden],#budgit-household-prototype [hidden]{display:none!important}
+#budgit-household-prototype .bp-account{background:linear-gradient(125deg,light-dark(#e3eef7,#223b50),light-dark(#f3f0fb,#282e48));border-radius:15px;padding:18px;display:grid;gap:14px;border:1px solid var(--bp-line)}
+#budgit-household-prototype .bp-account-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#budgit-household-prototype .bp-account-value{font-size:28px;font-weight:650}
+#budgit-household-prototype .bp-steps{font-size:12px;display:flex;justify-content:space-between;color:var(--bp-muted);gap:8px}
+#budgit-household-prototype .bp-steps .bp-active{color:var(--bp-accent);font-weight:600}
+#budgit-household-prototype .bp-review-line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bp-line);font-size:14px}
+#budgit-household-prototype .bp-history{--bp-income:light-dark(#248060,#75cfac);--bp-expense:light-dark(#cf4b45,#ef8c83);--bp-card-series:light-dark(#b77b2a,#e7b66d);padding:16px 10px}
+#budgit-household-prototype .bp-history-head{padding:0 6px}
+#budgit-household-prototype .bp-legend{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;font-size:12px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-legend span{display:inline-flex;gap:5px;align-items:center}
+#budgit-household-prototype .bp-dot{height:8px;width:8px;border-radius:50%;background:var(--bp-income)}
+#budgit-household-prototype .bp-dot-expense{background:var(--bp-expense)}
+#budgit-household-prototype .bp-dot-card{background:var(--bp-card-series)}
+#budgit-household-prototype .bp-scale{display:flex;justify-content:space-between;direction:ltr;color:var(--bp-muted);font-size:11px;margin-bottom:4px}
+#budgit-household-prototype .bp-history-chart{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));direction:ltr;gap:0;background:repeating-linear-gradient(to top,transparent 0,transparent 37px,var(--bp-line) 38px,transparent 39px);background-size:100% 116px;background-repeat:no-repeat;background-position:top}
+#budgit-household-prototype .bp-month{background:transparent;border:0;border-radius:8px;padding:0 3px;min-width:0;min-height:146px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px!important}
+#budgit-household-prototype .bp-month[aria-pressed=true]{background:var(--bp-fill)}
+#budgit-household-prototype .bp-month-bars{width:100%;height:116px;display:flex;align-items:flex-end;justify-content:center;gap:3px;padding-top:6px}
+#budgit-household-prototype .bp-month-bar{flex:1;max-width:9px;border-radius:3px 3px 0 0;min-height:2px;background:var(--bp-income)}
+#budgit-household-prototype .bp-month-bar.expense{background:var(--bp-expense)}
+#budgit-household-prototype .bp-month-bar.card-series{background:var(--bp-card-series)}
+#budgit-household-prototype .bp-history-summary{margin:10px 6px 0;padding-top:10px;border-top:1px solid var(--bp-line)}
+#budgit-household-prototype .bp-month-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0 0}
+#budgit-household-prototype .bp-month-totals strong{font-size:17px;display:block;letter-spacing:-.35px}
+#budgit-household-prototype .bp-reported{display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:var(--bp-surface);border:1px solid var(--bp-line);border-radius:12px;font-size:13px}
+#budgit-household-prototype .bp-reported svg{flex-shrink:0;margin-top:2px;color:var(--bp-good)}
+#budgit-household-prototype .bp-reported p+p{margin-top:3px}
+#budgit-household-prototype .bp-bank-logo{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:9px;padding:6px;flex-shrink:0}
+#budgit-household-prototype .bp-bank-logo img{display:block;width:52px;height:24px;object-fit:contain}
+#budgit-household-prototype .bp-bank-line{display:flex;align-items:center;gap:10px;min-width:0}
+#budgit-household-prototype .bp-bank-line>div{min-width:0;flex:1}
+#budgit-household-prototype .bp-bank-line h2{font-size:15px}
+#budgit-household-prototype .bp-wallet-wrap{margin-inline:-20px;overflow:hidden;min-width:0}
+#budgit-household-prototype .bp-wallet-heading{display:flex;align-items:center;justify-content:space-between;padding:0 20px 6px;gap:10px}
+#budgit-household-prototype .bp-wallet-heading span{font-size:12px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-wallet-stage{position:relative;height:196px;touch-action:pan-y pinch-zoom;user-select:none}
+#budgit-household-prototype .bp-credit-face{position:absolute;inset-block-start:10px;left:50%;width:78%;height:176px;transform:translateX(-50%);border-radius:18px;background:linear-gradient(130deg,light-dark(#d9e8f5,#263f57),light-dark(#f0eefa,#33394e));border:1px solid light-dark(#b6ccde,#53647e);box-shadow:0 8px 20px light-dark(#243b5722,#00000044);padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;text-align:start;overflow:hidden;color:var(--bp-text)}
+#budgit-household-prototype .bp-credit-face.bank-hapoalim{background:linear-gradient(130deg,light-dark(#f2dedf,#482d37),light-dark(#f3ebf3,#34364d));border-color:light-dark(#d8b9bd,#755560)}
+#budgit-household-prototype .bp-credit-face.bp-selected{z-index:3}
+#budgit-household-prototype .bp-credit-face.bp-peek{z-index:1;opacity:.7;scale:.94}
+#budgit-household-prototype .bp-credit-face.bp-left{transform:translateX(-151%) rotate(-5deg)}
+#budgit-household-prototype .bp-credit-face.bp-right{transform:translateX(51%) rotate(5deg)}
+#budgit-household-prototype .bp-credit-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#budgit-household-prototype .bp-issuer-logo{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:7px;padding:5px 8px}
+#budgit-household-prototype .bp-issuer-logo img{display:block;width:62px;height:25px;object-fit:contain}
+#budgit-household-prototype .bp-credit-number{font-size:13px;letter-spacing:1.5px;font-weight:600}
+#budgit-household-prototype .bp-credit-name{font-size:18px;font-weight:650;overflow-wrap:anywhere}
+#budgit-household-prototype .bp-credit-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-credit-bottom .bp-bank-logo{padding:3px 5px;border-radius:5px}
+#budgit-household-prototype .bp-credit-bottom .bp-bank-logo img{height:17px;width:39px}
+#budgit-household-prototype .bp-wallet-controls{display:flex;align-items:center;justify-content:center;gap:4px;padding:0 20px}
+#budgit-household-prototype .bp-wallet-controls>button{flex-shrink:0;width:44px;height:44px;border:0;border-radius:50%;display:grid;place-items:center;background:transparent}
+#budgit-household-prototype .bp-wallet-controls>button:hover{background:var(--bp-fill)}
+#budgit-household-prototype .bp-wallet-dots{display:flex;align-items:center;justify-content:center;flex:1;max-width:160px}
+#budgit-household-prototype .bp-wallet-dots button{width:44px;height:44px;background:transparent;border:0;display:grid;place-items:center;border-radius:50%}
+#budgit-household-prototype .bp-wallet-dots button span{width:7px;height:7px;border-radius:10px;background:var(--bp-muted);opacity:.4}
+#budgit-household-prototype .bp-wallet-dots button[aria-pressed=true] span{width:22px;background:var(--bp-accent);opacity:1}
+#budgit-household-prototype .bp-wallet-total{padding:7px 20px 0;text-align:center;font-size:12px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-selected-summary .bp-value{font-size:32px}
+#budgit-household-prototype .bp-card-detail-heading{display:flex;justify-content:space-between;gap:10px;align-items:center}
+#budgit-household-prototype .bp-home-title .bp-secondary{display:flex;gap:6px;align-items:center;flex-shrink:0}
+#budgit-household-prototype .bp-home-title h1{font-size:23px}
+#budgit-household-prototype .bp-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#budgit-household-prototype .bp-shortcut{background:var(--bp-surface);border:1px solid var(--bp-line);border-radius:15px;padding:12px 4px;min-width:0;display:grid;justify-items:center;gap:5px;min-height:88px;font-size:14px}
+#budgit-household-prototype .bp-shortcut>svg{color:var(--bp-accent)}
+#budgit-household-prototype .bp-shortcut small{font-size:12px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-category-link{display:flex;align-items:center;text-align:start;gap:12px;width:100%;min-height:70px;padding:10px 14px;background:var(--bp-surface);border:1px solid var(--bp-line);border-radius:15px}
+#budgit-household-prototype .bp-category-link>span{flex:1;min-width:0;display:grid;gap:6px}
+#budgit-household-prototype .bp-category-link strong{font-size:15px}
+#budgit-household-prototype .bp-back{display:flex;align-items:center;gap:6px;justify-self:start;min-height:44px;padding:0 4px;margin-block:-10px -6px}
+#budgit-household-prototype .bp-month-picker{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px}
+#budgit-household-prototype .bp-month-picker select{min-height:44px;min-width:0;padding:8px 10px;background:var(--bp-surface);color:var(--bp-text);border:1px solid var(--bp-line);border-radius:10px;font-size:16px}
+#budgit-household-prototype .bp-cat-food{--bp-cat:light-dark(#25845c,#6bc79c)}
+#budgit-household-prototype .bp-cat-pharmacy{--bp-cat:light-dark(#8954c8,#bd98f2)}
+#budgit-household-prototype .bp-cat-fuel{--bp-cat:light-dark(#c67b1c,#f3b85f)}
+#budgit-household-prototype .bp-cat-shopping{--bp-cat:light-dark(#367cc5,#80b4ef)}
+#budgit-household-prototype .bp-cat-home{--bp-cat:light-dark(#c7657d,#f5a3b8)}
+#budgit-household-prototype .bp-cat-loans{--bp-cat:light-dark(#26828e,#79ccd6)}
+#budgit-household-prototype .bp-cat-other{--bp-cat:light-dark(#7e8899,#aab7c9)}
+#budgit-household-prototype .bp-category-stack{display:flex;gap:3px;height:10px;overflow:hidden;border-radius:8px}
+#budgit-household-prototype .bp-category-stack>span{background:var(--bp-cat);min-width:2px;height:100%}
+#budgit-household-prototype .bp-category-list{margin-top:10px}
+#budgit-household-prototype .bp-category-list>div+div,#budgit-household-prototype .bp-category-list>details+details{border-top:1px solid var(--bp-line)}
+#budgit-household-prototype .bp-cat-row{display:flex;gap:10px;align-items:center;padding:11px 0;min-height:58px}
+#budgit-household-prototype .bp-cat-icon{background:color-mix(in srgb,var(--bp-cat) 14%,var(--bp-surface));color:var(--bp-cat);display:grid;place-items:center;width:36px;height:36px;flex-shrink:0;border-radius:12px}
+#budgit-household-prototype .bp-cat-body{flex:1;min-width:0;display:grid;gap:6px;font-size:14px}
+#budgit-household-prototype .bp-cat-track{height:4px;max-width:125px;border-radius:5px;background:var(--bp-bg);overflow:hidden}
+#budgit-household-prototype .bp-cat-track>span{display:block;height:100%;background:var(--bp-cat);border-radius:inherit}
+#budgit-household-prototype .bp-cat-row strong{font-size:14px;font-weight:600}
+#budgit-household-prototype .bp-category-list summary{list-style:none}
+#budgit-household-prototype .bp-category-list summary::-webkit-details-marker{display:none}
+#budgit-household-prototype .bp-cat-detail{padding:0 0 12px;font-size:13px}
+#budgit-household-prototype .bp-cat-detail .bp-review-line{font-size:13px;align-items:center}
+#budgit-household-prototype details[open]>.bp-cat-row>.bp-chevron{transform:rotate(-90deg)}
+#budgit-household-prototype .bp-category-total{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+#budgit-household-prototype .bp-category-total strong{font-size:25px;font-weight:650;letter-spacing:-.6px}
+#budgit-household-prototype .bp-record{padding:14px 16px}
+#budgit-household-prototype .bp-record+.bp-record{margin-top:10px}
+#budgit-household-prototype .bp-record summary{min-height:52px;font-size:15px}
+#budgit-household-prototype .bp-record summary strong{float:left;margin-inline-start:10px;font-weight:600}
+#budgit-household-prototype .bp-record summary small{display:block;margin-top:5px;font-size:12px;color:var(--bp-muted)}
+#budgit-household-prototype .bp-status{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--bp-muted);margin-top:5px}
+#budgit-household-prototype .bp-status.bp-cleared{color:var(--bp-good)}
+#budgit-household-prototype .bp-obligation-section>h2{margin-bottom:8px}
+#budgit-household-prototype .bp-loan-amount{font-size:32px;font-weight:650;display:block;letter-spacing:-.7px;margin:4px 0 14px}
+#budgit-household-prototype .bp-inline-note{margin-top:8px!important}
+#budgit-household-prototype .bp-sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#budgit-household-prototype .bp-category-card .bp-caption{margin-top:12px}
+#budgit-household-prototype .bp-selected-summary .bp-cat-row{min-height:49px;padding-block:8px}
+@media(max-width:380px){#budgit-household-prototype .bp-wallet-wrap{margin-inline:-14px}#budgit-household-prototype .bp-credit-face{padding:14px;width:80%}#budgit-household-prototype .bp-credit-name{font-size:16px}}
+#budgit-household-prototype .bp-list{margin:0;padding-inline-start:20px;font-size:14px;display:grid;gap:10px}
+@media(max-width:380px){#budgit-household-prototype{padding:8px 0 16px}#budgit-household-prototype .bp-context{padding-inline:14px}#budgit-household-prototype #bp-content{padding:16px 14px}#budgit-household-prototype .bp-value{font-size:32px}#budgit-household-prototype .bp-card{padding:15px}#budgit-household-prototype .bp-header{padding-inline:14px}}
+@media(max-width:380px){#budgit-household-prototype .bp-card.bp-history{padding:14px 8px}#budgit-household-prototype .bp-home-title h1{font-size:21px}#budgit-household-prototype .bp-home-title .bp-secondary{padding-inline:10px}#budgit-household-prototype .bp-legend{gap:8px}#budgit-household-prototype .bp-cat-row{gap:7px}#budgit-household-prototype .bp-cat-icon{width:32px;height:32px}#budgit-household-prototype .bp-category-total strong{font-size:23px}}
+@media(prefers-reduced-motion:no-preference){#budgit-household-prototype button{transition:background-color .16s,color .16s}#budgit-household-prototype .bp-meter span{transition:width .2s}}
+#budgit-household-prototype .bp-field input{width:100%;min-width:0;min-height:46px;border:1px solid var(--bp-line);border-radius:10px;padding:10px;background:var(--bp-bg);color:var(--bp-text);font-size:16px}
+#budgit-household-prototype .bp-form-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:12px}
+#budgit-household-prototype .bp-form-grid .bp-field{margin:0}
+#budgit-household-prototype .bp-record-sub{display:block;font-size:12px;color:var(--bp-muted);margin-top:4px}
+#budgit-household-prototype .bp-entry-error{color:var(--bp-bad);font-size:14px;margin:12px 0!important}
+#budgit-household-prototype .bp-warning{color:var(--bp-bad)}
+#budgit-household-prototype .bp-projection{margin-top:14px}
+#budgit-household-prototype .bp-projection summary{min-height:44px;font-size:14px}
+#budgit-household-prototype .bp-projection table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+#budgit-household-prototype .bp-projection caption{text-align:start;color:var(--bp-muted);padding:8px 0}
+#budgit-household-prototype .bp-projection td,#budgit-household-prototype .bp-projection th{padding:12px 2px;text-align:start;border-bottom:1px solid var(--bp-line);font-weight:400}
+#budgit-household-prototype .bp-projection small{display:block;color:var(--bp-muted);font-size:11px}
+#budgit-household-prototype .bp-calc-result .bp-review-line small{color:var(--bp-muted);font-size:12px}
+#budgit-household-prototype .bp-assumptions .bp-plain{margin-top:6px}
+</style>
+<script>
+(()=>{
+ const root=document.getElementById('budgit-household-prototype');
+ const content=root.querySelector('#bp-content'),phone=root.querySelector('.bp-phone'),notice=root.querySelector('#bp-notice'),overlay=root.querySelector('#bp-overlay');
+ const names={tal:'טל',linoy:'לינוי'};
+ const fixtures={
+  tal:{balance:9600,income:15800,goal:24000,target:40000,goalName:'כרית ביטחון',deposit:900,account:'חשבון אישי · טל',last4:'2481',card:3100,events:[{day:10,name:'משכורת',amount:15800,kind:'הכנסה צפויה'},{day:10,name:'חיוב כרטיס אשראי',amount:-3100,kind:'חיוב צפוי'},{day:12,name:'הפקדה לחשבון המשותף',amount:-3000,kind:'העברה מתוכננת'},{day:15,name:'הפקדה לחיסכון אישי',amount:-900,kind:'הפקדה מתוכננת'}]},
+  linoy:{balance:7200,income:12500,goal:8000,target:12000,goalName:'לימודים והעשרה',deposit:1200,account:'חשבון אישי · לינוי',last4:'7632',card:2100,events:[{day:10,name:'משכורת',amount:12500,kind:'הכנסה צפויה'},{day:10,name:'חיוב כרטיס אשראי',amount:-2100,kind:'חיוב צפוי'},{day:12,name:'הפקדה לחשבון המשותף',amount:-3000,kind:'העברה מתוכננת'},{day:15,name:'הפקדה לחיסכון אישי',amount:-1200,kind:'הפקדה מתוכננת'}]},
+  shared:{balance:12800,income:6000,goal:18000,target:30000,goalName:'החופשה שלנו',deposit:3000,account:'חשבון משותף · טל ולינוי',last4:'9104',card:3700,events:[{day:5,name:'שכר דירה',amount:-5200,kind:'תשלום צפוי'},{day:10,name:'חיוב הכרטיס המשותף',amount:-3700,kind:'חיוב צפוי'},{day:12,name:'הפקדות של שנינו',amount:6000,kind:'העברות צפויות · 3,000 ₪ מכל אחד'},{day:15,name:'חיסכון לחופשה',amount:-3000,kind:'הפקדה מתוכננת'}]}
+ };
+ const months=['מאי','יוני','יולי','אוג׳','ספט׳','אוק׳'];
+ const monthNames=['מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר'];
+ const histories={
+  tal:[[15000,3600,2700],[15000,4100,2900],[15800,3800,3100],[15800,5300,3900],[15800,4200,3200],[15800,3900,3100]],
+  linoy:[[12000,2400,1800],[12000,3000,2100],[12500,2700,1900],[12500,4100,2900],[12500,2900,2200],[12500,2800,2100]],
+  shared:[[11000,8600,3400],[11000,9300,4100],[11500,9700,4500],[11500,12100,6900],[12000,9200,4000],[12000,8900,3700]]
+ };
+ const brandAssets={"max": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA0IiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMTA0IDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPHBhdGggZD0iTTQzLjkgMzJjLTEuNTg2IDAtMi44NTEtLjQ2My0zLjc5NS0xLjM5LS45NDUtLjkyNy0xLjQxNy0yLjAzMy0xLjQxNy0zLjMyIDAtLjY4LjA5NS0xLjMyMy4yODQtMS45MjguMTg4LS42MDUuNTQ3LTEuNDU3IDEuMDc2LTIuNTUzbDkuMjktMTkuNTE4QzUwLjQzMyAxLjA5NyA1Mi4xNyAwIDU0LjU0OSAwYzIuNzU3IDAgNC42MjYgMS4wOTcgNS42MDggMy4yOWw5LjIzMyAxOS42MzJjLjQ5IDEuMDIxLjgxMiAxLjgyNS45NjMgMi40MTFhNy42IDcuNiAwIDAgMSAuMjI3IDEuOTAxYzAgMS4yODYtLjQ2MyAyLjQwMi0xLjM4OCAzLjM0OC0uOTI1Ljk0NS0yLjE4MSAxLjQxOC0zLjc2NyAxLjQxOC0xLjEzMyAwLTIuMDQ5LS4yMjctMi43NDctLjY4LS43LS40NTUtMS4zODgtMS4yNS0yLjA2OC0yLjM4NGwtMS4zNi0yLjE1NmMtLjU2Ni0uODctMS4yMDgtMS41ODktMS45MjUtMi4xNTYtLjcxOC0uNTY3LTEuNjA1LS44NTEtMi42NjMtLjg1MS0xLjAyIDAtMS44NzguMjc0LTIuNTc3LjgyMy0uNjk5LjU0OC0xLjM1IDEuMjc2LTEuOTU0IDIuMTg0bC0xLjQxNiAyLjE1NmMtLjc1NiAxLjEzNS0xLjQ3MyAxLjkzLTIuMTUzIDIuMzgzLS42OC40NTQtMS41NjcuNjgxLTIuNjYyLjY4MXptLTM4LjQwNS0uMDU3Yy0xLjczOCAwLTMuMDg4LS40NjMtNC4wNS0xLjM5Qy40OCAyOS42MjYgMCAyOC4yNTUgMCAyNi40NFY1Ljc4N2MwLTEuODE1LjQ3Mi0zLjIzNCAxLjQxNi00LjI1NVMzLjYwNiAwIDUuMTU1IDBjMS4wMiAwIDEuODYuMTUxIDIuNTIuNDU0LjY2MS4zMDMgMS4zMTMuODMyIDEuOTU1IDEuNTg5bDcuNzYgOC43MzcgNy42NDctOC43MzdjLjY0Mi0uNzU3IDEuMjg0LTEuMjg2IDEuOTI2LTEuNTlDMjcuNjA1LjE1MiAyOC40MzYgMCAyOS40NTUgMGMxLjU0OSAwIDIuODA0LjUxIDMuNzY3IDEuNTMyLjk2MyAxLjAyMSAxLjQ0NSAyLjQ0IDEuNDQ1IDQuMjU1VjI2LjQ0YzAgMS44MTUtLjQ4MiAzLjE4Ni0xLjQ0NSA0LjExMy0uOTYzLjkyNy0yLjMxMyAxLjM5LTQuMDUgMS4zOS0xLjcgMC0yLjk1NS0uNDU0LTMuNzY3LTEuMzYxLS44MTItLjkwOC0xLjIxOC0yLjI4OS0xLjIxOC00LjE0MnYtOGwtMi40OTIgMy4wMDdjLS43NTUuODctMS40NTQgMS40ODQtMi4wOTYgMS44NDQtLjY0Mi4zNi0xLjM3OC41MzktMi4yMDkuNTM5LTEuODEzIDAtMy4zMjMtLjc3Ni00LjUzMi0yLjMyNmwtMi4zMjItMy4wNjR2OGMwIDEuODkxLS40MTUgMy4yODEtMS4yNDYgNC4xNy0uODMxLjg4OS0yLjA5NiAxLjMzMy0zLjc5NSAxLjMzM3pNNzkuNjQzIDMyYy0xLjAyIDAtMS45NDUtLjI1NS0yLjc3Ni0uNzY2YTUuNTQ0IDUuNTQ0IDAgMCAxLTEuOTU0LTIuMDE0Yy0uNDcyLS44MzItLjcwOC0xLjY2NC0uNzA4LTIuNDk3IDAtMS41ODguNTEtMi45NjkgMS41My00LjE0MWw1Ljg5LTYuNTI1LTYuMDA0LTYuNzUyYy0xLjA1Ny0xLjIxLTEuNTg2LTIuNjEtMS41ODYtNC4xOTkgMC0xLjMyMy41MzgtMi41MDYgMS42MTQtMy41NDZTNzguMDIgMCA3OS41MyAwYzEuNjYyIDAgMy4xNTQuNzc1IDQuNDc1IDIuMzI2bDUuMDQyIDUuNzg3IDUuMDQxLTUuNzNDOTUuNTIyLjc5NCA5Ny4wMTQgMCA5OC41NjIgMGMxLjQzNSAwIDIuNy41MzkgMy43OTUgMS42MTdDMTAzLjQ1MiAyLjY5NSAxMDQgMy44NzcgMTA0IDUuMTYzYzAgMS41ODktLjUyOSAyLjk4OC0xLjU4NiA0LjE5OWwtNi4wMDQgNi43NTEgNS44MzQgNi41MjVjMS4wMiAxLjE3MyAxLjUzIDIuNTUzIDEuNTMgNC4xNDIgMCAuODMyLS4yMzcgMS42NTUtLjcwOSAyLjQ2OGE1LjYxNyA1LjYxNyAwIDAgMS0xLjk1NCAxLjk4NmMtLjgzLjUxLTEuNzk0Ljc2Ni0yLjg4OS43NjYtMS40MzUgMC0yLjg3LS43NzUtNC4zMDUtMi4zMjZMODkuMDQ2IDI0bC00LjkyOCA1LjY3NEM4Mi43NTggMzEuMjI0IDgxLjI2NyAzMiA3OS42NDMgMzJ6IiBmaWxsPSIjMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz4KPC9zdmc+Cg==", "cal": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDExOCA1NyIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTE4IDU3OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6IzFCNUVDRTt9Cgkuc3Qxe2ZpbGw6bm9uZTt9Cjwvc3R5bGU+CjxnIGlkPSJFYmVuZV8yIj4KCTxnPgoJCTxyZWN0IHg9Ijg3LjAyIiB5PSIxLjU4IiBjbGFzcz0ic3QwIiB3aWR0aD0iMTIuMSIgaGVpZ2h0PSI1NC4xNCIvPgoJCTxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjExMS4yIiBjeT0iNDkuNjciIHI9IjYuMDUiLz4KCQk8Zz4KCQkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTI4LjY2LDU2LjkyYy0xNS42MSwwLTI4LjMxLTEyLjctMjguMzEtMjguMzFTMTMuMDUsMC4zLDI4LjY2LDAuM2M1LjU2LDAsMTAuOTUsMS42MSwxNS41Nyw0LjY3ICAgICBsLTYuNzgsMTAuMjljLTIuNjEtMS43Mi01LjY0LTIuNjMtOC43OS0yLjYzYy04LjgxLDAtMTUuOTgsNy4xNy0xNS45OCwxNS45OHM3LjE3LDE1Ljk4LDE1Ljk4LDE1Ljk4YzMuMiwwLDYuMjktMC45NCw4LjkzLTIuNzMgICAgIGw2LjksMTAuMjFDMzkuODEsNTUuMjQsMzQuMzMsNTYuOTIsMjguNjYsNTYuOTJ6Ii8+CgkJPC9nPgoJCTxnPgoJCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNTcuNzEsMzIuNDZMNjcuMTgsMzFjMi4xOC0wLjMyLDIuOTEtMS4zOCwyLjkxLTIuNzVjMC0yLjM1LTIuMDItNC4zNy01LjktNC4zN2MtNC4yOSwwLTYuNjMsMi45MS02Ljg3LDUuOSAgICAgTDQ2LjY0LDI3LjZjMC40OS01Ljc0LDUuODItMTMuMzUsMTcuNjMtMTMuMzVjMTMuMDIsMCwxNy43OSw3LjI4LDE3Ljc5LDE1LjUzdjI1Ljg4aC0xMWMwLDAsMC0xLjc4LDAtNC41MyAgICAgYy0yLjEsMy40LTUuOTksNS42Ni0xMS4zMiw1LjY2Yy04LjgyLDAtMTMuOTEtNS44Mi0xMy45MS0xMi4yMUM0NS44MiwzNy40OCw1MS4wOCwzMy40Myw1Ny43MSwzMi40NnogTTcwLjA5LDM5Ljl2LTEuNzggICAgIGwtNy42LDEuMjFjLTIuNTksMC40LTQuNTMsMS42Mi00LjUzLDQuNDVjMCwyLjEsMS4zOCw0LjEzLDQuNzcsNC4xM0M2Ni4zNyw0Ny45MSw3MC4wOSw0Ni4xMyw3MC4wOSwzOS45eiIvPgoJCTwvZz4KCQk8cmVjdCB4PSItMS4wNCIgeT0iLTkuNDUiIGNsYXNzPSJzdDEiIHdpZHRoPSIxMjEuNzciIGhlaWdodD0iNzEuNjMiLz4KCTwvZz4KPC9nPgo8L3N2Zz4=", "hapoalim": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTU0IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTU0IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8bWFzayBpZD0ibWFzazBfMTI5NTFfNTE3NjAiIHN0eWxlPSJtYXNrLXR5cGU6bHVtaW5hbmNlIiBtYXNrVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4PSIxMjgiIHk9IjAiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiI+CjxwYXRoIGQ9Ik0xMjguMTQ5IDBIMTUzLjVWMjZIMTI4LjE0OVYwWiIgZmlsbD0id2hpdGUiLz4KPC9tYXNrPgo8ZyBtYXNrPSJ1cmwoI21hc2swXzEyOTUxXzUxNzYwKSI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTM4LjcxNSAyNS4wOTY2QzEzOS44NjYgMjYuMzAxMiAxNDEuNzM1IDI2LjMwMTIgMTQyLjkxMSAyNS4wOTY2TDE1Mi42MTkgMTUuMTYzN0MxNTMuNzkzIDEzLjk4MzggMTUzLjc5MyAxMi4wNjYgMTUyLjYxOSAxMC44NjE0TDE0Mi45MTEgMC45MDM3NDhDMTQxLjczNSAtMC4zMDEyNSAxMzkuODY2IC0wLjMwMTI1IDEzOC43MTUgMC45MDM3NDhMMTI5LjAzMSAxMC44NjE0QzEyNy44NTYgMTIuMDY2IDEyNy44NTYgMTMuOTgzOCAxMjkuMDMxIDE1LjE2MzdMMTM4LjcxNSAyNS4wOTY2WiIgZmlsbD0iI0YwMDAwQiIvPgo8L2c+CjxtYXNrIGlkPSJtYXNrMV8xMjk1MV81MTc2MCIgc3R5bGU9Im1hc2stdHlwZTpsdW1pbmFuY2UiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNSI+CjxwYXRoIGQ9Ik0wLjUgNy42NDA2MkgxMy40NDUxVjIxLjQzMzZIMC41VjcuNjQwNjJaIiBmaWxsPSJ3aGl0ZSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazFfMTI5NTFfNTE3NjApIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMC4zNzY2IDE4LjY4MDFIMy41OTI2NFYxMC40OTI1SDYuMTMzNThDNy41OTU5OCAxMC40OTI1IDguNjUwNDMgMTAuODEyNSA5LjI3NDAxIDExLjQ3NkMxMC4wMTczIDEyLjIzODMgMTAuMzc2NiAxMy4zNjkyIDEwLjM3NjYgMTQuODY5VjE4LjY4MDFaTTExLjc2NzIgOS4zNjE2NkMxMC41OTIzIDguMTMyMzUgOC44OTAxNSA3LjY0MDYyIDYuMjA1NDYgNy42NDA2MkgwLjVWMjEuNDMzNkgxMy40NDUyVjE0LjkxODFDMTMuNDQ1MiAxMi4yMzgzIDEyLjg0NTcgMTAuNTE3MiAxMS43NjcyIDkuMzYxNjZaIiBmaWxsPSIjNTI1MjUyIi8+CjwvZz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0yNS4xMzg2IDIxLjQzMTZIMjguMzAzMUwzMS42NTkyIDEwLjE0NjNDMzIuMTE0NiA4LjU5NzM5IDMxLjQxOTUgNy42Mzg2NSAyOS44NjExIDcuNjM4NjVIMjQuMDgzOFY0LjE3MTg4SDIxLjAxNTZWMTAuNDkwNkgyOC40MjI4TDI1LjEzODYgMjEuNDMxNloiIGZpbGw9IiM1MjUyNTIiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01OS40OTMyIDIxLjc1MjRDNjQuMTkyIDIxLjc1MjQgNjcuMjYwMiAxOS4zOTIzIDY3LjI2MDIgMTQuNDk5M0M2Ny4yNjAyIDkuODUyNjUgNjQuNTc1MSA3LjMyMDMxIDYwLjI2MDIgNy4zMjAzMUM1Ni40NzI4IDcuMzIwMzEgNTQuMTk1MyA5LjU1Nzc3IDU0LjE5NTMgMTIuMzg1QzU0LjE5NTMgMTQuOTQyIDU1Ljk5MzQgMTYuODU5NSA1OS4xODE2IDE2Ljg1OTVDNTkuNjM3IDE2Ljg1OTUgNTkuODUyNiAxNi44MzUyIDU5Ljk5NjcgMTYuODM1MlYxNC4zMDI5QzU5Ljg3NjcgMTQuMzc2NiA1OS43MzI5IDE0LjM3NjYgNTkuNTY1MSAxNC4zNzY2QzU4LjIyMjcgMTQuMzc2NiA1Ny4zNTk4IDEzLjQ0MjYgNTcuMzU5OCAxMi4yMzc2QzU3LjM1OTggMTAuOTU5MiA1OC4zNjY1IDEwLjAyNDggNjAuMTg4MyAxMC4wMjQ4QzYyLjU2MTggMTAuMDI0OCA2NC4xMTk3IDExLjU0OSA2NC4xMTk3IDE0LjU0ODdDNjQuMTE5NyAxNy43NDQ5IDYyLjI5OCAxOS4wNDg0IDU5LjQ2OTUgMTkuMDQ4NEM1OC4zMTg3IDE5LjA0ODQgNTYuNTQ0NyAxOC43Nzc0IDU1LjAzNDUgMTguMjYxNEw1NC4zMzk0IDIwLjc0NDdDNTUuNjU3NyAyMS40MDgyIDU3LjkxMTEgMjEuNzUyNCA1OS40OTMyIDIxLjc1MjRaIiBmaWxsPSIjNTI1MjUyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAzLjI0NyAyMS41MDczQzEwNi40NTkgMjEuNTA3MyAxMDguMDE3IDE5LjgxMSAxMDguMDE3IDE2LjQ5MTdWNy42NDA2MkgxMDQuOTczVjE2LjYxNDRDMTA0Ljk3MyAxNy45NjcyIDEwNC4zMDIgMTguODI3NSAxMDMuMDc5IDE4LjgyNzVDMTAyLjU1MiAxOC44Mjc1IDEwMi4wNDggMTguNzA0OCAxMDEuNzM3IDE4LjYwNjRMMTAxLjA4OSAyMS4wNjVDMTAxLjgwOCAyMS40MDg5IDEwMi41NzUgMjEuNTA3MyAxMDMuMjQ3IDIxLjUwNzNaIiBmaWxsPSIjNTI1MjUyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTUuNjI0IDE1LjA5MDZIMTguNzQwNFY3LjY0MDYySDE1LjYyNFYxNS4wOTA2WiIgZmlsbD0iIzUyNTI1MiIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMzLjY3NDcgMjEuNDMzNkgzOC41MTczQzQxLjE3NzkgMjEuNDMzNiA0Mi44OCAyMC45NjY2IDQ0LjA1NDUgMTkuNzYxNkM0NS4xNTc1IDE4LjYwNiA0NS43MDg4IDE2Ljg2MDMgNDUuNzA4OCAxNC4yNTQyVjcuNjQwNjJINDIuNjQwM1YxNC4zMDMyQzQyLjY0MDMgMTUuODUyNSA0Mi4yODA5IDE2Ljk4MyA0MS42MDk1IDE3LjY0NzJDNDEuMjAyIDE4LjA0MDUgNDAuNDU5MSAxOC40MDkxIDM5Ljg4MzcgMTguNDgzM0wzNi45NTg5IDcuNjQwNjJIMzMuNjI3TDM2Ljc0MzMgMTguNjgwMUgzMy42NzQ3VjIxLjQzMzZaIiBmaWxsPSIjNTI1MjUyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNDguNTg1OSAyMS40MzM2SDUxLjY3ODJWNy42NDA2Mkg0OC41ODU5VjIxLjQzMzZaIiBmaWxsPSIjNTI1MjUyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNzguMjM5NiAyMS40MzM2SDgxLjMwNzdWMTQuOTE4MUM4MS4zMDc3IDEyLjI4NzMgODAuNzgwNSAxMC41MTcyIDc5LjY1MzggOS4zNjEyN0M3OC41MDMgOC4xODEzNiA3Ni43NTMxIDcuNjQwNjIgNzQuMTE2MiA3LjY0MDYySDY5LjIwMjFWMTAuNDkyNUg3My45NzI0Qzc1LjQ4MjYgMTAuNDkyNSA3Ni42MDkzIDEwLjgxMjEgNzcuMjgwNyAxMS40NzZDNzcuOTk5OSAxMi4yMzgzIDc4LjIzOTYgMTMuMzY5MiA3OC4yMzk2IDE0Ljg2OVYyMS40MzM2WiIgZmlsbD0iIzUyNTI1MiIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTk0Ljk3MzYgMjEuNDMzNkg5OC4xMTQxTDEwMS41NDQgOS44NTQ5NUMxMDEuOTk5IDguNDQzMyAxMDEuNTI2IDcuNjQwNjIgOTkuOTY3NiA3LjY0MDYySDg4LjczODNWMTAuNDkyNUg5OC4yMUw5NC45NzM2IDIxLjQzMzZaIiBmaWxsPSIjNTI1MjUyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTEwLjMxOCAyMS40MzM2SDEyMi41NDRWMTguNjgwMUgxMjAuNTMxVjE0LjkxODFDMTIwLjUzMSAxMi4yODczIDExOS45NzkgMTAuNTE3MiAxMTguODUyIDkuMzYxMjdDMTE3LjcwMiA4LjEzMjM1IDExNS45NTIgNy42NDA2MiAxMTMuMzM5IDcuNjQwNjJIMTEwLjU1OFYxMC40OTI1SDExMy4xOTVDMTE0LjcyOSAxMC40OTI1IDExNS43ODQgMTAuNzEzNyAxMTYuMzgzIDExLjQwMjNDMTE3LjEwMiAxMi4xNjQyIDExNy40MzggMTMuMzY5MiAxMTcuNDM4IDE0Ljg2OVYxOC42ODAxSDExMC4zMThWMjEuNDMzNloiIGZpbGw9IiM1MjUyNTIiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02OS4zOTM2IDIxLjQzNDFINzIuNTA5OVYxNC4xNTYySDY5LjM5MzZWMjEuNDM0MVoiIGZpbGw9IiM1MjUyNTIiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik04OC45MDYyIDI1LjE5NjNIOTIuMDQ2N1YxNC4zMDQ3SDg4LjkwNjJWMjUuMTk2M1oiIGZpbGw9IiM1MjUyNTIiLz4KPC9zdmc+Cg==", "one-zero": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDkiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAxNDkgMjgiIGZpbGw9ImJsYWNrIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTQyLjY2NzIgMjMuMTk2M0MzNy41NTY3IDIzLjE5NjMgMzMuNDcwNiAxOS4xNjM0IDMzLjQ3MDYgMTMuOTk5OEMzMy40NzA2IDguODM2MTIgMzcuNTUzNyA0LjgwMzIyIDQyLjY2NzIgNC44MDMyMkM0Ny43ODA2IDQuODAzMjIgNTEuODYzNyA4LjgzOTA3IDUxLjg2MzcgMTMuOTk5OEM1MS44NjM3IDE5LjE2MDUgNDcuODA0MiAyMy4xOTYzIDQyLjY2NzIgMjMuMTk2M1pNNDIuNjY3MiAyMC45OTA5QzQ2LjU3NjEgMjAuOTkwOSA0OS41MzQzIDE3LjkwODcgNDkuNTM0MyAxMy45OTk4QzQ5LjUzNDMgMTAuMDkwOSA0Ni41NzYxIDcuMDA4NjIgNDIuNjY3MiA3LjAwODYyQzM4Ljc1ODMgNy4wMDg2MiAzNS44MjY2IDEwLjA5MDkgMzUuODI2NiAxMy45OTk4QzM1LjgyNjYgMTcuOTA4NyAzOC43ODQ4IDIwLjk5MDkgNDIuNjY3MiAyMC45OTA5WiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNjcuMDI0IDIyLjg5NThMNTYuMTk3OCA5LjAzNzVWMjIuODk1OEg1My44Njg0VjUuMTA0OThINTUuODk2N0w2Ni43MjI5IDE4Ljk2MzNWNS4xMDQ5OEg2OS4wMjg3VjIyLjg5NThINjcuMDI0WiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNzEuNzU5NyA1LjEwNDk4SDgyLjEzNDJWNy4zMTAzOEg3NC4wODkxVjEyLjY5ODRIODAuNjI4NVYxNC45MDM4SDc0LjA4OTFWMjAuNjkzM0g4Mi4xMzQyVjIyLjg5ODdINzEuNzU5N1Y1LjEwNDk4WiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNOTAuMjUzMSAyMS4zNDI5TDk5LjkwMTMgNy4zMTAzOEg5MC41MzA2VjUuMTA0OThIMTAyLjk4NFY2LjY1NzkxTDkzLjMzNTMgMjAuNjkwNEgxMDMuMjM1VjIyLjg5NThIOTAuMjUzMVYyMS4zNDI5WiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTA1LjQ2MyA1LjEwNDk4SDExNS44MzhWNy4zMTAzOEgxMDcuNzkzVjEyLjY5ODRIMTE0LjMzMlYxNC45MDM4SDEwNy43OTNWMjAuNjkzM0gxMTUuODM4VjIyLjg5ODdIMTA1LjQ2M1Y1LjEwNDk4WiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTE3LjkxOSA1LjEwNDk4SDEyMy45ODRDMTI3LjI2NyA1LjEwNDk4IDEyOS4yOTUgNy4wODYgMTI5LjI5NSAxMC4wMTc3QzEyOS4yOTUgMTIuNjI0NiAxMjcuNjQxIDE0LjM3ODMgMTI0LjkxMSAxNC43Nzk4TDEzMS43NTEgMjIuODk4N0gxMjguODE5TDEyMS45NzkgMTQuODA2NEgxMjAuMjQ5VjIyLjg5ODdIMTE3LjkxOVY1LjEwNDk4Wk0xMjMuNzA5IDEyLjcyMkMxMjUuNzQgMTIuNzIyIDEyNi45NjUgMTEuNzk1IDEyNi45NjUgMTAuMDE0N0MxMjYuOTY1IDguMjM0NDYgMTI1LjczNyA3LjI1NzI0IDEyMy43MDkgNy4yNTcyNEgxMjAuMjUyVjEyLjcxOTFIMTIzLjcwOVYxMi43MjJaIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMzkuNzkzIDIzLjE5NjNDMTM0LjY4MyAyMy4xOTYzIDEzMC41OTcgMTkuMTYzNCAxMzAuNTk3IDEzLjk5OThDMTMwLjU5NyA4LjgzNjEyIDEzNC42OCA0LjgwMzIyIDEzOS43OTMgNC44MDMyMkMxNDQuOTA3IDQuODAzMjIgMTQ4Ljk5IDguODM5MDcgMTQ4Ljk5IDEzLjk5OThDMTQ4Ljk5IDE5LjE2MDUgMTQ0LjkzIDIzLjE5NjMgMTM5Ljc5MyAyMy4xOTYzWk0xMzkuNzkzIDIwLjk5MDlDMTQzLjcwMiAyMC45OTA5IDE0Ni42NiAxNy45MDg3IDE0Ni42NiAxMy45OTk4QzE0Ni42NiAxMC4wOTA5IDE0My43MDIgNy4wMDg2MiAxMzkuNzkzIDcuMDA4NjJDMTM1Ljg4NCA3LjAwODYyIDEzMi45NTMgMTAuMDkwOSAxMzIuOTUzIDEzLjk5OThDMTMyLjk1MyAxNy45MDg3IDEzNS45MTEgMjAuOTkwOSAxMzkuNzkzIDIwLjk5MDlaIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNCAwQzYuMjc5NjMgMCAwIDYuMjc5NjMgMCAxNEMwIDIxLjcyMDQgNi4yNzk2MyAyOCAxNCAyOEMyMS43MjA0IDI4IDI4IDIxLjcyMDQgMjggMTRDMjggNi4yNzk2MyAyMS43MjA0IDAgMTQgMFpNMjYuNDc2NiAxNEMyNi40NzY2IDIwLjg3OSAyMC44NzkgMjYuNDc2NiAxNCAyNi40NzY2QzcuMTIxMDUgMjYuNDc2NiAxLjUyMzQxIDIwLjg4MTkgMS41MjM0MSAxNEMxLjUyMzQxIDcuMTE4MDkgNy4xMjEwNSAxLjUyMzQxIDE0IDEuNTIzNDFDMjAuODc5IDEuNTIzNDEgMjYuNDc2NiA3LjEyMTA1IDI2LjQ3NjYgMTRaIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNC43NjE3IDUuMDY2NDFIMTMuMjM4M1YyMi45MzRIMTQuNzYxN1Y1LjA2NjQxWiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgIDwvc3ZnPg==", "isracard": "data:image/png;base64,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"}; /* existing local Budgit provider assets */
+ const banks={tal:{brand:'hapoalim',name:'בנק הפועלים'},linoy:{brand:'one-zero',name:'ONE ZERO'},shared:{brand:'hapoalim',name:'בנק הפועלים'}};
+ const wallets={
+  tal:[{id:'tal-max',issuer:'max',label:'Max',name:'הכרטיס היומיומי',last4:'0284',amount:1700},{id:'tal-cal',issuer:'cal',label:'כאל',name:'קניות אונליין',last4:'9713',amount:950},{id:'tal-isracard',issuer:'isracard',label:'ישראכרט',name:'מנויים ותשלומים',last4:'5062',amount:450}],
+  linoy:[{id:'linoy-max',issuer:'max',label:'Max',name:'הכרטיס היומיומי',last4:'4312',amount:1250},{id:'linoy-cal',issuer:'cal',label:'כאל',name:'קניות אונליין',last4:'8046',amount:600},{id:'linoy-isracard',issuer:'isracard',label:'ישראכרט',name:'מנויים ותשלומים',last4:'1158',amount:250}],
+  shared:[{id:'shared-max',issuer:'max',label:'Max',name:'הוצאות הבית',last4:'1802',amount:2000},{id:'shared-cal',issuer:'cal',label:'כאל',name:'קניות משותפות',last4:'6620',amount:1200},{id:'shared-isracard',issuer:'isracard',label:'ישראכרט',name:'מנויים לבית',last4:'4039',amount:500}]
+ };
+ const selections={tal:'tal-max',linoy:'linoy-max',shared:'shared-max'};
+ let swipe=null;
+ const prefs={spacing:14};
+ const pages=['home','accounts','goals','more','upload','schedule','categories','checks','loans','calculator','income','newcheck','newloan','newincome'];
+ const categoryDefs={
+  food:{name:'מזון',icon:'shopping-basket'},
+  pharmacy:{name:'פארם ובריאות',icon:'pill'},
+  fuel:{name:'דלק ותחבורה',icon:'fuel'},
+  shopping:{name:'קניות',icon:'shopping-bag'},
+  home:{name:'בית ודיור',icon:'house'},
+  loans:{name:'החזר הלוואה',icon:'landmark'},
+  other:{name:'יתר החיובים',icon:'receipt-text'}
+ };
+ const commitments={
+  tal:{loanName:'הלוואה למחשב',initial:15000,remaining:12500,payment:500,checkPayee:'אחסון וציוד לבית',checkNo:'1038'},
+  linoy:{loanName:'הלוואה ללימודים',initial:9000,remaining:6300,payment:300,checkPayee:'ועד הבית',checkNo:'2047'},
+  shared:{loanName:'הלוואה לריהוט הבית',initial:30000,remaining:24000,payment:1000,checkPayee:'שכר דירה',checkNo:'3052'}
+ };
+ let state={actor:'linoy',scope:'shared',page:'home',theme:'system',step:0,month:5},imported=new Set(),pending=null,returnFocus=null;
+ const money=n=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',minimumFractionDigits:0,maximumFractionDigits:2}).format(n);
+ const icon=n=>`<i data-lucide="${n}" aria-hidden="true"></i>`;
+ const val=n=>`<bdi dir="ltr">${money(n)}</bdi>`;
+ const key=()=>state.scope==='shared'?'shared':state.actor;
+ const data=()=>({...fixtures[key()],history:histories[key()],bank:banks[key()],cards:wallets[key()],commitment:commitments[key()]});
+ const scopeTitle=()=>state.scope==='shared'?'המשותף שלנו':'האישי של '+names[state.actor];
+ const label=()=>state.scope==='shared'?'גלוי לטל וללינוי':'פרטי · רק '+names[state.actor]+' רואה את המרחב הזה';
+ function save(){if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{prototype:'Budgit household',demoActor:state.actor,scope:state.scope,page:state.page,homeMode:'reported-six-months',selectedMonth:'2026-'+String(state.month+5).padStart(2,'0'),selectedCard:state.page==='accounts'?selections[key()]:null},privateContent:{theme:state.theme,spacing:prefs.spacing,cardSelections:{...selections},trail:[...trail]}}).catch(()=>{});}
+ function restore(snapshot){const m=snapshot?.modelContent,p=snapshot?.privateContent;if(m?.prototype==='Budgit household'){if(['tal','linoy'].includes(m.demoActor))state.actor=m.demoActor;if(['shared','personal'].includes(m.scope))state.scope=m.scope;if(pages.includes(m.page))state.page=m.page;if(/^2026-(0[5-9]|10)$/.test(m.selectedMonth||''))state.month=Number(m.selectedMonth.slice(5))-5;}if(Array.isArray(p?.trail))trail=p.trail.filter(x=>pages.includes(x)).slice(-8);if(['system','light','dark'].includes(p?.theme))state.theme=p.theme;if(Number.isFinite(p?.spacing))prefs.spacing=Math.min(24,Math.max(12,p.spacing));for(const scope of ['tal','linoy','shared'])if(wallets[scope].some(c=>c.id===p?.cardSelections?.[scope]))selections[scope]=p.cardSelections[scope];}
+ function announce(message){notice.textContent=message;notice.hidden=!message;}
+ function announceSelection(){const row=data().history[state.month];root.querySelector('#bp-selection-announcement').textContent=monthNames[state.month]+' 2026 · הוצאות '+money(row[1])+' · מתוכן כרטיסים '+money(row[2]);}
+ function title(text,sub=''){return `<div class="bp-title"><div><h1>${text}</h1>${sub?`<p>${sub}</p>`:''}</div></div>`;}
+ function events(d,all){const check=d.history[5][1]-d.history[5][2]-d.commitment.payment;const entries=[...d.events.filter(e=>e.name!=='שכר דירה'),{day:5,name:d.commitment.checkPayee,amount:-check,kind:'צ׳ק מתוכנן'},{day:10,name:d.commitment.loanName,amount:-d.commitment.payment,kind:'החזר הלוואה מתוכנן'}].sort((a,b)=>a.day-b.day);return entries.slice(0,all?undefined:2).map(e=>`<div class="bp-row"><div class="bp-date"><strong>${e.day}</strong>נוב׳</div><div class="bp-row-body"><h3>${e.name}</h3><p>${e.kind}</p></div><span class="bp-row-amount ${e.amount>0?'bp-good':''}">${val(e.amount)}</span></div>`).join('');}
+ function goal(d,detail=false){const pct=Math.round(d.goal/d.target*100);return `<section class="bp-card"><div class="bp-sectionhead"><h2>${d.goalName}</h2><span class="bp-pill">${pct}% מהיעד</span></div><div class="bp-goal-numbers"><strong>${val(d.goal)}</strong><span class="bp-muted">מתוך ${val(d.target)}</span></div><div class="bp-meter" role="progressbar" aria-label="התקדמות ${d.goalName}" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div><p class="bp-caption">יתרה מדווחת בדוגמה · ההפקדה הבאה אינה כלולה</p>${detail?`<div class="bp-review-line"><span>הפקדה מתוכננת ב־15.11</span>${val(d.deposit)}</div><button class="bp-plain cursor-interaction" data-page="schedule" type="button">לצפייה בתכנון החודש ←</button>`:''}</section>`;}
+ function chart(d){
+  const incoming=state.scope==='shared'?'כניסות':'הכנסות';
+  const top=Math.ceil(Math.max(...d.history.flat())/5000)*5000,selected=d.history[state.month];
+  return `<section class="bp-card bp-history"><div class="bp-history-head"><h2>שישה חודשים במבט</h2><div class="bp-legend"><span><i class="bp-dot"></i>${incoming}</span><span><i class="bp-dot bp-dot-expense"></i>הוצאות</span><span><i class="bp-dot bp-dot-card"></i>מתוכן כרטיסים</span></div></div><div class="bp-scale"><span>${money(top)}</span><span>מאי–אוקטובר 2026 · ₪</span></div><div class="bp-history-chart" role="group" aria-label="השוואת סכומים חודשיים בשקלים, בסולם אפס עד ${top}. לחיצה על חודש מציגה את הסכומים שלו.">${d.history.map((r,i)=>`<button type="button" data-month="${i}" class="bp-month cursor-interaction" aria-pressed="${state.month===i}" aria-controls="bp-month-summary" aria-label="${monthNames[i]} 2026: ${incoming} ${money(r[0])}, הוצאות ${money(r[1])}, מתוכן כרטיסים ${money(r[2])}"><span class="bp-month-bars" aria-hidden="true"><span class="bp-month-bar" style="height:${r[0]/top*110}px"></span><span class="bp-month-bar expense" style="height:${r[1]/top*110}px"></span><span class="bp-month-bar card-series" style="height:${r[2]/top*110}px"></span></span><span>${months[i]}</span></button>`).join('')}</div><div class="bp-history-summary" id="bp-month-summary"><h3>${monthNames[state.month]} 2026</h3><div class="bp-month-totals">${[incoming,'הוצאות','מתוכן כרטיסים'].map((name,i)=>`<div><p class="bp-caption">${name}</p><strong>${val(selected[i])}</strong></div>`).join('')}</div>${state.scope==='shared'?'<p class="bp-caption bp-inline-note">כניסות = הפקדות לחשבון המשותף</p>':''}</div></section>`;
+ }
+ function home(d){
+  const rows=monthlyCategories(d,state.month);
+  return `<div class="bp-title bp-home-title"><div><h1>תמונה כללית</h1><p>דיווח אחרון · אוקטובר 2026</p></div><button type="button" data-page="upload" class="bp-secondary cursor-interaction" aria-label="עדכון מדוחות החודש">${icon('upload')}עדכון</button></div>`+chart(d)+`<button type="button" data-page="categories" class="bp-category-link cursor-interaction"><span><strong>לאן הלך הכסף ב${monthNames[state.month]}?</strong>${categoryStack(rows,d.history[state.month][1])}</span>${icon('chevron-left')}</button><div class="bp-shortcuts"><button type="button" data-page="checks" class="bp-shortcut cursor-interaction">${icon('notebook-pen')}<span>צ׳קים</span><small>${demoEntries[key()].checks.length?demoEntries[key()].checks.length+1+' טרם נפרעו':'1 טרם נפרע'}</small></button><button type="button" data-page="loans" class="bp-shortcut cursor-interaction">${icon('landmark')}<span>הלוואות</span><small>${demoEntries[key()].loans.length?demoEntries[key()].loans.length+1+' הלוואות':'הלוואה אחת'}</small></button><button type="button" data-page="calculator" class="bp-shortcut cursor-interaction">${icon('calculator')}<span>מחשבון</span><small>בדיקת רכישה</small></button></div>`;
+ }
+ // All amounts below are synthetic monthly aggregates, not individual transactions.
+ function distribute(total,weights){let cumulative=0,used=0;const sum=weights.reduce((a,b)=>a+b,0);return weights.map(w=>{cumulative+=w;const next=Math.round(total*cumulative/sum),amount=next-used;used=next;return amount;});}
+ function cardCategories(card,total=card.amount){
+  const ids=['food','pharmacy','fuel','shopping','other'];
+  const weights={max:[45,12,23,15,5],cal:[25,15,15,35,10],isracard:[20,10,10,15,45]};
+  const amounts=distribute(total,weights[card.issuer]);
+  return ids.map((id,i)=>({id,amount:amounts[i],sources:[]}));
+ }
+ function monthlyCategories(d,month){
+  const report=d.history[month],rows=Object.keys(categoryDefs).map(id=>({id,amount:0,sources:[]}));
+  const cardAmounts=distribute(report[2],d.cards.map(c=>c.amount));
+  d.cards.forEach((card,i)=>cardCategories(card,cardAmounts[i]).forEach(part=>{const row=rows.find(r=>r.id===part.id);row.amount+=part.amount;row.sources.push({name:card.label+' · '+card.last4,amount:part.amount});}));
+  const loan=rows.find(r=>r.id==='loans'),home=rows.find(r=>r.id==='home');
+  loan.amount=d.commitment.payment;loan.sources=[{name:'החזר שדווח בחשבון '+d.last4,amount:loan.amount}];
+  home.amount=report[1]-report[2]-loan.amount;home.sources=[{name:'צ׳ק שנפרע · '+d.commitment.checkPayee,amount:home.amount}];
+  return rows.filter(r=>r.amount>0);
+ }
+ function categoryStack(rows,total){return `<span class="bp-category-stack" aria-hidden="true">${rows.map(r=>`<span class="bp-cat-${r.id}" style="width:${r.amount/total*100}%"></span>`).join('')}</span>`;}
+ function categoryList(rows,total,expandable=false){
+  return `<div class="bp-category-list">${rows.map(r=>{
+   const def=categoryDefs[r.id],row=`<span class="bp-cat-icon">${icon(def.icon)}</span><span class="bp-cat-body"><span>${def.name}</span><span class="bp-cat-track" aria-hidden="true"><span style="width:${r.amount/total*100}%"></span></span></span><strong>${val(r.amount)}</strong>`;
+   return expandable?`<details class="bp-cat-${r.id}"><summary class="bp-cat-row cursor-interaction">${row}<span class="bp-chevron">${icon('chevron-left')}</span></summary><div class="bp-cat-detail">${r.sources.map(s=>`<div class="bp-review-line"><span>${s.name}</span>${val(s.amount)}</div>`).join('')}</div></details>`:`<div class="bp-cat-${r.id} bp-cat-row">${row}</div>`;
+  }).join('')}</div>`;
+ }
+
+ function categories(d){
+  const rows=monthlyCategories(d,state.month),total=d.history[state.month][1];
+  return backHome()+title('הוצאות לפי קטגוריות')+`<label class="bp-month-picker">חודש הדוח<select id="bp-category-month">${monthNames.map((m,i)=>`<option value="${i}" ${state.month===i?'selected':''}>${m} 2026</option>`).join('')}</select></label><section class="bp-card bp-category-card"><div class="bp-category-total"><h2>סך ההוצאות</h2><strong>${val(total)}</strong></div>${categoryStack(rows,total)}${categoryList(rows,total,true)}</section>`;
+ }
+ function checks(d){
+  const c=d.commitment,amount=d.history[5][1]-d.history[5][2]-c.payment,added=demoEntries[key()].checks;
+  const record=(cleared)=>`<details class="bp-card bp-record"><summary class="cursor-interaction"><strong>${val(amount)}</strong>${c.checkPayee}<small>${cleared?'מועד פירעון · 5.10.2026':'מועד מתוכנן · 5.11.2026'}</small><span class="bp-status ${cleared?'bp-cleared':''}">${icon(cleared?'circle-check':'clock-3')}${cleared?'נפרע · לפי דוח אוקטובר':'טרם נפרע · ממתין לאימות בדוח'}</span></summary><div class="bp-review-line"><span>מספר צ׳ק</span><bdi>${Number(c.checkNo)+(cleared?0:1)}</bdi></div><div class="bp-review-line"><span>חשבון משלם</span><span>${d.bank.name} · <bdi>${d.last4}</bdi></span></div><p class="bp-caption bp-inline-note">${cleared?'נכלל בהוצאות אוקטובר ובקטגוריית בית ודיור.':'עדיין לא נכלל בהוצאות המדווחות; ההערכה הקיימת במחשבון כבר כוללת אותו.'}</p></details>`;
+  return backHome()+title('צ׳קים')+openEntryLink('newcheck','הוספת צ׳ק')+`<section class="bp-obligation-section"><h2>טרם נפרעו · ${added.length?added.length+1+' צ׳קים':'צ׳ק אחד'}</h2><p class="bp-caption">סכום כולל ${val(amount+added.reduce((s,c)=>s+c.amount,0)/100)}</p>${record(false)}${added.map(r=>`<details class="bp-card bp-record"><summary class="cursor-interaction"><strong>${val(r.amount/100)}</strong>${escapeText(r.name)}<small>טרם נפרע · <bdi>${r.date}</bdi></small></summary><div class="bp-review-line"><span>מספר צ׳ק</span><bdi>${r.number}</bdi></div><p class="bp-caption bp-inline-note">${categoryDefs[r.category]?.name||'ללא קטגוריה'} · חשבון ${d.last4}</p></details>`).join('')}</section><section class="bp-obligation-section"><h2>נפרעו בדיווח האחרון</h2>${record(true)}</section><p class="bp-caption">הסטטוס מתבסס על דוחות עד 31.10.2026, ללא חיבור בזמן אמת לבנק.</p>`;
+ }
+ function loans(d){
+  const c=d.commitment,added=demoEntries[key()].loans;
+  return backHome()+title('הלוואות')+openEntryLink('newloan','הוספת הלוואה')+`<section class="bp-card"><div class="bp-sectionhead"><h2>${c.loanName}</h2><span class="bp-pill">לוח החזרים</span></div><p class="bp-caption">סך ההחזרים המתוכננים שנותרו מנובמבר</p><strong class="bp-loan-amount">${val(c.payment*24)}</strong><div class="bp-review-line"><span>החזר חודשי</span><strong>${val(c.payment)}</strong></div><div class="bp-review-line"><span>החזרים שנותרו בלוח</span><bdi>24</bdi></div><div class="bp-review-line"><span>חשבון משלם</span><span>${d.bank.name} · <bdi>${d.last4}</bdi></span></div><p class="bp-caption bp-inline-note">לוח הדוגמה: 30 החזרים ממאי 2026. הסכום שנותר בלוח אינו יתרת הקרן בבנק.</p></section><section class="bp-card"><h2>התשלום הבא · מתוכנן</h2><div class="bp-review-line"><bdi>10.11.2026</bdi><strong>${val(c.payment)}</strong></div><p class="bp-caption bp-inline-note">טרם אומת בדוח. החזר אוקטובר כבר כלול בהוצאות המדווחות.</p></section>${added.map(l=>`<section class="bp-card"><h2>${escapeText(l.name)}</h2><div class="bp-review-line"><span>החזר חודשי</span><strong>${val(l.amount/100)}</strong></div><p class="bp-caption bp-inline-note">${l.months} החזרים · החל מ${monthLabel(l.month)} · חשבון ${d.last4}</p></section>`).join('')}<details class="bp-card bp-record"><summary class="cursor-interaction">החזרים מדווחים</summary>${['אוקטובר','ספטמבר','אוגוסט'].map(m=>`<div class="bp-review-line"><span>${m} 2026</span>${val(c.payment)}</div>`).join('')}</details>`;
+ }
+ const mainPages=['home','accounts','goals','more'];
+ const pageNames={home:'תמונה הכללית',accounts:'חשבונות',goals:'מטרות',more:'תפריט ״עוד״',calculator:'מחשבון',checks:'צ׳קים',loans:'הלוואות',income:'הכנסות',categories:'קטגוריות',schedule:'תכנון',upload:'דוחות'};
+ let trail=[],entry=null;
+ const demoEntries={tal:{checks:[],loans:[],income:[]},linoy:{checks:[],loans:[],income:[]},shared:{checks:[],loans:[],income:[]}};
+ const calculatorInputs=Object.fromEntries(['tal','linoy','shared'].map(k=>[k,{price:'9000',payments:'3',start:'2026-11',floor:'5000'}]));
+ const escapeText=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const futureMonth=i=>{const date=new Date(Date.UTC(2026,10+i,1));return date.getUTCFullYear()+'-'+String(date.getUTCMonth()+1).padStart(2,'0');};
+ const monthOffset=value=>{if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(value))throw Error('יש לבחור חודש תקין.');return (Number(value.slice(0,4))-2026)*12+Number(value.slice(5))-11;};
+ const monthLabel=value=>new Intl.DateTimeFormat('he-IL',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(value+'-01T00:00:00Z'));
+ function parseAmount(raw,allowZero=false){if(!/^\d+(\.\d{1,2})?$/.test(String(raw).trim()))throw Error('יש להזין סכום תקין, עם עד שתי ספרות אחרי הנקודה.');const amount=Math.round(Number(raw)*100);if(!Number.isSafeInteger(amount)||amount<(allowZero?0:1)||amount>10000000000)throw Error('יש לבדוק את הסכום שהוזן.');return amount;}
+ function pushPage(page){if(mainPages.includes(page))trail=[];else trail.push(state.page);entry=null;state.page=page;if(['newcheck','newloan','newincome'].includes(page))entry=initialEntry(page);}
+ function goBack(){entry=null;state.page=trail.pop()||'home';}
+ function backHome(){const destination=trail.at(-1)||'home';return `<button type="button" data-action="back" class="bp-plain bp-back cursor-interaction">${icon('chevron-right')}חזרה ל${pageNames[destination]||'תמונה הכללית'}</button>`;}
+ function openEntryLink(page,label){return `<button type="button" data-page="${page}" class="bp-secondary cursor-interaction">${icon('plus')} ${label}</button>`;}
+ function initialEntry(page){return {page,dirty:false,name:'',amount:'',number:'',date:'2026-11-20',month:'2026-11',months:'12',kind:'monthly',category:'home'};}
+ function futureIncome(d,month){const override=demoEntries[key()].income.find(r=>r.kind==='monthly'&&r.month===month);return override?override.amount:Math.round(d.history[5][0]*100);}
+ function projection(d,overrideCount){
+  const inputs=calculatorInputs[key()],price=parseAmount(inputs.price),floor=parseAmount(inputs.floor,true),payments=Number(overrideCount??inputs.payments),start=monthOffset(inputs.start);
+  if(!Number.isInteger(payments)||payments<1||payments>60||start<0||start>2)throw Error('יש לבחור 1–60 תשלומים וחודש התחלה זמין.');
+  const entries=demoEntries[key()],horizon=Math.max(24,start+payments,...entries.loans.map(l=>monthOffset(l.month)+l.months),...entries.checks.map(c=>monthOffset(c.date.slice(0,7))+1),...entries.income.map(r=>monthOffset(r.month)+1));
+  const parts=distribute(price,Array(payments).fill(1));let before=Math.round(d.balance*100),after=before;
+  const rows=Array.from({length:horizon},(_,i)=>{
+   const month=futureMonth(i),income=futureIncome(d,month)+entries.income.filter(r=>r.kind==='once'&&r.month===month).reduce((s,r)=>s+r.amount,0);
+   const baseExpense=Math.round((d.history[5][1]+d.deposit+(state.scope==='personal'?3000:0)-(i>=24?d.commitment.payment:0))*100);
+   const checks=entries.checks.filter(r=>r.date.startsWith(month)).reduce((s,r)=>s+r.amount,0);
+   const loans=entries.loans.filter(l=>i>=monthOffset(l.month)&&i<monthOffset(l.month)+l.months).reduce((s,l)=>s+l.amount,0);
+   const payment=i>=start&&i<start+payments?parts[i-start]:0,net=income-baseExpense-checks-loans;before+=net;after+=net-payment;
+   return {month,before,after,payment};
+  });
+  return {rows,price,floor,payments,low:rows.reduce((a,r)=>r.after<a.after?r:a,rows[0]),parts};
+ }
+ function calculatorResult(d){
+  try{
+   const result=projection(d),low=result.low;
+   return `<section class="bp-card bp-calc-result"><div class="bp-sectionhead"><h2>ההשפעה על העו״ש</h2><span class="bp-pill">הדמיה</span></div><div class="bp-review-line"><span>תשלום חודשי${new Set(result.parts).size>1?' בקירוב':''}</span><strong>${val(result.parts[0]/100)}</strong></div><div class="bp-review-line"><span>היתרה הנמוכה בתקופה<br><small>${monthLabel(low.month)}</small></span><strong class="${low.after<result.floor?'bp-warning':''}">${val(low.after/100)}</strong></div><p class="bp-caption bp-inline-note">${low.after<result.floor?'הפריסה יורדת מתחת לרף הביטחון שבחרת.':'הפריסה נשארת מעל רף הביטחון שבחרת, לפי הנחות הדוגמה.'}</p><details class="bp-projection"><summary class="cursor-interaction">לפני ואחרי — בכל חודש</summary><table><caption>יתרת סוף חודש משוערת</caption><thead><tr><th>חודש</th><th>לפני רכישה</th><th>אחרי רכישה</th></tr></thead><tbody>${result.rows.map(r=>`<tr><th><bdi dir="ltr">${r.month}</bdi><small>${r.payment?'תשלום '+money(r.payment/100):'ללא תשלום'}</small></th><td>${val(r.before/100)}</td><td class="${r.after<result.floor?'bp-warning':''}">${val(r.after/100)}</td></tr>`).join('')}</tbody></table></details></section>`;
+  }catch(error){return `<p class="bp-entry-error" role="alert">${escapeText(error.message)}</p>`;}
+ }
+ function calculator(d){
+  const inputs=calculatorInputs[key()];
+  return backHome()+title('מחשבון רכישה')+`<section class="bp-card"><p class="bp-caption">חשבון משלם · ${d.bank.name} · <bdi>${d.last4}</bdi></p><label class="bp-field">מחיר סופי, כולל עמלות · ₪<input data-calc="price" inputmode="decimal" dir="ltr" value="${escapeText(inputs.price)}"></label><div class="bp-form-grid"><label class="bp-field">מספר תשלומים<input data-calc="payments" type="number" min="1" max="60" step="1" dir="ltr" value="${escapeText(inputs.payments)}"></label><label class="bp-field">תשלום ראשון<select data-calc="start">${[0,1,2].map(i=>`<option value="${futureMonth(i)}" ${inputs.start===futureMonth(i)?'selected':''}>${monthLabel(futureMonth(i))}</option>`).join('')}</select></label></div><label class="bp-field">רף ביטחון בעו״ש · ₪<input data-calc="floor" inputmode="decimal" dir="ltr" value="${escapeText(inputs.floor)}"></label><button type="button" class="bp-secondary cursor-interaction" data-action="shortest">מציאת הפריסה הקצרה ששומרת על הרף</button><p id="bp-calc-hint" class="bp-caption bp-inline-note" role="status"></p></section><div id="bp-calc-results" aria-live="polite">${calculatorResult(d)}</div><section class="bp-card bp-assumptions"><h2>על מה ההדמיה מבוססת?</h2><p class="bp-caption bp-inline-note">יתרת 31.10: ${val(d.balance)}. ${state.scope==='shared'?'הפקדות למשותף':'הכנסה'} צפויה: ${val(d.history[5][0])} לחודש, אלא אם עודכנה ידנית.</p><p class="bp-caption bp-inline-note">הוצאות, חיסכון והתחייבויות קיימות כלולים. צ׳קים והלוואות שתוסיפו בדוגמה ישפיעו גם כאן.</p><button type="button" data-page="income" class="bp-plain cursor-interaction">עדכון הכנסות עתידיות ←</button><p class="bp-caption">נתונים מדומים · יתרות סוף חודש בלבד, ללא בדיקת מינוס בתוך החודש או חישוב ריבית.</p></section>`;
+ }
+ function income(d){
+  const list=demoEntries[key()].income;
+  return backHome()+title('הכנסות עתידיות')+`<section class="bp-card"><h2>${state.scope==='shared'?'הפקדות למשותף':'הכנסה חודשית'} · הערכת הבסיס</h2><strong class="bp-loan-amount">${val(d.history[5][0])}</strong><p class="bp-caption">לפי הסכום האחרון בדוגמה. אין ממוצע אוטומטי.</p></section>${openEntryLink('newincome','הזנת הכנסה עתידית')}<section class="bp-card"><h2>עדכונים ידניים</h2>${list.length?list.map(r=>`<div class="bp-review-line"><span>${escapeText(r.name)}<small class="bp-record-sub">${monthLabel(r.month)} · ${r.kind==='monthly'?'מחליפה את הערכת הבסיס':'תוספת חד־פעמית'}</small></span><strong>${val(r.amount/100)}</strong></div>`).join(''):'<p class="bp-caption bp-inline-note">עדיין לא הוזנו עדכונים בדוגמה.</p>'}</section><p class="bp-caption">הזנה ידנית כאן משנה את התחזית בלבד. היא אינה הכנסה שהתקבלה.</p>`;
+ }
+ function entryForm(d){
+  const draft=entry||(entry=initialEntry(state.page)),isCheck=state.page==='newcheck',isLoan=state.page==='newloan';
+  const input=(field,label,type='text',value=draft[field])=>`<label class="bp-field">${label}<input data-entry="${field}" type="${type}" ${['amount','months'].includes(field)?'inputmode="decimal" dir="ltr"':''} ${field==='name'?'maxlength="80"':''} value="${escapeText(value)}" required></label>`;
+  return backHome()+title(isCheck?'הוספת צ׳ק':isLoan?'הוספת הלוואה':'הזנת הכנסה עתידית')+`<form id="bp-entry-form" class="bp-card"><p class="bp-caption">${isCheck||isLoan?'חשבון משלם':'חשבון מקבל'} · ${d.bank.name} · <bdi>${d.last4}</bdi></p>${!isCheck&&!isLoan?`<label class="bp-field">סוג עדכון<select data-entry="kind"><option value="monthly" ${draft.kind==='monthly'?'selected':''}>הערכה חדשה לחודש מסוים</option><option value="once" ${draft.kind==='once'?'selected':''}>הכנסה חד־פעמית נוספת</option></select></label>`:''}${input('name',isCheck?'למי הצ׳ק / עבור מה':isLoan?'שם ההלוואה':'תיאור ההכנסה')}${input('amount',isLoan?'החזר חודשי · ₪':'סכום · ₪')}${isCheck?input('number','מספר צ׳ק')+input('date','מועד פירעון','date')+`<label class="bp-field">קטגוריה<select data-entry="category">${Object.entries(categoryDefs).filter(([id])=>id!=='loans').map(([id,c])=>`<option value="${id}" ${draft.category===id?'selected':''}>${c.name}</option>`).join('')}</select></label>`:input('month',isLoan?'חודש ההחזר הראשון':'חודש ההכנסה','month')}${isLoan?input('months','מספר ההחזרים הכולל','number'):''}<p class="bp-caption">${isCheck?'בדוגמה מזינים צ׳ק עתידי שנמסר וטרם נפרע. הוא יתווסף לתחזית פעם אחת במועד הפירעון.':isLoan?'ההחזר, התקופה והחשבון קובעים את התחזית. אין כאן חישוב יתרת קרן או ריבית.':'הערכה לחודש מסוים מחליפה את סכום הבסיס; הכנסה חד־פעמית מתווספת אליו.'}</p><p id="bp-entry-error" class="bp-entry-error" role="alert"></p><button type="submit" class="bp-cta cursor-interaction">שמירה בדוגמה</button></form>`;
+ }
+ function saveEntry(){
+  try{
+   const draft=entry;if(!draft||!draft.name.trim())throw Error('יש להזין תיאור.');
+   const amount=parseAmount(draft.amount,draft.page==='newincome'),scope=demoEntries[key()],record={name:draft.name.trim().slice(0,80),amount};
+   if(draft.page==='newcheck'){
+    if(!Object.hasOwn(categoryDefs,draft.category)||draft.category==='loans')throw Error('יש לבחור קטגוריה מהרשימה.');
+    if(!/^\d{1,12}$/.test(draft.number))throw Error('יש להזין מספר צ׳ק תקין.');
+    const date=new Date(draft.date+'T00:00:00Z');if(Number.isNaN(date.getTime())||date.toISOString().slice(0,10)!==draft.date||monthOffset(draft.date.slice(0,7))<0||monthOffset(draft.date.slice(0,7))>59)throw Error('בדוגמה יש לבחור מועד עתידי בין נובמבר 2026 לאוקטובר 2031.');
+    if(scope.checks.some(c=>c.number===draft.number)||[data().commitment.checkNo,String(Number(data().commitment.checkNo)+1)].includes(draft.number))throw Error('מספר הצ׳ק כבר מופיע בחשבון הזה.');
+    scope.checks.push({...record,number:draft.number,date:draft.date,category:draft.category});
+   }else{
+    const offset=monthOffset(draft.month);if(offset<0||offset>59)throw Error('בדוגמה יש לבחור חודש בין נובמבר 2026 לאוקטובר 2031.');
+    if(draft.page==='newloan'){
+     const months=Number(draft.months);if(!Number.isInteger(months)||months<1||months>60)throw Error('בדוגמה יש להזין 1–60 החזרים.');scope.loans.push({...record,month:draft.month,months});
+    }else{if(!['monthly','once'].includes(draft.kind))throw Error('יש לבחור סוג הכנסה.');if(draft.kind==='monthly')scope.income=scope.income.filter(r=>r.kind!=='monthly'||r.month!==draft.month);scope.income.push({...record,month:draft.month,kind:draft.kind});}
+   }
+   const destination=draft.page==='newcheck'?'checks':draft.page==='newloan'?'loans':'income';entry=null;state.page=destination;trail.pop();render();save();announce('נשמר בדוגמה ומשפיע על המחשבון. נתוני האפליקציה לא השתנו.');
+  }catch(error){root.querySelector('#bp-entry-error').textContent=error.message;}
+ }
+ function brand(brandName,alt,issuer=false){return `<span class="${issuer?'bp-issuer-logo':'bp-bank-logo'}"><img src="${brandAssets[brandName]}" alt="${alt}" draggable="false" width="${issuer?62:52}" height="${issuer?25:24}" /></span>`;}
+ function walletFace(c,d,position){const active=position==='selected';return `<${active?'div':'button type="button"'} class="bp-credit-face bank-${d.bank.brand} bp-${active?'selected':'peek bp-'+position} ${active?'':'cursor-interaction'}" ${active?'role="group" aria-label="הכרטיס הנבחר: '+c.label+' '+c.last4+'"':'data-card-id="'+c.id+'" aria-label="הצגת '+c.label+' '+c.last4+'"'}><div class="bp-credit-top">${brand(c.issuer,c.label,true)}<bdi class="bp-credit-number" dir="ltr">•••• ${c.last4}</bdi></div><div class="bp-credit-name">${c.name}</div><div class="bp-credit-bottom"><span>מחויב מחשבון <bdi>${d.last4}</bdi></span>${brand(d.bank.brand,d.bank.name)}</div></${active?'div':'button'}>`;}
+ function accounts(d){
+  const index=Math.max(0,d.cards.findIndex(c=>c.id===selections[key()]));
+  const selected=d.cards[index],prev=d.cards[(index+d.cards.length-1)%d.cards.length],next=d.cards[(index+1)%d.cards.length];
+  const rows=cardCategories(selected);
+  return title('החשבונות והכרטיסים')+`<section class="bp-account"><div class="bp-bank-line">${brand(d.bank.brand,d.bank.name)}<div><h2><bdi>${d.bank.name}</bdi></h2><p class="bp-caption">חשבון <bdi>${d.last4}</bdi></p></div></div><div class="bp-account-head"><span class="bp-caption">יתרה ל־31.10.2026</span><strong>${val(d.balance)}</strong></div></section><section class="bp-wallet-wrap" role="region" aria-roledescription="קרוסלה" aria-label="כרטיסי האשראי במרחב הנבחר"><div class="bp-wallet-heading"><h2>כרטיסי האשראי</h2><span>${index+1} מתוך ${d.cards.length}</span></div><div class="bp-wallet-stage">${walletFace(prev,d,'right')}${walletFace(next,d,'left')}${walletFace(selected,d,'selected')}</div><div class="bp-wallet-controls"><button type="button" data-action="card-next" class="cursor-interaction" aria-label="הכרטיס הבא">${icon('chevron-right')}</button><div class="bp-wallet-dots" role="group" aria-label="בחירת כרטיס">${d.cards.map(c=>`<button type="button" data-card-id="${c.id}" class="cursor-interaction" aria-pressed="${c.id===selected.id}" aria-label="הצגת ${c.label} ${c.last4}"><span aria-hidden="true"></span></button>`).join('')}</div><button type="button" data-action="card-prev" class="cursor-interaction" aria-label="הכרטיס הקודם">${icon('chevron-left')}</button></div><p class="bp-wallet-total">סה״כ בכרטיסים · אוקטובר: ${val(d.cards.reduce((s,c)=>s+c.amount,0))}</p></section><section class="bp-card bp-selected-summary" id="bp-card-summary"><div class="bp-card-detail-heading"><h2>${selected.label} · <bdi>${selected.last4}</bdi></h2><span class="bp-pill">דוח אוקטובר</span></div><strong class="bp-value">${val(selected.amount)}</strong>${categoryStack(rows,selected.amount)}${categoryList(rows,selected.amount)}</section><section class="bp-card bp-menu"><button type="button" data-page="checks" class="cursor-interaction">${icon('notebook-pen')}<span>הצ׳קים בחשבון</span>${icon('chevron-left')}</button><button type="button" data-page="loans" class="cursor-interaction">${icon('landmark')}<span>ההלוואות בחשבון</span>${icon('chevron-left')}</button></section>`;
+ }
+ function selectCard(id,direction=0,focusSelector=''){const d=data(),c=d.cards.find(item=>item.id===id);if(!c)return;selections[key()]=id;render();const face=root.querySelector('.bp-credit-face.bp-selected');if(direction&&face?.animate&&!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)face.animate([{transform:`translateX(calc(-50% + ${direction*45}px))`,opacity:.8},{transform:'translateX(-50%)',opacity:1}],{duration:230,easing:'ease-out'});if(focusSelector)root.querySelector(focusSelector)?.focus();save();announce(c.label+' '+c.last4+' · חיובים מדווחים באוקטובר '+money(c.amount));}
+ function stepCard(delta,focusSelector=''){const d=data(),i=Math.max(0,d.cards.findIndex(c=>c.id===selections[key()]));selectCard(d.cards[(i+delta+d.cards.length)%d.cards.length].id,delta,focusSelector);}
+ function more(){return title('עוד')+`<section class="bp-card bp-menu">${[['calculator','calculator','מחשבון רכישה'],['income','banknote','הכנסות עתידיות'],['upload','files','דוחות ועדכונים'],['categories','chart-pie','הוצאות לפי קטגוריות'],['checks','notebook-pen','צ׳קים'],['loans','landmark','הלוואות'],['schedule','calendar-days','תכנון החודש']].map(([page,glyph,text])=>`<button type="button" data-page="${page}" class="cursor-interaction">${icon(glyph)}<span>${text}</span>${icon('chevron-left')}</button>`).join('')}<button type="button" data-action="privacy" class="cursor-interaction">${icon('shield-check')}<span>מי יכול לראות את המידע?</span>${icon('chevron-left')}</button></section><section class="bp-card"><h2>מראה</h2><label class="bp-field">ערכת נושא<select id="bp-theme"><option value="system" ${state.theme==='system'?'selected':''}>לפי המערכת</option><option value="light" ${state.theme==='light'?'selected':''}>בהיר</option><option value="dark" ${state.theme==='dark'?'selected':''}>כהה</option></select></label></section>`;}
+ function upload(d){const seen=imported.has(key());return title('עדכון מדוח')+`<div class="bp-steps"><span class="${state.step===0?'bp-active':''}">1 · בחירה</span><span class="${state.step===1?'bp-active':''}">2 · בדיקה</span><span class="${state.step===2?'bp-active':''}">3 · סיום</span></div>`+(state.step===0?`<div class="bp-drop">${icon('file-up')}<h2>${seen?'הדוח לדוגמה כבר נקלט':'מעדכנים את תמונת המצב'}</h2><p class="bp-caption">דוח בנק · אוקטובר 2026 · חשבון ${d.last4}</p><button type="button" data-action="sample" class="bp-cta cursor-interaction">${seen?'בדיקת אותו דוח שוב':'בחירת דוח לדוגמה'}</button></div><p class="bp-caption">${label()} · קבצים אמיתיים אינם נפתחים באב־הטיפוס</p>`:state.step===1?`<section class="bp-card"><h2>${seen?'הדוח הזה כבר מופיע כאן':'בדיקה לפני עדכון'}</h2><div class="bp-review-line"><span>מרחב</span><strong>${scopeTitle()}</strong></div><div class="bp-review-line"><span>חשבון</span><bdi>${d.last4}</bdi></div><div class="bp-review-line"><span>תאריך היתרה</span><bdi>31.10.2026</bdi></div><div class="bp-review-line"><span>יתרה בדוח</span>${val(d.balance)}</div><p class="bp-caption" style="margin-top:14px">${seen?'אין צורך לקלוט אותו שוב.':label()+' · היתרה בדוח תואמת ליתרה המוצגת.'}</p></section><button type="button" data-action="${seen?'done':'confirm'}" class="bp-cta cursor-interaction">${seen?'חזרה לתמונה הכללית':'אישור קליטה בדוגמה'}</button><button type="button" data-action="cancel-import" class="bp-secondary cursor-interaction">ביטול</button>`:`<section class="bp-card bp-hero"><span class="bp-mark" style="margin:0 auto 14px">${icon('check')}</span><h2>הדוגמה נקלטה</h2><p style="margin-top:8px">הדוח שויך אל ${scopeTitle()}</p><p class="bp-caption" style="margin-top:8px">היתרה נשארה ${money(d.balance)} · אין שינוי בנתונים אמיתיים</p></section><button type="button" data-action="done" class="bp-cta cursor-interaction">חזרה לתמונה הכללית</button>`);}
+ function render(){
+  const d=data();phone.style.colorScheme=state.theme==='system'?'inherit':state.theme;phone.style.setProperty('--bp-gap',prefs.spacing+'px');
+  root.querySelector('#bp-person').value=state.actor;
+  root.querySelectorAll('[data-scope]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.scope===state.scope)));
+  const navPage=mainPages.includes(state.page)?state.page:null;root.querySelector('.bp-navigation').hidden=!navPage;
+
+  root.querySelectorAll('[data-page]').forEach(b=>{if(b.closest('.bp-navigation')){if(b.dataset.page===navPage)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}});
+  const views={home,accounts,categories,checks,loans,calculator,income,newcheck:entryForm,newloan:entryForm,newincome:entryForm,more,upload:d=>backHome()+upload(d),goals:d=>title('המטרות')+goal(d,true),schedule:d=>backHome()+title('תכנון החודש','נובמבר 2026')+`<section class="bp-card">${events(d,true)}</section><p class="bp-caption">סכומים צפויים · אינם אישור לביצוע תשלום</p><button type="button" data-page="home" class="bp-secondary cursor-interaction">חזרה לתמונה הכללית</button>`};
+  content.innerHTML=(views[state.page]||home)(d);if(globalThis.lucide)lucide.createIcons({attrs:{width:18,height:18}});
+ }
+ function backgroundInert(value){root.querySelector('#bp-person').disabled=value;root.querySelectorAll('.bp-header,.bp-context,#bp-content,.bp-navigation,#bp-notice').forEach(el=>el.inert=value);}
+ function closeDialog(){overlay.hidden=true;overlay.innerHTML='';pending=null;backgroundInert(false);if(returnFocus?.isConnected)returnFocus.focus();returnFocus=null;}
+ function dialog(titleText,body,actions){returnFocus=document.activeElement;overlay.innerHTML=`<section class="bp-dialog" role="dialog" aria-modal="true" aria-labelledby="bp-dialog-title"><h2 id="bp-dialog-title">${titleText}</h2>${body}<div class="bp-dialog-actions">${actions}</div></section>`;overlay.hidden=false;backgroundInert(true);overlay.querySelector('button')?.focus();}
+ function navigate(next){if(state.page==='upload'&&state.step===1||entry?.dirty){pending=next;dialog(entry?.dirty?'לצאת בלי לשמור?':'לצאת מבדיקת הדוח?',`<p>יש שינויים שעדיין לא נשמרו בדוגמה. אפשר להישאר או לצאת ללא שמירה.</p>`,`<button type="button" class="bp-cta cursor-interaction" data-action="stay">להישאר</button><button type="button" class="bp-secondary cursor-interaction" data-action="leave">לצאת ללא שמירה</button>`);return;}next();state.step=0;announce('');render();save();}
+ root.addEventListener('click',e=>{const button=e.target.closest('button');if(!button||!root.contains(button))return;if(!overlay.hidden&&!overlay.contains(button))return;const {scope,page,action,month,cardId}=button.dataset;if(cardId){selectCard(cardId,0,'.bp-wallet-dots [data-card-id="'+cardId+'"]');return;}if(action==='card-next'||action==='card-prev'){stepCard(action==='card-next'?1:-1,'[data-action="'+action+'"]');return;}if(month!==undefined&&/^[0-5]$/.test(month)){state.month=Number(month);render();root.querySelector('[data-month="'+month+'"]')?.focus();save();announceSelection();return;}if(['personal','shared'].includes(scope)){if(scope!==state.scope)navigate(()=>{entry=null;state.scope=scope;});return;}if(pages.includes(page)){navigate(()=>pushPage(page));return;}
+  if(action==='back'){navigate(goBack);return;}
+  if(action==='shortest'){try{const d=data();let found=null;for(let n=1;n<=60;n++){const result=projection(d,n);if(result.low.after>=result.floor){found=n;break;}}if(found){calculatorInputs[key()].payments=String(found);render();root.querySelector('[data-action="shortest"]')?.focus();}root.querySelector('#bp-calc-hint').textContent=found?'נבחרו '+found+' תשלומים לפי נתוני הדוגמה, לכל תקופת התחזית.':'לא נמצאה פריסה של 1–60 תשלומים ששומרת על הרף לפי ההנחות האלה.';}catch(error){root.querySelector('#bp-calc-hint').textContent=error.message;}return;}
+  if(action==='refresh'){navigate(()=>{});if(overlay.hidden)announce('נתוני הדוגמה עודכנו. אין חיבור לחשבונות אמיתיים.');}
+  if(action==='sample'){state.step=1;announce('');render();save();}
+  if(action==='confirm'){imported.add(key());state.step=2;render();save();announce('הקליטה הושלמה באב־הטיפוס בלבד.');}
+  if(action==='done'){entry=null;trail=[];state.page='home';state.step=0;render();save();announce('מוצגת תמונת המצב של '+scopeTitle());}
+  if(action==='cancel-import')navigate(()=>state.page='home');
+  if(action==='stay'||action==='close')closeDialog();
+  if(action==='leave'){const next=pending;closeDialog();entry=null;next?.();state.step=0;announce('הבדיקה נסגרה ללא שמירה');render();save();}
+  if(action==='privacy')dialog('המרחבים שלכם',`<ul class="bp-list"><li>האישי של טל — גלוי לטל בלבד</li><li>האישי של לינוי — גלוי ללינוי בלבד</li><li>המשותף — גלוי לשניכם</li></ul><p class="bp-caption">בחירת הדמות היא כלי בדיקה של האב־טיפוס. ביישום האמיתי ההרשאות נקבעות לפי החשבון המחובר.</p>`,`<button type="button" data-action="close" class="bp-cta cursor-interaction">הבנתי</button>`);
+ });
+ root.addEventListener('change',e=>{if(e.target.id==='bp-person'&&['tal','linoy'].includes(e.target.value)){const actor=e.target.value;e.target.value=state.actor;navigate(()=>{entry=null;trail=[];state.actor=actor;state.scope='personal';state.page='home';});}if(e.target.id==='bp-theme'&&['system','light','dark'].includes(e.target.value)){state.theme=e.target.value;render();save();announce('המראה עודכן');}if(e.target.id==='bp-category-month'&&/^[0-5]$/.test(e.target.value)){state.month=Number(e.target.value);render();root.querySelector('#bp-category-month')?.focus();save();announceSelection();}});
+ function updatePlanningInput(e){
+  const dataset=e.target.dataset||{};
+  if(['price','payments','start','floor'].includes(dataset.calc)){
+   calculatorInputs[key()][dataset.calc]=e.target.value;
+   root.querySelector('#bp-calc-results').innerHTML=calculatorResult(data());
+   root.querySelector('#bp-calc-hint').textContent='';
+   if(globalThis.lucide)lucide.createIcons({attrs:{width:18,height:18}});
+  }
+  if(entry&&['name','amount','number','date','month','months','kind','category'].includes(dataset.entry)){
+   entry[dataset.entry]=e.target.value;entry.dirty=true;
+  }
+ }
+ root.addEventListener('input',updatePlanningInput);
+ root.addEventListener('change',updatePlanningInput);
+ root.addEventListener('submit',e=>{if(e.target.id==='bp-entry-form'){e.preventDefault();saveEntry();}});
+ root.addEventListener('pointerdown',e=>{swipe=null;const stage=e.target.closest('.bp-wallet-stage');if(!stage||!overlay.hidden||!e.isPrimary||e.button!==0||e.target.closest('button'))return;swipe={x:e.clientX,y:e.clientY,id:e.pointerId,scope:key()};stage.setPointerCapture?.(e.pointerId);});
+ root.addEventListener('pointerup',e=>{const start=swipe;swipe=null;if(!start||start.id!==e.pointerId||start.scope!==key()||state.page!=='accounts')return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){e.preventDefault();stepCard(dx>0?1:-1);}});
+ root.addEventListener('pointercancel',()=>{swipe=null;});
+ root.addEventListener('lostpointercapture',()=>{swipe=null;});
+ root.addEventListener('keydown',e=>{if(!overlay.hidden||state.page!=='accounts'||!e.target.closest('.bp-wallet-wrap'))return;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();stepCard(e.key==='ArrowRight'?1:-1,'[data-action="card-next"]');}});
+ root.addEventListener('keydown',e=>{if(overlay.hidden)return;if(e.key==='Escape'){e.preventDefault();closeDialog();}if(e.key==='Tab'){const controls=[...overlay.querySelectorAll('button')];if(!controls.length)return;const first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
+ restore(window.openai?.widgetState);render();
+ window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState){closeDialog();entry=null;restore(e.detail.globals.widgetState);state.step=0;render();}});
+ if(globalThis.Tweak){const tweak=new Tweak({container:phone,onChange:()=>{render();save();}});tweak.addSlider(prefs,'spacing',{label:'ריווח בין חלקי המסך',min:12,max:24,step:2,unit:'px'});}
+})();
+</script>

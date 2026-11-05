@@ -1,0 +1,127 @@
+{
+  "baseline": "5acbeac6f77add3bcdb40682198205dd208ce1c4",
+  "date": "2026-11-03",
+  "scope": "source navigation only; not browser or complete workflow acceptance",
+  "routes": {
+    "baselineCount": 90,
+    "currentCount": 94,
+    "removed": [],
+    "added": [
+      "/accounts",
+      "/checks",
+      "/income",
+      "/more"
+    ]
+  },
+  "settings": {
+    "count": 26,
+    "allListedExactlyOnce": true,
+    "allRegistered": true,
+    "destinations": [
+      {
+        "label": "ניהול כניסה לשרת · למנהל השרת",
+        "path": "/settings/access"
+      },
+      {
+        "label": "מדדי הוצאה, השוואה ותצוגות שמורות",
+        "path": "/analysis"
+      },
+      {
+        "label": "Apple Pay · חיבור האייפון ובדיקת הייבוא",
+        "path": "/settings/wallet"
+      },
+      {
+        "label": "מצב Gmail ועדכוני בנק פרטיים",
+        "path": "/settings/gmail"
+      },
+      {
+        "label": "גיבוי חיצוני ב־Google Drive · למנהל השרת",
+        "path": "/settings/drive"
+      },
+      {
+        "label": "סקירת מעבר רישום חשבון בין מרחבים",
+        "path": "/overview/migration"
+      },
+      {
+        "label": "יעדים חודשיים והתקדמות מדיווחי אמת",
+        "path": "/goals"
+      },
+      {
+        "label": "בסיס התחזית והערכות קבועות",
+        "path": "/settings/forecast"
+      },
+      {
+        "label": "התחלה מודרכת לתקציב חדש",
+        "path": "/start"
+      },
+      {
+        "label": "שם לתצוגה וחשבון מחובר",
+        "path": "/settings/profile"
+      },
+      {
+        "label": "תמונה כוללת · חשבונות ומטרות",
+        "path": "/overview"
+      },
+      {
+        "label": "טיוטה שמורה במכשיר",
+        "path": "/settings/device-draft"
+      },
+      {
+        "label": "הצפנה, נעילה, שחזור וייבוא גיבוי",
+        "path": "/settings/security"
+      },
+      {
+        "label": "לטיפול ותזכורות אישיות",
+        "path": "/actions"
+      },
+      {
+        "label": "מרכז הדוחות והמקורות השמורים",
+        "path": "/upload"
+      },
+      {
+        "label": "דוחות צפויים ומועדי הגעה",
+        "path": "/settings/report-expectations"
+      },
+      {
+        "label": "היסטוריית ייבוא בנק וביטול קליטה",
+        "path": "/upload/history"
+      },
+      {
+        "label": "סימולציית השקעות ויעד חודשי",
+        "path": "/investment"
+      },
+      {
+        "label": "תכנון הפקדות חודשיות לחיסכון",
+        "path": "/savings/schedule"
+      },
+      {
+        "label": "העברות חיסכון ואישור ביצוע",
+        "path": "/savings/transfers"
+      },
+      {
+        "label": "ניהול צ׳קים ופירוט ידני",
+        "path": "/details/manage"
+      },
+      {
+        "label": "ניהול מילון הקטגוריות",
+        "path": "/categories/manage"
+      },
+      {
+        "label": "תקרות הוצאה לפי קטגוריה",
+        "path": "/categories/limits"
+      },
+      {
+        "label": "העברות בתכנון בין חשבונות עו״ש",
+        "path": "/accounts/transfers"
+      },
+      {
+        "label": "שיוך כרטיסים והתחייבויות לחשבונות",
+        "path": "/accounts/assignments"
+      },
+      {
+        "label": "פרטי הכרטיסים",
+        "path": "/card-setup"
+      }
+    ]
+  }
+}

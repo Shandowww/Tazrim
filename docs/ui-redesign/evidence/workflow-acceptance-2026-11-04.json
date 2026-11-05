@@ -1,0 +1,102 @@
+{
+  "date": "2026-11-04",
+  "applicationCommit": "90af8ba",
+  "baselineRevision": 1,
+  "finalRevision": 4,
+  "financialPutAttempts": 4,
+  "successfulFinancialWrites": 3,
+  "loan": {
+    "monthly": 123.45,
+    "from": "2026-05",
+    "months": 12,
+    "totalCents": 148140,
+    "scheduledRemainingCents": 74070,
+    "remainingMonths": 6,
+    "identifiedPaymentsCents": 0,
+    "lostSuccessAcknowledgedWithNoSecondPut": true
+  },
+  "income": {
+    "amount": 1200.01,
+    "month": "2027-01",
+    "kind": "income",
+    "payments": 1
+  },
+  "purchase": {
+    "amount": 600.01,
+    "firstMonth": "2027-01",
+    "payments": 3,
+    "paymentCents": [
+      20000,
+      20000,
+      20001
+    ],
+    "cardId": "card1",
+    "cashAccountId": "sample-bank-1"
+  },
+  "comparison": [
+    {
+      "month": "2026-11",
+      "before": 14535.56,
+      "after": 14535.56,
+      "change": 0,
+      "issues": []
+    },
+    {
+      "month": "2026-12",
+      "before": 21371.12,
+      "after": 21371.12,
+      "change": 0,
+      "issues": []
+    },
+    {
+      "month": "2027-01",
+      "before": 29406.69,
+      "after": 29206.69,
+      "change": -200,
+      "issues": []
+    },
+    {
+      "month": "2027-02",
+      "before": 36242.25,
+      "after": 35842.25,
+      "change": -400,
+      "issues": []
+    },
+    {
+      "month": "2027-03",
+      "before": 43077.81,
+      "after": 42477.8,
+      "change": -600.01,
+      "issues": []
+    },
+    {
+      "month": "2027-04",
+      "before": 49913.37,
+      "after": 49313.36,
+      "change": -600.01,
+      "issues": []
+    },
+    {
+      "month": "2027-05",
+      "before": 56872.38,
+      "after": 56272.37,
+      "change": -600.01,
+      "issues": []
+    }
+  ],
+  "checks": {
+    "originalLoanCommandExact": true,
+    "originalIncomeCommandExact": true,
+    "originalScenarioCommandExact": true,
+    "displayedComparisonExact": true,
+    "failedScenarioPreservedStoredPlan": true,
+    "stayPreservedDraft": true,
+    "reportedMonthsAndDetailsUnchanged": true,
+    "savingsGoalsUnchanged": true,
+    "otherUsersAndSharedBytesUnchanged": true
+  },
+  "limitations": [
+    "Synthetic disposable service; desktop Chromium at phone width.",
+    "No real bank report, provider, physical touch, iPhone or production mutation."
+  ]
+}

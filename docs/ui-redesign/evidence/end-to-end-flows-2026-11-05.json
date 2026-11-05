@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-05",
+  "boundary": "Synthetic in-memory service and desktop browser at phone width; no real records or production writes.",
+  "flows": {
+    "reportReviewSaveRefresh": {
+      "proof": [
+        "report-acceptance-2026-11-04.json",
+        "EXECUTION-STATUS.md:128-130",
+        "EXECUTION-STATUS.md:179-183"
+      ],
+      "observed": "A stored card source was reviewed, decisions saved and reloaded, JSON backup downloaded, and one atomic commit confirmed; mixed bank/card and separate bank retries did not duplicate the commit or source. The refreshed accounts view showed the saved card amount and category."
+    },
+    "chequeClearOnce": {
+      "proof": [
+        "EXECUTION-STATUS.md:128",
+        "test/household-commitments.test.mjs:14"
+      ],
+      "observed": "A synthetic additional cheque was created and cleared through the UI; the original clear command moved it to cleared while the full cash forecast stayed equal before and after, so clearing did not charge it again."
+    },
+    "pastStartLoan": {
+      "proof": [
+        "workflow-acceptance-2026-11-04.json",
+        "loan-past-start-light-390.png"
+      ],
+      "observed": "A May 2026 loan showed 12 scheduled repayments and six remaining from November, with identified report payments separate. Lost-save success recovered without a second PUT."
+    },
+    "futureIncomePurchaseSave": {
+      "proof": [
+        "workflow-acceptance-2026-11-04.json",
+        "scenario-save-failure-light-390.png"
+      ],
+      "observed": "₪1,200.01 future income and a ₪600.01 three-payment card purchase were explicitly saved; the displayed forecast matched original commands. A failed save retained the old plan and draft."
+    },
+    "dirtyExitStay": {
+      "proof": [
+        "EXECUTION-STATUS.md:137",
+        "EXECUTION-STATUS.md:162",
+        "account-boundary-2026-11-04.json"
+      ],
+      "observed": "A cheque draft blocked refresh and browser Back; Stay preserved its values and route, while explicit discard left no record and sent no financial PUT."
+    }
+  },
+  "limits": [
+    "Physical iPhone and real provider acceptance remain separate.",
+    "Detailed viewer and failure checks for every cheque and loan form remain open under item 5.7."
+  ]
+}

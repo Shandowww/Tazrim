@@ -1,37 +1,31 @@
+import {ChequesPage} from './app/cheques-page'
+import {IncomePlanningPage} from './app/income-planning-page'
+import {HouseholdAccountsPage} from './app/household-accounts'
+import {HouseholdHome} from './app/household-home'
+import {householdSpaceHref} from './app/household-model'
+import {HouseholdNavigation,HouseholdBack,HouseholdMore} from './app/household-navigation'
 import {InterfaceLayoutSetting} from './app/interface-layout-setting'
 import {openingViewSearch} from './app/navigation-query'
 import {SessionControls} from './app/session-controls'
 import {GlobalActionCenter} from './app/global-action-center'
-const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-access-page')).AdminAccessPage }))
-const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
-const WalletPage = lazy(async () => ({ default: (await import('./app/wallet-page')).WalletPage }))
-const GmailPage = lazy(async () => ({ default: (await import('./app/gmail-page')).GmailPage }))
-const DriveBackupPage = lazy(async () => ({ default: (await import('./app/drive-backup-page')).DriveBackupPage }))
-const MigrationPage = lazy(async () => ({ default: (await import('./app/migration-page')).MigrationPage }))
 import {ComparisonGoalsPage} from './app/comparison-goals-page'
 import {ForecastSettingsPage} from './app/forecast-settings-page'
 import {OnboardingPage} from './app/onboarding-page'
-import {isUnconfiguredBudget} from '../../src/budget.js'
 import {ProfilePage} from './app/profile-page'
-const TransferMatchesPage = lazy(async () => ({ default: (await import('./app/transfer-matches-page')).TransferMatchesPage }))
-const OverviewPage = lazy(async () => ({ default: (await import('./app/overview-page')).OverviewPage }))
-const DeviceDraftPage = lazy(async () => ({ default: (await import('./app/device-draft-page')).DeviceDraftPage }))
 import {ExistingWorkflowLinks} from './app/existing-workflow-links'
-import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
+import { StrictMode, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
-import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { RefreshCw } from 'lucide-react'
+import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate, ScrollRestoration, type Location } from 'react-router-dom'
+import { RefreshCw, Wallet } from 'lucide-react'
 import { Sidebar } from './tazrim/components/layout/sidebar'
-import { BottomNav } from './tazrim/components/layout/bottom-nav'
 import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
-import { DashboardSummaryCards } from './tazrim/components/dashboard/summary-cards'
 import { PeriodPicker } from './tazrim/components/layout/period-picker'
 import type { Period } from './tazrim/lib/period'
 import { AppearanceContext } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
-import { demoAccounts, demoSummary, demoBankSummary, demoCardSummary } from './app/demo-fixture'
-import { budgetDashboard, budgetNavigation } from './app/budget-adapter'
+import { demoAccounts, demoHouseholdPlan } from './app/demo-fixture'
+import { budgetNavigation } from './app/budget-adapter'
 import { withViewQuery } from './app/navigation-query'
 import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
 import { installPullRefresh } from './app/pull-refresh'
@@ -40,6 +34,15 @@ import './tazrim/globals.css'
 import './app.css'
 import Link from './app/link'
 
+const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-access-page')).AdminAccessPage }))
+const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
+const WalletPage = lazy(async () => ({ default: (await import('./app/wallet-page')).WalletPage }))
+const GmailPage = lazy(async () => ({ default: (await import('./app/gmail-page')).GmailPage }))
+const DriveBackupPage = lazy(async () => ({ default: (await import('./app/drive-backup-page')).DriveBackupPage }))
+const MigrationPage = lazy(async () => ({ default: (await import('./app/migration-page')).MigrationPage }))
+const TransferMatchesPage = lazy(async () => ({ default: (await import('./app/transfer-matches-page')).TransferMatchesPage }))
+const OverviewPage = lazy(async () => ({ default: (await import('./app/overview-page')).OverviewPage }))
+const DeviceDraftPage = lazy(async () => ({ default: (await import('./app/device-draft-page')).DeviceDraftPage }))
 const SecurityPage = lazy(async () => ({ default: (await import('./app/security-page')).SecurityPage }))
 const HelpPage = lazy(async () => ({ default: (await import('./app/help-page')).HelpPage }))
 const ActionCenterPage = lazy(async () => ({ default: (await import('./app/action-center-page')).ActionCenterPage }))
@@ -76,8 +79,6 @@ const DetailManagementPage = lazy(async () => ({ default: (await import('./app/d
 const DetailAnnotationPage = lazy(async () => ({ default: (await import('./app/detail-annotation-page')).DetailAnnotationPage }))
 const ExpenseDetailsPage = lazy(async () => ({ default: (await import('./app/expense-details-page')).ExpenseDetailsPage }))
 const AccountsPage = lazy(async () => ({ default: (await import('./app/accounts-page')).AccountsPage }))
-const CombinedChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/combined-chart')).CombinedChart }))
-const CCMonthlyChart = lazy(async () => ({ default: (await import('./tazrim/components/dashboard/cc-monthly-chart')).CCMonthlyChart }))
 
 function useFixtureMode() {
   const { search } = useLocation()
@@ -85,7 +86,7 @@ function useFixtureMode() {
 }
 
 function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
-  const { pathname, search } = useLocation()
+  const { pathname, search, state } = useLocation()
   const navigate = useNavigate()
   const guard = useDraftGuard()
   const params = new URLSearchParams(search)
@@ -97,21 +98,21 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
     query.set('year', String(next.year))
     if (next.month) query.set('month', String(next.month))
     else query.delete('month')
-    navigate(pathname + `?${query}`)
+    navigate(pathname + `?${query}`,{state,preventScrollReset:true})
   }
   function selectBudget(id: string) {
-    const next = new URLSearchParams(search)
-    if (id === 'personal') next.delete('budget')
-    else next.set('budget', id)
-    navigate(pathname + (next.size ? `?${next}` : ''))
+    if(budget.status!=='ready'||id===budget.budgetId||!budget.spaces.some(space=>space.id===id))return
+    navigate(householdSpaceHref(pathname,search,id))
   }
   return (
-    <header className="sticky top-0 z-30 grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b bar-glass px-4 py-2.5">
-      <div className="min-w-0 text-xs font-semibold text-muted-foreground">{budget.status === 'ready' ? <label className="flex min-w-0 items-center gap-2"><span className="sr-only">מרחב תקציב</span><select className="min-w-0 max-w-full truncate rounded-lg bg-transparent p-1" value={budget.budgetId} onChange={event => selectBudget(event.target.value)}>{budget.spaces.map(space => <option key={space.id} value={space.id}>{space.name}{space.role === 'viewer' ? ' · צפייה בלבד' : ''}</option>)}</select></label> : 'Budgit'}</div>
-      <PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod} />
-      <div className="flex items-center justify-end gap-2"><GlobalActionCenter budget={budget}/>
-        <button type="button" className="rounded-lg p-2 text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
+    <header className="household-header sticky top-0 z-30 border-b">
+      <div className="household-topbar">
+        {pathname==='/'?<div className="household-brand"><span><Wallet size={21} aria-hidden/></span><strong dir="ltr">Budgit</strong></div>:<div className="household-period"><PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod}/></div>}
+        <div className="household-header-actions"><GlobalActionCenter budget={budget}/>
+          <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
+        </div>
       </div>
+      {budget.status==='ready'&&(budget.spaces.length===2?<div className="household-space-switch" role="group" aria-label="מרחב תקציב">{budget.spaces.map(space=><button type="button" key={space.id} aria-pressed={budget.budgetId===space.id} onClick={()=>selectBudget(space.id)}><span>{space.name}</span>{space.role==='viewer'&&<small>צפייה בלבד</small>}</button>)}</div>:budget.spaces.length>2?<label className="household-space-select"><span className="sr-only">מרחב תקציב</span><select value={budget.budgetId} onChange={event=>selectBudget(event.target.value)}>{budget.spaces.map(space=><option key={space.id} value={space.id}>{space.name}{space.role==='viewer'?' · צפייה בלבד':''}</option>)}</select></label>:<div className="household-space-name">{budget.spaces[0]?.name}{budget.spaces[0]?.role==='viewer'&&' · צפייה בלבד'}</div>)}
     </header>
   )
 }
@@ -128,33 +129,10 @@ function Dashboard({ fixture, budget }: { fixture: boolean; budget: ReturnType<t
   if (!fixture && budget.status === 'ready' && !budget.value.plan) return <section className="surface rounded-xl p-6">עדיין אין תקציב שמור. <Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/upload',locationSearch)}>העלאת דוחות והתחלה</Link><Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/start',locationSearch)}>הגדרה ידנית</Link><Link className="inline-flex min-h-11 items-center px-3 text-primary underline" href={withViewQuery('/settings/security',locationSearch)}>יש לי גיבוי לייבוא</Link></section>
   if (!fixture && budget.status === 'ready' && budget.value.plan?.format === 'monthly-flow-encrypted-v1') return <section className="surface rounded-xl p-6">התקציב מוצפן. </section>
   if (!fixture && budget.status === 'ready') {
-    const search = new URLSearchParams(window.location.search)
-    const year = /^20\d{2}$/.test(search.get('year') || '') ? search.get('year')! : jerusalemMonth().slice(0, 4)
-    const month = /^(?:[1-9]|1[0-2]|0[1-9])$/.test(search.get('month') || '') ? String(Number(search.get('month'))).padStart(2, '0') : ''
-    let view: ReturnType<typeof budgetDashboard>
-    try { view = budgetDashboard(budget.value.plan, { year, month, asOf: jerusalemMonth() }) }
-    catch { return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב. </section> }
-    const accountCount = budgetNavigation(budget.value.plan).filter(account => account.kind === 'BANK').length
-    return <div className="mx-auto max-w-7xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>{isUnconfiguredBudget(budget.value.plan)&&<section className="surface space-y-3 rounded-xl p-4"><h2 className="font-semibold">מתחילים מהדוחות שלך</h2><Link href={withViewQuery('/upload',search)} className="inline-flex min-h-11 items-center text-primary underline">העלאת דוחות והתחלה</Link><Link href={withViewQuery('/start',search)} className="inline-flex min-h-11 items-center px-3 text-primary underline">הגדרה ידנית</Link></section>}
-      <p className="text-sm text-muted-foreground">{view.partial ? 'דיווח חלקי · ' : ''}{view.reportedMonths} חודשים מדווחים{budget.value.budget?.role === 'viewer' ? ' · צפייה בלבד' : ''} · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>
-      {view.hasReports ? <>
-        <DashboardSummaryCards {...view.cards} query={search.toString()} bankHint={accountCount ? `${accountCount} חשבונות` : 'ללא חשבון מוגדר'} cardHint="כרטיסי אשראי" monthHasData={view.reportedMonths > 0} />
-        <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={view.bankSummary} maxSummary={view.cardSummary} cardsName="כרטיס" selectedMonth={month ? Number(month) : undefined} /></Suspense>
-        <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={view.cardSummary} selectedMonth={month ? Number(month) : undefined} /></Suspense></div>
-      </> : <section className="surface rounded-xl p-6">אין נתוני אמת לתקופה זו. תחזיות וסכומי ברירת מחדל אינם מוצגים כדיווח.</section>}
-      <section className="surface rounded-xl p-5"><h2 className="mb-3 font-semibold">עדכונים וניהול</h2><nav aria-label="פעולות התקציב" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{[['/upload','דוחות ומקורות'],['/monthly','עדכון החודש'],['/banks','חשבונות בנק'],['/cards','כרטיסי אשראי'],['/plans','הוצאות מתוכננות'],['/loans','הלוואות'],['/savings','חיסכון ומטרות'],['/settings','כל ההגדרות']].map(([path,label])=><Link key={path} href={withViewQuery(path,locationSearch)} className="flex min-h-12 items-center rounded-xl border px-4 py-3 text-sm text-primary">{label}</Link>)}</nav></section>
-    </div>
+    try {return <HouseholdHome key={budget.budgetId} plan={budget.value.plan} asOf={jerusalemMonth()}/>}
+    catch {return <section className="surface rounded-xl p-6" role="alert">לא ניתן להציג את נתוני התקציב.</section>}
   }
-  return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">סקירה כללית</h1>
-      <DashboardSummaryCards {...demoSummary} query={new URLSearchParams(locationSearch).toString()} bankHint="2 חשבונות" cardHint="כרטיס ראשי" />
-      <Suspense fallback={<section className="surface h-52 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים" />}><CombinedChart bankSummary={demoBankSummary} maxSummary={demoCardSummary} cardsName="כרטיס" /></Suspense>
-      <div className="grid gap-4 lg:grid-cols-2"><Suspense fallback={<section className="surface h-48 animate-pulse rounded-xl p-4" role="status" aria-label="טוען תרשים כרטיסים" />}><CCMonthlyChart data={demoCardSummary} /></Suspense></div>
-      <section className="surface rounded-xl p-6"><h2 className="font-semibold">דוגמת תצוגה</h2><p className="mt-2 text-sm text-muted-foreground">הסכומים בדוגמה בלבד. בתצוגת החשבון מוצגים נתוני הדיווח השמורים ב-Budgit.</p></section>
-    </div>
-  )
+  return <HouseholdHome plan={demoHouseholdPlan} asOf={jerusalemMonth()}/>
 }
 
 function PendingPage({ title }: { title: string }) {
@@ -164,11 +142,36 @@ function PendingPage({ title }: { title: string }) {
 
 function App() {
   const guard = useDraftGuard()
+  const navigate = useNavigate()
   const [pullHint, setPullHint] = useState('')
   const fixture = useFixtureMode()
   const { pathname, search } = useLocation()
   const budgetId = new URLSearchParams(search).get('budget') || 'personal'
   const budget = useBudget(budgetId, !fixture)
+  const currentAccountId = !fixture && budget.status === 'ready' ? budget.value.accountId : null
+  const lastAccountId = useRef<string | null>(null)
+  const accountChanged = !!currentAccountId && !!lastAccountId.current && currentAccountId !== lastAccountId.current
+  useEffect(() => {
+    if (!currentAccountId) return
+    lastAccountId.current = currentAccountId
+    if (accountChanged) navigate(householdSpaceHref(pathname, search, budgetId), {replace:true, state:null})
+  }, [currentAccountId, accountChanged, budgetId, pathname, search, navigate])
+  const routeScopeKey = fixture ? 'demo' : budget.status === 'ready' ? budget.value.accountId + '/' + budgetId : 'pending/' + budgetId
+  const scrollKeys = useRef(new Map<string, string>())
+  const scrollActor = fixture ? 'demo' : budget.status === 'ready' ? budget.value.accountId : undefined
+  const getScrollKey = useCallback((location: Location) => {
+    if (!scrollActor) return location.key
+    const query = new URLSearchParams(location.search)
+    query.sort()
+    const route = JSON.stringify([scrollActor, location.pathname, query.toString()])
+    const key = scrollKeys.current.get(route)
+    if (key) return key
+    // Keep account identifiers and route filters out of React Router's session storage.
+    const opaqueKey = crypto.randomUUID()
+    if (scrollKeys.current.size >= 80) scrollKeys.current.delete(scrollKeys.current.keys().next().value!)
+    scrollKeys.current.set(route, opaqueKey)
+    return opaqueKey
+  }, [scrollActor])
   const [theme, setTheme] = useState(() => { try { return localStorage.getItem('budgit-react-appearance') || 'system' } catch { return 'system' } })
   const [systemDark, setSystemDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches)
   useEffect(() => {
@@ -184,16 +187,31 @@ function App() {
   const sections = buildNavSections(fixture ? demoAccounts : actualPlan && actualPlan.format !== 'monthly-flow-encrypted-v1' ? budgetNavigation(actualPlan) : [])
   return (
     <AppearanceContext.Provider value={dark}><NavSectionsProvider sections={sections}>
-      <div className="flex min-h-screen font-sans">
+      <div className="household-shell flex min-h-screen font-sans">
         <Sidebar initialCollapsed={false} initialClosed={[]} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Header budget={budget} />
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}
-            <Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
-            {!fixture && budget.status==='ready' && budget.value.plan?.format==='monthly-flow-encrypted-v1' ? <SecurityPage fixture={fixture} budget={budget}/> : <Routes>
+            {!accountChanged&&<HouseholdBack/>}<div className="household-screen"><Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
+            {accountChanged ? <section className="household-page" role="status">מעדכנים את החשבון…</section> : !fixture && budget.status==='error' ? (
+              <section className="household-page">
+                <h1>התקציב לא זמין</h1>
+                <div className="surface space-y-3 p-4">
+                  <p role="alert">{budget.message}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" className="household-update" disabled={budget.refreshPending} onClick={()=>guard.run(budget.refresh)}>ניסיון חוזר</button>
+                    {budgetId!=='personal'&&<Link href={householdSpaceHref(pathname,search,'personal')} className="household-update">לתקציב האישי</Link>}
+                  </div>
+                </div>
+              </section>
+            ) : !fixture && budget.status==='ready' && budget.value.plan?.format==='monthly-flow-encrypted-v1' ? <SecurityPage key={routeScopeKey} fixture={fixture} budget={budget}/> : <Routes key={routeScopeKey}>
               <Route path="/" element={<Dashboard fixture={fixture} budget={budget} />} />
+              <Route path="/accounts" element={<HouseholdAccountsPage fixture={fixture} budget={budget}/>}/>
+              <Route path="/checks" element={<ChequesPage fixture={fixture} budget={budget}/>}/>
+              <Route path="/income" element={<IncomePlanningPage/>}/>
+              <Route path="/more" element={<HouseholdMore/>}/>
               <Route path="/banks" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
               <Route path="/banks/:id" element={<AccountsPage kind="banks" fixture={fixture} budget={budget} />} />
               <Route path="/cards" element={<AccountsPage kind="cards" fixture={fixture} budget={budget} />} />
@@ -280,21 +298,22 @@ function App() {
               <Route path="/goals" element={<ComparisonGoalsPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/start" element={<OnboardingPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings/profile" element={<ProfilePage key={budgetId} fixture={fixture} budget={budget}/>} />
-              <Route path="/settings" element={<div className="mx-auto max-w-7xl space-y-4"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1>{!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}<InterfaceLayoutSetting/><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
+              <Route path="/settings" element={<div className="household-page"><h1 className="text-2xl font-semibold">הגדרות אפליקציה</h1>{!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}<InterfaceLayoutSetting/><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
             </Routes>}
-            </Suspense>
+              <ScrollRestoration getKey={getScrollKey} storageKey="budgit-scroll-positions"/>
+            </Suspense></div>
           </main>
         </div>
       </div>
-      <BottomNav />
+      <HouseholdNavigation />
       {pullHint&&<div role="status" className="pointer-events-none fixed inset-x-4 top-[max(0.75rem,env(safe-area-inset-top))] z-40 mx-auto w-fit rounded-xl surface-overlay px-4 py-2 text-sm">{pullHint}</div>}
-      {(budget.status === 'error' || budget.status === 'ready' && budget.refreshError) && createPortal(
+      {budget.status === 'ready' && budget.refreshError && createPortal(
         <div role="alert" className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[100] mx-auto flex max-w-lg items-center gap-3 rounded-xl bg-foreground p-4 text-background shadow-2xl">
-          <span className="min-w-0 flex-1">{budget.status === 'error' ? budget.message : `${budget.refreshError} הנתונים האחרונים נשארו מוצגים.`}</span>
+          <span className="min-w-0 flex-1">{budget.refreshError} הנתונים האחרונים נשארו מוצגים.</span>
           <button type="button" className="shrink-0 rounded-lg border border-background/40 px-2 py-1" onClick={()=>guard.run(budget.refresh)}>ניסיון חוזר</button>
-          {budget.status === 'ready' && <button type="button" className="shrink-0 rounded-lg px-2 py-1" aria-label="סגירת הודעה" onClick={budget.dismissRefreshError}>סגירה</button>}
+          <button type="button" className="shrink-0 rounded-lg px-2 py-1" aria-label="סגירת הודעה" onClick={budget.dismissRefreshError}>סגירה</button>
         </div>, document.body
       )}
     </NavSectionsProvider></AppearanceContext.Provider>

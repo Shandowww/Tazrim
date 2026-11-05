@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-05",
+  "kind": "read-only release-source audit",
+  "host": "existing Budgit server",
+  "documentedLiveCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d",
+  "documentedRuntimeImage": "sha256:61f67298fc2bb06d6593ba78a5e34716b6caf64f36ba44a531749eb243230b8b",
+  "runtimeHashes": {
+    "server/app.mjs": "22de6be1b62f36c41049e68d71500892233b151d1cdfc5cda5412c95fff7b180",
+    "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+    "dist/index.html": "1eb76a7e35ede6c17a7de246f7be94eed3f11d97bca9cf9381e6348ee18c9435",
+    "dist/frontend/index.html": "54a8a736ef269dd3113509aa3766d491f2975c87fc98361c1297a782c45248d0"
+  },
+  "hashesMatchDocumentedRelease": true,
+  "candidateCommit": "e589975c295a7f6fd69fcd20acaf8492c92b0859",
+  "liveCommitIsCandidateAncestor": true,
+  "candidateDiffShortStat": "212 files changed, 4854 insertions(+), 409 deletions(-)",
+  "publicHealth": {
+    "ok": true,
+    "loginConfigured": true
+  },
+  "publicUnauthenticatedPlanStatus": 401,
+  "publicNativeRouteStatus": 200,
+  "publicNativeCacheControl": "no-store",
+  "mutationPerformed": false,
+  "limits": [
+    "The live runtime hashes identify the documented release and do not complete the final acceptance of this candidate.",
+    "A fresh verified SQLite backup, isolated preflight, rollback image, and final runtime checks must be performed immediately around publication after physical acceptance.",
+    "No production records, server services, Sites, or audience were changed."
+  ]
+}
