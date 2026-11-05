@@ -548,6 +548,7 @@ export function categoryRegistryValid(p){
  for(const entry of registry.entries){
   if(!entry||typeof entry!=='object'||Array.isArray(entry)||typeof entry.id!=='string'||!/^cat_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(entry.id)||ids.has(entry.id)||typeof entry.label!=='string'||!entry.label.trim()||entry.label.length>60||!Array.isArray(entry.aliases)||entry.aliases.length>10)return false;
   if(entry.color!==undefined&&(typeof entry.color!=='string'||!/^(#[0-9a-fA-F]{6}|var\(--(accent|teal|amber|green|red)\))$/.test(entry.color))||entry.archivedAt!==undefined&&!dateOk(entry.archivedAt)||entry.mergedInto!==undefined&&typeof entry.mergedInto!=='string')return false;
+  if(entry.colorCustom!==undefined&&typeof entry.colorCustom!=='boolean')return false;
   ids.add(entry.id);
   for(const name of [entry.label,...entry.aliases]){if(typeof name!=='string')return false;const key=categoryKey(name);if(!key||name.length>60||names.has(key))return false;names.add(key);}
  }
@@ -606,6 +607,49 @@ export function mergeRegisteredCategories(p,sourceLabel,targetLabel){
  source.mergedInto=target.id;source.archivedAt=new Date().toISOString().slice(0,10);
  if(!validatePlan(next))throw Error('לא ניתן למזג את הקטגוריות.');return next;
 }
+export function addRegisteredCategory(p,label,color){
+ const name=categoryKey(label);
+ if(!name||name.split(' / ').length>2||name.split(' / ').some(part=>!part.trim()))throw Error('אפשר להוסיף קטגוריה ראשית או קטגוריית־משנה אחת בשם ״אב / שם״.');
+ if(expenseCategoryOptions(p).includes(name)||categoryRegistryEntry(p,name))throw Error('השם כבר קיים, גם אם הקטגוריה הוסרה. אפשר לשנות שם או להחזיר אותה מהארכיון.');
+ const parent=name.includes(' / ')?name.slice(0,name.indexOf(' / ')):'';
+ if(parent&&categoryRegistryEntry(p,parent)?.archivedAt)throw Error('יש להחזיר את קטגוריית האב מהארכיון לפני הוספה.');
+ return setRegisteredCategoryColor(withRegisteredCategory(p,name),name,color);
+}
+export function setRegisteredCategoryColor(p,label,color){
+ if(typeof color!=='string'||!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('יש לבחור צבע תקין.');
+ const next=clone(withRegisteredCategory(p,label)),entry=categoryRegistryEntry(next,label);
+ entry.color=color.toLowerCase();entry.colorCustom=true;
+ if(!validatePlan(next))throw Error('לא ניתן לשמור את צבע הקטגוריה.');return next;
+}
+// Count all stored references (including cancelled details and stale splits),
+// since they can become active again. Count each detail once, not each split.
+export function categoryRemovalImpact(p,label){
+ const source=categoryRegistryEntry(p,label)?.label??label;
+ const matches=name=>categoryContains(source,categoryRegistryEntry(p,name)?.label??name);
+ const labels=[...new Set([...categoryManagementOptions(p),...expenseCategoryOptions(p),...(p.detailAnnotations??[]).flatMap(row=>row.parts.map(part=>part.category)),...Object.keys(p.categoryGoals??{})].map(name=>categoryRegistryEntry(p,name)?.label??name))].filter(matches);
+ const detailIds=new Set((p.details??[]).filter(row=>matches(row.category)).map(row=>row.id));
+ for(const row of p.detailAnnotations??[])if(row.parts.some(part=>matches(part.category)))detailIds.add(row.detailId);
+ const bankCount=(p.bankImport?.entries??[]).filter(row=>{const entry=p.categoryRegistry?.entries.find(entry=>entry.id===row.bankCategoryId);return entry&&matches(entry.label)}).length;
+ const limits=Object.keys(p.categoryGoals??{}).filter(matches);
+ return {source,labels,detailCount:detailIds.size,bankCount,limits,requiresTarget:detailIds.size+bankCount+limits.length>0};
+}
+export function removeRegisteredCategory(p,label,targetLabel=''){
+ const impact=categoryRemovalImpact(p,label);
+ if(!expenseCategoryOptions(p).includes(label))throw Error('יש לבחור קטגוריה פעילה.');
+ if(impact.requiresTarget&&!targetLabel)throw Error('לקטגוריה יש שיוכים או תקרות. יש לבחור קטגוריה להעברה מרוכזת לפני ההסרה.');
+ if(targetLabel&&(!expenseCategoryOptions(p).includes(targetLabel)||categoryContains(impact.source,targetLabel)))throw Error('יש לבחור יעד פעיל מחוץ לקטגוריה ולקטגוריות־המשנה שלה.');
+ // Materialize built-in descendants too, so removal cannot leave selectable
+ // children behind. Stable IDs/aliases preserve original source evidence.
+ let next=p;for(const name of impact.labels)next=withRegisteredCategory(next,name);
+ if(!targetLabel)return archiveRegisteredCategory(next,label);
+ next=clone(withRegisteredCategory(next,targetLabel));
+ const target=categoryRegistryEntry(next,targetLabel),targetLimits=Object.keys(next.categoryGoals??{}).filter(name=>categoryRegistryEntry(next,name)?.id===target.id);
+ if(impact.limits.length>1||impact.limits.length&&targetLimits.length)throw Error('יש תקרות הוצאה מתנגשות. יש להסיר או לאחד אותן במסך תקרות ההוצאה לפני ההעברה.');
+ for(const name of impact.limits){Object.defineProperty(next.categoryGoals,target.label,{value:next.categoryGoals[name],writable:true,enumerable:true,configurable:true});delete next.categoryGoals[name];}
+ const ids=new Set(impact.labels.map(name=>categoryRegistryEntry(next,name)?.id));
+ for(const entry of next.categoryRegistry.entries)if(ids.has(entry.id)){entry.mergedInto=target.id;entry.archivedAt=new Date().toISOString().slice(0,10);}
+ if(!validatePlan(next))throw Error('לא ניתן להסיר את הקטגוריה עם השיוכים האלה.');return next;
+}
 // A bank category is source metadata, not another budget charge. Only a
 // source-backed direct debit can be classified; card settlement and transfers
 // remain outside purchase categories.
@@ -621,10 +665,10 @@ export function assignBankMovementCategory(p,key,label){
 export function bankCategoryCoverage(p,month){
  if(!monthOk(month))throw Error('יש לבחור חודש תקין.');
  const candidates=(p.bankImport?.entries??[]).filter(entry=>entry.month===month&&entry.source&&['variable','checks'].includes(entry.field)&&entry.cents<0);
- const registered=new Map((p.categoryRegistry?.entries??[]).map(entry=>[entry.id,entry.label])),amounts=new Map();let categorizedCents=0;
- for(const entry of candidates)if(entry.bankCategoryId&&registered.has(entry.bankCategoryId)){categorizedCents-=entry.cents;amounts.set(entry.bankCategoryId,(amounts.get(entry.bankCategoryId)??0)-entry.cents);}
+ const registered=new Map((p.categoryRegistry?.entries??[]).map(entry=>[entry.id,categoryRegistryEntry(p,entry.label)])),amounts=new Map();let categorizedCents=0;
+ for(const entry of candidates)if(entry.bankCategoryId&&registered.has(entry.bankCategoryId)){categorizedCents-=entry.cents;const id=registered.get(entry.bankCategoryId).id;amounts.set(id,(amounts.get(id)??0)-entry.cents);}
  const totalCents=candidates.reduce((sum,entry)=>sum-entry.cents,0);
- return {month,count:candidates.length,categorizedCount:candidates.filter(entry=>entry.bankCategoryId&&registered.has(entry.bankCategoryId)).length,totalCents,categorizedCents,unclassifiedCents:totalCents-categorizedCents,categories:[...amounts].map(([id,cents])=>({id,label:registered.get(id),cents})).sort((a,b)=>b.cents-a.cents)};
+ return {month,count:candidates.length,categorizedCount:candidates.filter(entry=>entry.bankCategoryId&&registered.has(entry.bankCategoryId)).length,totalCents,categorizedCents,unclassifiedCents:totalCents-categorizedCents,categories:[...amounts].map(([id,cents])=>({id,label:registered.get(id)?.label,cents})).sort((a,b)=>b.cents-a.cents)};
 }
 // Evidence only: amount and nearby dates may match an existing direct detail,
 // but cannot establish identity. Never merge or post a charge from this hint.

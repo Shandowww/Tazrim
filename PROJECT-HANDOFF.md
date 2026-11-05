@@ -1,5 +1,9 @@
 # Monthly Flow — project handoff
 
+## Latest category release — 2026-11-05
+
+The live app at https://budgit.duckdns.org/next now includes category management under More for Advanced and Expert modes. It supports category add/edit/removal, explicit bulk reassignment of in-use categories, color editing and guarded spending-limit conflicts. Application source `0b830c5` passed 1,170 regressions, build/typecheck, 15 core checks, synthetic phone behavior and the server backup, rollback, access and 42-table preservation gates. Details: `docs/ui-redesign/CATEGORY-MANAGEMENT.md` and `docs/ui-redesign/evidence/release-categories-2026-11-05.json`. Current work checkout is `work/budgit-household-ui` on `codex/budgit-household-ui`.
+
 ## Selected compact header published — 2026-11-05
 
 Application `be4a124a56df1d6c66ad70f93362a2a21b6ce110` is verified live at https://budgit.duckdns.org/next. Selected Option 1 uses a single account-switch/bell/refresh row, without the app name or wallet symbol. The header is 61px including its border, plus safe area; controls remain 44px. Month controls now share page headings and preserve existing query/state/draft guards. Full account names remain accessible; desktop, viewer and one/multiple budget states are supported.

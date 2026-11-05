@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-05",
+  "status": "published-and-verified",
+  "productionURL": "https://budgit.duckdns.org/next",
+  "applicationSource": {
+    "commit": "0b830c5",
+    "branch": "codex/budgit-household-ui",
+    "previousProductionCommit": "be4a124a56df1d6c66ad70f93362a2a21b6ce110",
+    "priorSourceFilesVerified": 845
+  },
+  "features": ["Advanced and Expert More-menu category editing submenu", "Add, rename, move, archive, restore, merge and recolor categories", "Removal counts stored details, bank movements, limits and children", "In-use removal requires a destination and redirects stable identities in bulk", "Conflicting spending limits require explicit resolution"],
+  "validation": {"build": "passed", "typecheck": "passed", "regressions": 1170, "coreChecks": 15, "diffCheck": "passed", "browserEvidence": "category-browser-2026-11-05.json", "physicalIPhoneRetested": false},
+  "artifact": {
+    "image": "sha256:2c7fa7e55e042f894f9696f6806c7c5401a592eef652860710dd5cbcf4e8f829",
+    "previousImage": "sha256:b11a702e6af62ed9903223129324ac0fc380109c1a59283930fbcb0551610bc3",
+    "sourceArchiveSha256": "1c83b15f6c933766515eb3f79a454ebd46db783a1bdc3c31fa6c76675fa421ba",
+    "nineCandidateHashesMatchValidatedLocalBuild": true,
+    "runtimeHashesMatchCandidate": true
+  },
+  "backup": {"sha256": "e08085001ae88cebd9a232612066593184d6b90ab72a2f19c8cf7752fa456fa3", "consistentSQLite": true, "integrityVerified": true, "freshBeforeActivation": true},
+  "isolatedGates": {"networkDisabled": true, "financial": "passed", "accessHTTPAnd13EncryptedSources": "passed", "candidateStartup": "passed", "previousImageFinancialAndAccess": "passed", "retainedPreviousAssets": 400},
+  "runtime": {"healthOK": true, "loginConfigured": true, "authoritativeTablesPreserved": 42, "configurationKeysPreserved": true, "adjacentServicesPreserved": true, "publicHealthAuthDeepRoutesRootAndManifest": "passed", "releaseDirectory": "/opt/budgit-releases/category-0b830c5", "rollbackImage": "budgit-rollback:category-0b830c5", "rollbackSource": "/opt/budgit-rollbacks/category-0b830c5/source-be4a124.tar.gz"},
+  "productionFinancialEdits": 0,
+  "sitesChanges": 0,
+  "paidResourceChanges": 0
+}

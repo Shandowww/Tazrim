@@ -8,7 +8,7 @@ test('Basic supports setup, report intake/review, read-only summaries, security 
  for(const route of ['/monthly','/details/new','/accounts/abc/edit','/savings/abc/deposit','/loans/new','/upload/abc/delete','/upload/history'])assert.equal(modeAllows('basic',route),false,route);
 });
 test('Advanced exposes routine edits while Expert retains every current route and reconciliation tool',()=>{
- for(const route of ['/monthly','/income','/plans/scenario','/plans/new','/accounts/transfers/new','/details/abc/clear','/loans/abc/edit','/savings/schedule','/settings/report-expectations'])assert.equal(modeAllows('advanced',route),true,route);
- for(const route of ['/accounts/assignments','/categories/manage','/overview/migration','/upload/history/x/undo','/settings/access','/analysis','/loans/x/payments']){assert.equal(routeInterfaceMode(route),'expert');assert.equal(modeAllows('advanced',route),false)}
+ for(const route of ['/monthly','/income','/plans/scenario','/plans/new','/accounts/transfers/new','/details/abc/clear','/loans/abc/edit','/savings/schedule','/settings/report-expectations','/categories/manage'])assert.equal(modeAllows('advanced',route),true,route);
+ for(const route of ['/accounts/assignments','/overview/migration','/upload/history/x/undo','/settings/access','/analysis','/loans/x/payments']){assert.equal(routeInterfaceMode(route),'expert');assert.equal(modeAllows('advanced',route),false)}
  for(const [,path]of readFileSync('frontend/src/main.tsx','utf8').matchAll(/<Route path="([^"]+)"/g))assert.equal(modeAllows('expert',path),true,path);
 });

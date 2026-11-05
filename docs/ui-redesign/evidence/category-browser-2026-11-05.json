@@ -1,0 +1,17 @@
+{
+  "kind": "synthetic-category-acceptance",
+  "date": "2026-11-05",
+  "viewport": "390 CSS pixels",
+  "checks": {
+    "menuSubmenu": true,
+    "addAndColorSaved": true,
+    "savedColorLoaded": true,
+    "draftGuard": true,
+    "assignedCategoryWarning": true,
+    "bulkRemovalRecoveredOnce": true,
+    "viewerRefusal": true,
+    "phoneNoOverflow": true
+  },
+  "financial": "Synthetic removed-category save advanced only the selected personal budget once. Source detail rows, monthly values, bank source rows, Bob's private budget and the shared budget remained unchanged.",
+  "physicalIPhone": "Not retested for this change"
+}

@@ -9,6 +9,7 @@ export function routeInterfaceMode(href){
  if(/^\/(banks|cards)\/[^/]+$/.test(path)||/^\/notices\//.test(path)||/^\/settings\/gmail\/notices\//.test(path))return 'basic'
  if(path==='/upload'||/^\/upload\/(?!history(?:\/|$))[^/]+(?:\/(?:bank|card|group|review))?$/.test(path)||/^\/details\/(?!new$|manage$)[^/]+$/.test(path))return 'basic'
  if(path==='/upload/history'||/^\/upload\/.+\/(?:delete|state)$/.test(path))return 'expert'
+ if(path==='/categories/manage')return 'advanced'
  if(['/monthly','/income','/plans','/recurring','/card-setup','/categories/limits','/settings/report-expectations','/settings/forecast','/accounts/transfers','/savings/transfers','/savings/transfer','/savings/accounts','/savings/schedule','/savings/new','/details/manage','/details/new','/loans/new','/goals'].includes(path))return 'advanced'
  if(/^\/accounts\/[^/]+\/(?:edit|monthly(?:\/correction)?)$/.test(path)||/^\/accounts\/transfers\//.test(path)||/^\/card-setup\/[^/]+$/.test(path)||/^\/cards\/[^/]+\/(?:billing(?:\/[^/]+)?|no-activity|stop)$/.test(path))return 'advanced'
  if(/^\/(?:loans\/[^/]+\/(?:edit|remove)|details\/[^/]+\/(?:edit|delete|clear)|plans\/[^/]+(?:\/(?:edit|remove))?|savings\/[^/]+\/(?:edit|deposit|remove)|savings\/transfers\/.*)$/.test(path))return 'advanced'

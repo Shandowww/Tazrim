@@ -1,5 +1,9 @@
 # Monthly Flow project context
 
+## Category management published — 2026-11-05
+
+Application source `0b830c5` is verified live at https://budgit.duckdns.org/next. Advanced and Expert More-menu users can add, rename, move, archive/restore, merge, remove and recolor categories. Removal warns about stored detail, bank and limit assignments, requires a destination for in-use categories, and redirects the entire selected category branch in one guarded save. Original source evidence and financial amounts remain intact; conflicting limits require explicit resolution. Basic retains read-only category analysis. Build/typecheck, 1,170 regressions and 15 core checks pass; synthetic 390px category add/color, assigned warning, lost-response bulk save once, draft guard, viewer refusal and no overflow pass. Fresh verified SQLite backup, 845 prior source files, isolated financial/access/13-source decryption/startup/rollback/400-asset gates, runtime hashes/health/public access, 42 authoritative tables, keys and adjacent services passed. Evidence: `docs/ui-redesign/evidence/release-categories-2026-11-05.json`. No production financial edits, Sites or paid-resource changes. Physical iPhone acceptance was not rerun. Continue in `work/budgit-household-ui`; retain previous source and rollback image.
+
 ## Selected compact header published — 2026-11-05
 
 Application `be4a124a56df1d6c66ad70f93362a2a21b6ce110` is verified live at https://budgit.duckdns.org/next. Selected Option 1 uses a single account-switch/bell/refresh row, without the app name or wallet symbol. The header is 61px including its border, plus safe area; controls remain 44px. Month controls now share page headings and preserve existing query/state/draft guards. Full account names remain accessible; desktop, viewer and one/multiple budget states are supported.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {assignBankMovementCategory,bankCategoryCoverage,categoryRegistryEntry,clone,createDemoPlan,monthlyMetricSnapshot,possibleBankDetailMatches,validatePlan,zero} from '../src/budget.js';
+import {assignBankMovementCategory,bankCategoryCoverage,categoryRegistryEntry,categoryRemovalImpact,removeRegisteredCategory,clone,createDemoPlan,monthlyMetricSnapshot,possibleBankDetailMatches,validatePlan,zero} from '../src/budget.js';
 import {financialProjection} from '../server/financial-data.mjs';
 
 const source={date:'2026-04-12',description:'בית עסק',details:'',beneficiary:'',purpose:'',reference:'',currency:'ILS'};
@@ -26,6 +26,19 @@ test('categorizing a source-backed bank debit preserves the report total and tra
  assert.equal(financialProjection(next).transactions.find(row=>row.id==='bank:'+'b'.repeat(64)).category_id,null);
  const cleared=assignBankMovementCategory(next,'a'.repeat(64),'');assert.equal(cleared.bankImport.entries[0].bankCategoryId,undefined);
  assert.equal(monthlyMetricSnapshot(cleared,'reported-spending','2026-04').valueCents,total);
+});
+
+test('Bulk category removal reassigns a bank movement without changing its source or amount',()=>{
+ const p=assignBankMovementCategory(plan(),'a'.repeat(64),'מזון / סופר ומכולת'),before=clone(p),id=categoryRegistryEntry(p,'מזון / סופר ומכולת').id;
+ assert.equal(categoryRemovalImpact(p,'מזון / סופר ומכולת').bankCount,1);
+ assert.throws(()=>removeRegisteredCategory(p,'מזון / סופר ומכולת'),/העברה/);
+ const next=removeRegisteredCategory(p,'מזון / סופר ומכולת','קניות / ביגוד והנעלה');
+ assert.equal(validatePlan(next),true);
+ assert.equal(next.bankImport.entries[0].bankCategoryId,id);
+ assert.deepEqual(next.bankImport,before.bankImport);
+ assert.equal(financialProjection(next).transactions.find(row=>row.id==='bank:'+'a'.repeat(64)).category_id,categoryRegistryEntry(next,'קניות / ביגוד והנעלה').id);
+ assert.deepEqual(bankCategoryCoverage(next,'2026-04').categories,[{id:categoryRegistryEntry(next,'קניות / ביגוד והנעלה').id,label:'קניות / ביגוד והנעלה',cents:20000}]);
+ assert.equal(monthlyMetricSnapshot(next,'reported-spending','2026-04').valueCents,monthlyMetricSnapshot(p,'reported-spending','2026-04').valueCents);
 });
 
 test('card settlement, internal transfer, missing source and unknown categories cannot be bank purchases',()=>{

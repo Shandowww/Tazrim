@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "8d8a2e9fae48cf017f162f5dcef6110a5572633e",
+  "sourceCommit": "a542ba74ed21c3abb634caf800fe52eceddbe593",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Selected compact header published and verified; requested three-phase auto-sync plan documented.",
+  "status": "Published category management with guarded bulk reassignment and color editing",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1165,
+    "regressionTests": 1170,
     "coreChecks": 15,
-    "browser": "Synthetic 320/390/430/1440 compact header, 44px targets, page-level periods, month/scope/refresh draft guards, bell, viewer and one/multiple spaces, no overflow and unchanged financial hashes pass.",
-    "release": "docs/ui-redesign/evidence/release-compact-header-2026-11-05.json: fresh verified backup, isolated financial/access/decryption/startup/rollback/333-retained-asset gates, nine runtime hashes and 42 authoritative tables preserved."
+    "browser": "Synthetic 390px menu, category add/color, assigned warning, one-write bulk reassignment recovery, draft guard, viewer refusal and no overflow pass.",
+    "release": "docs/ui-redesign/evidence/release-categories-2026-11-05.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "be4a124a56df1d6c66ad70f93362a2a21b6ce110"
+  "productionApplicationCommit": "0b830c5dce2460d21a2e3076f51dba440eb44c99"
 }
