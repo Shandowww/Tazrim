@@ -1,0 +1,201 @@
+{
+  "date": "2026-11-05",
+  "status": "published-and-verified",
+  "productionURL": "https://budgit.duckdns.org/next",
+  "applicationSource": {
+    "commit": "f6733473c38847e39683076b95f8f598743e8262",
+    "branch": "codex/budgit-household-ui",
+    "previousProductionCommit": "e6df93ee568be21a5958b268e485276d2ca77b7c",
+    "priorSourceFilesVerified": 828,
+    "financialEngineSourceUnchanged": true
+  },
+  "features": [
+    "Mode selector moved from home/header into More menu; detailed Settings selector retained",
+    "Purchase calculator allowed in Basic mode through the shared route/link policy",
+    "Shared RTL circular primary Back control, contextual chevron links, 44px touch targets, accessible labels, keyboard focus and reduced-motion styling"
+  ],
+  "sourceBackup": {
+    "budgitViaSSH": true,
+    "tazrimSnapshot": "162285043ac5f6ad62a12c34ebf814c58a2b544a",
+    "tazrimBranch": "codex/budgit-react-frontend",
+    "independentHistoryAndLicensesPreserved": true,
+    "sourcePathsCompared": 832
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "regressions": 1162,
+    "coreChecks": 15,
+    "diffCheck": "passed",
+    "browser": {
+      "320": {
+        "homeSelectorAbsent": true,
+        "menuSelectorPresent": true,
+        "basicCalculatorAccessible": true,
+        "noOverflow": true,
+        "back44px": true,
+        "rtlChevron": true,
+        "accessibleName": true,
+        "keyboardReturn": true,
+        "lightDarkReducedMotion": true
+      },
+      "390": {
+        "homeSelectorAbsent": true,
+        "menuSelectorPresent": true,
+        "basicCalculatorAccessible": true,
+        "noOverflow": true,
+        "back44px": true,
+        "rtlChevron": true,
+        "accessibleName": true,
+        "keyboardReturn": true,
+        "lightDarkReducedMotion": true
+      },
+      "1440": {
+        "homeSelectorAbsent": true,
+        "menuSelectorPresent": true,
+        "basicCalculatorAccessible": true,
+        "noOverflow": true,
+        "back44px": true,
+        "rtlChevron": true,
+        "accessibleName": true,
+        "keyboardReturn": true,
+        "lightDarkReducedMotion": true
+      },
+      "basicCalculatorInputs": true,
+      "backDraftProtection": true,
+      "sharedPeriodReturn": true,
+      "financialUnchanged": true
+    },
+    "browserEvidence": "menu-calculator-back-browser-2026-11-05.json",
+    "physicalIPhoneRetested": false
+  },
+  "artifact": {
+    "image": "sha256:62f5e7ac0c8868c55cf92a85720fb7dd491e1450b00091282568e391590120e6",
+    "sourceArchiveSha256": "37b3b4b159320ab67d32286e34ea263d59569b52c48df6063627b214ae15548b",
+    "sixCandidateHashesMatchValidatedLocalBuild": true
+  },
+  "backup": {
+    "sha256": "ca1b47dfc83509b6389c54aae38f5197f45f0ac6d9c47ccfcbecdccad988f308",
+    "consistentSQLite": true,
+    "integrityVerified": true,
+    "freshBeforeActivation": true
+  },
+  "isolatedGates": {
+    "networkDisabled": true,
+    "financial": "passed",
+    "accessHTTPDecryption": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "80e92d3cec61cd74ac534aadcedad273fa9cd7862ad343e7adf1501d1cc82778",
+      "reactHTMLSha256": "99887fc198e73f2a3241352bd3bc34ac4e7907507a2c107c6097af7d51b0d440"
+    },
+    "candidateStartup": "passed",
+    "rollbackFinancial": "passed",
+    "rollbackAccess": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "a981094f895b99d5d23eb0fd9883e106b433e1fc505ea3ca49dc6551766897d1",
+      "reactHTMLSha256": "cd50a6f408be2b1952b10590235f8d9914552e03c26e3829482d887e6111f1b0"
+    }
+  },
+  "runtime": {
+    "healthy": true,
+    "imageMatches": true,
+    "sha256": {
+      "server/app.mjs": "2b7bc23eba1c5d8a7149fa595fe341a75d31be33938295619ce84bd6bcf97ce6",
+      "server/statement-notices.mjs": "e0cfbcb2f2e98d73ed9d3e445201b98651fe0a472c173e56c331254905db4d25",
+      "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+      "dist/server/statement-notices.mjs": "0152b031be1c19eb9047917c9ef4994d4c94ebb059bbf853b46bba5a5772af9c",
+      "dist/index.html": "80e92d3cec61cd74ac534aadcedad273fa9cd7862ad343e7adf1501d1cc82778",
+      "dist/frontend/index.html": "99887fc198e73f2a3241352bd3bc34ac4e7907507a2c107c6097af7d51b0d440"
+    },
+    "publicChecks": {
+      "checkedAt": "2026-11-05T09:44:05.506Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    }
+  },
+  "preservation": {
+    "authoritativeTablesPreserved": 42,
+    "integrity": true,
+    "foreignKeys": true,
+    "referenceInterestCacheExcluded": true,
+    "backupAttemptTimestampExcluded": true,
+    "configurationAndEncryptionKeysUnchanged": true,
+    "adjacentParkingAndProxyUnchanged": true,
+    "financialRecordsSourcesAccessAndBackupCredentialsPreserved": true,
+    "comparisonExceptions": [
+      "Existing derived financial/backup caches",
+      "reference_interest cache",
+      "drive_backup_connections.last_attempt only"
+    ],
+    "sitesAndPaidResourcesUnchanged": true
+  },
+  "rollback": {
+    "previousImage": "sha256:a32d4ffdf2433e8d2ba0e54d18c2fe63bcd05cf27bde1c203ce4d3e34324852d",
+    "imageAndSourceRetained": true,
+    "candidateDatabaseCompatibilityVerified": true,
+    "databaseNeverRestoredOrOverwritten": true
+  },
+  "cleanup": {
+    "taskOwnedSyntheticPreviewStopped": true,
+    "taskOwnedHeadlessBrowserStopped": true,
+    "unrelatedTunnelsUntouched": true
+  },
+  "limitations": [
+    "Fresh physical iPhone Safari acceptance for these new controls is not claimed.",
+    "Existing readable-text statement-extraction and provider/device limitations remain unchanged."
+  ],
+  "userAction": "Reload Safari or reopen the home-screen app. Change modes under More or Settings; Basic now includes the purchase calculator."
+}

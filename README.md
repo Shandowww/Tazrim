@@ -1,5 +1,13 @@
 # Monthly Flow
 
+## Menu, Basic calculator and back navigation published — 2026-11-05
+
+Application `f6733473c38847e39683076b95f8f598743e8262` is verified live at https://budgit.duckdns.org/next. The mode selector is now in More (and Settings), with no front-page/header selector. Basic includes the purchase calculator. Main Back controls use a compact circular RTL chevron; contextual return links share the icon, touch spacing and focus/press styling. Existing navigation trails, scope/month, mode rules and unfinished-edit guards are preserved.
+
+Build/typecheck, 1,162 regressions and 15 core checks pass. Synthetic 320/390/1440 checks cover menu/calculator, 44px back targets, accessible names, keyboard activation, Light/Dark/reduced-motion, unfinished-edit stay/discard and shared-space/month return; financial hashes remain unchanged. All 828 prior-live source files matched. A fresh verified backup, isolated financial/access/HTTP/13-source-decryption/startup and rollback gates preceded activation. Six validated-build/runtime hashes, health/login/root/deep routes/manifest, all 42 authoritative tables, keys and adjacent services passed. Both SSH source backups retain independent histories/licenses. Task-owned preview/browser stopped.
+
+Continue from `codex/budgit-household-ui` in `/Users/talshandor/Documents/personal-projects/monthly-flow/work/budgit-household-ui`; preserve unrelated outer/older work. Evidence: `docs/ui-redesign/evidence/release-menu-calculator-back-2026-11-05.json`; design references: `docs/ui-redesign/BACK-NAVIGATION.md`. Reload the app. Fresh physical iPhone acceptance is not claimed. No production financial edits, paid resource changes or Sites publication.
+
 ## Interface modes and issuer notices published — 2026-11-05
 
 Application `e6df93ee568be21a5958b268e485276d2ca77b7c` is verified live at https://budgit.duckdns.org/next. Circular pull refresh retains the existing upper-screen and draft guards in both interfaces. Basic / Advanced / Expert modes filter the shared routes/actions, remember the choice per actor/device and preserve existing users in Expert. Local readable PDF/CSV/Excel text extraction adds encrypted source-linked issuer notices, with attention versus quiet updates, personal read/snooze state, source access and explicit historical-source scanning. Extraction never changes financial records; failed retries preserve prior notices.
