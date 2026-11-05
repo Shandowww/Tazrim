@@ -1,0 +1,149 @@
+{
+  "date": "2026-11-05",
+  "status": "published-and-verified",
+  "productionURL": "https://budgit.duckdns.org/next",
+  "applicationSource": {
+    "repository": "Shandowww/monthly-flow-budget",
+    "branch": "codex/budgit-household-ui",
+    "commit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6",
+    "acceptedApplicationCode": "d67cf22",
+    "previousProductionCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d",
+    "trackedPreviousSourceFilesVerified": 702,
+    "financialEngineSourceUnchanged": true
+  },
+  "sourceBackup": {
+    "budgitPushedViaSSH": true,
+    "tazrimSnapshotCommit": "56c37d12c7bda5746b74df3b80b9723ec6f35758",
+    "tazrimBranch": "codex/budgit-react-frontend",
+    "independentHistoryAndLicensesPreserved": true,
+    "matchingSourcePaths": 814,
+    "finalReleaseDocumentation": "Follow-up documentation checkpoint exported after activation; see Git history and Tazrim fork-sync.json."
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "regressions": {
+      "passed": 1153,
+      "failed": 0
+    },
+    "coreChecks": {
+      "passed": 15,
+      "failed": 0
+    },
+    "diffCheck": "passed",
+    "iPhoneAcceptance": "Tal accepted the updated synthetic preview; see IPHONE-ACCEPTANCE.md and iphone-feedback-2026-11-05.json."
+  },
+  "artifact": {
+    "image": "sha256:680dfd29ca6e937d42f6daa15c8d2d8c431ba3ff773e6dab059f7d031d8ba99f",
+    "sourceArchiveSha256": "6a569a393196339ca604f758b0e31afa6c4f430e9b7ba917891f4dad9ee815ac"
+  },
+  "backup": {
+    "createdAt": "2026-11-05T06:11:21.461Z",
+    "sha256": "e0a06a54608a7b7b6b408075c321b81c790234bfb242026a9a758d45070b9dfc",
+    "consistentSQLiteBackup": true,
+    "integrityVerified": true,
+    "permissions": "0600"
+  },
+  "isolatedGates": {
+    "networkDisabled": true,
+    "financialAndSignedCentProjection": "passed",
+    "allExistingStoredRecords": "passed",
+    "accessHTTPAndEncryptedSources": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "d970e661b410ec4e5007ab2ad7a19588a7a16c3e5c882b06ab48b3b3eecfa79c",
+      "reactHTMLSha256": "59262b400d96d799fcebf9bc2889efea5d306e9696a4bf9b26bcbec6ba4fe0ca"
+    },
+    "candidateStartup": "passed",
+    "previousImageAgainstCandidateInitializedDatabase": {
+      "financial": "passed",
+      "accessHTTPAndDecryption": "passed"
+    }
+  },
+  "runtime": {
+    "healthy": true,
+    "imageMatches": true,
+    "publicChecks": {
+      "checkedAt": "2026-11-05T06:17:27.699Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "sha256": {
+      "server/app.mjs": "7f2730f7bf0bb5c4425c096d3f5fe33dd84968569bbfabe55f0f64f3ff0ed66f",
+      "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+      "dist/index.html": "d970e661b410ec4e5007ab2ad7a19588a7a16c3e5c882b06ab48b3b3eecfa79c",
+      "dist/frontend/index.html": "59262b400d96d799fcebf9bc2889efea5d306e9696a4bf9b26bcbec6ba4fe0ca"
+    },
+    "runtimeHashesMatchCandidateAndLocalBuild": true,
+    "appearance": "Exact accepted frontend build is running; System/Light/Dark acceptance is documented in the iPhone/browser evidence, without changing device preferences during deployment."
+  },
+  "preservation": {
+    "authoritativeTablesPreserved": 41,
+    "integrity": true,
+    "foreignKeys": true,
+    "referenceInterestCacheExcluded": true,
+    "backupAttemptTimestampExcluded": true,
+    "configurationAndEncryptionKeysUnchanged": true,
+    "backupSettingsCredentialsAndAccountAccessPreserved": true,
+    "parkingAndProxyContainerIdentitiesImagesAndStartTimesUnchanged": true,
+    "sitesUnchanged": true,
+    "paidResourcesUnchanged": true,
+    "comparisonScope": "Existing table columns/rows, excluding existing helper-derived financial/backup cache tables, reference_interest cache and drive_backup_connections.last_attempt only. Backup settings, credentials, all other backup columns, financial records, sources, identity and access remain compared.",
+    "schedulerDiagnosis": "After the first candidate startup the only database column changed from the fresh backup was drive_backup_connections.last_attempt. The existing backup scheduler runs at startup. Column-name-only diagnostic printed no record values."
+  },
+  "rollback": {
+    "previousImage": "sha256:61f67298fc2bb06d6593ba78a5e34716b6caf64f36ba44a531749eb243230b8b",
+    "imageAndSourceRetained": true,
+    "candidateDatabaseCompatibilityVerified": true,
+    "currentDatabaseNeverRestoredOrOverwritten": true,
+    "activationRetries": "Automatic rollback restored the previous application after snapshot-container permission/temporary-storage failures and the scheduler timestamp comparison. Final attempt passed every gate."
+  },
+  "cleanup": {
+    "taskOwnedIPhonePreviewStopped": true,
+    "taskOwnedAuthenticationProxyStopped": true,
+    "taskOwnedTemporaryTunnelStopped": true,
+    "unrelatedTunnelLeftAlone": true
+  },
+  "limitations": [
+    "iPhone model and iOS version were not supplied.",
+    "Real Google/provider consent and platform-specific PRF/Face ID were not retested by this visual release.",
+    "No new offline or notification support claim."
+  ],
+  "userAction": "Reload Safari or reopen the home-screen app to load the published redesign."
+}

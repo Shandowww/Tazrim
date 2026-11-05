@@ -1,5 +1,15 @@
 # Monthly Flow
 
+## Household redesign published — 2026-11-05
+
+Tal accepted the updated iPhone preview. Application `b340ebf6d9306cd4704947683b2f91cc4bf8bfe6` is verified live at https://budgit.duckdns.org/next, with smoother card dragging, refresh gestures starting only in the upper screen area, persistent mobile navigation, the first chart month on the right and grouped money entry. Identical preview goals were duplicated synthetic fixtures; budget data remains separately scoped.
+
+Current application source is branch `codex/budgit-household-ui`, isolated checkout `/Users/talshandor/Documents/personal-projects/monthly-flow/work/budgit-household-ui`. Continue from this release; the older managed frontend/canonical work must not overwrite it. Both approved SSH Git destinations retain source backups, with independent Tazrim history and licenses. Subsequent release-documentation commits do not change the running application source.
+
+Build/typecheck, 1,153 regressions and 15 core checks passed. All 702 previous-live tracked source files were reconciled. A fresh verified SQLite backup, isolated financial/access/HTTP/13-source-decryption gates and prior-image compatibility checks preceded activation. Running image/hashes/health/auth/root/deep routes/manifest passed. All 41 authoritative tables were preserved, with only the reference-rate cache and normal Drive backup attempt timestamp excluded from the runtime comparison; backup settings/credentials, financial data, sources, access, encryption keys and adjacent parking/proxy services passed preservation checks. Temporary preview/auth proxy/tunnel stopped. Sites and paid resources were untouched. Evidence: `docs/ui-redesign/evidence/release-2026-11-05.json`.
+
+Reload Safari or reopen the home-screen app. iPhone model/iOS version were not supplied; real provider consent and platform PRF/Face ID were not retested. Earlier pending-publication notes below are historical.
+
 ## Layout switching and bell fixes published; hosted-copy audit — 2026-11-01
 
 Application `54633e5` is verified live on the existing server. Both Settings interfaces switch between the actual Original and Tazrim interfaces with existing draft guards and scope/month retention. A device hint controls bare-root launches; explicit native routes remain native. The bell keeps its ActionList/preference state mounted but portals to the body, centers in the viewport and keeps Close outside its scrollable list; Close/outside/Escape work. Original bell dismissal is repaired too. Build/typecheck,1,116 regressions and15 core checks pass.386 prior-live source files matched. Fresh verified backup, isolated financial/all-record/access/HTTP/source-decryption gates and rollback preceded activation; runtime hashes/health/auth/default and preferred root/deep routes passed. Authoritative records/settings/keys/parking unchanged. Evidence: docs/tazrim-migration/release-layout-bell-2026-11-01.json.

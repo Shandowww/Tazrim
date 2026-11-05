@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6",
+  "sourceCommit": "cf655b76b44cf60f2bdf1394bef7e7ed00025095",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Household redesign accepted by Tal after iPhone preview feedback on 2026-11-05. All existing workflows retained; top-area refresh, persistent mobile navigation, RTL chart, grouped amount entry and smooth card drag included. Production remains 54633e5 pending fresh isolated release gates.",
+  "status": "Household redesign accepted by Tal and published to the existing server on 2026-11-05. Runtime and authoritative-record preservation verified; temporary preview closed. This checkpoint includes final release documentation.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1153,
     "coreChecks": 15,
     "browser": "93-route text audit, reference comparison, 320/390/430/1280 responsive checks, scoped synthetic workflows and user iPhone acceptance; see docs/ui-redesign evidence.",
-    "release": "User acceptance complete; fresh backup/preflight/rollback/runtime gates in progress."
+    "release": "Passed fresh verified SQLite backup, isolated financial/access/HTTP/13-source-decryption gates, rollback compatibility, runtime image/hashes/health/auth/routes/manifest and 41-table authoritative-record preservation. See docs/ui-redesign/evidence/release-2026-11-05.json."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "54633e587f0e5abf57908a700f4bbafbaa322e8d"
+  "productionApplicationCommit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6"
 }
