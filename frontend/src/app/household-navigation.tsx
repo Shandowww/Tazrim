@@ -1,8 +1,9 @@
 import {useInterfaceMode,InterfaceModeSelector} from './interface-mode'
 import {modeAllows} from './interface-mode-model'
 import {useLocation} from 'react-router-dom'
-import {House,Landmark,Target,Ellipsis,ChevronRight} from 'lucide-react'
+import {House,Landmark,Target,Ellipsis} from 'lucide-react'
 import Link from './link'
+import BackLink from './back-link'
 import {withViewQuery} from './navigation-query'
 import {mainPages,returnDestination,householdTrail,householdFallback} from './household-model'
 export function HouseholdBack(){
@@ -11,7 +12,7 @@ export function HouseholdBack(){
  const fallback=householdFallback(location.pathname,location.search)
  const trail=householdTrail(location.state,location.search)
  const target=returnDestination(trail.at(-1)??withViewQuery(fallback,location.search),location.search)
- return <Link className="household-back" replace state={{householdTrail:trail.slice(0,-1)}} href={withViewQuery(target,location.search,import.meta.env.DEV)}><ChevronRight size={18}/>חזרה</Link>
+ return <BackLink iconOnly replace state={{householdTrail:trail.slice(0,-1)}} href={withViewQuery(target,location.search,import.meta.env.DEV)}>חזרה</BackLink>
 }
 export function HouseholdNavigation(){
  const {pathname,search}=useLocation()

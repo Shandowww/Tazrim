@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "617cb862c8568693db4f308b6fd89ea16a0a2371",
+  "sourceCommit": "f6733473c38847e39683076b95f8f598743e8262",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Mode selector moved into More menu and Basic calculator enabled; validated source, release gates in progress.",
+  "status": "Menu mode selector, Basic calculator and polished RTL back navigation validated; publication pending.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1162,
     "coreChecks": 15,
-    "browser": "Synthetic 320/390/1440 checks: selector absent from home/header, present in More menu; Basic calculator link, route and inputs work; no overflow and unchanged financial hashes.",
+    "browser": "Synthetic 320/390/1440 checks: selector absent from home/header, present in More menu; Basic calculator link, route and inputs work; circular RTL back controls, 44px targets, keyboard, Light/Dark/reduced motion, dirty-editor stay/discard, scoped month return, no overflow and unchanged financial hashes.",
     "release": "Fresh verified SQLite backup, isolated financial/access/HTTP/13-source-decryption/startup and rollback gates passed. Six runtime/local hashes, health/auth/routes/manifest, 41 existing authoritative tables, keys and adjacent services verified. See docs/ui-redesign/evidence/release-improvements-2026-11-05.json."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",

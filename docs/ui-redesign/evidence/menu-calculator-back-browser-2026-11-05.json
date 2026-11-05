@@ -1,0 +1,49 @@
+{
+  "320": {
+    "homeSelectorAbsent": true,
+    "menuSelectorPresent": true,
+    "basicCalculatorAccessible": true,
+    "noOverflow": true,
+    "back44px": true,
+    "rtlChevron": true,
+    "accessibleName": true,
+    "keyboardReturn": true,
+    "lightDarkReducedMotion": true
+  },
+  "390": {
+    "homeSelectorAbsent": true,
+    "menuSelectorPresent": true,
+    "basicCalculatorAccessible": true,
+    "noOverflow": true,
+    "back44px": true,
+    "rtlChevron": true,
+    "accessibleName": true,
+    "keyboardReturn": true,
+    "lightDarkReducedMotion": true
+  },
+  "1440": {
+    "homeSelectorAbsent": true,
+    "menuSelectorPresent": true,
+    "basicCalculatorAccessible": true,
+    "noOverflow": true,
+    "back44px": true,
+    "rtlChevron": true,
+    "accessibleName": true,
+    "keyboardReturn": true,
+    "lightDarkReducedMotion": true
+  },
+  "basicCalculatorInputs": true,
+  "backDraftProtection": true,
+  "sharedPeriodReturn": true,
+  "financialUnchanged": true,
+  "date": "2026-11-05",
+  "browser": "Synthetic Chrome; no fresh physical iPhone acceptance",
+  "screenshotsVisuallyInspected": [
+    "390px Light",
+    "390px Dark"
+  ],
+  "build": true,
+  "typecheck": true,
+  "regressions": 1162,
+  "coreChecks": 15
+}

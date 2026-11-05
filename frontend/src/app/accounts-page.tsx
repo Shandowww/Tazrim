@@ -1,5 +1,6 @@
 import { useLocation, useParams } from 'react-router-dom'
 import Link from './link'
+import BackLink from './back-link'
 import { BankSummaryRow, CardSummaryRow } from '../tazrim/components/accounts/account-cards'
 import { CardWallet, CardHeroTotal, BankHeroBalance, CardStackTotal } from '../tazrim/components/cards/card-wallet'
 import { accountWorkflows } from './account-workflows'
@@ -42,7 +43,7 @@ export function AccountsPage({ kind, fixture, budget }: { kind: 'banks' | 'cards
   const navigation = buildNavSections(fixture ? demoAccounts : [...overview.banks, ...overview.cards])
   const accountRows = kind === 'banks' ? overview.banks : overview.cards
   const selected = id ? accountRows.find(account => account.id === id) : null
-  if (id && !selected) return <section className="surface rounded-xl p-6" role="alert">החשבון אינו זמין במרחב הזה. <Link href={periodHref(`/${kind}`)} className="text-primary underline">חזרה לרשימה</Link></section>
+  if (id && !selected) return <section className="surface rounded-xl p-6" role="alert">החשבון אינו זמין במרחב הזה. <BackLink href={periodHref(`/${kind}`)}>חזרה לרשימה</BackLink></section>
   const navRows = kind === 'banks' ? navigation.banks : navigation.cards
 
   const walletCards = accountRows.map(account => ({ id: account.id, path: navRows.find(row => row.id === account.id)!.href,
