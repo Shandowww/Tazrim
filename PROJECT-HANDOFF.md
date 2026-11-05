@@ -1,5 +1,15 @@
 # Monthly Flow — project handoff
 
+## Loans/calculator import recovery published — 2026-11-05
+
+Application `a48024685bc36f3631cf797e427a32e028b2aa3f` is verified live at https://budgit.duckdns.org/next. Open previous-release sessions had requested deleted lazy modules. Startup now retains authenticated hashed UI assets beside the database, expires superseded files after 30 days and refuses immutable collisions. Current assets/HTML take precedence. Assets from four recent live releases were seeded; 266 original assets passed byte-identity checks. A Hebrew screen-level recovery control preserves navigation and uses explicit connectivity-checked, draft-guarded reload.
+
+Build/typecheck, 1,165 regressions and 15 core checks pass. Synthetic 390/1440 previous-release sessions load Loans and calculator after a simulated deployment without reload; scoped month, Basic calculator, offline failure/recovery, Back and unchanged financial hashes pass. All 833 prior source files matched. Fresh verified backup, isolated financial/access/HTTP/13-source-decryption/startup/rollback/retained-asset gates preceded activation. Nine validated/runtime hashes, health/auth/deep routes/root/manifest, 42 authoritative tables, keys and adjacent services passed. Previously missing module URLs now return 200 in the running container. Both SSH source backups are current; task preview/browser stopped.
+
+Continue in `work/budgit-household-ui` on `codex/budgit-household-ui`. Evidence: `docs/ui-redesign/evidence/release-import-recovery-2026-11-05.json`. Reload once if the old error is still open. Fresh physical iPhone acceptance is not claimed. No production financial edits or Sites/paid-resource changes.
+
+Follow-up assessment: `docs/ui-redesign/IPHONE-FOLDER-SYNC-STATUS-2026-11-05.md`. The daily folder Shortcut remains unfinished; do not promote its prototype. Two compact header concepts are in `docs/ui-redesign/HEADER-OPTIONS-2026-11-05.html`; no header redesign is published by this repair.
+
 ## Menu, Basic calculator and back navigation published — 2026-11-05
 
 Application `f6733473c38847e39683076b95f8f598743e8262` is verified live at https://budgit.duckdns.org/next. The mode selector is now in More (and Settings), with no front-page/header selector. Basic includes the purchase calculator. Main Back controls use a compact circular RTL chevron; contextual return links share the icon, touch spacing and focus/press styling. Existing navigation trails, scope/month, mode rules and unfinished-edit guards are preserved.

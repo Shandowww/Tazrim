@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "a48024685bc36f3631cf797e427a32e028b2aa3f",
+  "sourceCommit": "54d0b36b406c72bd013370ab4e56afc7ed0329c3",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Loans/calculator deployment-import repair validated; publication pending.",
+  "status": "Loans/calculator import recovery published and verified; folder-sync assessment and header concepts documented.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1165,
     "coreChecks": 15,
     "browser": "Synthetic 390/1440 previous-release sessions open Loans and calculator after deployment without reloading; scoped month, Basic calculator, Hebrew import/offline recovery, Back, no overflow and unchanged financial hashes pass.",
-    "release": "docs/ui-redesign/evidence/release-menu-calculator-back-2026-11-05.json: fresh verified backup; isolated financial/access/decryption/startup/rollback gates; six runtime hashes; 42 authoritative tables and adjacent services preserved."
+    "release": "docs/ui-redesign/evidence/release-import-recovery-2026-11-05.json: fresh verified backup; isolated financial/access/decryption/startup/rollback/retained-asset gates; nine runtime hashes; 42 authoritative tables and adjacent services preserved."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "f6733473c38847e39683076b95f8f598743e8262"
+  "productionApplicationCommit": "a480246"
 }

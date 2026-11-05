@@ -1,0 +1,216 @@
+{
+  "date": "2026-11-05",
+  "status": "published-and-verified",
+  "productionURL": "https://budgit.duckdns.org/next",
+  "applicationSource": {
+    "commit": "a48024685bc36f3631cf797e427a32e028b2aa3f",
+    "branch": "codex/budgit-household-ui",
+    "previousProductionCommit": "f6733473c38847e39683076b95f8f598743e8262",
+    "priorSourceFilesVerified": 833,
+    "financialCommandsUnchanged": true
+  },
+  "diagnosis": "Previous Loans/calculator module URLs returned 404 after release replacement; current URLs returned 200. Open sessions retain previous dynamic-import URLs.",
+  "repair": [
+    "Retain authenticated hashed frontend assets across releases in the existing data volume, with 30-day expiry for superseded files",
+    "Seed recent live-release assets; current packaged assets and current HTML take precedence",
+    "Keep navigation available on load failure and offer Hebrew explicit, connectivity-checked, draft-guarded reload"
+  ],
+  "sourceBackup": {
+    "budgitViaSSH": true,
+    "tazrimSnapshot": "ab41cbc1d05e230d580f7e28a3927088f6beb028",
+    "tazrimBranch": "codex/budgit-react-frontend",
+    "independentHistoryAndLicensesPreserved": true,
+    "sourcePathsCompared": 838
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "regressions": 1165,
+    "coreChecks": 15,
+    "diffCheck": "passed",
+    "browser": {
+      "390": {
+        "previousReleaseLoans": true,
+        "previousReleaseCalculator": true,
+        "noReload": true,
+        "sharedMonthPreserved": true,
+        "noOverflow": true
+      },
+      "1440": {
+        "previousReleaseLoans": true,
+        "previousReleaseCalculator": true,
+        "noReload": true,
+        "sharedMonthPreserved": true,
+        "noOverflow": true
+      },
+      "offlineRecoveryPreservesPage": true,
+      "explicitRecoveryRestoresLoans": true,
+      "failedCalculatorBackWorks": true,
+      "currentBasicCalculator": true,
+      "financialUnchanged": true
+    },
+    "browserEvidence": "import-recovery-browser-2026-11-05.json",
+    "physicalIPhoneRetested": false
+  },
+  "artifact": {
+    "image": "sha256:6a4264d72848570242b213c9f73ef65677361cb7a8a4eeef3ce31a88553fe78e",
+    "sourceArchiveSha256": "27cb8561f8cf72e07e6efb3c7714202b3cc463312380311800d5fb38ba8e4b58",
+    "nineCandidateHashesMatchValidatedLocalBuild": true
+  },
+  "backup": {
+    "sha256": "6472bd5841e77ac10af7c0b56505b0689d0e32c18cb6b48f477a97f714ea6d44",
+    "consistentSQLite": true,
+    "integrityVerified": true,
+    "freshBeforeActivation": true
+  },
+  "isolatedGates": {
+    "networkDisabled": true,
+    "financial": "passed",
+    "accessHTTPDecryption": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "71a3615dd47534da344f97aa6353f8ff252e0cbbea008e8011e9b99574e16a68",
+      "reactHTMLSha256": "e4ae4a9f81acc988fed6b21876cae601f58cb3e0574d47983327acf6d0a8e188"
+    },
+    "candidateStartup": "passed",
+    "rollbackFinancial": "passed",
+    "rollbackAccess": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "80e92d3cec61cd74ac534aadcedad273fa9cd7862ad343e7adf1501d1cc82778",
+      "reactHTMLSha256": "99887fc198e73f2a3241352bd3bc34ac4e7907507a2c107c6097af7d51b0d440"
+    },
+    "retainedAssets": {
+      "priorReleases": [
+        "54633e5",
+        "b340ebf",
+        "e6df93e",
+        "f673347"
+      ],
+      "originalAssetsVerified": 266,
+      "currentAndPriorBytesMatch": true
+    }
+  },
+  "runtime": {
+    "healthy": true,
+    "imageMatches": true,
+    "sha256": {
+      "server/app.mjs": "fdc2e3812f1bd3a9ad0ed9dbea403eb54147e203cca1cb0f4dee51f3346b5d48",
+      "server/start.mjs": "f64cbe8acd70f0c32def3f2cf89774dcc1d8583a925e186db911465e0b0e2602",
+      "server/react-ui.mjs": "86861804dce5d1cabbc5b7d1a171f0615517842ae39d1e83e37d14c2174040d5",
+      "server/react-asset-archive.mjs": "51a84685b672ae428380a44c1b67fb0dd8401063a0a07773a84630d48a828df2",
+      "server/statement-notices.mjs": "e0cfbcb2f2e98d73ed9d3e445201b98651fe0a472c173e56c331254905db4d25",
+      "dist/server/statement-notices.mjs": "0152b031be1c19eb9047917c9ef4994d4c94ebb059bbf853b46bba5a5772af9c",
+      "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+      "dist/index.html": "71a3615dd47534da344f97aa6353f8ff252e0cbbea008e8011e9b99574e16a68",
+      "dist/frontend/index.html": "e4ae4a9f81acc988fed6b21876cae601f58cb3e0574d47983327acf6d0a8e188"
+    },
+    "publicChecks": {
+      "checkedAt": "2026-11-05T14:17:32.900Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "previousModuleProbes": [
+      {
+        "file": "loans-page-DSPCcX0x.js",
+        "status": 200
+      },
+      {
+        "file": "scenario-page-Df3V_ozz.js",
+        "status": 200
+      },
+      {
+        "file": "loans-page-CBoCd2-y.js",
+        "status": 200
+      },
+      {
+        "file": "scenario-page-CuxhgUaZ.js",
+        "status": 200
+      }
+    ]
+  },
+  "preservation": {
+    "authoritativeTablesPreserved": 42,
+    "integrity": true,
+    "foreignKeys": true,
+    "referenceInterestCacheExcluded": true,
+    "backupAttemptTimestampExcluded": true,
+    "configurationAndEncryptionKeysUnchanged": true,
+    "adjacentParkingAndProxyUnchanged": true,
+    "financialRecordsSourcesAccessAndBackupCredentialsPreserved": true,
+    "comparisonExceptions": [
+      "Existing derived financial/backup caches",
+      "reference_interest cache",
+      "drive_backup_connections.last_attempt only"
+    ],
+    "sitesAndPaidResourcesUnchanged": true
+  },
+  "rollback": {
+    "previousImage": "sha256:62f5e7ac0c8868c55cf92a85720fb7dd491e1450b00091282568e391590120e6",
+    "imageAndSourceRetained": true,
+    "candidateDatabaseCompatibilityVerified": true,
+    "databaseNeverRestoredOrOverwritten": true
+  },
+  "cleanup": {
+    "taskOwnedSyntheticPreviewStopped": true,
+    "taskOwnedHeadlessBrowserStopped": true,
+    "unrelatedTunnelsUntouched": true
+  },
+  "limitations": [
+    "Fresh physical iPhone Safari acceptance is not claimed.",
+    "Already-rejected module imports may remain cached in the open document; reload once to clear that failure.",
+    "Superseded assets expire after 30 days; older sessions can use explicit recovery."
+  ],
+  "userAction": "Reload Safari or reopen the home-screen app once if the old error screen is still open."
+}
