@@ -35,6 +35,7 @@ import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
 import './app.css'
 import Link from './app/link'
+import {PageLoadBoundary} from './app/page-load-boundary'
 
 const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-access-page')).AdminAccessPage }))
 const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
@@ -198,7 +199,7 @@ function App() {
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}
-            {!accountChanged&&<HouseholdBack/>}<div className="household-screen"><Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
+            {!accountChanged&&<HouseholdBack/>}<div className="household-screen"><PageLoadBoundary resetKey={routeScopeKey+pathname+search}><Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
             {accountChanged ? <section className="household-page" role="status">מעדכנים את החשבון…</section> : !fixture && budget.status==='error' ? (
               <section className="household-page">
                 <h1>התקציב לא זמין</h1>
@@ -309,7 +310,7 @@ function App() {
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
             </Routes></InterfaceModeBoundary>}
               <ScrollRestoration getKey={getScrollKey} storageKey="budgit-scroll-positions"/>
-            </Suspense></div>
+            </Suspense></PageLoadBoundary></div>
           </main>
         </div>
       </div>

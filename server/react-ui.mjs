@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { resolve, sep } from 'node:path'
+import { retainedReactAsset } from './react-asset-archive.mjs'
 
 const root = resolve('dist/frontend')
 const types = { '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.json': 'application/json; charset=utf-8' }
 const mime = path => types[path.slice(path.lastIndexOf('.'))] || 'application/octet-stream'
 
 /** Called only after createApp has verified the signed-in user and allowlist. */
-export function reactUiResponse(request) {
+export function reactUiResponse(request, { assetArchiveRoot, frontendRoot = root } = {}) {
   const path = new URL(request.url).pathname
   if (!(path === '/next' || path.startsWith('/next/') || path.startsWith('/ui-assets/'))) return null
   if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, HEAD', 'Cache-Control': 'no-store' } })
@@ -15,10 +16,15 @@ export function reactUiResponse(request) {
   if (!relative || relative.length > 256 || !/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(relative) || relative.split('/').some(segment => segment === '.' || segment === '..' || !segment)) {
     return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } })
   }
-  const file = resolve(root, relative)
-  if (!file.startsWith(root + sep)) return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } })
+  const file = resolve(frontendRoot, relative)
+  if (!file.startsWith(frontendRoot + sep)) return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } })
   try {
-    const bytes = readFileSync(file)
+    let bytes
+    try { bytes = readFileSync(file) }
+    catch (error) {
+      if (error.code !== 'ENOENT' || !assetArchiveRoot || !asset || !retainedReactAsset(relative)) throw error
+      bytes = readFileSync(resolve(assetArchiveRoot, relative.slice('assets/'.length)))
+    }
     return new Response(request.method === 'HEAD' ? null : bytes, {
       headers: {
         'Content-Type': mime(relative),

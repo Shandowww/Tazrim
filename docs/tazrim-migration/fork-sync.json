@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "227433741753af79cc1816383ca94ad8f174f180",
+  "sourceCommit": "a48024685bc36f3631cf797e427a32e028b2aa3f",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Menu mode selector, Basic calculator and polished RTL back navigation published and verified.",
+  "status": "Loans/calculator deployment-import repair validated; publication pending.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1162,
+    "regressionTests": 1165,
     "coreChecks": 15,
-    "browser": "Synthetic 320/390/1440 checks: selector absent from home/header, present in More menu; Basic calculator link, route and inputs work; circular RTL back controls, 44px targets, keyboard, Light/Dark/reduced motion, dirty-editor stay/discard, scoped month return, no overflow and unchanged financial hashes.",
+    "browser": "Synthetic 390/1440 previous-release sessions open Loans and calculator after deployment without reloading; scoped month, Basic calculator, Hebrew import/offline recovery, Back, no overflow and unchanged financial hashes pass.",
     "release": "docs/ui-redesign/evidence/release-menu-calculator-back-2026-11-05.json: fresh verified backup; isolated financial/access/decryption/startup/rollback gates; six runtime hashes; 42 authoritative tables and adjacent services preserved."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",

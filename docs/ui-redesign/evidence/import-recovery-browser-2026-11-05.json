@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-05",
+  "build": true,
+  "typecheck": true,
+  "regressions": 1165,
+  "coreChecks": 15,
+  "browser": "Synthetic Chrome; old release loaded before server switch",
+  "checks": {
+    "390": {
+      "previousReleaseLoans": true,
+      "previousReleaseCalculator": true,
+      "noReload": true,
+      "sharedMonthPreserved": true,
+      "noOverflow": true
+    },
+    "1440": {
+      "previousReleaseLoans": true,
+      "previousReleaseCalculator": true,
+      "noReload": true,
+      "sharedMonthPreserved": true,
+      "noOverflow": true
+    },
+    "offlineRecoveryPreservesPage": true,
+    "explicitRecoveryRestoresLoans": true,
+    "failedCalculatorBackWorks": true,
+    "currentBasicCalculator": true,
+    "financialUnchanged": true
+  },
+  "physicalIPhoneRetested": false
+}
