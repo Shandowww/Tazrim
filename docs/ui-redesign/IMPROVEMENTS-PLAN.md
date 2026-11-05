@@ -19,7 +19,7 @@ One app, shared calculations and storage. Modes control which options are visibl
 | Advanced / מתקדם | Basic plus routine manual planning | Manual income/balance corrections, goals and saving amounts, planned purchases, cheques, loans and transfers; common account/report/reminder settings. |
 | Expert / מומחה | The complete current interface | All existing tools, including detailed reconciliation, source editing/history, category rules, allocation, migration and administrative tools where authorized. |
 
-- Offer Basic during new-user setup; preserve Expert for existing users. Keep an obvious mode selector and remember the choice per signed-in user, independently of the selected personal/shared budget.
+- Offer Basic during new-user setup; preserve Expert for existing users. Keep the mode selector in the More menu and Settings, and remember the choice per signed-in user, independently of the selected personal/shared budget. The purchase calculator is available in Basic too.
 - Always retain account/scope identity, appearance, refresh, security, sign-out, data export, required import decisions, save errors and critical warnings.
 - Switching modes never changes records, calculations, roles or notification visibility. Protect drafts before switching. A direct link to an advanced tool explains the required mode and offers a switch while retaining destination and scope.
 - First map every existing route/action to the three modes. Reuse existing forms, commands and guards; do not maintain three copies of the application.
@@ -57,7 +57,7 @@ The shared policy is `frontend/src/app/interface-mode-model.js`. Links, grouped 
 
 | Minimum mode | Routes and actions |
 | --- | --- |
-| Basic | Home; bank/card/cheque/loan/category summaries; read-only saving goals; report upload, saved-group review and required import decisions; essential account/card setup; all notifications and source notices; profile, appearance, spaces, security, backup import/export, Gmail, Drive and device-draft recovery. |
+| Basic | Home and purchase calculator; bank/card/cheque/loan/category summaries; read-only saving goals; report upload, saved-group review and required import decisions; essential account/card setup; all notifications and source notices; profile, appearance, spaces, security, backup import/export, Gmail, Drive and device-draft recovery. |
 | Advanced | Monthly/account corrections; planned income and purchases; recurring estimates; cheques and manual details; loans; saving goals, deposits and schedules; transfers; card billing/no-activity/estimate retirement; report expectations and forecast settings. |
 | Expert | Source editing/history/undo/archive/delete; detailed reconciliation and payer repair; category administration; cross-space review/migration; investment simulations; saved analyses; server administration; Original interface and remaining existing tools. |
 

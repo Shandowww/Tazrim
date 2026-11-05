@@ -1,0 +1,22 @@
+{
+  "320": {
+    "homeSelectorAbsent": true,
+    "menuSelectorPresent": true,
+    "basicCalculatorAccessible": true,
+    "noOverflow": true
+  },
+  "390": {
+    "homeSelectorAbsent": true,
+    "menuSelectorPresent": true,
+    "basicCalculatorAccessible": true,
+    "noOverflow": true
+  },
+  "1440": {
+    "homeSelectorAbsent": true,
+    "menuSelectorPresent": true,
+    "basicCalculatorAccessible": true,
+    "noOverflow": true
+  },
+  "basicCalculatorInputs": true,
+  "financialUnchanged": true
+}

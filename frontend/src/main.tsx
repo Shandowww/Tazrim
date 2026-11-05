@@ -111,7 +111,7 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
     <header className="household-header sticky top-0 z-30 border-b">
       <div className="household-topbar">
         {pathname==='/'?<div className="household-brand"><span><Wallet size={21} aria-hidden/></span><strong dir="ltr">Budgit</strong></div>:<div className="household-period"><PeriodPicker key={budget.refreshError || budget.status} period={{ year, month }} onChange={selectPeriod}/></div>}
-        <div className="household-header-actions"><InterfaceModeSelector compact/><GlobalActionCenter budget={budget}/>
+        <div className="household-header-actions"><GlobalActionCenter budget={budget}/>
           <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
         </div>
       </div>

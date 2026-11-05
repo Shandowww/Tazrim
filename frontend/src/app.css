@@ -76,5 +76,4 @@ body,.font-sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sa
  .budgit-refresh-indicator[data-refreshing=true] svg{animation:budgit-refresh-spin .8s linear infinite}
  @keyframes budgit-refresh-spin{to{transform:rotate(360deg)}}
  @media(prefers-reduced-motion:reduce){.budgit-refresh-indicator[data-refreshing=true] svg{animation:none}}
-@media(max-width:480px){.household-topbar{grid-template-columns:minmax(0,1fr)}.household-header-actions{justify-content:flex-end}.household-mode-compact{margin-inline-end:auto}.household-period{max-width:none}}
 .household-notices bdi{white-space:normal;overflow-wrap:anywhere}
