@@ -30,6 +30,7 @@ html=html.replace('/*SCRIPT*/',()=>model+'\n'+planningModel+'\n'+actionModel+'\n
 mkdirSync('dist/server',{recursive:true});
 copyFileSync('tools/bank-csv/cal-activity.mjs','dist/server/cal-activity.mjs');
 copyFileSync('tools/bank-csv/parser.mjs','dist/server/parser.mjs');
+copyFileSync('tools/bank-csv/statement-notices.mjs','dist/server/statement-notices.mjs');
 cpSync('frontend/dist','dist/frontend',{recursive:true,force:true});
 writeFileSync('dist/server/page.js','export const html = '+JSON.stringify(html)+';\n');
 copyFileSync('src/worker.js','dist/server/index.js');
@@ -54,6 +55,6 @@ assets['/shortcuts/install']={type:'text/html; charset=utf-8',data:Buffer.from(r
 assets['/shortcuts/budgit-apple-pay-ios27.shortcut']={type:'application/octet-stream',download:'budgit-apple-pay-ios27.shortcut',data:readFileSync('public/shortcuts/budgit-apple-pay-ios27.shortcut').toString('base64')};
 assets['/shortcuts/budgit-apple-pay.shortcut']={type:'application/octet-stream',download:'budgit-apple-pay.shortcut',data:readFileSync('public/shortcuts/budgit-apple-pay.shortcut').toString('base64')};
 assets['/manifest.webmanifest']={type:'application/manifest+json; charset=utf-8',data:readFileSync('public/manifest.webmanifest').toString('base64')};
-for(const [url,file]of Object.entries({'/bank-import/intake-reader.mjs':'intake-reader.mjs','/bank-import/cal-billing.mjs':'cal-billing.mjs','/bank-import/cal-activity.mjs':'cal-activity.mjs','/bank-import/pdf-reader.mjs':'pdf-reader.mjs','/bank-import/isracard-pdf.mjs':'isracard-pdf.mjs','/bank-import/vendor/pdfjs/pdf.mjs':'vendor/pdfjs/pdf.mjs','/bank-import/vendor/pdfjs/pdf.worker.mjs':'vendor/pdfjs/pdf.worker.mjs','/bank-import/parser.mjs':'parser.mjs','/bank-import/classifier.mjs':'classifier.mjs','/bank-import/xlsx-reader.mjs':'xlsx-reader.mjs','/bank-import/xlsx-worker.js':'xlsx-worker.js','/bank-import/vendor/xlsx-mini.js':'vendor/xlsx-mini.cjs','/bank-import/vendor/xlsx-full.js':'vendor/xlsx-full.cjs'})){assets[url]={type:'text/javascript; charset=utf-8',data:readFileSync('tools/bank-csv/'+file).toString('base64')};}
+for(const [url,file]of Object.entries({'/bank-import/statement-notices.mjs':'statement-notices.mjs','/bank-import/intake-reader.mjs':'intake-reader.mjs','/bank-import/cal-billing.mjs':'cal-billing.mjs','/bank-import/cal-activity.mjs':'cal-activity.mjs','/bank-import/pdf-reader.mjs':'pdf-reader.mjs','/bank-import/isracard-pdf.mjs':'isracard-pdf.mjs','/bank-import/vendor/pdfjs/pdf.mjs':'vendor/pdfjs/pdf.mjs','/bank-import/vendor/pdfjs/pdf.worker.mjs':'vendor/pdfjs/pdf.worker.mjs','/bank-import/parser.mjs':'parser.mjs','/bank-import/classifier.mjs':'classifier.mjs','/bank-import/xlsx-reader.mjs':'xlsx-reader.mjs','/bank-import/xlsx-worker.js':'xlsx-worker.js','/bank-import/vendor/xlsx-mini.js':'vendor/xlsx-mini.cjs','/bank-import/vendor/xlsx-full.js':'vendor/xlsx-full.cjs'})){assets[url]={type:'text/javascript; charset=utf-8',data:readFileSync('tools/bank-csv/'+file).toString('base64')};}
 writeFileSync('dist/server/assets.js','export const assets = '+JSON.stringify(assets)+';\n');
 console.log('Budget app built.');

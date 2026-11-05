@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import {demoPlan,clone,forecast,validatePlan,indexMonth,defaultBudgetMonth,latestExpenseDataMonth} from '../src/budget.js';
 const source=fs.readFileSync(new URL('../src/client.js',import.meta.url),'utf8');
 function gesture(){
- const handlers={},indicator={hidden:true};let refreshes=0,prevented=0;
+ const handlers={},indicator={hidden:true,style:{setProperty(){}}};let refreshes=0,prevented=0;
  const document={scrollingElement:{scrollTop:0},querySelector:()=>null,getElementById:()=>indicator,addEventListener:(k,fn)=>handlers[k]=fn};
  vm.runInNewContext(source.slice(source.indexOf('// Pull-down refresh:')),{document,window:{innerHeight:900},loading:false,saving:false,refreshBudget(){refreshes++;}});
  const touch=(y,x=100,target={closest:()=>null})=>({target,touches:[{clientY:y,clientX:x}],cancelable:true,preventDefault(){prevented++;}});
@@ -29,7 +29,7 @@ test('Short, cancelled and multiple-finger gestures never refresh',()=>{
  f.handlers.touchstart(f.touch(100));f.handlers.touchmove({...f.touch(200),touches:[{},{}]});f.handlers.touchend();assert.equal(f.refreshes(),0);
 });
 function refreshContext(){
- const indicator={hidden:true,classList:{add(){},remove(){}}};let requests=0,reloads=0;const notices=[],stored=new Map();
+ const indicator={hidden:true,style:{setProperty(){}},classList:{add(){},remove(){}}};let requests=0,reloads=0;const notices=[],stored=new Map();
  const context=vm.createContext({demoPreview:false,hasSecurityDraft:()=>false,securityBusy:false,loadBudgets:async()=>{},budgetURL:()=>'/api/plan',emptyBudget:()=>clone(demoPlan),hasScenarioDraft:()=>false,loading:false,saving:false,dirty:false,tab:'settings',settingsSection:'cash-accounts',selectedMonth:'2026-11',itemDraft:{id:'',name:'',amount:0},document:{activeElement:{blur(){}},getElementById:()=>indicator},confirmAction:(title,text,action)=>{context.confirm=action;notices.push(text);},notify:m=>notices.push(m),render(){},sessionStorage:{setItem:(k,v)=>stored.set(k,v)},window:{location:{reload(){reloads++;}}},async fetch(url,options){requests++;assert.equal(url,'/');assert.equal(options.cache,'no-store');return{ok:true,headers:{get:()=> 'text/html; charset=utf-8'},text:async()=>'<html>New UI</html>'};}});
  vm.runInContext(source.slice(source.indexOf('async function refreshBudget('),source.indexOf('\nasync function save()')),context);
  return{context,indicator,notices,stored,requests:()=>requests,reloads:()=>reloads};

@@ -191,7 +191,7 @@ async function refreshBudget(acceptDraft=false){
  if(dirty&&!acceptDraft){
   confirmAction('לטעון את הנתונים השמורים?', 'יש במכשיר הזה שינויים שלא נשמרו. טעינת הנתונים השמורים תציג גם עדכונים שנשמרו במובייל. הטיוטה מהמכשיר תישמר בנפרד להשוואה, ולא תישלח לשרת.',()=>refreshBudget(true),'טעינת הנתונים השמורים','המשך עם הטיוטה');return;
  }
- const indicator=document.getElementById('pull-refresh-indicator');indicator.hidden=false;indicator.textContent='מרענן את האפליקציה…';indicator.classList.add('refreshing');
+ const indicator=document.getElementById('pull-refresh-indicator');indicator.hidden=false;indicator.textContent='מרענן את האפליקציה…';indicator.style.setProperty('--pull-angle','0deg');indicator.classList.add('refreshing');
  loading=true;render();
  try{
   // Keep the current page usable when offline; a full navigation loads new UI code.
@@ -254,7 +254,7 @@ document.addEventListener('touchstart',event=>{
  resetPull();
  if(event.touches.length!==1||loading||saving||(document.scrollingElement?.scrollTop??0)>2||document.querySelector('dialog[open]'))return;
  if(event.target.closest?.('input,select,textarea,button,a,summary,[role=button],[role=slider],[contenteditable]'))return;
- const touch=event.touches[0];if(touch.clientY<0||touch.clientY>window.innerHeight/3)return;
+ const touch=event.touches[0];if(touch.clientY<0||touch.clientY>Math.min(180,window.innerHeight/4))return;
  for(let node=event.target;node;node=node.parentElement){if(node!==document.scrollingElement&&node!==document.body&&node!==document.documentElement&&node.scrollHeight>node.clientHeight+2)return;}
  pullStart=touch.clientY;pullX=touch.clientX;
 },{passive:true});
@@ -265,7 +265,7 @@ document.addEventListener('touchmove',event=>{
  // Ignore initial finger jitter; only commit after a clear downward gesture.
  if(pullDistance<-12||(horizontal>12&&horizontal>pullDistance)||(document.scrollingElement?.scrollTop??0)>2||document.querySelector('dialog[open]')){resetPull();return;}
  if(pullDistance<=12)return;if(!event.cancelable){resetPull();return;}event.preventDefault();
- pullIndicator.hidden=false;pullIndicator.textContent=pullDistance>=80?'אפשר לשחרר כדי לרענן':'משיכה מטה לרענון';
+ pullIndicator.hidden=false;pullIndicator.style.setProperty('--pull-angle',Math.min(1,pullDistance/80)*270+'deg');pullIndicator.textContent=pullDistance>=80?'אפשר לשחרר כדי לרענן':'משיכה מטה לרענון';
 },{passive:false});
 document.addEventListener('touchend',()=>{const shouldRefresh=pullStart!==null&&pullDistance>=80&&!document.querySelector('dialog[open]');resetPull();if(shouldRefresh)refreshBudget();});
 document.addEventListener('touchcancel',resetPull);

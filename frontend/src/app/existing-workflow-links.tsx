@@ -1,3 +1,5 @@
+import {useInterfaceMode} from './interface-mode'
+import {modeAllows} from './interface-mode-model'
 import {useLocation} from 'react-router-dom'
 import {withViewQuery} from './navigation-query'
 import Link from './link'
@@ -16,6 +18,7 @@ const nativeWorkflows=[
  ['/settings/device-draft','טיוטה שמורה במכשיר'],
  ['/settings/security','הצפנה, נעילה, שחזור וייבוא גיבוי'],
  ['/actions','לטיפול ותזכורות אישיות'],
+ ['/notices','עדכוני בנקים ומנפיקים'],
  ['/upload','מרכז הדוחות והמקורות השמורים'],
  ['/settings/report-expectations','דוחות צפויים ומועדי הגעה'],
  ['/upload/history','היסטוריית ייבוא בנק וביטול קליטה'],
@@ -30,13 +33,14 @@ const nativeWorkflows=[
  ['/card-setup','פרטי הכרטיסים'],
 ] as const
 const groups=[
- {label:'דוחות וניתוח',paths:['/analysis','/actions','/upload','/upload/history','/settings/report-expectations','/categories/manage','/categories/limits','/details/manage']},
+ {label:'דוחות וניתוח',paths:['/analysis','/actions','/notices','/upload','/upload/history','/settings/report-expectations','/categories/manage','/categories/limits','/details/manage']},
  {label:'תכנון וחיסכון',paths:['/goals','/settings/forecast','/investment','/savings/schedule','/savings/transfers']},
  {label:'חשבונות ומרחבים',paths:['/overview','/overview/migration','/accounts/transfers','/accounts/assignments','/card-setup','/start']},
  {label:'פרטיות וגיבוי',paths:['/settings/security','/settings/device-draft','/settings/drive','/settings/gmail']},
  {label:'פרופיל וחיבורים נוספים',paths:['/settings/profile','/settings/access','/settings/wallet']},
 ]
 export function ExistingWorkflowLinks(){
- const {search}=useLocation()
- return <section className="surface household-bank"><h2 className="font-semibold">ניהול והגדרות נוספות</h2>{groups.map(group=><details key={group.label}><summary className="min-h-11 py-3 text-sm">{group.label}</summary><ul className="divide-y">{nativeWorkflows.filter(([path])=>group.paths.includes(path)).map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search,import.meta.env.DEV)}>{label}</Link></li>)}</ul></details>)}</section>
+ const {search}=useLocation(),{mode}=useInterfaceMode()
+ const visible=groups.map(group=>({...group,paths:group.paths.filter(path=>modeAllows(mode,path))})).filter(group=>group.paths.length)
+ return <section className="surface household-bank"><h2 className="font-semibold">ניהול והגדרות נוספות</h2>{visible.map(group=><details key={group.label}><summary className="min-h-11 py-3 text-sm">{group.label}</summary><ul className="divide-y">{nativeWorkflows.filter(([path])=>group.paths.includes(path)).map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search,import.meta.env.DEV)}>{label}</Link></li>)}</ul></details>)}</section>
 }

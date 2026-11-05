@@ -1,4 +1,5 @@
 import {normalizeGmailFilters} from '../dist/server/gmail-filter-model.js';
+import {issuerNoticeIdentity} from '../dist/server/statement-notices.mjs';
 import {isVault} from '../dist/server/vault.js';
 import {OAuth2Client} from 'google-auth-library';import {randomBytes} from 'node:crypto';
 import {budgetAccess,serviceJSON,boundedJSON,serviceError} from './budget-access.mjs';import {reportHash,sealReport,openReport} from './report-crypto.mjs';
@@ -12,7 +13,7 @@ export function bankMailNotice(message){
  const subject=mailHeader(message,'Subject').slice(0,300),sender=mailHeader(message,'From').slice(0,300),parts=messageParts(message.payload),body=parts.filter(p=>/^text\/(plain|html)$/.test(p.mimeType)&&p.body?.data&&(p.body?.size??0)<=100000).map(p=>decode(p.body.data).toString('utf8').slice(0,100000)).join('\n').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').slice(0,12000),text=subject+' '+body;
  const kind=/עמל[הת]|fee/i.test(text)?'fee':/הטב[הת]|פטור|benefit|discount/i.test(text)?'benefit':/חשבון|דוח|תדפיס|statement|account/i.test(text)?'account':null;if(!kind)return null;
  const dateMatch=text.match(/(?:בתאריך|עד לתאריך|החל מ|בתוקף עד)\s*[:־-]?\s*(\d{2})[./](\d{2})[./](20\d{2})/),candidate=dateMatch?dateMatch[3]+'-'+dateMatch[2]+'-'+dateMatch[1]:null,date=candidate&&Number.isFinite(Date.parse(candidate))&&new Date(candidate+'T00:00:00Z').toISOString().slice(0,10)===candidate?candidate:null;
- return{subject,sender,kind,text:body||subject,explicitDate:date,dateKind:dateMatch?/בתוקף עד|עד לתאריך/.test(dateMatch[0])?'expires':/החל מ/.test(dateMatch[0])?'starts':'mentioned':null,cancellation:/(?:ביטול|בוטלה|בוטל).{0,25}(?:הטב|פטור)|(?:הטב|פטור).{0,25}(?:ביטול|בוטלה|בוטל)/.test(text),receivedAt:Number.isFinite(Number(message.internalDate))?new Date(Number(message.internalDate)).toISOString():null,sourceId:message.id};
+ return{subject,sender,kind,...issuerNoticeIdentity(sender+' '+text),text:body||subject,explicitDate:date,dateKind:dateMatch?/בתוקף עד|עד לתאריך/.test(dateMatch[0])?'expires':/החל מ/.test(dateMatch[0])?'starts':'mentioned':null,cancellation:/(?:ביטול|בוטלה|בוטל).{0,25}(?:הטב|פטור)|(?:הטב|פטור).{0,25}(?:ביטול|בוטלה|בוטל)/.test(text),receivedAt:Number.isFinite(Number(message.internalDate))?new Date(Number(message.internalDate)).toISOString():null,sourceId:message.id};
 }
 export function createGmailImport(db,{origin,clientId,clientSecret,isAllowed,reportStore,now=()=>Date.now(),oauthFactory=()=>new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback')}={}){
  db.exec(`CREATE TABLE IF NOT EXISTS gmail_connections(user_id TEXT NOT NULL,budget TEXT NOT NULL,data BLOB NOT NULL,revision INTEGER NOT NULL DEFAULT 1,enabled INTEGER NOT NULL DEFAULT 0,since INTEGER NOT NULL DEFAULT 0,until_time INTEGER,page_token TEXT,last_checked INTEGER,last_success INTEGER,error TEXT,preview_hash TEXT,PRIMARY KEY(user_id,budget));

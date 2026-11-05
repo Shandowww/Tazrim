@@ -72,3 +72,9 @@ body,.font-sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sa
 
 .household-bank-list .household-bank{background:linear-gradient(125deg,light-dark(#e3eef7,#223b50),light-dark(#f3f0fb,#282e48))}
 .household-screen select{min-height:44px}
+ .budgit-refresh-indicator{position:fixed;top:max(.75rem,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:50;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--background);color:var(--primary);border:1px solid var(--border);box-shadow:0 4px 18px #0002;pointer-events:none}
+ .budgit-refresh-indicator[data-refreshing=true] svg{animation:budgit-refresh-spin .8s linear infinite}
+ @keyframes budgit-refresh-spin{to{transform:rotate(360deg)}}
+ @media(prefers-reduced-motion:reduce){.budgit-refresh-indicator[data-refreshing=true] svg{animation:none}}
+@media(max-width:480px){.household-topbar{grid-template-columns:minmax(0,1fr)}.household-header-actions{justify-content:flex-end}.household-mode-compact{margin-inline-end:auto}.household-period{max-width:none}}
+.household-notices bdi{white-space:normal;overflow-wrap:anywhere}

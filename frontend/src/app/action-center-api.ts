@@ -11,11 +11,12 @@ export function actionClock():ActionClock{const p=new Intl.DateTimeFormat('en-US
 export function reportActionFacts(snapshot:ExpectationsSnapshot,clock:ActionClock){
  const plan=snapshot.budget.value.plan,locked=plan?.format==='monthly-flow-encrypted-v1'
  if(!Array.isArray(snapshot.actions.reports)||!snapshot.actions.preferences||typeof snapshot.actions.preferences!=='object'||Array.isArray(snapshot.actions.preferences))throw Error('רשימת הפעולות לא התקבלה בצורה תקינה.')
- const facts=actionIssues(validatePlan(plan)?plan:null,{scope:snapshot.budget.value.accountId+'/'+snapshot.actions.budgetId,asOf:clock.asOf,day:clock.day,locked,reports:snapshot.actions.reports,expectations:snapshot.actions.expectations,...(snapshot.integrations?{gmail:snapshot.integrations.gmail,notices:snapshot.integrations.notices,backup:snapshot.integrations.backup,admin:snapshot.integrations.admin}:{})} as any).sort((a,b)=>(a.severity==='required'?0:1)-(b.severity==='required'?0:1))
- return{facts,active:facts.filter(i=>actionIssueVisible(i,snapshot.actions.preferences,clock.now)),deferred:facts.filter(i=>!actionIssueVisible(i,snapshot.actions.preferences,clock.now))}
+ const facts=actionIssues(validatePlan(plan)?plan:null,{scope:snapshot.budget.value.accountId+'/'+snapshot.actions.budgetId,asOf:clock.asOf,day:clock.day,locked,reports:snapshot.actions.reports,statementNotices:snapshot.actions.statementNotices??[],expectations:snapshot.actions.expectations,...(snapshot.integrations?{gmail:snapshot.integrations.gmail,notices:snapshot.integrations.notices,backup:snapshot.integrations.backup,admin:snapshot.integrations.admin}:{})} as any).sort((a,b)=>(a.severity==='required'?0:1)-(b.severity==='required'?0:1))
+ return{facts,active:facts.filter(i=>i.severity!=='info'&&actionIssueVisible(i,snapshot.actions.preferences,clock.now)),deferred:facts.filter(i=>i.severity!=='info'&&!actionIssueVisible(i,snapshot.actions.preferences,clock.now)),updates:facts.filter(i=>i.severity==='info')}
 }
 export function reportActionDestination(search:string,issue:ActionIssue){
  if(!validActionTarget(issue.target))throw Error('יעד הפעולה אינו זמין.')
+ if(issue.target.screen==='statement-notice'&&issue.target.noticeId)return{href:withViewQuery('/notices/'+encodeURIComponent(issue.target.noticeId),search),native:true}
  if(issue.target.screen==='gmail')return{href:withViewQuery('/settings/gmail',search),native:true}
  if(issue.target.screen==='notice'&&issue.target.noticeId)return{href:withViewQuery('/settings/gmail/notices/'+encodeURIComponent(issue.target.noticeId),search),native:true}
  if(issue.target.screen==='backup')return{href:withViewQuery('/settings/drive',search),native:true}

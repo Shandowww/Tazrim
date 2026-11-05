@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "cf655b76b44cf60f2bdf1394bef7e7ed00025095",
+  "sourceCommit": "e6df93ee568be21a5958b268e485276d2ca77b7c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Household redesign accepted by Tal and published to the existing server on 2026-11-05. Runtime and authoritative-record preservation verified; temporary preview closed. This checkpoint includes final release documentation.",
+  "status": "Circular refresh, Basic/Advanced/Expert modes and encrypted source-linked issuer notices implemented and validated; publication gates in progress.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1153,
+    "regressionTests": 1162,
     "coreChecks": 15,
-    "browser": "93-route text audit, reference comparison, 320/390/430/1280 responsive checks, scoped synthetic workflows and user iPhone acceptance; see docs/ui-redesign evidence.",
-    "release": "Passed fresh verified SQLite backup, isolated financial/access/HTTP/13-source-decryption gates, rollback compatibility, runtime image/hashes/health/auth/routes/manifest and 41-table authoritative-record preservation. See docs/ui-redesign/evidence/release-2026-11-05.json."
+    "browser": "Synthetic Chrome: mode defaults, remembered actor/space choice, dirty switches, PDF/CSV/XLSX text workers, quiet updates/read state, touch pull/cancel, 320/390/1440 Light/Dark/reduced-motion and viewer/isolation; financial hashes unchanged.",
+    "release": "New application not activated yet. Existing server release gates in progress."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "b340ebf6d9306cd4704947683b2f91cc4bf8bfe6"

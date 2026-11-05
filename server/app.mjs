@@ -5,6 +5,7 @@ import {createReportStore} from './report-store.mjs';
 import {createSpaceMigrationReview} from './space-migration-review.mjs';
 import {createTransferMatches} from './transfer-matches.mjs';
 import {createActions} from './actions.mjs';
+import {createStatementNotices} from './statement-notices.mjs';
 import {reactUiResponse} from './react-ui.mjs';
 import {randomBytes,createHash,randomUUID} from 'node:crypto';
 import {queryFinancialTransactions} from './financial-data.mjs';
@@ -39,7 +40,8 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const migrations=createSpaceMigrations(db,{isAllowed,secret:reportStore.secret,now});
  const migrationReview=createSpaceMigrationReview(db,{isAllowed});
  const transferMatches=createTransferMatches(db,{isAllowed,secret:reportStore.secret,now});
- const actions=createActions(db,{isAllowed,now,reports:reportStore.list,isAdmin:user=>admins.has(user.email.toLowerCase())});
+ const statementNotices=createStatementNotices(db,{isAllowed,secret:reportStore.secret,now});
+ const actions=createActions(db,{isAllowed,now,reports:reportStore.list,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
  origin=base.origin;const wallet=createApplePay(db,{origin,now,isAllowed});const configured=!!(clientId&&clientSecret);oauth??=new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback');
  const handle=async function handle(request,{ip='unknown'}={}){
  const u=new URL(request.url),path=u.pathname,time=now(),loginTarget=path==='/'&&u.search||path==='/next'||path.startsWith('/next/')?path+u.search:'/';const jar=cookies(request);
@@ -100,6 +102,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  if(path==='/api/card-push'||path==='/api/card-push/schedule'||path==='/api/card-push/test'){if(!push)return json({error:'התראות אינן זמינות כרגע.'},503);return push.handle(request,user);}
  if(path==='/api/plan-history')return history.handle(request,user);
  if(path==='/api/reports')return reportStore.handle(request,user);
+ if(path==='/api/statement-notices')return statementNotices.handle(request,user);
  if(path==='/api/space-migrations')return migrations(request,user);
  if(path==='/api/space-migration-review')return migrationReview(request,user);
  if(path==='/api/transfer-matches')return transferMatches(request,user);
