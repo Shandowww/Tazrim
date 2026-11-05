@@ -1,0 +1,237 @@
+{
+  "date": "2026-11-05",
+  "status": "published-and-verified",
+  "productionURL": "https://budgit.duckdns.org/next",
+  "applicationSource": {
+    "commit": "be4a124a56df1d6c66ad70f93362a2a21b6ce110",
+    "branch": "codex/budgit-household-ui",
+    "previousProductionCommit": "a48024685bc36f3631cf797e427a32e028b2aa3f",
+    "priorSourceFilesVerified": 839,
+    "financialCommandsUnchanged": true
+  },
+  "features": [
+    "Selected Option 1: one-row account switch, bell and refresh; app name/wallet removed from header",
+    "61px header including border, plus device safe area; 44px touch controls",
+    "Shared page headings retain existing period picker and guarded scope/month navigation",
+    "Full scope names retained for accessibility/desktop; viewer and one/multiple budget states handled"
+  ],
+  "sourceBackup": {
+    "budgitViaSSH": true,
+    "tazrimSnapshot": "593bea4ffc108f53b8767eaae5b95369fc1c2b0a",
+    "tazrimBranch": "codex/budgit-react-frontend",
+    "independentHistoryAndLicensesPreserved": true,
+    "sourcePathsCompared": 844
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "regressions": 1165,
+    "coreChecks": 15,
+    "diffCheck": "passed",
+    "browser": {
+      "320": {
+        "headerHeight": 61,
+        "oneRow": true,
+        "brandRemoved": true,
+        "touchTargets44": true,
+        "scopeSwitchWorks": true,
+        "pagePeriods": true,
+        "noOverflow": true
+      },
+      "390": {
+        "headerHeight": 61,
+        "oneRow": true,
+        "brandRemoved": true,
+        "touchTargets44": true,
+        "scopeSwitchWorks": true,
+        "pagePeriods": true,
+        "noOverflow": true
+      },
+      "430": {
+        "headerHeight": 61,
+        "oneRow": true,
+        "brandRemoved": true,
+        "touchTargets44": true,
+        "scopeSwitchWorks": true,
+        "pagePeriods": true,
+        "noOverflow": true
+      },
+      "1440": {
+        "headerHeight": 61,
+        "oneRow": true,
+        "brandRemoved": true,
+        "touchTargets44": true,
+        "scopeSwitchWorks": true,
+        "pagePeriods": true,
+        "noOverflow": true
+      },
+      "periodArrowsAndPicker": true,
+      "monthScopeRefreshDraftGuards": true,
+      "bellWorks": true,
+      "viewerIdentity": true,
+      "singleSpace": true,
+      "multipleSpaces": true,
+      "financialUnchanged": true
+    },
+    "browserEvidence": "compact-header-browser-2026-11-05.json",
+    "physicalIPhoneRetested": false
+  },
+  "artifact": {
+    "image": "sha256:b11a702e6af62ed9903223129324ac0fc380109c1a59283930fbcb0551610bc3",
+    "sourceArchiveSha256": "448537dc3152877303aca766f4220e5ff53ce7a8cf4bcb4cedc1bcf5075c48bf",
+    "nineCandidateHashesMatchValidatedLocalBuild": true
+  },
+  "backup": {
+    "sha256": "2790e9a4b18476430794bb57368ac99926482972ee5cf7d354b4d9268df3cc6f",
+    "consistentSQLite": true,
+    "integrityVerified": true,
+    "freshBeforeActivation": true
+  },
+  "isolatedGates": {
+    "networkDisabled": true,
+    "financial": "passed",
+    "accessHTTPDecryption": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "0c7c463d4a8636d4ecc6c62f900d4a7f540ab3fd729a047c89e31be3dcde7288",
+      "reactHTMLSha256": "c8a544e1ae356687674edb85dba77896e182a8089a5a7790ade8fcc633123706"
+    },
+    "candidateStartup": "passed",
+    "rollbackFinancial": "passed",
+    "rollbackAccess": {
+      "startupPreservesAllExistingRecords": true,
+      "anonymousAndForgedAPIsDenied": true,
+      "anonymousDeepRoutesShowLogin": true,
+      "authenticatedDeepRoutes": true,
+      "privateImmutableAssetsAndMime": true,
+      "framingProtection": true,
+      "freshActorBoundAndEmpty": true,
+      "nonadministratorDenied": true,
+      "existingSpacesPrivate": true,
+      "apiNotSwallowedBySPA": true,
+      "allExistingRecordsPreservedAfterReadChecks": true,
+      "storedSourcesDecrypted": 13,
+      "defaultAndPreferredRootLaunch": true,
+      "originalHTMLSha256": "71a3615dd47534da344f97aa6353f8ff252e0cbbea008e8011e9b99574e16a68",
+      "reactHTMLSha256": "e4ae4a9f81acc988fed6b21876cae601f58cb3e0574d47983327acf6d0a8e188"
+    },
+    "retainedAssets": {
+      "priorReleases": [
+        "54633e5",
+        "a480246",
+        "b340ebf",
+        "e6df93e",
+        "f673347"
+      ],
+      "originalAssetsVerified": 333,
+      "currentAndPriorBytesMatch": true
+    }
+  },
+  "runtime": {
+    "healthy": true,
+    "imageMatches": true,
+    "sha256": {
+      "server/app.mjs": "fdc2e3812f1bd3a9ad0ed9dbea403eb54147e203cca1cb0f4dee51f3346b5d48",
+      "server/start.mjs": "f64cbe8acd70f0c32def3f2cf89774dcc1d8583a925e186db911465e0b0e2602",
+      "server/react-ui.mjs": "86861804dce5d1cabbc5b7d1a171f0615517842ae39d1e83e37d14c2174040d5",
+      "server/react-asset-archive.mjs": "51a84685b672ae428380a44c1b67fb0dd8401063a0a07773a84630d48a828df2",
+      "server/statement-notices.mjs": "e0cfbcb2f2e98d73ed9d3e445201b98651fe0a472c173e56c331254905db4d25",
+      "dist/server/statement-notices.mjs": "0152b031be1c19eb9047917c9ef4994d4c94ebb059bbf853b46bba5a5772af9c",
+      "dist/server/budget.js": "5100cce88b2c0e9a226ceefd099fdfaae2afd9908a356f0e7a7daf94ed4c8772",
+      "dist/index.html": "0c7c463d4a8636d4ecc6c62f900d4a7f540ab3fd729a047c89e31be3dcde7288",
+      "dist/frontend/index.html": "c8a544e1ae356687674edb85dba77896e182a8089a5a7790ade8fcc633123706"
+    },
+    "publicChecks": {
+      "checkedAt": "2026-11-05T19:23:35.640Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "previousModuleProbes": [
+      {
+        "file": "assets/index-lQ5m36UI.js",
+        "status": 200
+      },
+      {
+        "file": "assets/loans-page-CSDBj_Bo.js",
+        "status": 200
+      },
+      {
+        "file": "assets/scenario-page-CuV_rlKC.js",
+        "status": 200
+      }
+    ],
+    "previousAssetsRetainedAutomaticallyWithoutManualSeeding": true
+  },
+  "preservation": {
+    "authoritativeTablesPreserved": 42,
+    "integrity": true,
+    "foreignKeys": true,
+    "referenceInterestCacheExcluded": true,
+    "backupAttemptTimestampExcluded": true,
+    "configurationAndEncryptionKeysUnchanged": true,
+    "adjacentParkingAndProxyUnchanged": true,
+    "financialRecordsSourcesAccessAndBackupCredentialsPreserved": true,
+    "comparisonExceptions": [
+      "Existing derived financial/backup caches",
+      "reference_interest cache",
+      "drive_backup_connections.last_attempt only"
+    ],
+    "sitesAndPaidResourcesUnchanged": true
+  },
+  "rollback": {
+    "previousImage": "sha256:6a4264d72848570242b213c9f73ef65677361cb7a8a4eeef3ce31a88553fe78e",
+    "imageAndSourceRetained": true,
+    "candidateDatabaseCompatibilityVerified": true,
+    "databaseNeverRestoredOrOverwritten": true
+  },
+  "cleanup": {
+    "taskOwnedSyntheticPreviewStopped": true,
+    "taskOwnedHeadlessBrowserStopped": true,
+    "unrelatedTunnelsUntouched": true
+  },
+  "limitations": [
+    "Fresh physical iPhone Safari acceptance is not claimed.",
+    "Auto-sync work remains planning only; this publication changes the header, not automation policy."
+  ],
+  "userAction": "Reload Safari or reopen the home-screen app to load the compact header."
+}

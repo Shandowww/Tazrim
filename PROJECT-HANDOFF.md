@@ -1,5 +1,15 @@
 # Monthly Flow — project handoff
 
+## Selected compact header published — 2026-11-05
+
+Application `be4a124a56df1d6c66ad70f93362a2a21b6ce110` is verified live at https://budgit.duckdns.org/next. Selected Option 1 uses a single account-switch/bell/refresh row, without the app name or wallet symbol. The header is 61px including its border, plus safe area; controls remain 44px. Month controls now share page headings and preserve existing query/state/draft guards. Full account names remain accessible; desktop, viewer and one/multiple budget states are supported.
+
+Build/typecheck, 1,165 regressions and 15 core checks pass. Synthetic 320/390/430/1440 scope/month/refresh draft guards, period arrows/dialog, bell, viewer/multiple spaces, Light/Dark phone inspection, no overflow and unchanged financial hashes pass. All 839 prior source files matched. Fresh verified backup, isolated financial/access/HTTP/13-source-decryption/startup/rollback gates and 333 prior assets passed. Nine runtime hashes, public health/auth/deep routes/root/manifest, 42 authoritative tables, keys and adjacent services passed. Previous module URLs still load; retention required no manual seeding. Both SSH source backups updated; task preview/browser stopped.
+
+Current checkout remains `work/budgit-household-ui`, branch `codex/budgit-household-ui`. Evidence: `docs/ui-redesign/evidence/release-compact-header-2026-11-05.json`. Reload Safari or reopen the home-screen app. Fresh physical iPhone acceptance is not claimed. No production financial edits or Sites/paid-resource changes.
+
+Tal requested a three-phase automation plan, documented in `docs/ui-redesign/AUTO-SYNC-THREE-PHASE-PLAN.md` with an HTML flow diagram and official Paperless-ngx/n8n/Hazel/Actual/Apple references. Phase 1 verifies before digestion; Phase 2 prepares changes automatically with approval before application; Phase 3 applies eligible reports automatically and escalates exceptions. This is a plan only. The native folder-access blocker, per-user incoming inbox/routing, locked-vault constraints and device acceptance remain explicit; no automatic financial policy was enabled.
+
 ## Loans/calculator import recovery published — 2026-11-05
 
 Application `a48024685bc36f3631cf797e427a32e028b2aa3f` is verified live at https://budgit.duckdns.org/next. Open previous-release sessions had requested deleted lazy modules. Startup now retains authenticated hashed UI assets beside the database, expires superseded files after 30 days and refuses immutable collisions. Current assets/HTML take precedence. Assets from four recent live releases were seeded; 266 original assets passed byte-identity checks. A Hebrew screen-level recovery control preserves navigation and uses explicit connectivity-checked, draft-guarded reload.
