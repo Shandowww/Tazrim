@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "91305d724d3a17f5741286aabb97fe718942486f",
+  "sourceCommit": "fc1cf20ddd5fe70988037d8cd567513d5e80910a",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published pilot remains 46ab406. Owner false missing-key notification traced to wrong native Count parameter WFInput; changed to Input throughout and corrected Recursive field. Native metadata check rejects previous graph and accepts 172 non-conditional actions; 3 synthetic native counts, 23 focused tests, build/typecheck/signing pass. Native full run/PDF delivery pending; no deployment.",
+  "status": "Published application remains 46ab406. Owner Native-Inputs manual Mac run confirmed 2 examined/supported, 0 skipped, 1 new delivery; read-only server confirms 2 incoming sources/deliveries and no upload error. Native parameter schema/3 synthetic counts/23 focused tests/build/typecheck/signing passed. iPhone/scheduled/locked execution and explicit financial workflow remain pending. No deployment.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
