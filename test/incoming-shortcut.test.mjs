@@ -40,13 +40,21 @@ test('Native receipt conditions use concrete Text inputs and a receipt ID for ca
  assert.equal(actions[index+1].WFWorkflowActionIdentifier,'is.workflow.actions.gettext');
  assert.equal(actions[index+2].WFWorkflowActionIdentifier,'is.workflow.actions.count');
  assert.equal(actions[index+2].WFWorkflowActionParameters.WFCountType,'Characters');
- assert.equal(output(actions[index+2].WFWorkflowActionParameters.WFInput),actions[index+1]);
+ assert.equal(output(actions[index+2].WFWorkflowActionParameters.Input),actions[index+1]);
  assert.equal(presence.WFCondition,4);
  assert.equal(presence.WFConditionalActionString,'0');
  assert.equal(output(presence.WFInput.Variable),actions[index+3]);
  // Native Text emits one item even for an empty string. No existence condition
  // may mistake that item for a nonempty key, receipt ID or server error.
  assert.ok(!actions.some(a=>a.WFWorkflowActionParameters.WFCondition===101));
+});
+test('Count actions bind the native Input parameter, including setup guards and final counters',()=>{
+ const w=workflow(),counts=w.WFWorkflowActions.filter(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.count');
+ assert.ok(counts.length>=9);
+ for(const {WFWorkflowActionParameters:p} of counts){assert.ok(p.Input,'Count reads Input');assert.equal(p.WFInput,undefined,'WFInput is ignored by native Count');}
+ const folder=w.WFWorkflowActions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.file.getfoldercontents').WFWorkflowActionParameters;
+ assert.equal(folder.Recursive,false);
+ assert.equal(folder.WFGetFolderContentsRecursive,undefined);
 });
 test('Incoming native QA accepts only its synthetic bytes and returns a connection-local receipt catalog',async()=>{
  const qa=await startIncomingShortcutQA();try{

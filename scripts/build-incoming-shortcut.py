@@ -72,11 +72,11 @@ def build(config=None, folder_input=True):
         # Text with an empty string is still one native content item. Testing
         # Has Any Value therefore misclassifies an absent receipt/error/key.
         concrete = ref(add('gettext', WFTextActionText=text('\ufffc', value)), 'Text')
-        length = ref(add('count', WFInput=concrete, WFCountType='Characters'), 'Count')
+        length = ref(add('count', Input=concrete, WFCountType='Characters'), 'Count')
         return begin(length, expected='0')
 
-    def require(value, message):
-        group = empty_text(value)
+    def require(value, message, items=False):
+        group = begin(ref(add('count', Input=value, WFCountType='Items'), 'Count'), expected='0') if items else empty_text(value)
         notice(message)
         add('exit')
         end(group)
@@ -105,7 +105,7 @@ def build(config=None, folder_input=True):
     cleanup_setting = ref(add('gettext', WFTextActionText='retain'), 'Text')
     add('comment', WFCommentActionText='סוף ההגדרות — אין צורך לערוך את הפעולות שמתחת. הפענוח, השיוך והשמירה הכספית מחייבים אישור בתוך Budgit. תזמון מוגדר בנפרד רק לאחר בדיקה ידנית. גרסת QA עם כתובת 127.0.0.1 עובדת במחשב הבדיקה בלבד, לא ב־iPhone.')
     require(secret, 'חסר מפתח העלאה. מלאו את Text תחת הגדרה 2/3.')
-    require(incoming, 'בחרו תיקייה בפעולת File תחת הגדרה 1/3.' if folder_input else 'יש להעביר קובצי דוח מגיליון השיתוף.')
+    require(incoming, 'בחרו תיקייה בפעולת File תחת הגדרה 1/3.' if folder_input else 'יש להעביר קובצי דוח מגיליון השיתוף.', items=True)
     headers = {'WFSerializationType': 'WFDictionaryFieldValue', 'Value': {'WFDictionaryFieldValueItems': [
         {'WFItemType': 0, 'WFKey': text('Authorization'), 'WFValue': text('Bearer \ufffc', secret)},
         {'WFItemType': 0, 'WFKey': text('Content-Type'), 'WFValue': text('application/octet-stream')},
@@ -119,7 +119,7 @@ def build(config=None, folder_input=True):
     expected_bool = ref(add('getvalueforkey', WFInput=expected_json, WFDictionaryKey='expected'), 'Dictionary Value')
     expected_type = ref(add('getitemtype', WFInput=expected_bool), 'Type')
     expected_text = ref(add('gettext', WFTextActionText=text('\ufffc', expected_bool)), 'Text')
-    files = ref(add('file.getfoldercontents', WFFolder=incoming, WFGetFolderContentsRecursive=False), 'Folder Contents') if folder_input else incoming
+    files = ref(add('file.getfoldercontents', WFFolder=incoming, Recursive=False), 'Folder Contents') if folder_input else incoming
     for name in ['BudgitUploaded', 'BudgitScanned', 'BudgitExamined', 'BudgitSkipped']:
         empty = ref(add('list', WFItems=[]), 'List')
         add('setvariable', WFVariableName=name, WFInput=empty)
@@ -142,7 +142,7 @@ def build(config=None, folder_input=True):
     end(unsupported)
     supported = begin(variable('BudgitSupported'), expected='yes')
     add('appendvariable', WFVariableName='BudgitScanned', WFInput=name)
-    count = ref(add('count', WFInput=variable('BudgitScanned'), WFCountType='Items'), 'Count')
+    count = ref(add('count', Input=variable('BudgitScanned'), WFCountType='Items'), 'Count')
     count_text = ref(add('gettext', WFTextActionText=text('\ufffc', count)), 'Text')
     limit = begin(count_text, expected='501')
     notice('יש יותר מ־500 מקורות נתמכים בתיקייה. יש לארגן את המקורות הישנים ולהריץ שוב; הסריקה אינה מלאה.')
@@ -178,7 +178,7 @@ def build(config=None, folder_input=True):
     equal_or_stop(received_hash, text('\ufffc', source_hash), 'חתימת הקבלה אינה תואמת למקור. יש לבדוק את הקובץ בתיבה.')
     add('setvariable', WFVariableName='BudgitReceipt', WFInput=response)
     add('appendvariable', WFVariableName='BudgitUploaded', WFInput=name)
-    uploaded = ref(add('count', WFInput=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
+    uploaded = ref(add('count', Input=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
     uploaded_text = ref(add('gettext', WFTextActionText=text('\ufffc', uploaded)), 'Text')
     batch = begin(uploaded_text, expected='10')
     notice('נמסרו עשרה קבצים חדשים. יתר הקבצים ייבדקו בהרצה הבאה; הקבלות מאפשרות לדלג על מה שכבר נמסר.')
@@ -234,7 +234,7 @@ def build(config=None, folder_input=True):
         # before hashing/deleting; hashing the original item again is insufficient.
         empty = ref(add('list', WFItems=[]), 'List')
         add('setvariable', WFVariableName='BudgitFreshMatches', WFInput=empty)
-        fresh_files = ref(add('file.getfoldercontents', WFFolder=incoming, WFGetFolderContentsRecursive=False), 'Folder Contents')
+        fresh_files = ref(add('file.getfoldercontents', WFFolder=incoming, Recursive=False), 'Folder Contents')
         fresh_loop = str(uuid.uuid5(uuid.NAMESPACE_URL, 'budgit/incoming/fresh-files')).upper()
         add('repeat.each', WFInput=fresh_files, GroupingIdentifier=fresh_loop, WFControlFlowMode=0)
         candidate = variable('Repeat Item')
@@ -243,7 +243,7 @@ def build(config=None, folder_input=True):
         add('appendvariable', WFVariableName='BudgitFreshMatches', WFInput=candidate)
         end(same_name)
         add('repeat.each', GroupingIdentifier=fresh_loop, WFControlFlowMode=2)
-        matches = ref(add('count', WFInput=variable('BudgitFreshMatches'), WFCountType='Items'), 'Count')
+        matches = ref(add('count', Input=variable('BudgitFreshMatches'), WFCountType='Items'), 'Count')
         matches_text = ref(add('gettext', WFTextActionText=text('\ufffc', matches)), 'Text')
         equal_or_stop(matches_text, '1', 'הקובץ אינו זמין באופן חד־משמעי. לא בוצעה מחיקה.')
         current_hash = ref(add('hash', WFInput=variable('BudgitFreshMatches'), WFHashType='SHA256'), 'Hash')
@@ -254,10 +254,10 @@ def build(config=None, folder_input=True):
         end(cleanup_enabled)
     end(supported)
     add('repeat.each', GroupingIdentifier=loop, WFControlFlowMode=2)
-    uploaded = ref(add('count', WFInput=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
-    examined = ref(add('count', WFInput=variable('BudgitExamined'), WFCountType='Items'), 'Count')
-    supported_count = ref(add('count', WFInput=variable('BudgitScanned'), WFCountType='Items'), 'Count')
-    skipped_count = ref(add('count', WFInput=variable('BudgitSkipped'), WFCountType='Items'), 'Count')
+    uploaded = ref(add('count', Input=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
+    examined = ref(add('count', Input=variable('BudgitExamined'), WFCountType='Items'), 'Count')
+    supported_count = ref(add('count', Input=variable('BudgitScanned'), WFCountType='Items'), 'Count')
+    skipped_count = ref(add('count', Input=variable('BudgitSkipped'), WFCountType='Items'), 'Count')
     notice(text('נבדקו \ufffc פריטים; נתמכים: \ufffc; דולגו: \ufffc; נמסרו עכשיו: \ufffc. קבצים שכבר נמסרו אינם נשלחים שוב. המקורות נשארים במכשיר. בדקו את תיבת הסנכרון ב־Budgit.', examined, supported_count, skipped_count, uploaded))
     skipped_text = ref(add('gettext', WFTextActionText=text('\ufffc', skipped_count)), 'Text')
     skipped = begin(skipped_text, expected='0')

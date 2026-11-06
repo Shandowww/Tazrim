@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "9dd469472889840f9d06a1360ea785833c72b97f",
+  "sourceCommit": "91305d724d3a17f5741286aabb97fe718942486f",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published pilot remains 46ab406. One incoming delivery confirmed by read-only counts; owner spreadsheet-only rerun validates its retained receipt. Native logs prove empty Text misclassified as present for missing PDF receipt. Local signed replacement uses character counts; 22 focused checks/build/typecheck/signing pass. Native PDF delivery pending; no deployment.",
+  "status": "Published pilot remains 46ab406. Owner false missing-key notification traced to wrong native Count parameter WFInput; changed to Input throughout and corrected Recursive field. Native metadata check rejects previous graph and accepts 172 non-conditional actions; 3 synthetic native counts, 23 focused tests, build/typecheck/signing pass. Native full run/PDF delivery pending; no deployment.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
