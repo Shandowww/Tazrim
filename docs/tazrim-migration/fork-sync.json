@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "0e6a978789ec8d0bd6ea4cd3f38c161e940973ad",
+  "sourceCommit": "7241824d144a8f86b90e3768d6c14072aeb0a188",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published manual pilot remains 46ab406. Local signed follow-up removes Change Case from extension filtering and adds examined/skipped counters; owner native acceptance pending, no new deployment.",
+  "status": "Published pilot remains 46ab406. Local transfer candidate preserves name extensions and surfaces server rejections. Native run reached upload but was rejected; zero incoming sources stored. Owner native acceptance remains pending; no new deployment.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",

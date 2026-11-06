@@ -14,7 +14,7 @@ test('Incoming folder workflow keeps originals, has no embedded bookmark/token, 
  assert.ok(!w.WFWorkflowActions.some(a=>short(a)==='text.changecase'));
  const filters=w.WFWorkflowActions.filter(a=>short(a)==='conditional').map(a=>a.WFWorkflowActionParameters.WFConditionalActionString);
  for(const extension of ['csv','xlsx','pdf','PDF','.XLSX'])assert.ok(filters.includes(extension));
- assert.ok(JSON.stringify(w).includes('BudgitSkipped'));assert.ok(JSON.stringify(w).includes('BudgitExamined'));
+ assert.ok(w.WFWorkflowActions.some(a=>short(a)==='urlencode'&&a.WFWorkflowActionParameters.WFEncodeMode==='Encode'));assert.ok(w.WFWorkflowActions.some(a=>short(a)==='getvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='error')); assert.ok(JSON.stringify(w).includes('BudgitSkipped'));assert.ok(JSON.stringify(w).includes('BudgitExamined'));
  assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='file.getfoldercontents').length,1);assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='downloadurl').length,2);assert.ok(!JSON.stringify(w).includes('/Users/'));assert.ok(!JSON.stringify(w).includes('http://127.0.0.1'));
 })
 test('Incoming native QA accepts only its synthetic bytes and returns a connection-local receipt catalog',async()=>{
