@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "46ab40643b2b8a94c7994a4c665e9e91ca7ffa8d",
+  "sourceCommit": "84e0811c8e63c1dbd766806b0d3a63de3063b721",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Manual incoming-report pilot candidate; production deployment gates in progress. Production shortcut retains all originals and has no deletion action. Native iPhone delivery/scheduling/locked-device acceptance remains pending.",
+  "status": "Published manual incoming-report pilot. Device originals retained; no production Shortcut deletion/move. Physical iPhone/native/scheduled/locked acceptance pending; Phase 2/3 disabled.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1270,
     "coreChecks": 15,
     "browser": "Synthetic inbox approval/routing retry/account isolation/responsive checks passed on final candidate.",
-    "release": "No sync release; production evidence remains docs/ui-redesign/evidence/release-categories-2026-11-05.json"
+    "release": "Verified backup/source/financial/access/decryption/startup/rollback/intake restore/retained assets/runtime/public preservation; see release-incoming-pilot-2026-11-06.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "0b830c5dce2460d21a2e3076f51dba440eb44c99"
+  "productionApplicationCommit": "46ab40643b2b8a94c7994a4c665e9e91ca7ffa8d"
 }

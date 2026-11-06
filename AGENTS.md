@@ -1,5 +1,10 @@
 # Monthly Flow project context
 
+## Incoming report manual pilot published — 2026-11-06
+
+Application `46ab406` is live. Open `/next/incoming` for private storage consent, connection/key creation and the signed folder-first installer. Production Shortcut contains no deletion/move actions and retains all device originals; financial parsing approval, routing review and original explicit save remain required. Phase 2/3 stay disabled. Build/typecheck,1,270 tests/15 core checks,851 prior source files,fresh verified backup,financial/access/13-source decryption/startup/rollback/5-intake-table restore/67 retained-asset gates and runtime/public preservation passed.42 authoritative tables,keys and parking/proxy preserved. Physical iPhone delivery/folder/scheduling/locked-device acceptance remains pending; user must replace old QA/setup copies with the published installer. Evidence: docs/ui-redesign/evidence/release-incoming-pilot-2026-11-06.json.
+
+
 ## Phase 1 sync local checkpoint — 2026-11-06
 
 The private incoming inbox, exact-file parsing approval, identifier routing, guarded staging-copy cleanup and existing backup tracking are implemented locally in `work/budgit-household-ui`. Financial review/save remains explicit. The Shortcut retains originals; native folder execution and actual iPhone 17 Pro/iOS 27 `Downloads/Budgit` scheduling remain unverified. This is a source checkpoint, not a production release or Phase 1 acceptance. Details and validation: `docs/ui-redesign/PHASE1-LOCAL-CHECKPOINT-2026-11-06.md`. Production remains the verified category-management release; preserve unrelated outer/older checkouts.

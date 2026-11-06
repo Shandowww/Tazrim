@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-06",
+  "status": "published-manual-pilot",
+  "applicationCommit": "46ab40643b2b8a94c7994a4c665e9e91ca7ffa8d",
+  "previousApplicationCommit": "0b830c5dce2460d21a2e3076f51dba440eb44c99",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "installer": "https://budgit.duckdns.org/shortcuts/budgit-incoming.shortcut",
+  "image": "sha256:bda229b31fcc5f4712cd381265adfc5a57d8aeb602e0749163882e2000b98b5f",
+  "sourceArchiveSha256": "76cb4ef296036d0b0f0f0c13f3f4ef2ec6ac208d39f0871375e4f93a7ba571e3",
+  "validation": {
+    "buildTypecheck": true,
+    "tests": 1270,
+    "coreChecks": 15,
+    "priorSourceFilesMatched": 851,
+    "syntheticInboxBrowser": {
+      "gateBeforeParsing": true,
+      "manualIdentifierMappingAndRetry": true,
+      "nextReportAutomaticallyAssigned": true,
+      "notificationTracksPending": true,
+      "responsiveNoOverflow": true,
+      "financialUnchanged": true,
+      "actorIsolation": true
+    },
+    "freshVerifiedBackup": true,
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "existingEncryptedSourcesDecrypted": 13,
+    "intakeFiveTableRestoreAndEncryptedOriginalAndConnectionReceipt": true,
+    "priorAssetsVerified": 67,
+    "runtimeHashesMatchLocal": true,
+    "public": {
+      "checkedAt": "2026-11-06T12:42:30.283Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/incoming",
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "publishedInstallerMatchesSignedBytes": true,
+    "invalidUploadKeyRefused": true
+  },
+  "preservation": {
+    "authoritativeTables": 42,
+    "integrityAndForeignKeys": true,
+    "configKeysAndAdjacentServices": true,
+    "productionFinancialEdits": false,
+    "sitesOrPaidResourcesChanged": false
+  },
+  "policy": {
+    "automaticFinancialProcessing": false,
+    "financialReviewAndSaveRequired": true,
+    "deviceOriginalsRetained": true,
+    "productionShortcutHasDeletionOrMove": false
+  },
+  "limits": [
+    "Physical iPhone folder/provider and native delivery acceptance pending.",
+    "Scheduled and locked-device runs not verified.",
+    "Existing QA/setup shortcuts must be replaced by published installer."
+  ],
+  "notes": [
+    "First retained-asset fixture had incorrect directory nesting; corrected fixture passed before activation.",
+    "Private backup paths, credentials and financial records are not included in source evidence."
+  ]
+}

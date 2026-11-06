@@ -5,3 +5,5 @@ This bounded release exposes private report inbox consent, scoped upload connect
 Manual iPhone folder/provider access, native delivery, duplicate delivery, scheduled/locked runs and iCloud availability need owner/device acceptance after publication; these are not advertised as verified unattended automation. The previous QA/setup copies must be replaced by the published installer. No personal upload key is embedded in source or the shared installer.
 
 Local validation: exact build/typecheck, 1,270 application/reader tests and 15 core checks passed. Release additionally requires fresh verified backup, source reconciliation, isolated financial/all-record/access/decryption/startup/rollback/retained-asset gates and runtime preservation checks. Record actual publication separately.
+
+Published application `46ab406` on 2026-11-06. All required release gates passed; exact evidence is `evidence/release-incoming-pilot-2026-11-06.json`. First real iPhone upload remains owner acceptance.
