@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-06",
+  "status": "published",
+  "applicationCommit": "ab8310a96c4abd235c738e125ed43fdd5186264b",
+  "previousApplicationCommit": "e9c4b0174a82f200249f2b0eb5faa7698a7c0ebe",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "image": "sha256:e59b8cb8eed91a8ccba0bb999aa66dd439bc9023b24857a080ed64e9188d37ec",
+  "sourceArchiveSha256": "54cc02845ba72933fdb3a4146a8503b72ee18d0571553d8afd9d020cbc56fc1b",
+  "behavior": {
+    "calDigitalMonthlyPDF": "all numbered pages, unique card suffix and reconciled billed ILS total; original installment/foreign evidence retained",
+    "routing": "existing report orchestration; card suffix and linked bank shown",
+    "notices": "separate issuer bullets from card-message section; existing encrypted notice scan after routing; existing bell and scoped retry destination",
+    "approval": "visible local progress/errors and refreshed approval after parsing failure",
+    "financialImport": "explicit existing review and save required"
+  },
+  "validation": {
+    "buildTypecheck": true,
+    "regressions": 1279,
+    "coreChecks": 15,
+    "syntheticBrowser": {
+      "cardDestinationReached": true,
+      "twoNoticesReachBell": true,
+      "noOverflow": true,
+      "financialUnchanged": true,
+      "inlineParseFailureAndApprovalRefresh": true
+    },
+    "priorSourceFilesMatched": 878,
+    "freshVerifiedBackup": true,
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "existingEncryptedSourcesDecrypted": 17,
+    "intakeRestore": true,
+    "retainedAssetsVerified": 68,
+    "runtimeHashesMatchValidatedLocalBuild": 11,
+    "public": {
+      "checkedAt": "2026-11-06T18:38:36.068Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/incoming",
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "publishedInstallerBytesMatch": true,
+    "invalidUploadKeyDenied": true,
+    "runtimeAPTSecurityUpgradeRetained": true
+  },
+  "preservationAtActivation": {
+    "authoritativeTables": 47,
+    "integrityAndForeignKeys": true,
+    "configKeysAndAdjacentServices": true,
+    "financialRecordsUnchanged": true,
+    "sitesOrPaidResourcesChanged": false
+  },
+  "limits": [
+    "Cal PDF reader accepts the verified digital monthly template, not every Cal export/scanned layout.",
+    "Physical iPhone acceptance and user financial import were not performed.",
+    "Private source inspection artifacts are excluded from Git."
+  ]
+}

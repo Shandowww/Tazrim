@@ -1,4 +1,5 @@
 import {bankIdentityHints} from './intake-reader.mjs';
+import {inspectCalPDF} from './cal-pdf.mjs';
 import {inspectIsracardPDF} from './isracard-pdf.mjs';
 import {LIMITS,parseMoney,parseDate,guessMapping} from './parser.mjs';
 const norm=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/[\s:״”"׳']/g,'');
@@ -111,4 +112,4 @@ export async function readPDFPages(bytes){
 }
 
 export async function readOneZeroPDF(bytes){return inspectOneZeroPDF(await readPDFPages(bytes));}
-export async function readReportPDF(bytes,options={}){const pages=await readPDFPages(bytes);if(pages.some(page=>lines(page.items).some(row=>['תאריך','פעולה','חובה','זכות','יתרהבשח'].every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectHapoalimPDF(pages,options)};if(pages.some(page=>lines(page.items).some(row=>headerNames.every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectOneZeroPDF(pages,options)};const report=inspectIsracardPDF(pages);if(report)return{intake:{kind:'card',provider:'isracard',identity:report.last4?'isracard:'+report.last4:'',report}};throw Error('מבנה דוח PDF לא נתמך. בחרו דוח תנועות מקורי של הפועלים או וואן זירו, דוח ישראכרט, או יצוא Excel מהבנק.');}
+export async function readReportPDF(bytes,options={}){const pages=await readPDFPages(bytes);if(pages.some(page=>lines(page.items).some(row=>['תאריך','פעולה','חובה','זכות','יתרהבשח'].every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectHapoalimPDF(pages,options)};if(pages.some(page=>lines(page.items).some(row=>headerNames.every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectOneZeroPDF(pages,options)};const cal=inspectCalPDF(pages);if(cal)return{intake:{kind:'card',provider:'cal',identity:'cal:'+cal.last4,report:cal}};const report=inspectIsracardPDF(pages);if(report)return{intake:{kind:'card',provider:'isracard',identity:report.last4?'isracard:'+report.last4:'',report}};throw Error('מבנה דוח PDF לא נתמך. בחרו דוח תנועות מקורי של הפועלים או וואן זירו, דוח חיוב חודשי של כאל או ישראכרט, או יצוא Excel מהבנק או מחברת האשראי.');}

@@ -1,5 +1,13 @@
 # Monthly Flow
 
+## Cal monthly PDF and issuer messages published — 2026-11-06
+
+Application `ab8310a96c4abd235c738e125ed43fdd5186264b` is verified live. The shared reader now supports the verified digital Cal monthly PDF template, reconciles all numbered pages and billed ILS totals, preserves original installment/foreign evidence and reaches the existing card routing/review. Card destinations show suffix and linked bank. Parsing progress/errors appear in the approval panel, and successful approval refreshes even when extraction fails. Explicit incoming routing also invokes the existing encrypted issuer-notice scan: separate Cal message bullets feed the existing bell, with scoped updates/retry access. Financial import still requires the existing explicit review/save.
+
+Build/typecheck, 1,279 regressions and 15 core checks pass. Synthetic PDF/worker/service/browser checks cover routing, both separate notices reaching bell action data, inline failure/approval refresh, 320/390/430/1440px no-overflow and unchanged private/shared financial hashes. All 878 prior source files matched; verified fresh backup, isolated financial/access/17-source decryption/startup/rollback/intake restore/68 retained assets passed. Eleven runtime hashes match the validated local build; public health/auth/deep routes/root/manifest/installer pass. All 47 authoritative tables, keys and adjacent services were preserved. Runtime APT security upgrade from the CI branch is retained. Physical iPhone acceptance/user financial import remain unperformed; exact private source inspection is excluded from Git. No Sites or paid-resource changes. Evidence: `docs/ui-redesign/evidence/release-cal-pdf-2026-11-06.json`; details: `docs/ui-redesign/CAL-PDF-2026-11-06.md`.
+
+Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`. Save review drafts and use guarded refresh before continuing an existing inbox PDF; no re-upload is required.
+
 ## Overview chart scale callout removed — 2026-11-06
 
 Application `e9c4b0174a82f200249f2b0eb5faa7698a7c0ebe` is verified live on the existing server. The overview no longer shows the standalone upper-scale value with the ambiguous monthly-amount label. Bar calculations, negative values, selected-month totals and financial models are unchanged.

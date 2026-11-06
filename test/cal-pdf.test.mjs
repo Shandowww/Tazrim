@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readReportPDF} from '../tools/bank-csv/pdf-reader.mjs';
+import {calTextFixture as fixture,calPDFFixture,item,glyphs} from '../tools/bank-csv/cal-pdf-fixture.mjs';
+import {extractStatementNotices,pdfNoticePages} from '../tools/bank-csv/statement-notices.mjs';
+import {readPDFPages} from '../tools/bank-csv/pdf-reader.mjs';
+import {inspectCalPDF} from '../tools/bank-csv/cal-pdf.mjs';
+test('Cal monthly PDF reconciles every page, suffix, billed installments and signed refunds with RTL glyphs',()=>{const p=fixture(),before=structuredClone(p),r=inspectCalPDF(p);assert.equal(r.amount,50);assert.equal(r.count,2);assert.equal(r.last4,'1234');assert.equal(r.dueDate,'2026-10-15');assert.equal(r.entries[0].date,'2026-09-01');assert.equal(r.entries[0].merchant,'עסק לדוגמה');assert.equal(r.entries[0].amountCents,10000);assert.equal(r.entries[0].originalCents,100000);assert.equal(r.entries[1].amountCents,-5000);assert.deepEqual(p,before);});
+test('Foreign purchases retain original currency but only reconciled ILS becomes a charge',()=>{const p=fixture();p[0].items.find(i=>i.str==='₪ 1,000.00').str='EU 25.00';const r=inspectCalPDF(p);assert.equal(r.entries[0].originalCurrency,'EUR');assert.equal(r.entries[0].foreignCents,2500);assert.equal(r.entries[0].originalCents,10000);assert.equal(r.amount,50);});
+test('Cal PDF refuses missing/reordered pages, mismatched suffixes, totals, extra charge/date rows and unknown geometry',()=>{const changes=[p=>p.pop(),p=>p.reverse(),p=>p[1].items.push(item('המסתיים ב-9999',300,790,180)),p=>p[1].items.find(i=>i.str==='₪ 50.00'&&i.transform[5]<740).str='₪ 51.00',p=>p[0].items.push(item('₪ 4.00',145,300,30)),p=>p[0].items.push(item('לא תאריך',510,300,28)),p=>p[0].width=600,p=>p[0].items.find(i=>i.str==='₪ 100.00').str='EU 100.00',p=>p[0].items.find(i=>i.str==='₪ 100.00').transform[4]=120];for(const change of changes){const p=fixture();change(p);assert.throws(()=>inspectCalPDF(p),/אין קליטה חלקית/);}});
+test('Unrelated PDF remains available to existing bank/Isracard readers',()=>{const p=fixture();for(const page of p)page.items=page.items.filter(i=>!i.str.includes('cal-online'));assert.equal(inspectCalPDF(p),null);});
+
+test('Actual synthetic Cal PDF bytes pass the shared reader with a card routing identity',async()=>{const result=await readReportPDF(calPDFFixture());assert.equal(result.intake.kind,'card');assert.equal(result.intake.identity,'cal:1234');assert.equal(result.intake.report.amount,50);assert.equal(result.intake.report.count,2);});
+
+test('Cal notice scan preserves two page-two bullets and excludes ads and financial table content',async()=>{const notices=extractStatementNotices(pdfNoticePages(await readPDFPages(calPDFFixture()))).notices;assert.equal(notices.length,2);assert.deepEqual(notices.map(n=>n.category),['promotion','terms']);assert.ok(notices.every(n=>n.issuer==='cal'&&n.page===2&&n.needsReview));assert.match(notices[0].text,/יתרת ההטבה/);assert.match(notices[1].text,/מסגרת הכרטיס/);assert.ok(!notices.some(n=>/עסק לדוגמה|50.00/.test(n.text)));});
+
+test('Latin merchant words and their numeric identifiers keep their visual order',()=>{const p=fixture(),page=p[0];page.items=page.items.filter(i=>!(i.transform[5]===500&&i.transform[4]>=420&&i.transform[4]<500));page.items.push(...glyphs('SHOP EXAMPLE 42',498,500));assert.equal(inspectCalPDF(p).entries[0].merchant,'SHOP EXAMPLE 42');});

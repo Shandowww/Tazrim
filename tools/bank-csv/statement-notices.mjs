@@ -1,3 +1,4 @@
+import {calPDFNoticePages} from './cal-pdf.mjs';
 export const statementNoticeCategories={charge:'חיוב או עמלה צפויים',account:'נדרש טיפול בחשבון',promotion:'הטבה או מבצע',terms:'שינוי בתנאים',update:'עדכון מהמנפיק'};
 export const normalizeNoticeText=value=>String(value??'').normalize('NFKC').replace(/[\u0000-\u001f\u007f\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,' ').replace(/\s+/g,' ').trim();
 const heading=/^(?:הודעות(?: חשובות)?|מידע חשוב|לידיעתך|לתשומת לבך|עדכונים|הטבות(?: ומבצעים)?|מבצעים|שינויים בתנאים|important (?:information|notices)|notices|promotions|updates)\s*[:：־-]?$/i;
@@ -9,7 +10,7 @@ export function issuerNoticeIdentity(text){
 }
 function category(text){
  if(/(?:יש|נדרש|עליך|עליכם) (?:להסדיר|לעדכן|ליצור קשר|לטפל)|חריגה ממסגרת|פיגור בתשלום|חשבון.*(?:חסום|מוגבל)|action required|overdue|account.*(?:blocked|suspended)/i.test(text))return 'account';
- if(/שינוי(?:ים)? ב(?:תנאי|תעריפ|הסכם)|עדכון (?:תנאי|תעריפ)|תנאים חדשים|changes? to (?:terms|conditions)|terms.*(?:change|update)/i.test(text))return 'terms';
+ if(/מסגרת (?:הכרטיס|האשראי) מתעדכנת|שינוי(?:ים)? ב(?:תנאי|תעריפ|הסכם)|עדכון (?:תנאי|תעריפ)|תנאים חדשים|changes? to (?:terms|conditions)|terms.*(?:change|update)/i.test(text))return 'terms';
  if(/הטבה|מבצע|קופון|הנחה|promoti(?:on|onal)|special offer|discount/i.test(text))return 'promotion';
  if(/(?:תחויב|תחויבו|ייגבה|תגבה|צפוי להיגבות|חיוב צפוי|עמלה.*(?:החל|תחויב|תיגבה)|upcoming (?:charge|fee)|will be charged)/i.test(text))return 'charge';
  return 'update';
@@ -33,6 +34,7 @@ export function extractStatementNotices(pages){
    if(/^\d{1,2}[./]\d{1,2}(?:[./]\d{2,4})?[ ,;]/.test(row)){flush();continue}
    if(heading.test(row)){flush();section=true;continue}
    if(table.test(row)){flush();section=false;continue}
+   if(/^[•●]\s*/.test(row))flush();
    const kind=category(row),explicit=kind!=='update'&&row.length>=20;
    if(!section&&!explicit){flush();continue}
    if(explicit&&block.length)flush();
@@ -45,6 +47,7 @@ export function extractStatementNotices(pages){
  return{version:1,issuer,notices};
 }
 export function pdfNoticePages(pages){
+ const cal=calPDFNoticePages(pages);if(cal)return cal;
  return pages.map((page,index)=>{
   const rows=[];
   for(const item of page.items??[]){if(typeof item.str!=='string'||!item.str.trim())continue;const vertical=item.transform?.[5]??0;let row=rows.find(candidate=>Math.abs(candidate.vertical-vertical)<2);if(!row){row={vertical,items:[]};rows.push(row)}row.items.push(item)}

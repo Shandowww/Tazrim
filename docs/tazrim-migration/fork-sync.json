@@ -1,20 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "1a667af4ad60fb3905a6bfa334e5b51bca031914",
+  "sourceCommit": "d9619bf4403a289220d39bf51df9701339b2c20e",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published removal of confusing overview chart scale callout. Chart calculations and financial models unchanged. Private financial audit and record-maintenance artifacts are excluded from the tracked-source export.",
+  "status": "Published Cal digital monthly PDF routing, visible parsing feedback and separate issuer messages through the existing encrypted notice scan and notification bell. Private source inspection artifacts excluded.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "focusedHouseholdHomeTests": 11,
+    "regressionTests": 1279,
     "coreChecks": 15,
-    "priorFinancialRegressionTests": 1272,
-    "release": "876 source matches, verified backup, isolated financial/access/decryption/startup/rollback/intake restore, 68 retained assets, 9 runtime hashes, public checks and 47 authoritative tables preserved at UI activation; see release-chart-scale-removal-2026-11-06.json"
+    "browser": "Synthetic Cal worker/service routing, two notices reaching bell action data, inline failure and approval refresh, 320/390/430/1440px without overflow; private/shared financial hashes unchanged.",
+    "release": "878 prior files matched; verified backup; isolated financial/access/17-source decryption/startup/rollback/intake restore/68 retained assets; 11 runtime hashes/public checks; 47 authoritative tables/keys/adjacent services preserved. See release-cal-pdf-2026-11-06.json."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "e9c4b0174a82f200249f2b0eb5faa7698a7c0ebe",
-  "productionImage": "sha256:89652efd20499ce7ab80f80a5e1d6ca3e51e5ea785bb972700fcb3806b9ffa78"
+  "productionApplicationCommit": "ab8310a96c4abd235c738e125ed43fdd5186264b",
+  "productionImage": "sha256:e59b8cb8eed91a8ccba0bb999aa66dd439bc9023b24857a080ed64e9188d37ec"
 }

@@ -37,7 +37,7 @@ export async function scanStatementNotices(budgetId:string,actor:BudgetResponse,
  if(result.accountId!==actor.accountId||result.budgetId!==budgetId||result.noticeIdentityBound!==true||result.ok!==true)throw new AccessError('לא התקבל אישור בדיקה לחשבון ולמרחב הנכונים.')
  return status
 }
-export async function scanNewStatement(budgetId:string,actor:BudgetResponse,sourceId:string,bytes:Uint8Array,signal:AbortSignal){
+export async function scanNewStatement(budgetId:string,actor:BudgetResponse,sourceId:string,bytes:Uint8Array|undefined,signal:AbortSignal){
  const snapshot=await loadStatementNotices(budgetId,actor,signal),scan=snapshot.scans.find(value=>value.source.id===sourceId)
  if(!scan)throw Error('קובץ המקור לא זמין לבדיקת הודעות.')
  if(scan.status==='complete')return scan.status
