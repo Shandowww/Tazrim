@@ -17,6 +17,30 @@ test('Incoming folder workflow keeps originals, has no embedded bookmark/token, 
  assert.ok(w.WFWorkflowActions.some(a=>short(a)==='urlencode'&&a.WFWorkflowActionParameters.WFEncodeMode==='Encode'));assert.ok(w.WFWorkflowActions.some(a=>short(a)==='getvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='error')); assert.ok(JSON.stringify(w).includes('BudgitSkipped'));assert.ok(JSON.stringify(w).includes('BudgitExamined'));
  assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='file.getfoldercontents').length,1);assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='downloadurl').length,2);assert.ok(!JSON.stringify(w).includes('/Users/'));assert.ok(!JSON.stringify(w).includes('http://127.0.0.1'));
 })
+test('Native receipt conditions use concrete Text inputs and a receipt ID for catalog presence',()=>{
+ const w=workflow(),actions=w.WFWorkflowActions,byId=new Map(actions.map(a=>[a.WFWorkflowActionParameters.UUID,a]));
+ const output=p=>byId.get(p?.Value?.OutputUUID);
+ let dynamic=0;
+ for(const a of actions){
+  const p=a.WFWorkflowActionParameters;
+  if(a.WFWorkflowActionIdentifier!=='is.workflow.actions.conditional'||p.WFControlFlowMode!==0||p.WFCondition!==4)continue;
+  assert.equal(output(p.WFInput.Variable)?.WFWorkflowActionIdentifier,'is.workflow.actions.gettext','Native equality must receive unambiguous Text');
+  assert.ok(p.WFConditionalActionString,'Native equality requires a populated RHS');
+  if(typeof p.WFConditionalActionString==='object'){
+   dynamic++;
+   const t=p.WFConditionalActionString;
+   assert.equal(t.WFSerializationType,'WFTextTokenString');
+   assert.equal(t.Value.string,'\ufffc');
+   assert.equal(Object.keys(t.Value.attachmentsByRange).length,1);
+  }
+ }
+ assert.ok(dynamic>=6,'Boolean type/value and both receipt hashes remain guarded');
+ const receiptLookup=actions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.getvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='receiptId');
+ const index=actions.indexOf(receiptLookup),presence=actions[index+2].WFWorkflowActionParameters;
+ assert.equal(actions[index+1].WFWorkflowActionIdentifier,'is.workflow.actions.gettext');
+ assert.equal(presence.WFCondition,101);
+ assert.equal(output(presence.WFInput.Variable),actions[index+1]);
+});
 test('Incoming native QA accepts only its synthetic bytes and returns a connection-local receipt catalog',async()=>{
  const qa=await startIncomingShortcutQA();try{
  const headers={authorization:'Bearer '+qa.token},catalog=await(await fetch(qa.endpoint+'?catalog=1',{headers})).json();assert.deepEqual(catalog,{version:1,receipts:{}});

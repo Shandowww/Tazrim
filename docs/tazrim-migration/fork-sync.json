@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "7241824d144a8f86b90e3768d6c14072aeb0a188",
+  "sourceCommit": "dea078d8f5b4dd89c9d732288088548577e15a66",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published pilot remains 46ab406. Local transfer candidate preserves name extensions and surfaces server rejections. Native run reached upload but was rejected; zero incoming sources stored. Owner native acceptance remains pending; no new deployment.",
+  "status": "Published pilot remains 46ab406. Local signed replacement materializes equality inputs as Text and checks catalog receipt ID presence. 22 focused checks and build/typecheck/signing pass; owner native execution remains pending. No new deployment.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",

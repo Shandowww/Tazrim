@@ -52,6 +52,12 @@ def build(config=None, folder_input=True):
         group = str(uuid.uuid5(uuid.NAMESPACE_URL, 'budgit/incoming/condition/' + str(len(actions)))).upper()
         p = {'GroupingIdentifier': group, 'WFControlFlowMode': 0, 'WFInput': {'Type': 'Variable', 'Variable': value}, 'WFCondition': condition}
         if expected is not None:
+            # Dictionary Value / Type outputs have an ambiguous native content
+            # type. Shortcuts can select a different comparison parameter and
+            # display an empty RHS despite WFConditionalActionString being set.
+            # Materialize Text before *every* equality, including hash/type checks.
+            comparison = ref(add('gettext', WFTextActionText=text('\ufffc', value)), 'Text')
+            p['WFInput'] = {'Type': 'Variable', 'Variable': comparison}
             p['WFConditionalActionString'] = expected
         add('conditional', **p)
         return group
@@ -142,7 +148,11 @@ def build(config=None, folder_input=True):
     upload_name = ref(add('gettext', WFTextActionText=text('\ufffc.\ufffc', stem, clean_extension)), 'Text')
     source_hash = ref(add('hash', WFInput=current, WFHashType='SHA256'), 'Hash')
     old = ref(add('getvalueforkey', WFInput=receipts, WFDictionaryKey=text('\ufffc', source_hash)), 'Dictionary Value')
-    absent = begin(old, 101)
+    # A missing dictionary lookup can still produce a native content item.
+    # Test a concrete receipt identifier as Text, not the container's presence.
+    prior_id = ref(add('getvalueforkey', WFInput=old, WFDictionaryKey='receiptId'), 'Dictionary Value')
+    prior_id_text = ref(add('gettext', WFTextActionText=text('\ufffc', prior_id)), 'Text')
+    absent = begin(prior_id_text, 101)
     encoded_name = ref(add('urlencode', WFInput=text('\ufffc', upload_name), WFEncodeMode='Encode'), 'URL Encoded Text')
     response = ref(add('downloadurl', WFURL=text(endpoint + '?name=\ufffc', encoded_name), WFHTTPMethod='POST', WFHTTPBodyType='File', WFRequestVariable=current, ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
     server_error = ref(add('getvalueforkey', WFInput=response, WFDictionaryKey='error'), 'Dictionary Value')
