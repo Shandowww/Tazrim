@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-06",
+  "status": "published",
+  "scope": "UI release activation only; private audit and authorized record maintenance have separate private evidence",
+  "applicationCommit": "e9c4b0174a82f200249f2b0eb5faa7698a7c0ebe",
+  "previousApplicationCommit": "eb772e18de8d62f8d525961f19dafed2fbc84a65",
+  "entry": "https://budgit.duckdns.org/next",
+  "image": "sha256:89652efd20499ce7ab80f80a5e1d6ca3e51e5ea785bb972700fcb3806b9ffa78",
+  "sourceArchiveSha256": "4a5be351b0482ae68f7059c5b8b09997d2acad8c9de3369dbccdd6fbaa56b909",
+  "behavior": {
+    "standaloneChartScaleCalloutRemoved": true,
+    "chartGeometryAndFinancialCalculationsUnchanged": true,
+    "selectedMonthTotalsRetained": true
+  },
+  "validation": {
+    "buildTypecheck": true,
+    "focusedHouseholdHomeTests": 11,
+    "coreChecks": 15,
+    "priorFinancialRegressionSuite": 1272,
+    "priorFinancialSuiteNotRepeatedForPresentationOnlyRemoval": true,
+    "priorSourceFilesMatched": 876,
+    "freshVerifiedBackup": true,
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "existingEncryptedSourcesDecrypted": 15,
+    "intakeRestore": true,
+    "retainedAssetsVerified": 68,
+    "runtimeHashesMatchValidatedLocalBuild": 9,
+    "public": {
+      "checkedAt": "2026-11-06T17:29:52.610Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/incoming",
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "publishedInstallerBytesMatch": true,
+    "invalidUploadKeyDenied": true
+  },
+  "preservationAtUIActivation": {
+    "authoritativeTables": 47,
+    "integrityAndForeignKeys": true,
+    "configKeysAndAdjacentServices": true,
+    "financialRecordsUnchanged": true,
+    "sitesOrPaidResourcesChanged": false
+  },
+  "limits": [
+    "Physical iPhone acceptance was not repeated.",
+    "Native folder, scheduled and locked-device Shortcut execution remain unverified."
+  ],
+  "notes": [
+    "Private financial audit details and maintenance receipts are excluded from both source backups."
+  ]
+}

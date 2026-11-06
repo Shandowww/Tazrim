@@ -1,5 +1,13 @@
 # Monthly Flow project context
 
+## Overview chart scale callout removed — 2026-11-06
+
+Application `e9c4b0174a82f200249f2b0eb5faa7698a7c0ebe` is verified live on the existing server. The overview no longer shows the standalone upper-scale value with the ambiguous monthly-amount label. Bar calculations, negative values, selected-month totals and financial models are unchanged.
+
+Build/typecheck, 11 existing household-home contracts and 15 core checks pass; the prior 1,272 financial regressions remain current. All 876 prior source files matched. Fresh verified backup, isolated financial/access/15-source decryption/startup/rollback/intake restore/68 retained-asset gates passed. All nine runtime hashes match the validated local build, and public health/auth/deep routes/root/manifest/installer checks pass. UI activation preserved 47 authoritative tables, configuration keys and adjacent services. Private audit/authorized maintenance evidence is separate from this UI-release receipt and must not be exported to either Git repository. Physical iPhone acceptance was not repeated; no Sites or paid-resource change.
+
+Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`. Evidence: `docs/ui-redesign/evidence/release-chart-scale-removal-2026-11-06.json`. Save drafts before using guarded refresh to load the new UI.
+
 ## Transaction details before classification published — 2026-11-06
 
 Application `eb772e18de8d62f8d525961f19dafed2fbc84a65` is verified live on the existing server. Native individual and grouped bank/card review displays transaction description, date, signed amount and available reader details before the type/category control. Every group row is accessible; controls explain when a choice covers the whole group. Existing classification, optional categories, progress and explicit financial save behavior are preserved. The previously validated native Shortcut parameter fixes are included in the public installer.
