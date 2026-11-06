@@ -1,17 +1,17 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "f5a6d5834c9f34dd7148791a84f1eb90e702a6bd",
+  "sourceCommit": "46ab40643b2b8a94c7994a4c665e9e91ca7ffa8d",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Local Phase 1 foundation checkpoint; not released. Private intake, exact-source approval, guarded identity routing, cleanup and backup tracking are tested. Native folder/scheduled/physical-device acceptance remains pending; production stays 0b830c5.",
+  "status": "Manual incoming-report pilot candidate; production deployment gates in progress. Production shortcut retains all originals and has no deletion action. Native iPhone delivery/scheduling/locked-device acceptance remains pending.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1270,
     "coreChecks": 15,
-    "browser": "Prior bounded synthetic inbox acceptance; latest native cleanup UI/device acceptance pending. QA session-specific corrective graph currently under disposable native test.",
+    "browser": "Synthetic inbox approval/routing retry/account isolation/responsive checks passed on final candidate.",
     "release": "No sync release; production evidence remains docs/ui-redesign/evidence/release-categories-2026-11-05.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",

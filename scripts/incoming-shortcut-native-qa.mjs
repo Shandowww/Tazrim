@@ -19,7 +19,7 @@ execFileSync('shortcuts',['sign','--mode','anyone','--input',unsigned,'--output'
 chmodSync(signed,0o600);
 }catch(error){await qa.close();throw error;}
 rmSync(config);rmSync(unsigned);
-console.log(JSON.stringify({signed,input:qa.input,endpoint:qa.endpoint,expiresMinutes:20,shortcutName,commands:['status','run','import','mode <fault-mode>','close'],instructions:'Import this session-specific copy, then run. Approve only loopback/generated-fixture prompts. After import command succeeds, change second Text from retain to delete-after-saved for cleanup acceptance.'}));
+console.log(JSON.stringify({signed,input:qa.input,endpoint:qa.endpoint,expiresMinutes:20,shortcutName,commands:['status','run','import','mode <fault-mode>','close'],instructions:'Import this session-specific copy and select the printed input folder in the first File action under setup 1/3, then run. Approve only loopback/generated-fixture prompts. After import command succeeds, change second Text from retain to delete-after-saved for cleanup acceptance.'}));
 const rl=createInterface({input:process.stdin,terminal:false});let child,closed=false,busy=false;
 async function close(){if(closed)return;closed=true;child?.kill('SIGTERM');rl.close();console.log(JSON.stringify({final:qa.stats(),fixturesRemaining:qa.filenames.filter(name=>existsSync(join(qa.input,name)))}));await qa.close();}
 const expiry=setTimeout(()=>void close(),20*60000);

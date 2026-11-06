@@ -214,7 +214,3 @@ Remaining acceptance: other pages/workflow matrix, long-label/empty/loading/erro
 ## Current published frontend — 2026-11-01
 
 Application1457bf0 is active at the authenticated https://budgit.duckdns.org/next entry after fresh verified backup, isolated actual-backup preservation/financial/access/HTTP/decryption checks and tested previous-image compatibility. Original root/interface and Sites are unchanged; no hosting upgrade or real-record edits were performed. Current evidence: docs/tazrim-migration/release-2026-11-01.json and RESUME.md. Do not treat historical SSH blockers or completed feature-connection lists as current work. Real-iPhone/touch/platform PRF/Face ID/provider consent limits remain documented. Preserve unrelated canonical WIP; documentation checkpoints after1457bf0 are not new runtime activations.
-
-## Fork snapshot branch
-
-This `Shandowww/Tazrim` branch is a tracked-source export of the Budgit checkpoint named in `docs/tazrim-migration/fork-sync.json`. Development continues in the canonical Budgit source/worktrees. Sync completed checkpoints here without replacing upstream `main` or importing Budgit private Git history. Preserve MIT/OFL notices. The household redesign was accepted by Tal on 2026-11-05; release status is recorded in `docs/ui-redesign/EXECUTION-STATUS.md`.

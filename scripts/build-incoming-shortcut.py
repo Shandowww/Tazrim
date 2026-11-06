@@ -1,7 +1,7 @@
 """Generate secret-free incoming-report Shortcuts. Native/device QA is required.
 
-The folder variant receives a native Folder as Shortcut Input from an Apple
-automation. It avoids embedding a File bookmark in the generated workflow.
+The folder variant exposes its native folder selector in the setup block.
+No device-specific File bookmark is embedded in the generated workflow.
 Original files are retained by default; opt-in cleanup requires a fresh full-import
 receipt and an immediate byte-hash recheck. A connection-local catalog skips files
 already uploaded. --qa-config permits only the disposable loopback endpoint.
@@ -75,12 +75,24 @@ def build(config=None, folder_input=True):
         add('exit')
         end(group)
 
+    questions = []
+    add('comment', WFCommentActionText='הגדרה 1/3 — תיקיית הדוחות. בפעולת File שמתחת בחרו את Downloads/Budgit דרך בורר הקבצים של iPhone. אין לבחור תיקייה דרך Receive … from. בחרו תיקייה בלבד, ולא קובץ יחיד.')
+    if folder_input:
+        folder_index = len(actions)
+        incoming = ref(add('file'), 'File')
+        questions.append({'ActionIndex': folder_index, 'Category': 'Parameter', 'ParameterKey': 'WFFile', 'Text': 'בחרו את תיקיית Downloads/Budgit במכשיר שלכם.'})
+    else:
+        incoming = {'WFSerializationType': 'WFTextTokenAttachment', 'Value': {'Type': 'ExtensionInput'}}
+    add('comment', WFCommentActionText='הגדרה 2/3 — מפתח העלאה. הדביקו בפעולת Text שמתחת רק מפתח חיבור מסנכרון דוחות ב־Budgit. אין להזין סיסמה או מפתח שחזור ואין לשתף עותק עם מפתח.')
+    token_index = len(actions)
     secret = ref(add('gettext', WFTextActionText=setup.get('token', '')), 'Text')
-    require(secret, 'חסר מפתח העלאה. צרו חיבור בסנכרון דוחות והדביקו את המפתח בפעולת הטקסט הראשונה.')
+    if not config:
+        questions.append({'ActionIndex': token_index, 'Category': 'Parameter', 'ParameterKey': 'WFTextActionText', 'DefaultValue': '', 'Text': 'הדביקו רק את מפתח ההעלאה, בלי Bearer. אין להזין סיסמה או מפתח שחזור.'})
+    add('comment', WFCommentActionText='הגדרה 3/3 — שמירת קבצים. השאירו retain בפעולת Text שמתחת: המקורות נשארים במכשיר. הגרסה הזו אינה מוחקת או מעבירה קבצים; אין לשנות ערך זה.')
     cleanup_setting = ref(add('gettext', WFTextActionText='retain'), 'Text')
-    incoming = {'WFSerializationType': 'WFTextTokenAttachment', 'Value': {'Type': 'ExtensionInput'}}
-    require(incoming, 'יש להעביר תיקייה לקיצור מהאוטומציה.' if folder_input else 'יש להעביר קובצי דוח לקיצור מגיליון השיתוף או מאוטומציה.')
-    add('comment', WFCommentActionText='ברירת המחדל שומרת מקורות במכשיר. לניקוי אופציונלי שנו את פעולת הטקסט השנייה מ־retain ל־delete-after-saved. המחיקה דורשת קליטה מלאה ושמורה ותיבדק בהרצות הבאות; iOS עשוי לבקש אישור גישה או מחיקה. רק קבצים עם קבלה תקינה נחשבים שנמסרו. הפענוח והשיוך ממתינים לאישור בתוך Budgit. אין לשתף עותק שמכיל מפתח אישי.')
+    add('comment', WFCommentActionText='סוף ההגדרות — אין צורך לערוך את הפעולות שמתחת. הפענוח, השיוך והשמירה הכספית מחייבים אישור בתוך Budgit. תזמון מוגדר בנפרד רק לאחר בדיקה ידנית. גרסת QA עם כתובת 127.0.0.1 עובדת במחשב הבדיקה בלבד, לא ב־iPhone.')
+    require(secret, 'חסר מפתח העלאה. מלאו את Text תחת הגדרה 2/3.')
+    require(incoming, 'בחרו תיקייה בפעולת File תחת הגדרה 1/3.' if folder_input else 'יש להעביר קובצי דוח מגיליון השיתוף.')
     headers = {'WFSerializationType': 'WFDictionaryFieldValue', 'Value': {'WFDictionaryFieldValueItems': [
         {'WFItemType': 0, 'WFKey': text('Authorization'), 'WFValue': text('Bearer \ufffc', secret)},
         {'WFItemType': 0, 'WFKey': text('Content-Type'), 'WFValue': text('application/octet-stream')},
@@ -155,7 +167,7 @@ def build(config=None, folder_input=True):
     add('setvariable', WFVariableName='BudgitReceipt', WFInput=old)
     end(absent)
     # Share-sheet inputs cannot be safely re-resolved by folder/name.
-    if folder_input:
+    if folder_input and config:
         cleanup_enabled = begin(cleanup_setting, expected='delete-after-saved')
         # Recheck on every sweep, including previously uploaded files. The catalog
         # only skips uploads; it never authorizes removal from a stale snapshot.
@@ -214,7 +226,7 @@ def build(config=None, folder_input=True):
     add('repeat.each', GroupingIdentifier=loop, WFControlFlowMode=2)
     uploaded = ref(add('count', WFInput=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
     notice(text('הסריקה הסתיימה. נמסרו \ufffc מקורות חדשים. קבצים נשמרים כברירת מחדל; ניקוי מופעל דורש קליטה מלאה ואישור המכשיר. יש לבדוק את המצב בתוך Budgit.', uploaded))
-    return {'WFWorkflowName': setup.get('qaName', 'Budgit-Incoming-QA-v2') if config else ('Budgit — סנכרון תיקייה' if folder_input else 'Budgit — שליחת דוחות'), 'WFWorkflowClientVersion': '5037.0.19', 'WFWorkflowMinimumClientVersion': 900, 'WFWorkflowMinimumClientVersionString': '900', 'WFQuickActionSurfaces': [], 'WFWorkflowTypes': [] if folder_input else ['ActionExtension'], 'WFWorkflowHasShortcutInputVariables': True, 'WFWorkflowInputContentItemClasses': ['WFFileContentItem'], 'WFWorkflowOutputContentItemClasses': [], 'WFWorkflowImportQuestions': [] if config else [{'ActionIndex': 0, 'Category': 'Parameter', 'ParameterKey': 'WFTextActionText', 'DefaultValue': '', 'Text': 'הדביקו רק את מפתח ההעלאה מסנכרון דוחות ב־Budgit, בלי Bearer. אין להזין סיסמה או מפתח שחזור.'}], 'WFWorkflowIcon': {'WFWorkflowIconGlyphNumber': 61440, 'WFWorkflowIconStartColor': -23508481}, 'WFWorkflowActions': actions}
+    return {'WFWorkflowName': setup.get('qaName', 'Budgit-Incoming-QA-v2') if config else ('Budgit — סנכרון תיקייה' if folder_input else 'Budgit — שליחת דוחות'), 'WFWorkflowClientVersion': '5037.0.19', 'WFWorkflowMinimumClientVersion': 900, 'WFWorkflowMinimumClientVersionString': '900', 'WFQuickActionSurfaces': [], 'WFWorkflowTypes': [] if folder_input else ['ActionExtension'], 'WFWorkflowHasShortcutInputVariables': not folder_input, 'WFWorkflowInputContentItemClasses': [] if folder_input else ['WFFileContentItem'], 'WFWorkflowOutputContentItemClasses': [], 'WFWorkflowImportQuestions': questions, 'WFWorkflowIcon': {'WFWorkflowIconGlyphNumber': 61440, 'WFWorkflowIconStartColor': -23508481}, 'WFWorkflowActions': actions}
 
 
 if __name__ == '__main__':
