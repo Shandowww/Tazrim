@@ -68,8 +68,15 @@ def build(config=None, folder_input=True):
     def notice(message):
         add('notification', WFNotificationActionTitle='Budgit — סנכרון דוחות', WFNotificationActionBody=message)
 
+    def empty_text(value):
+        # Text with an empty string is still one native content item. Testing
+        # Has Any Value therefore misclassifies an absent receipt/error/key.
+        concrete = ref(add('gettext', WFTextActionText=text('\ufffc', value)), 'Text')
+        length = ref(add('count', WFInput=concrete, WFCountType='Characters'), 'Count')
+        return begin(length, expected='0')
+
     def require(value, message):
-        group = begin(value, 101)
+        group = empty_text(value)
         notice(message)
         add('exit')
         end(group)
@@ -151,12 +158,11 @@ def build(config=None, folder_input=True):
     # A missing dictionary lookup can still produce a native content item.
     # Test a concrete receipt identifier as Text, not the container's presence.
     prior_id = ref(add('getvalueforkey', WFInput=old, WFDictionaryKey='receiptId'), 'Dictionary Value')
-    prior_id_text = ref(add('gettext', WFTextActionText=text('\ufffc', prior_id)), 'Text')
-    absent = begin(prior_id_text, 101)
+    absent = empty_text(prior_id)
     encoded_name = ref(add('urlencode', WFInput=text('\ufffc', upload_name), WFEncodeMode='Encode'), 'URL Encoded Text')
     response = ref(add('downloadurl', WFURL=text(endpoint + '?name=\ufffc', encoded_name), WFHTTPMethod='POST', WFHTTPBodyType='File', WFRequestVariable=current, ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
     server_error = ref(add('getvalueforkey', WFInput=response, WFDictionaryKey='error'), 'Dictionary Value')
-    no_error = begin(server_error, 101)
+    no_error = empty_text(server_error)
     add('conditional', GroupingIdentifier=no_error, WFControlFlowMode=1)
     notice(text('העלאת \ufffc לא אושרה: \ufffc. המקור נשאר במכשיר.', upload_name, server_error))
     add('exit')

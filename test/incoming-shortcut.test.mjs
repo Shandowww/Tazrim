@@ -36,10 +36,17 @@ test('Native receipt conditions use concrete Text inputs and a receipt ID for ca
  }
  assert.ok(dynamic>=6,'Boolean type/value and both receipt hashes remain guarded');
  const receiptLookup=actions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.getvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='receiptId');
- const index=actions.indexOf(receiptLookup),presence=actions[index+2].WFWorkflowActionParameters;
+ const index=actions.indexOf(receiptLookup),presence=actions[index+4].WFWorkflowActionParameters;
  assert.equal(actions[index+1].WFWorkflowActionIdentifier,'is.workflow.actions.gettext');
- assert.equal(presence.WFCondition,101);
- assert.equal(output(presence.WFInput.Variable),actions[index+1]);
+ assert.equal(actions[index+2].WFWorkflowActionIdentifier,'is.workflow.actions.count');
+ assert.equal(actions[index+2].WFWorkflowActionParameters.WFCountType,'Characters');
+ assert.equal(output(actions[index+2].WFWorkflowActionParameters.WFInput),actions[index+1]);
+ assert.equal(presence.WFCondition,4);
+ assert.equal(presence.WFConditionalActionString,'0');
+ assert.equal(output(presence.WFInput.Variable),actions[index+3]);
+ // Native Text emits one item even for an empty string. No existence condition
+ // may mistake that item for a nonempty key, receipt ID or server error.
+ assert.ok(!actions.some(a=>a.WFWorkflowActionParameters.WFCondition===101));
 });
 test('Incoming native QA accepts only its synthetic bytes and returns a connection-local receipt catalog',async()=>{
  const qa=await startIncomingShortcutQA();try{

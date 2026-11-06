@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "dea078d8f5b4dd89c9d732288088548577e15a66",
+  "sourceCommit": "9dd469472889840f9d06a1360ea785833c72b97f",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published pilot remains 46ab406. Local signed replacement materializes equality inputs as Text and checks catalog receipt ID presence. 22 focused checks and build/typecheck/signing pass; owner native execution remains pending. No new deployment.",
+  "status": "Published pilot remains 46ab406. One incoming delivery confirmed by read-only counts; owner spreadsheet-only rerun validates its retained receipt. Native logs prove empty Text misclassified as present for missing PDF receipt. Local signed replacement uses character counts; 22 focused checks/build/typecheck/signing pass. Native PDF delivery pending; no deployment.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
