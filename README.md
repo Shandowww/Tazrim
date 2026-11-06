@@ -1,5 +1,10 @@
 # Monthly Flow
 
+## Phase 1 sync local checkpoint — 2026-11-06
+
+The private incoming inbox, exact-file parsing approval, identifier routing, guarded staging-copy cleanup and existing backup tracking are implemented locally in `work/budgit-household-ui`. Financial review/save remains explicit. The Shortcut retains originals; native folder execution and actual iPhone 17 Pro/iOS 27 `Downloads/Budgit` scheduling remain unverified. This is a source checkpoint, not a production release or Phase 1 acceptance. Details and validation: `docs/ui-redesign/PHASE1-LOCAL-CHECKPOINT-2026-11-06.md`. Production remains the verified category-management release; preserve unrelated outer/older checkouts.
+
+
 ## Selected compact header published — 2026-11-05
 
 Application `be4a124a56df1d6c66ad70f93362a2a21b6ce110` is verified live at https://budgit.duckdns.org/next. Selected Option 1 uses a single account-switch/bell/refresh row, without the app name or wallet symbol. The header is 61px including its border, plus safe area; controls remain 44px. Month controls now share page headings and preserve existing query/state/draft guards. Full account names remain accessible; desktop, viewer and one/multiple budget states are supported.

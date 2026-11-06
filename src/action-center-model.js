@@ -1,13 +1,14 @@
 import {monthlyDataCoverage,monthAt,creditCards,cashAccountList} from './budget.js';
 
 // Facts are derived from their owning subsystem. Reading/snoozing never resolves them.
-export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,locked=false,saveError='',reports=[],expectations=[],gmail=null,notices=[],statementNotices=[],day=asOf+'-01'}={}){
+export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,locked=false,saveError='',reports=[],expectations=[],gmail=null,notices=[],statementNotices=[],incomingReports=null,day=asOf+'-01'}={}){
  const issues=[],add=(code,id,title,effect,action,target,evidence,severity='required')=>issues.push({key:scope+':'+code+':'+id,code,title,effect,action,target,evidence:JSON.stringify(evidence),severity});
  if(saveError)add('save.failed','device','השינויים במכשיר טרם נשמרו',saveError,'חזרה לשמירה',{screen:'save'},saveError);
  if(admin&&backup){
   if(backup.error)add('backup.failed','server','הגיבוי החיצוני לא הושלם',backup.error,'טיפול בגיבוי',{screen:'backup'},[backup.lastAttempt,backup.error]);
   else if(!backup.connected||!backup.ready||!backup.lastSuccess)add('backup.setup','server','נדרשת השלמת הגיבוי החיצוני',!backup.connected?'יש לחבר Google Drive.':!backup.ready?'יש להגדיר מפתח שחזור.':'יש לבצע גיבוי ראשון.','פתיחת הגיבוי',{screen:'backup'},[backup.connected,backup.ready,backup.lastSuccess]);
  }
+ if(Number.isSafeInteger(incomingReports?.count)&&incomingReports.count>0)add('import.incoming','private','דוחות חדשים ממתינים לאישור פענוח',incomingReports.count+' קבצים בתיבת הסנכרון הפרטית. חשבון היעד יזוהה אחרי האישור.','פתיחת תיבת הסנכרון',{screen:'incoming'},[incomingReports.count,incomingReports.latest]);
  if(locked){add('import.unlock','vault','התקציב נעול','פתחו אותו כדי לבדוק את הנתונים והפעולות התלויות בתוכנו.','פתיחת התקציב',{screen:'unlock'},'locked');return issues;}
  for(const notice of statementNotices){
   const title={charge:'חיוב או עמלה צפויים',account:'נדרש טיפול בחשבון',promotion:'הטבה או מבצע',terms:'שינוי בתנאים',update:'עדכון מהמנפיק'}[notice.category];
@@ -43,7 +44,7 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
 
 export function actionIssueVisible(issue,preferences,now){const p=preferences?.[issue.key];return !p||p.evidence!==issue.evidence||!(p.until>now);}
 
-export function validActionTarget(t){return !!t&&typeof t==='object'&&['save','backup','report','unlock','upload','gmail','notice','statement-notice'].includes(t.screen)&&Object.keys(t).every(k=>['screen','month','kind','target','reportId','noticeId'].includes(k))&&(!t.month||/^20\d{2}-(0[1-9]|1[0-2])$/.test(t.month))&&['target','reportId','noticeId'].every(k=>t[k]===undefined||typeof t[k]==='string'&&/^[\w:-]{1,100}$/.test(t[k]));}
+export function validActionTarget(t){return !!t&&typeof t==='object'&&['save','backup','report','unlock','upload','gmail','notice','statement-notice','incoming'].includes(t.screen)&&Object.keys(t).every(k=>['screen','month','kind','target','reportId','noticeId'].includes(k))&&(!t.month||/^20\d{2}-(0[1-9]|1[0-2])$/.test(t.month))&&['target','reportId','noticeId'].every(k=>t[k]===undefined||typeof t[k]==='string'&&/^[\w:-]{1,100}$/.test(t[k]));}
 
 export function nextActionAnnouncement(active,preferences,announced){return active.find(i=>i.severity==='required'&&!announced.has(i.key+i.evidence)&&preferences[i.key]?.evidence!==i.evidence);}
 export function actionPreferencePayload(issue,preferences,until,action,accountId,compare=false){const prior=Object.hasOwn(preferences,issue.key)?preferences[issue.key]:null;return{...(action==='read'?{action:'read'}:{}),key:issue.key,evidence:issue.evidence,until,accountId,...(compare?{previous:prior?{evidence:prior.evidence,until:prior.until}:null}:{})};}

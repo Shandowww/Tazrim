@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-06",
+  "status": "source-checkpoint-native-acceptance-pending",
+  "productionChanged": false,
+  "laterPhasesEnabled": false,
+  "defaultRetention": true,
+  "native": {
+    "earlierRun": {
+      "timeLocal": "08:42:00–08:42:25",
+      "observedBlockingAction": "first catalog downloadurl",
+      "evidence": "unified log: content destination requires first run approval; canceled 3072 at termination"
+    },
+    "v2Run": {
+      "timeUTC": "2026-11-06T07:04:56.493Z",
+      "exitCode": 0,
+      "matchingSessionRequests": 0,
+      "sources": 0,
+      "budgets": 0,
+      "accepted": false,
+      "reason": "same-name native graph reached folder/Change Case; another QA endpoint was running; exact endpoint identity not established"
+    },
+    "schemaCorrection": {
+      "action": "is.workflow.actions.text.changecase",
+      "parameters": {
+        "text": "extension action output",
+        "type": "lowercase"
+      },
+      "metadata": "ActionKit Actions.intentdefinition ChangeCase; previous WFInput/WFCaseType keys were not the declared parameters"
+    },
+    "currentRunAccepted": false,
+    "physicalIPhoneAccepted": false,
+    "scheduledLockedAccepted": false,
+    "userAction": "Import the session-specific QA artifact printed by scripts/incoming-shortcut-native-qa.mjs, retain originals, approve only its loopback/fixture prompts; then run twice before isolated import/cleanup acceptance."
+  },
+  "tests": {
+    "focused": 17,
+    "combined": 1270,
+    "combinedFailed": 0,
+    "buildTypecheck": "passed",
+    "core": 15,
+    "combinedLog": "work/ui-redesign/native-qa-final-tests.log",
+    "focusedLog": "work/ui-redesign/native-qa-focused.log"
+  },
+  "cleanup": {
+    "freshFolderResolution": true,
+    "exactNameMatchesRequired": 1,
+    "freshHashRecheck": true,
+    "nativeConfirmation": true,
+    "shareSheetRetention": true,
+    "storedOriginalsRetained": true,
+    "realIsolatedImportReceiptTested": true,
+    "nativeDeletionAccepted": false
+  },
+  "sourceSha256": {
+    "scripts/build-incoming-shortcut.py": "6753cb501afd5c78f651507a5b1b59c3f36a775a65becfc5d5b67d51651bdd4c",
+    "scripts/incoming-shortcut-native-qa.mjs": "77c327d4ec4ccf51ac62da11fe7dce508c896e5f37d22f85aca03f2ba625a937",
+    "scripts/incoming-shortcut-qa.mjs": "3ce1bb5d77be63a4a340b7a08b2d4c0bf2f317b43ef1d0f35a0d420f4cc4ddf6",
+    "test/incoming-shortcut.test.mjs": "4c545c4d1b7e4ee45b94539e8ba946f268ce007c5f6e3d2d8d37fabb4955197b"
+  }
+}

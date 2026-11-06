@@ -6,7 +6,7 @@ export function householdSpaceHref(path,search,id){
  const query=new URLSearchParams(search),next=new URLSearchParams()
  for(const key of ['year','month','demo'])if(query.has(key))next.set(key,query.get(key))
  if(id!=='personal')next.set('budget',id)
- const lists=['/','/accounts','/savings','/more','/income','/monthly','/loans','/plans','/plans/scenario','/recurring','/categories','/categories/manage','/categories/limits','/search','/analysis','/details/manage','/checks','/accounts/transfers','/accounts/assignments','/card-setup','/upload','/upload/history','/actions','/investment','/goals','/overview','/overview/transfers','/overview/migration','/start','/about','/settings','/settings/spaces','/settings/forecast','/settings/profile','/settings/security','/settings/history','/settings/device-draft','/settings/access','/settings/gmail','/settings/drive','/settings/wallet','/settings/report-expectations','/savings/accounts','/savings/returns','/savings/allocation','/savings/transfer','/savings/transfers','/savings/schedule']
+ const lists=['/','/accounts','/savings','/more','/income','/monthly','/loans','/plans','/plans/scenario','/recurring','/categories','/categories/manage','/categories/limits','/search','/analysis','/details/manage','/checks','/accounts/transfers','/accounts/assignments','/card-setup','/incoming','/upload','/upload/history','/actions','/investment','/goals','/overview','/overview/transfers','/overview/migration','/start','/about','/settings','/settings/spaces','/settings/forecast','/settings/profile','/settings/security','/settings/history','/settings/device-draft','/settings/access','/settings/gmail','/settings/drive','/settings/wallet','/settings/report-expectations','/savings/accounts','/savings/returns','/savings/allocation','/savings/transfer','/savings/transfers','/savings/schedule']
  const parent=/^\/(accounts|banks|cards)\//.test(path)?'/accounts':householdFallback(path)
  const destination=lists.includes(path)?path:parent
  return destination+(next.size?'?'+next:'')
@@ -75,7 +75,7 @@ export function householdFallback(path,search=''){
  if(path.startsWith('/savings/'))return '/savings'
  if(path==='/investment')return '/savings'
  if(path.startsWith('/loans/'))return '/loans'
- if(path==='/loans'||path==='/income'||path==='/upload'||path==='/plans/scenario')return '/more'
+ if(path==='/loans'||path==='/income'||path==='/incoming'||path==='/upload'||path==='/plans/scenario')return '/more'
  if(path.startsWith('/upload/'))return '/upload'
  if(path.startsWith('/plans/'))return '/plans'
  if(path.startsWith('/categories/'))return '/categories'

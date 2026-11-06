@@ -1,5 +1,10 @@
 # Monthly Flow — project handoff
 
+## Phase 1 sync local checkpoint — 2026-11-06
+
+The private incoming inbox, exact-file parsing approval, identifier routing, guarded staging-copy cleanup and existing backup tracking are implemented locally in `work/budgit-household-ui`. Financial review/save remains explicit. The Shortcut retains originals; native folder execution and actual iPhone 17 Pro/iOS 27 `Downloads/Budgit` scheduling remain unverified. This is a source checkpoint, not a production release or Phase 1 acceptance. Details and validation: `docs/ui-redesign/PHASE1-LOCAL-CHECKPOINT-2026-11-06.md`. Production remains the verified category-management release; preserve unrelated outer/older checkouts.
+
+
 ## Latest category release — 2026-11-05
 
 The live app at https://budgit.duckdns.org/next now includes category management under More for Advanced and Expert modes. It supports category add/edit/removal, explicit bulk reassignment of in-use categories, color editing and guarded spending-limit conflicts. Application source `0b830c5` passed 1,170 regressions, build/typecheck, 15 core checks, synthetic phone behavior and the server backup, rollback, access and 42-table preservation gates. Details: `docs/ui-redesign/CATEGORY-MANAGEMENT.md` and `docs/ui-redesign/evidence/release-categories-2026-11-05.json`. Current work checkout is `work/budgit-household-ui` on `codex/budgit-household-ui`.

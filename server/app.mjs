@@ -2,6 +2,7 @@ import {createSpaceMigrations} from './space-migrations.mjs';
 import {createPlanHistory} from './plan-history.mjs';
 import {createGmailImport} from './gmail-import.mjs';
 import {createReportStore} from './report-store.mjs';
+import {createReportIntake} from './report-intake.mjs';
 import {createSpaceMigrationReview} from './space-migration-review.mjs';
 import {createTransferMatches} from './transfer-matches.mjs';
 import {createActions} from './actions.mjs';
@@ -37,11 +38,12 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const reportStore=createReportStore(db,{...reportOptions,DB,origin:base.origin,isAllowed,now,savePlan:(user,budget,plan,revision,storage)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(storage,user,budget,'report-import')})});
  const history=createPlanHistory(db,{isAllowed,secret:reportStore.secret,now,savePlan:(user,budget,plan,revision,kind)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(DB,user,budget,kind)})});
  const gmail=createGmailImport(db,{origin:base.origin,clientId,clientSecret,isAllowed,reportStore,now,...(gmailOAuthFactory?{oauthFactory:gmailOAuthFactory}:{})});
+ const reportIntake=createReportIntake(db,{reportStore,origin:base.origin,isAllowed,now});
  const migrations=createSpaceMigrations(db,{isAllowed,secret:reportStore.secret,now});
  const migrationReview=createSpaceMigrationReview(db,{isAllowed});
  const transferMatches=createTransferMatches(db,{isAllowed,secret:reportStore.secret,now});
  const statementNotices=createStatementNotices(db,{isAllowed,secret:reportStore.secret,now});
- const actions=createActions(db,{isAllowed,now,reports:reportStore.list,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
+ const actions=createActions(db,{isAllowed,now,reports:reportStore.list,incomingReports:reportIntake.pending,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
  origin=base.origin;const wallet=createApplePay(db,{origin,now,isAllowed});const configured=!!(clientId&&clientSecret);oauth??=new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback');
  const handle=async function handle(request,{ip='unknown'}={}){
  const u=new URL(request.url),path=u.pathname,time=now(),loginTarget=path==='/'&&u.search||path==='/next'||path.startsWith('/next/')?path+u.search:'/';const jar=cookies(request);
@@ -51,6 +53,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const cleanup=()=>{for(const table of ['auth_pending','auth_sessions','auth_limits'])db.prepare(`DELETE FROM ${table} WHERE expires_at<=?`).run(time)};
  if((path==='/shortcuts/install'||path==='/shortcuts/budgit-apple-pay-ios27.shortcut'||path==='/shortcuts/budgit-apple-pay.shortcut'||path==='/manifest.webmanifest'||path==='/sw.js'||/^\/icons\/[a-zA-Z0-9.-]+\.(png|ico)$/.test(path)||path==='/favicon.ico')&&['GET','HEAD'].includes(request.method)){const assetRequest=new Request(origin+(path==='/favicon.ico'?'/icons/favicon-v1.png':path),{method:request.method});const r=await worker.fetch(assetRequest,{DB});const h=new Headers(r.headers);for(const [k,v]of Object.entries(headers))if(k!=='Cache-Control')h.set(k,v);if(path==='/sw.js')h.set('Service-Worker-Allowed','/');if(path==='/shortcuts/install'&&request.method==='GET'&&r.ok){const html=await r.text();h.set('Content-Security-Policy',scriptReportPolicy(html));return new Response(html,{status:r.status,headers:h});}return new Response(r.body,{status:r.status,headers:h});}
  if(path==='/api/imports/reports')return reportStore.receive(request);
+ if(path==='/api/imports/incoming')return reportIntake.receive(request);
  if(path==='/api/imports/apple-pay')return wallet(request);
  if(path==='/api/health')return json({ok:true,loginConfigured:configured},200);
  if(!['GET','HEAD'].includes(request.method)&&request.headers.get('origin')!==origin)return json({error:'מקור הבקשה אינו תקין.'},403);
@@ -102,6 +105,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  if(path==='/api/card-push'||path==='/api/card-push/schedule'||path==='/api/card-push/test'){if(!push)return json({error:'התראות אינן זמינות כרגע.'},503);return push.handle(request,user);}
  if(path==='/api/plan-history')return history.handle(request,user);
  if(path==='/api/reports')return reportStore.handle(request,user);
+ if(path==='/api/report-intake')return reportIntake.handle(request,user);
  if(path==='/api/statement-notices')return statementNotices.handle(request,user);
  if(path==='/api/space-migrations')return migrations(request,user);
  if(path==='/api/space-migration-review')return migrationReview(request,user);

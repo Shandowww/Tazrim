@@ -13,7 +13,7 @@ Already implemented:
 
 ## Remaining milestones
 
-1. **Finish the native folder Shortcut.** A draft generator and single-file native upload probe exist. The last full native run stopped at the source File action before any request. Resolve folder/provider access, then finish sequential upload, exact receipt/hash verification, bounded retries and safe movement into an Uploaded subfolder. Preserve originals and never overwrite or delete on an uncertain result. Add a usable setup entry in the current interface and a signed, secret-free installer.
+1. **Finish the native folder Shortcut.** A draft generator and single-file native upload probe exist. The last full native run stopped at the source File action before any request. Resolve folder/provider access, then finish sequential upload, exact receipt/hash verification, bounded retries and default local retention, with optional verified cleanup only after a complete durable import. Never overwrite or delete on an uncertain result. Add a usable setup entry in the current interface and a signed, secret-free installer.
 2. **Handle one folder containing different budgets.** Current upload connections target one budget, not an arbitrary collection of personal/shared accounts. Mixed-folder intake needs verified bank/card-to-budget mappings or a separate private staging inbox before routing. Ambiguous files require review. Automatic parsing/notice extraction of newly delivered external files also needs orchestration; arrival in the inbox currently does not imply it has been parsed or financially applied.
 3. **Prove the actual iPhone workflow.** Choose the folder and per-user connection once, test duplicate delivery, Hebrew filenames, interrupted uploads, changed files, destination collisions, locked-device access and scheduled runs. A Shortcut that signs/imports successfully is not evidence that it works on the phone.
 
@@ -39,3 +39,16 @@ Official references checked 2026-11-05:
 - `docs/ACTION-CENTER-AND-AUTOMATIC-IMPORT-PLAN-2026-10-18.md`: original folder, receipt, privacy and explicit-save contract.
 
 This assessment creates no user tokens or automations and changes no files on the iPhone.
+
+
+## Confirmed device-test target — 2026-11-06
+
+Tal selected `Downloads/Budgit` on an iPhone 17 Pro running iOS 27. Select this folder using the native Files picker; its iCloud Drive versus On My iPhone provider is not yet confirmed. No daily run time has been selected. This records the intended test setup only: installation, folder permission, synthetic delivery, scheduling and locked-device behavior remain unverified. Originals must remain in place during initial acceptance.
+
+## Current continuation — 2026-11-06
+
+The private incoming inbox, exact-source approval and identifier routing now have synthetic browser acceptance at 320/390/1440px, actor isolation and unchanged financial data. The generator uses a Folder passed by an Apple automation, with a share-sheet Files-input alternative; it does not embed a static folder bookmark. The user has already added the native QA Shortcut. Do not ask them to add it again.
+
+Optional local cleanup is now a source draft. Default `retain` keeps every local original. Explicitly changing the second Text action to `delete-after-saved` enables a fresh connection-local receipt check on subsequent sweeps, followed by another hash check and the native Delete File action with confirmation enabled. Uploading, parsing, routing or saving a partial report never authorizes cleanup. Full import requires atomic completion evidence for every stored group member, current financial receipts and preserved readable original bytes. Cal activity exports remain ineligible because their current receipts prove only selected cycles. Locked vaults and missing/revoked access remain ineligible. Budgit's stored original is retained.
+
+Native execution is **not accepted**: the supported CLI listed the imported copy as `Budgit-Incoming-QA`; running that copy with only generated synthetic Folder input timed out after 25 seconds with no output and zero endpoint requests. The endpoint and child were stopped; no user file was touched. Do not infer Files permissions, case-action compatibility, delete authorization, scheduling or locked-device behavior from structural/service tests. There is no assumed immediate callback to iOS. The updated cleanup workflow has not completed a native run or been distributed as a production installer.

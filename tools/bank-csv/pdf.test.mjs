@@ -1,3 +1,4 @@
+import {inspectIntake} from './intake-reader.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {inspectOneZeroPDF,readOneZeroPDF} from './pdf-reader.mjs';import {normalizeRows} from './parser.mjs';import {pdfTextFixture,pdfFixture} from './pdf-fixture.mjs';
 test('PDF table reconciliation preserves signs, cancellation, exact cents and complete stated period',()=>{
@@ -26,3 +27,11 @@ test('One-row headerless continuation remains readable, but a genuine in-table c
  const i=inspectOneZeroPDF(p);assert.equal(i.pdfReconciliation.count,3);assert.equal(i.rows.at(-1).page,2);
  const bad=pdfTextFixture({pages:2});bad[1].items=bad[1].items.filter(i=>i.transform[5]!==520);bad[1].items.push({str:'טקסט שחוצה באמת את העמודות',dir:'rtl',transform:[10,0,0,10,310,495],width:140,height:10});assert.throws(()=>inspectOneZeroPDF(bad),/חוצה עמודות/);
 });
+
+test('Approved One Zero routing includes a printed branch while legacy metadata stays unchanged',()=>{
+ const pages=pdfTextFixture(),item=(str,y)=>({str,transform:[8,0,0,8,200,y],width:str.length*4,height:8});
+ pages[0].items.push(item('מספר חשבון 123456',690),item('סניף 12',670));
+ const legacy=inspectOneZeroPDF(pages);assert.equal(inspectIntake([legacy]).identity,'bank:one-zero:123456');
+ const approved=inspectOneZeroPDF(pages,{includeAccountIdentity:true});assert.equal(inspectIntake([approved]).identity,'bank:one-zero:012:123456');assert.deepEqual(approved.rows,legacy.rows);
+ pages[0].items.push(item('סניף 13',650));assert.equal(inspectIntake([inspectOneZeroPDF(pages,{includeAccountIdentity:true})]).identity,'');
+})

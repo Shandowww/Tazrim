@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-06",
+  "status": "local-draft-native-acceptance-pending",
+  "branch": "codex/budgit-household-ui",
+  "baseHead": "a542ba74ed21c3abb634caf800fe52eceddbe593",
+  "productionChanged": false,
+  "defaultLocalRetention": true,
+  "optionalCleanupMode": "delete-after-saved",
+  "storedOriginalRetained": true,
+  "automaticLaterPhasesEnabled": false,
+  "tests": {
+    "combined": {
+      "passed": 1268,
+      "failed": 0,
+      "log": "work/ui-redesign/intake-cleanup-final-tests.log"
+    },
+    "buildTypecheck": "passed; work/ui-redesign/intake-cleanup-build.log",
+    "core": {
+      "passed": 15,
+      "log": "work/ui-redesign/intake-cleanup-core.log"
+    },
+    "syntheticBrowser": {
+      "passed": true,
+      "widths": [
+        320,
+        390,
+        1440
+      ],
+      "financialWrites": 0,
+      "actorIsolation": true,
+      "log": "work/ui-redesign/intake-cleanup-browser.log"
+    }
+  },
+  "native": {
+    "installedNameListed": "Budgit-Incoming-QA",
+    "userAlreadyAdded": true,
+    "runResult": "terminated after 25 seconds without output",
+    "endpointRequests": 0,
+    "sources": 0,
+    "budgets": 0,
+    "realFilesDeleted": 0,
+    "cleanupRevisionRunAccepted": false,
+    "physicalIPhoneAccepted": false,
+    "scheduledLockedAccepted": false,
+    "qaEndpointStopped": true,
+    "credentialBearingQAArtifactsRemoved": true
+  },
+  "conservativeRetainedCases": [
+    "upload/approval/routing only",
+    "partial/missing/inconsistent group",
+    "activity-cycle export",
+    "selected workbook sheet",
+    "narrowed bank date range",
+    "skipped month",
+    "failed/pending/ambiguous source",
+    "missing or changed financial receipt",
+    "revoked connection/target access",
+    "locked vault",
+    "legacy import without full-group witness"
+  ],
+  "sourceSha256": {
+    "server/report-cleanup.mjs": "3b1464f052531080ed5de87bf54f00c7192630f610b1926bc070618742fe59af",
+    "server/report-intake.mjs": "8d9f7ba15ca830358bcc26c893bb4231ca2dfb858350d46d31bfd820687bb8fe",
+    "server/report-store.mjs": "943fdd9a39758277493f054d808593f4bad4cef8892b0a13e3f38086f5c10689",
+    "scripts/build-incoming-shortcut.py": "ba98d590cb924d9c22d62481bdce25a216e5f9087a8a41da8be6a7e6499a3df2",
+    "scripts/incoming-shortcut-qa.mjs": "0228b66a0f453344c7f889c9589ef83b01376f708dffb9a5b4446a99d54c89cb",
+    "test/report-cleanup.test.mjs": "7070dfde5b5565f79933a709b099cc0214a9c87f3a8c0cf9f2b50c4b2511cc68",
+    "test/report-intake.test.mjs": "7f1a130ff44dea696ad6df858ffbabac2f1bcd13b44f33d81368cdd2969f70de",
+    "test/incoming-shortcut.test.mjs": "b88df3af645a672c28824811db5b22af89848996d96854e7c58ccd72b6ad2cf8"
+  }
+}

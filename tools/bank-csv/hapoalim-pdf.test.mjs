@@ -33,3 +33,17 @@ test('Hapoalim rejects changed amounts, balances, missing rows/pages, duplicate 
 });
 
 test('An unsupported bank PDF mentioning Isracard does not claim it is a card bill',async()=>{const p=fixture();p[0].items.find(i=>i.str==='פעולה').str='מבנה אחר';assert.equal(inspectIsracardPDF(p),null);globalThis.DOMMatrix??=class{};await assert.rejects(()=>readReportPDF(pdfFixture(p)),/מבנה דוח PDF לא נתמך/);});
+
+test('Approved private intake can extract the validated Hapoalim account and branch without changing legacy inspection or money',()=>{
+ const pages=fixture({multi:true}),legacy=inspectHapoalimPDF(pages);
+ assert.equal(legacy.pdfReconciliation.accountHint,undefined);
+ const item=(str,end,y)=>({str,transform:[8,0,0,8,end-str.length*4,y],width:str.length*4,height:8});
+ for(const page of pages)page.items.push(item('סניף',215,738),item('12',215,724));
+ const inspection=inspectHapoalimPDF(pages,{includeAccountIdentity:true}),intake=inspectIntake([inspection]);
+ assert.equal(intake.identity,'bank:hapoalim:012:123456');
+ const {accountHint,branchHint,identityAmbiguous,...money}=inspection.pdfReconciliation;
+ assert.deepEqual(money,legacy.pdfReconciliation);assert.deepEqual(inspection.rows,legacy.rows);
+ pages[1].items.find(i=>i.str==='12'&&Math.abs(i.transform[4]+i.width-215)<1).str='13';
+ assert.equal(inspectIntake([inspectHapoalimPDF(pages,{includeAccountIdentity:true})]).identity,'');
+ assert.equal(inspectHapoalimPDF(pages).pdfReconciliation.accountHint,undefined);
+});

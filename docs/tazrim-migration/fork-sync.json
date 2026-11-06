@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "a542ba74ed21c3abb634caf800fe52eceddbe593",
+  "sourceCommit": "f5a6d5834c9f34dd7148791a84f1eb90e702a6bd",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published category management with guarded bulk reassignment and color editing",
+  "status": "Local Phase 1 foundation checkpoint; not released. Private intake, exact-source approval, guarded identity routing, cleanup and backup tracking are tested. Native folder/scheduled/physical-device acceptance remains pending; production stays 0b830c5.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1170,
+    "regressionTests": 1270,
     "coreChecks": 15,
-    "browser": "Synthetic 390px menu, category add/color, assigned warning, one-write bulk reassignment recovery, draft guard, viewer refusal and no overflow pass.",
-    "release": "docs/ui-redesign/evidence/release-categories-2026-11-05.json"
+    "browser": "Prior bounded synthetic inbox acceptance; latest native cleanup UI/device acceptance pending. QA session-specific corrective graph currently under disposable native test.",
+    "release": "No sync release; production evidence remains docs/ui-redesign/evidence/release-categories-2026-11-05.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "0b830c5dce2460d21a2e3076f51dba440eb44c99"

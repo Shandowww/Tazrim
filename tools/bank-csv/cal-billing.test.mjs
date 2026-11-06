@@ -1,3 +1,4 @@
+import {statementBatchGroups} from '../../src/card-statement-model.js';
 import {cashCardsForAccount} from '../../src/budget.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -45,7 +46,7 @@ test('Cal typed numeric amounts preserve real fractions of a cent rejection',()=
 function billingUI(){
  const nodes=new Map(),node=selector=>{if(!nodes.has(selector))nodes.set(selector,{value:'',textContent:'',innerHTML:'',disabled:false,hidden:true,querySelector:node,querySelectorAll:()=>[]});return nodes.get(selector);};
  const dialog={querySelector:node,querySelectorAll:()=>[],showModal(){},close(){},remove(){}};let applied=null,saves=0;
- const c=vm.createContext({window:{addEventListener(){}},app:{addEventListener(){}},document:{createElement:()=>dialog,body:{append(){}}},plan:{cashPlanning:{cardAccounts:{card1:'a'}}},creditCards:()=>[{id:'card1',name:'כרטיס לדוגמה'}],cashAccountList:()=>[{id:'a',label:'חשבון'}],cashCardsForAccount,billingReport:()=>null,esc:String,currency:String,money:String,knownCategories:()=>[],validatePlan:()=>true,mutate:n=>{applied=n;c.plan=n;saves++;},demoPreview:true,render(){},notify(){},dirty:false,FormData:class{get(k){return k.startsWith('batch-date-')?(k.endsWith('0')?'2026-11-15':'2026-12-15'):k.startsWith('batch-account-')?'a':null;}},applyBillingBatch:(p,entries)=>({entries})});
+ const c=vm.createContext({window:{addEventListener(){}},app:{addEventListener(){}},document:{createElement:()=>dialog,body:{append(){}}},plan:{cashPlanning:{cardAccounts:{card1:'a'}}},creditCards:()=>[{id:'card1',name:'כרטיס לדוגמה'}],cashAccountList:()=>[{id:'a',label:'חשבון'}],cashCardsForAccount,statementBatchGroups,billingReport:()=>null,esc:String,currency:String,money:String,knownCategories:()=>[],validatePlan:()=>true,mutate:n=>{applied=n;c.plan=n;saves++;},demoPreview:true,render(){},notify(){},dirty:false,FormData:class{get(k){return k.startsWith('batch-date-')?(k.endsWith('0')?'2026-11-15':'2026-12-15'):k.startsWith('batch-account-')?'a':null;}},applyBillingBatch:(p,entries)=>({entries})});
  vm.runInContext(fs.readFileSync('src/card-billing-client.js','utf8'),c);
  vm.runInContext("billingCanEdit=()=>true;readBillingFile=async file=>({issuer:'cal',dueDate:file.name==='a.xlsx'?'2026-11-15':'2026-12-15',amount:615.16,count:3});openBillingEditor('card1','2026-10-15');",c);
  return {c,node,dialog,getApplied:()=>applied,getSaves:()=>saves};

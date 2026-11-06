@@ -1,3 +1,4 @@
+import {fullReportGroup,fullReportReceipt} from './report-cleanup.mjs';
 import {activityReceiptPresent} from './activity-receipt.mjs';
 import {randomUUID,randomBytes} from 'node:crypto';import {dirname,join} from 'node:path';import {existsSync} from 'node:fs';
 import {budgetAccess,serviceJSON,boundedJSON,serviceError} from './budget-access.mjs';
@@ -19,7 +20,8 @@ export function createReportStore(db,{DB,origin,isAllowed,now=()=>Date.now(),key
  const secret=()=>cached??=(reportKey(db,{keyFile,publicKeyFile,key,recoveryPublicKey}));
  const seal=(bytes,aad)=>sealReport(secret(),bytes,aad),open=(blob,aad)=>openReport(secret(),blob,aad),meta=r=>JSON.parse(open(r.metadata,r.scope+'|'+r.id+'|metadata'));
  const backupState=r=>{const covered=db.prepare('SELECT * FROM report_backup_coverage WHERE id=? AND scope=?').get(r.id,r.scope);return{cleanupEligible:false,backupState:covered&&covered.source_hash===r.source_hash?(covered.revision===r.revision?'verified':'source-verified'):'not-confirmed',backupVerifiedAt:covered?.verified_at??null};};
- const list=scope=>db.prepare('SELECT id,scope,source_hash,metadata,revision,state,kind,target,month,created_at FROM report_sources WHERE scope=? ORDER BY created_at DESC LIMIT 500').all(scope).map(r=>({id:r.id,...meta(r),...backupState(r),revision:r.revision,state:r.state,kind:r.kind,target:r.target,month:r.month,createdAt:r.created_at}));
+ const displayMeta=row=>{const {localCleanup,...visible}=meta(row);return visible;};
+ const list=scope=>db.prepare('SELECT id,scope,source_hash,metadata,revision,state,kind,target,month,created_at FROM report_sources WHERE scope=? ORDER BY created_at DESC LIMIT 500').all(scope).map(r=>({id:r.id,...displayMeta(r),...backupState(r),revision:r.revision,state:r.state,kind:r.kind,target:r.target,month:r.month,createdAt:r.created_at}));
  const quota=(scope,extra)=>{const row=db.prepare('SELECT COUNT(*) AS n,COALESCE(SUM(length(source)+length(metadata)+COALESCE(length(draft),0)),0) AS bytes FROM report_sources WHERE scope=?').get(scope),all=db.prepare('SELECT COALESCE(SUM(length(source)+length(metadata)+COALESCE(length(draft),0)),0) AS bytes FROM report_sources').get().bytes;if(row.n>=500||row.bytes+extra>maxScope||all+extra>maxAll)throw serviceError('תיבת הדוחות מלאה. הקובץ נשאר במכשיר; אין מחיקה אוטומטית של דוחות.',413);};
  const allowStorage=access=>{if(isVault(access.plan)&&!db.prepare('SELECT consented FROM report_privacy WHERE scope=?').get(access.scope)?.consented)throw serviceError('התקציב מוצפן. יש לאשר בנפרד שמירת דוחות בתיבה שהשרת יכול לקרוא.',409);};
  const upload=(access,bytes,name)=>{
@@ -87,7 +89,11 @@ export function createReportStore(db,{DB,origin,isAllowed,now=()=>Date.now(),key
    // The standard worker still owns financial/vault validation. This hook runs
    // synchronously in the same SQLite transaction, after projection and before COMMIT.
    let commitFailure;const commitHook=()=>{try{
-    budgetAccess(db,user,budget,{write:true,isAllowed});for(const ref of input.reports){const record=db.prepare('SELECT revision,state,source_hash,draft FROM report_sources WHERE id=? AND scope=?').get(ref.id,scope);if(!record||record.revision!==ref.revision||record.state!=='ready')throw serviceError('הדוח השתנה. פתחו אותו מחדש.',409);if(!isVault(input.plan)&&!input.plan.reportInbox?.receipts?.some(receipt=>receipt.hash===record.source_hash)){const draft=record.draft?JSON.parse(open(record.draft,scope+'|'+ref.id+'|draft')):null,item=draft?.items?.find(i=>i.storedId===ref.id&&i.hash===record.source_hash&&i.kind==='bank');if(!activityReceiptPresent(input.plan,draft,ref.id,record.source_hash)&&(!item||!input.plan.bankImport?.batches?.some(batch=>batch.id===item.id&&batch.accountId===item.target)))throw serviceError('חסרה קבלת מקור בתקציב. הקליטה לא נשמרה.',409);}db.prepare('UPDATE report_sources SET state=?,revision=revision+1 WHERE id=? AND scope=?').run('committed',ref.id,scope);}
+    budgetAccess(db,user,budget,{write:true,isAllowed});
+    const cleanupRows=input.reports.map(ref=>{const row=db.prepare('SELECT * FROM report_sources WHERE id=? AND scope=?').get(ref.id,scope);return row?{...row,parsedDraft:row.draft?JSON.parse(open(row.draft,scope+'|'+row.id+'|draft')):null}:null;});
+    const members=cleanupRows.every(Boolean)&&!isVault(input.plan)?fullReportGroup(input.plan,cleanupRows):null;
+    for(const ref of input.reports){const record=db.prepare('SELECT revision,state,source_hash,draft FROM report_sources WHERE id=? AND scope=?').get(ref.id,scope);if(!record||record.revision!==ref.revision||record.state!=='ready')throw serviceError('הדוח השתנה. פתחו אותו מחדש.',409);if(!isVault(input.plan)&&!input.plan.reportInbox?.receipts?.some(receipt=>receipt.hash===record.source_hash)){const draft=record.draft?JSON.parse(open(record.draft,scope+'|'+ref.id+'|draft')):null,item=draft?.items?.find(i=>i.storedId===ref.id&&i.hash===record.source_hash&&i.kind==='bank');if(!activityReceiptPresent(input.plan,draft,ref.id,record.source_hash)&&(!item||!input.plan.bankImport?.batches?.some(batch=>batch.id===item.id&&batch.accountId===item.target)))throw serviceError('חסרה קבלת מקור בתקציב. הקליטה לא נשמרה.',409);}db.prepare('UPDATE report_sources SET state=?,revision=revision+1 WHERE id=? AND scope=?').run('committed',ref.id,scope);}
+    if(members)for(const row of cleanupRows){const metadata=seal(Buffer.from(JSON.stringify({...meta(row),localCleanup:{version:1,actionId:input.actionId,members}})),scope+'|'+row.id+'|metadata');db.prepare('UPDATE report_sources SET metadata=? WHERE id=? AND scope=?').run(metadata,row.id,scope);}
     db.prepare('INSERT INTO report_commits VALUES(?,?,?,?)').run(scope,input.actionId,payloadHash,input.revision+1);
    }catch(e){commitFailure=e;throw e;}};
    const response=await savePlan(user,budget,input.plan,input.revision,DB.withPlanWrite(commitHook));if(commitFailure)throw commitFailure;return response;
@@ -103,5 +109,17 @@ export function createReportStore(db,{DB,origin,isAllowed,now=()=>Date.now(),key
   if(request.method!=='POST')throw serviceError('הפעולה אינה נתמכת.',405);const name=url.searchParams.get('name')??'',bytes=Buffer.from(await request.arrayBuffer()),receipt=(()=>{if(!db.prepare('SELECT 1 FROM report_connections WHERE id=? AND revoked=0').get(connection.id))throw serviceError('חיבור ההעלאה בוטל.',401);return upload(budgetAccess(db,user,connection.budget,{isAllowed,write:true}),bytes,name);})();db.prepare('INSERT OR IGNORE INTO report_submissions VALUES(?,?)').run(connection.id,receipt.receiptId);db.prepare('UPDATE report_connections SET last_success=? WHERE id=? AND revoked=0').run(new Date(now()).toISOString(),connection.id);return serviceJSON(receipt,201);
  };
  const safe=fn=>async(...args)=>{try{return await fn(...args);}catch(e){return serviceJSON({error:e.safeToExpose?e.message:'תיבת הדוחות אינה זמינה כרגע. הקובץ המקורי נשאר במכשיר.'},e.safeToExpose?e.status:503);}};
- return{handle:safe(manage),receive:safe(receive),list,upload,secret};
+ // Internal transport access for the private incoming inbox. Public callers
+ // must first authorize the exact scope; this does not parse report content.
+ const source=(scope,id)=>{const row=db.prepare('SELECT * FROM report_sources WHERE scope=? AND id=?').get(scope,id);return row?{id:row.id,...displayMeta(row),sourceHash:row.source_hash,revision:row.revision,state:row.state,bytes:open(row.source,scope+'|'+id+'|source')}:null;};
+ const cleanupComplete=(access,id,hash,destination)=>{
+  try{
+   if(!access.plan||isVault(access.plan))return false;
+   const row=db.prepare('SELECT * FROM report_sources WHERE scope=? AND id=? AND source_hash=?').get(access.scope,id,hash);
+   const proof=row&&meta(row).localCleanup;
+   if(proof?.version!==1||!Array.isArray(proof.members)||!proof.members.length||!proof.members.some(m=>m.id===id&&m.hash===hash&&(!destination||m.kind===destination.kind&&m.target===destination.target))||!db.prepare('SELECT 1 FROM report_commits WHERE scope=? AND action_id=?').get(access.scope,proof.actionId))return false;
+   return proof.members.every(member=>{const current=db.prepare('SELECT * FROM report_sources WHERE scope=? AND id=?').get(access.scope,member.id);return current?.state==='committed'&&current.revision===member.revision&&current.source_hash===member.hash&&reportHash(open(current.source,access.scope+'|'+current.id+'|source'))===member.hash&&JSON.stringify(meta(current).localCleanup)===JSON.stringify(proof)&&fullReportReceipt(access.plan,member);});
+  }catch{return false}
+ };
+ return{handle:safe(manage),receive:safe(receive),list,upload,source,secret,cleanupComplete};
 }

@@ -10,7 +10,7 @@ self.onmessage=async({data})=>{
    if(pages.reduce((sum,page)=>sum+page.text.length,0)>200000)throw Error('טקסט הדוח גדול מדי לבדיקה.');self.postMessage({id:data.id,pages});return;
   }
   if(data.action==='bank-pdf'){const api=await import('./pdf-reader.mjs');const inspection=await api.readOneZeroPDF(new Uint8Array(data.bytes));self.postMessage({id:data.id,inspection});return;}
-  if(data.action==='pdf'){const api=await import('./pdf-reader.mjs');const parsed=await api.readReportPDF(new Uint8Array(data.bytes));self.postMessage({id:data.id,...parsed});return;}
+  if(data.action==='pdf'){const api=await import('./pdf-reader.mjs');const parsed=await api.readReportPDF(new Uint8Array(data.bytes),{includeAccountIdentity:data.includeAccountIdentity===true});self.postMessage({id:data.id,...parsed});return;}
   const api=await reader;
   if(data.action==='load'||data.action==='billing'||data.action==='intake'){
    if(data.format==='xls'&&!fullReader){importScripts('./vendor/xlsx-full.js');fullReader=true;}

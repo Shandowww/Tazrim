@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-06",
+  "status": "local-foundation-checkpoint-not-released",
+  "productionApplicationCommit": "0b830c5dce2460d21a2e3076f51dba440eb44c99",
+  "scope": [
+    "Actor-private incoming report storage and upload-only connections",
+    "Exact-file approval before local extraction",
+    "Confirmed identifier routing with branch/issuer evidence and revision guards",
+    "Atomic delivery/routing, retry recovery, quota preservation and streaming revocation",
+    "Explicit staging-copy cleanup preserving routed source and financial records",
+    "Current full-report completion evidence and existing backup tracking"
+  ],
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "applicationAndReaderTests": 1268,
+    "coreChecks": 15,
+    "diffCheck": "passed",
+    "nativeMacTest": {
+      "boundedSeconds": 25,
+      "result": "terminated without HTTP requests",
+      "requests": 0,
+      "sources": 0,
+      "budgets": 0
+    },
+    "nativeShortcutInstalled": "owner screenshot confirms installation only",
+    "physicalIPhoneAccepted": false,
+    "latestCleanupUIBrowserAccepted": false,
+    "qaOnlyRefinements": "QA name/runner syntax and focused Shortcut checks; not native/device acceptance"
+  },
+  "deviceTarget": {
+    "model": "iPhone 17 Pro",
+    "os": "iOS 27",
+    "folder": "Downloads/Budgit",
+    "provider": "not assumed; select through native picker",
+    "scheduledTime": "not selected"
+  },
+  "originals": "Retain by default. Optional delete-after-saved requires explicit setup, fresh full-import witness, matching current bytes and native confirmation; unverified and not enabled for QA.",
+  "publication": {
+    "sourceBackupOnly": true,
+    "syncRelease": false,
+    "installerPublished": false,
+    "productionFinancialEdits": 0,
+    "sitesChanges": 0,
+    "paidResourceChanges": 0
+  },
+  "remaining": [
+    "Native folder/provider execution and fault matrix",
+    "Latest phone-size/keyboard/draft/cleanup UI acceptance",
+    "Actual iPhone manual/scheduled/locked-device acceptance",
+    "Fresh normal publication preservation gates"
+  ]
+}

@@ -1,5 +1,10 @@
 # Monthly Flow project context
 
+## Phase 1 sync local checkpoint — 2026-11-06
+
+The private incoming inbox, exact-file parsing approval, identifier routing, guarded staging-copy cleanup and existing backup tracking are implemented locally in `work/budgit-household-ui`. Financial review/save remains explicit. The Shortcut retains originals; native folder execution and actual iPhone 17 Pro/iOS 27 `Downloads/Budgit` scheduling remain unverified. This is a source checkpoint, not a production release or Phase 1 acceptance. Details and validation: `docs/ui-redesign/PHASE1-LOCAL-CHECKPOINT-2026-11-06.md`. Production remains the verified category-management release; preserve unrelated outer/older checkouts.
+
+
 ## Category management published — 2026-11-05
 
 Application source `0b830c5` is verified live at https://budgit.duckdns.org/next. Advanced and Expert More-menu users can add, rename, move, archive/restore, merge, remove and recolor categories. Removal warns about stored detail, bank and limit assignments, requires a destination for in-use categories, and redirects the entire selected category branch in one guarded save. Original source evidence and financial amounts remain intact; conflicting limits require explicit resolution. Basic retains read-only category analysis. Build/typecheck, 1,170 regressions and 15 core checks pass; synthetic 390px category add/color, assigned warning, lost-response bulk save once, draft guard, viewer refusal and no overflow pass. Fresh verified SQLite backup, 845 prior source files, isolated financial/access/13-source decryption/startup/rollback/400-asset gates, runtime hashes/health/public access, 42 authoritative tables, keys and adjacent services passed. Evidence: `docs/ui-redesign/evidence/release-categories-2026-11-05.json`. No production financial edits, Sites or paid-resource changes. Physical iPhone acceptance was not rerun. Continue in `work/budgit-household-ui`; retain previous source and rollback image.

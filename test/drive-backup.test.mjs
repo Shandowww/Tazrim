@@ -1,3 +1,4 @@
+import {createReportIntake} from '../server/report-intake.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {createHash} from 'node:crypto';import {createDriveBackup,backupCutoffDay} from '../server/drive-backup.mjs';
 import {origin,user,scope,setup} from './helpers/drive-backup-fixture.mjs';
 test('Drive consent is separate, administrator-only, state-bound and stores only encrypted refresh credentials',async()=>{const t=setup();try{assert.equal((await t.service.begin({id:'other',email:'other@example.test'})).status,403);assert.equal((await t.service.callback(new Request(origin+'/auth/google/callback?state=dbk.forged'),user)).status,403);assert.equal((await t.connect()).status,303);const row=t.db.prepare('SELECT * FROM drive_backup_connections').get();assert.ok(!row.credentials.includes('test-secret'));assert.equal(row.enabled,0);assert.equal(t.service.status(user).lastSuccess,null);}finally{t.close();}});
@@ -66,3 +67,22 @@ test('Native Drive connection returns to the same native settings scope on succe
  }finally{t.close()}}
  const t=setup();try{assert.equal((await t.service.begin(user,new Request(origin+'/auth/backup-drive?returnTo=native&accountId=other'))).status,403);assert.equal(t.db.prepare('SELECT COUNT(*) AS n FROM drive_backup_pending').get().n,0)}finally{t.close()}
 })
+
+test('Private inbox approvals, mappings and connection changes request backup while delivery status does not',async()=>{
+ const t=setup();try{
+  createReportIntake(t.db,{});t.service.trackTables();await t.connect();await post(t,{action:'run'});
+  const statements=[
+   "INSERT INTO report_intake_privacy VALUES('alice','now')",
+   "INSERT INTO report_intake_connections(id,user_id,token_hash,label,created_at) VALUES('qa','alice','synthetic-hash','iPhone','now')",
+   "INSERT INTO report_intake_submissions VALUES('qa','source')",
+   "INSERT INTO report_intake_approvals(intake_id,user_id,source_hash,approved_at) VALUES('source','alice','hash','now')",
+   "INSERT INTO report_intake_bindings VALUES('alice','identity','bank','personal','bank-a',1)",
+   "UPDATE report_intake_connections SET revoked=1 WHERE id='qa'",
+   "DELETE FROM report_intake_approvals WHERE intake_id='source'",
+  ];
+  for(const statement of statements){t.db.exec(statement);assert.equal(t.service.status(user).pendingChanges,true,statement);await post(t,{action:'run'});assert.equal(t.service.status(user).pendingChanges,false);}
+  t.db.exec("UPDATE report_intake_connections SET last_attempt='later',last_success='later',last_error='synthetic retry' WHERE id='qa'");
+  assert.equal(t.service.status(user).pendingChanges,false);
+  t.db.exec("BEGIN;UPDATE report_intake_bindings SET revision=2;ROLLBACK;");assert.equal(t.service.status(user).pendingChanges,false);
+ }finally{t.close()}
+});

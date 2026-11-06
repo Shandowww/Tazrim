@@ -55,6 +55,7 @@ const ReportGroupPage = lazy(async () => ({ default: (await import('./app/report
 const ReportStatePage = lazy(async () => ({ default: (await import('./app/report-state-page')).ReportStatePage }))
 const CardReportPage = lazy(async () => ({ default: (await import('./app/card-report-page')).CardReportPage }))
 const ReportLibraryPage = lazy(async () => ({ default: (await import('./app/report-library-page')).ReportLibraryPage }))
+const IncomingReportsPage = lazy(async () => ({default:(await import('./app/incoming-reports-page')).IncomingReportsPage}))
 const SpacesPage = lazy(async () => ({ default: (await import('./app/spaces-page')).SpacesPage }))
 const SavingsBalancePage = lazy(async () => ({ default: (await import('./app/savings-balance-page')).SavingsBalancePage }))
 const ScenarioPage = lazy(async () => ({ default: (await import('./app/scenario-page')).ScenarioPage }))
@@ -276,6 +277,7 @@ function App() {
               <Route path="/upload/:id/state" element={<ReportStatePage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/:id/review" element={<CardReportPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload" element={<ReportLibraryPage key={budgetId} fixture={fixture} budget={budget} />} />
+              <Route path="/incoming" element={<IncomingReportsPage fixture={fixture} budget={budget}/>} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />
               <Route path="/search" element={<ExpenseDetailsPage key={budgetId + search} mode="search" fixture={fixture} budget={budget} />} />
               <Route path="/details/:id/annotate" element={<DetailAnnotationPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />

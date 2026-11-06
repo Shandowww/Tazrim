@@ -1,3 +1,4 @@
+import {bankIdentityHints} from './intake-reader.mjs';
 import {inspectIsracardPDF} from './isracard-pdf.mjs';
 import {LIMITS,parseMoney,parseDate,guessMapping} from './parser.mjs';
 const norm=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/[\s:״”"׳']/g,'');
@@ -6,9 +7,9 @@ const money=s=>{const raw=String(s).replace(/[א-ת״”"׳'₪\s]/g,'');if(!/^[
 const x=i=>i.transform[4],y=i=>i.transform[5],right=i=>x(i)+i.width;
 function lines(items){const result=[];for(const i of [...items].sort((a,b)=>y(b)-y(a)||x(b)-x(a))){let line=result.find(l=>Math.abs(l.y-y(i))<1.5);if(!line){line={y:y(i),items:[]};result.push(line);}line.items.push(i);}return result.sort((a,b)=>b.y-a.y);}
 function cellText(items){return lines(items).map(l=>l.items.sort((a,b)=>x(b)-x(a)).map(i=>i.str.trim()).join(' ')).join(' ').trim();}
-export function inspectOneZeroPDF(pages){
+export function inspectOneZeroPDF(pages,{includeAccountIdentity=false}={}){
  if(!pages.length||pages.length>20)throw Error('אפשר לקרוא דוח PDF עם 1–20 עמודים.');
- let columns=null,summary=null,declared=null,all=[],count=0,accountHint='';
+ let columns=null,summary=null,declared=null,all=[],count=0,accountHint='',routingHints={};
  for(let pageIndex=0;pageIndex<pages.length;pageIndex++){
  const page=pages[pageIndex],items=page.items.filter(i=>typeof i.str==='string'&&i.str.trim());count+=items.length;if(count>100000)throw Error('דוח PDF גדול מדי לאחר פתיחה.');
  if(items.some(i=>Math.abs(i.transform[1])>0.01||Math.abs(i.transform[2])>0.01))throw Error('PDF עם טקסט מסובב אינו נתמך.');
@@ -17,7 +18,7 @@ export function inspectOneZeroPDF(pages){
  if(!columns)throw Error('לא נמצאה טבלת תנועות של וואן זירו. PDF סרוק אינו נתמך; בחר דוח מקורי מהבנק.');
  if(pageIndex===0){
  const top=items.filter(i=>!header||y(i)>header.y+3),text=top.map(i=>i.str).join(' ');if(!/ONE\s*ZERO/i.test(text)||!/שקליות/.test(text))throw Error('קורא PDF זה תומך בדוח התנועות המלא של וואן זירו בלבד.');
- const accountText=lines(top).map(l=>cellText(l.items)).join(' '),accountMatches=[...accountText.matchAll(/מספר חשבון[:\s]*(\d{3,16})(?!\d)/g)].map(m=>m[1]);if(new Set(accountMatches).size===1)accountHint=accountMatches[0];
+ const accountText=lines(top).map(l=>cellText(l.items)).join(' '),accountMatches=[...accountText.matchAll(/מספר חשבון[:\s]*(\d{3,16})(?!\d)/g)].map(m=>m[1]);if(new Set(accountMatches).size===1)accountHint=accountMatches[0];if(includeAccountIdentity){const hints=bankIdentityHints(accountText);routingHints={branchHint:hints.branchHint,identityAmbiguous:hints.identityAmbiguous};}
  const periodLine=lines(top).find(l=>/\d{2}\/\d{2}\/\d{4}\s*-\s*\d{2}\/\d{2}\/\d{4}/.test(cellText(l.items)));
  if(!periodLine)throw Error('לא זוהה טווח תקופה בכותרת דוח PDF.');const dates=cellText(periodLine.items).match(/\d{2}\/\d{2}\/\d{4}/g).map(d=>parseDate(d)).sort();declared={from:dates[0],to:dates.at(-1)};
  const getSummary=label=>{const labelItem=top.find(i=>norm(i.str)===norm(label));if(!labelItem)throw Error('חסר סיכום כספי בדוח PDF');const candidates=top.filter(i=>Math.abs(y(i)-y(labelItem))<2&&right(i)<x(labelItem)&&/\d/.test(i.str));if(candidates.length!==1)throw Error('סיכום כספי לא חד־משמעי בדוח PDF');return money(candidates[0].str);};
@@ -46,14 +47,14 @@ export function inspectOneZeroPDF(pages){
  if(balance!==summary.closingCents)throw Error('יתרת הסיום אינה תואמת לדוח PDF.');
  const dates=all.map(r=>r.date).sort(),from=declared.from<dates[0]?declared.from:dates[0],to=declared.to>dates.at(-1)?declared.to:dates.at(-1),periodMismatch=dates[0]<declared.from||dates.at(-1)>declared.to;
  const headers=['תאריך תנועה','תאריך ערך','פרטי הפעולה','חיובים','זיכויים','יתרה'];
- return {format:'pdf',rows:[{line:1,cells:headers},...all.map((r,i)=>({line:i+2,cells:[r.date,r.valueDate,r.description,(r.debit/100).toFixed(2),(r.credit/100).toFixed(2),(r.balance/100).toFixed(2)],page:r.page}))],headerIndex:0,mapping:guessMapping(headers),pdfReconciliation:{...summary,...(accountHint?{accountHint}:{}),count:all.length,verified:true,declared,from,to,periodMismatch,reversals:all.filter(r=>r.debit<0||r.credit<0).length}};
+ return {format:'pdf',rows:[{line:1,cells:headers},...all.map((r,i)=>({line:i+2,cells:[r.date,r.valueDate,r.description,(r.debit/100).toFixed(2),(r.credit/100).toFixed(2),(r.balance/100).toFixed(2)],page:r.page}))],headerIndex:0,mapping:guessMapping(headers),pdfReconciliation:{...summary,...(accountHint?{accountHint}:{}),...routingHints,count:all.length,verified:true,declared,from,to,periodMismatch,reversals:all.filter(r=>r.debit<0||r.credit<0).length}};
 }
 // Hapoalim's original five-column export is newest first. It has no printed
 // totals: reconcile adjacent running balances, then emit chronological rows.
 // Do not copy account names/numbers or document metadata into the inspection.
-export function inspectHapoalimPDF(pages){
+export function inspectHapoalimPDF(pages,{includeAccountIdentity=false}={}){
  if(!Array.isArray(pages)||!pages.length||pages.length>20)throw Error('אפשר לקרוא דוח PDF עם 1–20 עמודים.');
- const names=['תאריך','פעולה','חובה','זכות','יתרהבשח'],all=[];let declared,accountSignature,count=0;
+ const names=['תאריך','פעולה','חובה','זכות','יתרהבשח'],all=[];let declared,accountSignature,branchSignature='',identityAmbiguous=false,count=0;
  const fail=()=>{throw Error('מבנה דוח PDF של הפועלים אינו תואם או שחסרים נתונים. נסו לייצא את תנועות החשבון כ־Excel.');};
  for(const [index,page]of pages.entries()){
   const items=page.items.filter(i=>typeof i.str==='string'&&i.str.trim());count+=items.length;
@@ -66,6 +67,14 @@ export function inspectHapoalimPDF(pages){
   const account=items.find(i=>norm(i.str)==='חשבון'),accountValues=account?items.filter(i=>y(i)<y(account)&&y(i)>y(account)-20&&Math.abs(right(i)-right(account))<5):[];
   if(accountValues.length!==1||!/^\d+$/.test(norm(accountValues[0].str)))fail();
   const signature=norm(accountValues[0].str);if(accountSignature&&signature!==accountSignature)fail();accountSignature=signature;
+  if(includeAccountIdentity){
+   const branches=items.filter(i=>norm(i.str)==='סניף');
+   if(branches.length){
+    const values=branches.flatMap(label=>items.filter(i=>y(i)<y(label)&&y(i)>y(label)-20&&Math.abs(right(i)-right(label))<5));
+    if(branches.length!==1||values.length!==1||!/^\d{1,3}$/.test(norm(values[0].str)))identityAmbiguous=true;
+    else{const branch=norm(values[0].str).padStart(3,'0');if(branchSignature&&branchSignature!==branch)identityAmbiguous=true;branchSignature=branch;}
+   }
+  }
   const footer=items.filter(i=>y(i)<35),number=footer.filter(i=>x(i)>555&&/^\d+$/.test(i.str)),total=footer.filter(i=>x(i)>520&&x(i)<535&&/^\d+$/.test(i.str));
   if(!footer.some(i=>norm(i.str)==='מתוך')||number.length!==1||total.length!==1||+number[0].str!==index+1||+total[0].str!==pages.length)fail();
   if(index===0){
@@ -88,7 +97,7 @@ export function inspectHapoalimPDF(pages){
  if(all.length<2||all.length>LIMITS.rows)fail();
  for(let i=0;i<all.length-1;i++){const r=all[i],older=all[i+1];if(r.date<older.date||r.balance!==older.balance+r.credit-r.debit)throw Error('יתרות התנועות בדוח הפועלים אינן תואמות. הקליטה נעצרה; נסו יצוא Excel מלא מהבנק.');}
  const chronological=[...all].reverse(),oldest=chronological[0],headers=['תאריך','הפעולה','חובה','זכות','יתרה'];
- return {format:'pdf',rows:[{line:1,cells:headers},...chronological.map((r,i)=>({line:i+2,page:r.page,cells:[r.date,r.description,r.debit?(r.debit/100).toFixed(2):'',r.credit?(r.credit/100).toFixed(2):'',(r.balance/100).toFixed(2)]}))],headerIndex:0,mapping:guessMapping(headers),pdfReconciliation:{provider:'hapoalim',method:'running-balances',verified:true,count:all.length,declared,...declared,periodMismatch:false,openingCents:oldest.balance-oldest.credit+oldest.debit,closingCents:all[0].balance,debitCents:all.reduce((s,r)=>s+r.debit,0),creditCents:all.reduce((s,r)=>s+r.credit,0),reversals:all.filter(r=>r.debit<0).length}};
+ return {format:'pdf',rows:[{line:1,cells:headers},...chronological.map((r,i)=>({line:i+2,page:r.page,cells:[r.date,r.description,r.debit?(r.debit/100).toFixed(2):'',r.credit?(r.credit/100).toFixed(2):'',(r.balance/100).toFixed(2)]}))],headerIndex:0,mapping:guessMapping(headers),pdfReconciliation:{...(includeAccountIdentity?{accountHint:accountSignature,branchHint:branchSignature,identityAmbiguous}:{}),provider:'hapoalim',method:'running-balances',verified:true,count:all.length,declared,...declared,periodMismatch:false,openingCents:oldest.balance-oldest.credit+oldest.debit,closingCents:all[0].balance,debitCents:all.reduce((s,r)=>s+r.debit,0),creditCents:all.reduce((s,r)=>s+r.credit,0),reversals:all.filter(r=>r.debit<0).length}};
 }
 
 export async function readPDFPages(bytes){
@@ -102,4 +111,4 @@ export async function readPDFPages(bytes){
 }
 
 export async function readOneZeroPDF(bytes){return inspectOneZeroPDF(await readPDFPages(bytes));}
-export async function readReportPDF(bytes){const pages=await readPDFPages(bytes);if(pages.some(page=>lines(page.items).some(row=>['תאריך','פעולה','חובה','זכות','יתרהבשח'].every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectHapoalimPDF(pages)};if(pages.some(page=>lines(page.items).some(row=>headerNames.every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectOneZeroPDF(pages)};const report=inspectIsracardPDF(pages);if(report)return{intake:{kind:'card',provider:'isracard',identity:report.last4?'isracard:'+report.last4:'',report}};throw Error('מבנה דוח PDF לא נתמך. בחרו דוח תנועות מקורי של הפועלים או וואן זירו, דוח ישראכרט, או יצוא Excel מהבנק.');}
+export async function readReportPDF(bytes,options={}){const pages=await readPDFPages(bytes);if(pages.some(page=>lines(page.items).some(row=>['תאריך','פעולה','חובה','זכות','יתרהבשח'].every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectHapoalimPDF(pages,options)};if(pages.some(page=>lines(page.items).some(row=>headerNames.every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectOneZeroPDF(pages,options)};const report=inspectIsracardPDF(pages);if(report)return{intake:{kind:'card',provider:'isracard',identity:report.last4?'isracard:'+report.last4:'',report}};throw Error('מבנה דוח PDF לא נתמך. בחרו דוח תנועות מקורי של הפועלים או וואן זירו, דוח ישראכרט, או יצוא Excel מהבנק.');}

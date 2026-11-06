@@ -2,6 +2,8 @@
 
 Requested by Tal, 2026-11-05. **Planning only: no automatic report processing or financial posting is enabled by this document.**
 
+**Execution handoff:** Tal requested that implementation be left to **Sol 6.1**. Resume using [the Sol 6.1 handoff](AUTO-SYNC-SOL-6.1-HANDOFF.md). A local Phase 1 implementation draft exists and is uncommitted; it has not been published or accepted as complete. The current production app remains the verified category-management release.
+
 ## Meaning of each operation
 
 - **Sync:** deliver the original file securely into the user's private incoming inbox and verify its upload receipt.
@@ -18,21 +20,26 @@ The server already has encrypted report storage, upload connections, hash dedupl
 
 Current connections are bound to **one user and one budget**. For one folder containing both personal and shared reports, add a **user-private incoming inbox** and a narrowly scoped intake connection. The intake token can upload and check its own receipts; it cannot choose arbitrary budgets, read financial records or approve changes. After routing is authorized, hand the original into the existing target-budget report workflow. Preserve a stable intake receipt linked to the target report; moving scope must not break acknowledgement/retry behavior.
 
-Require exact file-byte receipt/hash acknowledgement before moving a file into an Uploaded subfolder. Never delete originals, overwrite a same-named destination, or move changed bytes on an old receipt. Interrupted uploads, missing permissions and quotas leave files available to retry. Preserve server duplicate detection and visible per-file outcomes.
+Retain local originals by default. Tal explicitly requested optional local cleanup after Budgit has fully imported and saved the report. Only an opted-in Shortcut may request deletion, after a fresh receipt from its own active connection proves a durable full import for the exact current file hash and every report cycle/group member. Recheck on subsequent Shortcut runs; do not assume immediate server callbacks. Uploaded, parsed, routed, partial, ambiguous, failed, pending-review, inaccessible or revoked reports never authorize deletion. Retain Budgit’s stored original. Rehash immediately before the native Delete File action and honor Files/provider permission or confirmation requirements. Activity-cycle exports remain ineligible until whole-file coverage is proven. Interrupted uploads, changed bytes, missing permissions and quotas leave files available to retry.
 
 ## Phase 1 — auto-sync; verify before digestion
 
 **User outcome:** download a report into the folder; Budgit receives it and asks permission before analyzing it.
 
-Flow: **Download → auto-upload → user verifies file and destination → digest → existing review/save.**
+Flow: **Download → auto-upload → user verifies file → digest and identify account → route by identifier → existing review/save.**
+
+Tal clarified that the report's account number or card digits should select its account automatically. After permission to read the exact file, reuse confirmed identifier mappings across the user's personal/shared budgets. A unique issuer/card-digit match can suggest the initial account; unknown, missing or colliding identifiers need a one-time explicit choice. Do not use a filename, bank name alone, or the only visible account as automatic routing evidence. The first approval permits extraction and account matching, while financial application retains its existing separate confirmation.
+
+For a bank, match the bank/account identity actually extracted from the report, including branch information when the format provides it. For a card, use issuer plus the available card digits. Search all authorized destinations; a collision or an inaccessible/locked destination must remain explicit. A confirmed mapping should be reused rather than asking for the same assignment on every report.
 
 ### Deliver
 
 1. Finish the folder Shortcut, per-user setup, connection creation/revocation, schedule instructions and last-success/error display in Budgit.
 2. Create the private incoming inbox. New arrivals show filename, file type, size, received time and original-file access, with **ממתין לאישור פענוח**.
 3. Permit only transport/storage validation before verification: size/type checks, hashing, duplicate detection and encryption. **No automatic report extraction, OCR, classification, account/month inference, issuer-notice extraction, or financial proposal before approval.** Opening the original for the user's own verification remains possible.
-4. The user confirms the original and its intended budget/account, then chooses **אישור פענוח**. Persist approval against that exact source hash, user and authorized destination.
-5. Call the existing parser/review flow. The current explicit financial save remains; approval to read a document is not permission to apply arbitrary financial changes.
+4. The user confirms the original, then chooses **אישור פענוח**. Persist approval against that exact source hash and user before extracting any identifier.
+5. Extract the account/card identifier with the existing reader. Resolve a confirmed authorized destination automatically; ask once for a missing or ambiguous mapping, and remember only an explicitly confirmed choice. Bind the routing receipt to the exact source, actor and authorized budget/account.
+6. Call the existing parser/review flow. The current explicit financial save remains; approval to read a document is not permission to apply arbitrary financial changes.
 
 ### Exit criteria
 
@@ -124,3 +131,7 @@ The main uncertainty in Phase 1 is native folder/provider access and scheduling.
 6. Apple automation triggers and unattended-run settings: https://support.apple.com/guide/shortcuts/add-automations-apdfbdbd7123/ios
 
 The Paperless documentation site returned HTTP 403 during this research; its official repository documentation was read instead. No third-party product was installed, connected to Budgit, or given financial data.
+
+## Cleanup continuation — 2026-11-06
+
+The local draft now records full-group completion witnesses in encrypted source metadata in the existing atomic financial transaction. Token receipts recheck current authorization, exact source/connection, every group member and financial evidence. The generated workflow retains by default; explicit `delete-after-saved` opts into a fresh receipt, exact hash recheck and native confirmed deletion. Service tests cover actual original parser/review/group saves and rollback. Native QA is already added; a supported CLI run of the listed `Budgit-Incoming-QA` copy timed out with zero requests. Native folder/delete permissions and physical iPhone scheduled/locked runs remain unaccepted. No production sync or later-phase policy was enabled.
