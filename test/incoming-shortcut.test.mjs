@@ -11,7 +11,10 @@ test('Incoming folder workflow keeps originals, has no embedded bookmark/token, 
  assert.ok(!w.WFWorkflowActions.some(a=>short(a)==='file.delete'));assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='gettext'&&a.WFWorkflowActionParameters.WFTextActionText==='retain').length,1);
  const qa=JSON.parse(execFileSync('python3',['-B','-c',"import importlib.util,json;s=importlib.util.spec_from_file_location('builder','scripts/build-incoming-shortcut.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(json.dumps(m.build({'endpoint':'http://127.0.0.1:54321/api/imports/incoming','token':'x'*43,'qaName':'Budgit-Incoming-QA-test'})))"],{encoding:'utf8'}));
  const deletion=qa.WFWorkflowActions.find(a=>short(a)==='file.delete');assert.equal(deletion.WFWorkflowActionParameters.WFDeleteFileConfirm,true);assert.equal(deletion.WFWorkflowActionParameters.WFInput.Value.VariableName,'BudgitFreshMatches');
- const change=w.WFWorkflowActions.find(a=>short(a)==='text.changecase').WFWorkflowActionParameters;assert.equal(change.type,'lowercase');assert.equal(change.text.Value.Type,'ActionOutput');assert.equal(change.WFCaseType,undefined);assert.equal(change.WFInput,undefined);
+ assert.ok(!w.WFWorkflowActions.some(a=>short(a)==='text.changecase'));
+ const filters=w.WFWorkflowActions.filter(a=>short(a)==='conditional').map(a=>a.WFWorkflowActionParameters.WFConditionalActionString);
+ for(const extension of ['csv','xlsx','pdf','PDF','.XLSX'])assert.ok(filters.includes(extension));
+ assert.ok(JSON.stringify(w).includes('BudgitSkipped'));assert.ok(JSON.stringify(w).includes('BudgitExamined'));
  assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='file.getfoldercontents').length,1);assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='downloadurl').length,2);assert.ok(!JSON.stringify(w).includes('/Users/'));assert.ok(!JSON.stringify(w).includes('http://127.0.0.1'));
 })
 test('Incoming native QA accepts only its synthetic bytes and returns a connection-local receipt catalog',async()=>{

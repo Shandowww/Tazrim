@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "84e0811c8e63c1dbd766806b0d3a63de3063b721",
+  "sourceCommit": "0e6a978789ec8d0bd6ea4cd3f38c161e940973ad",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published manual incoming-report pilot. Device originals retained; no production Shortcut deletion/move. Physical iPhone/native/scheduled/locked acceptance pending; Phase 2/3 disabled.",
+  "status": "Published manual pilot remains 46ab406. Local signed follow-up removes Change Case from extension filtering and adds examined/skipped counters; owner native acceptance pending, no new deployment.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",

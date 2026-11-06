@@ -107,7 +107,7 @@ def build(config=None, folder_input=True):
     expected_type = ref(add('getitemtype', WFInput=expected_bool), 'Type')
     expected_text = ref(add('gettext', WFTextActionText=text('\ufffc', expected_bool)), 'Text')
     files = ref(add('file.getfoldercontents', WFFolder=incoming, WFGetFolderContentsRecursive=False), 'Folder Contents') if folder_input else incoming
-    for name in ['BudgitUploaded', 'BudgitScanned']:
+    for name in ['BudgitUploaded', 'BudgitScanned', 'BudgitExamined', 'BudgitSkipped']:
         empty = ref(add('list', WFItems=[]), 'List')
         add('setvariable', WFVariableName=name, WFInput=empty)
     loop = str(uuid.uuid5(uuid.NAMESPACE_URL, 'budgit/incoming/files')).upper()
@@ -116,14 +116,17 @@ def build(config=None, folder_input=True):
     current = variable('BudgitSource')
     name = ref(add('properties.files', WFInput=current, WFContentItemPropertyName='Name'), 'Name')
     extension = ref(add('properties.files', WFInput=current, WFContentItemPropertyName='File Extension'), 'File Extension')
-    lower = ref(add('text.changecase', text=extension, type='lowercase'), 'Updated Text')
+    add('appendvariable', WFVariableName='BudgitExamined', WFInput=name)
     no = ref(add('gettext', WFTextActionText='no'), 'Text')
     add('setvariable', WFVariableName='BudgitSupported', WFInput=no)
-    for ext in ['csv', 'xls', 'xlsx', 'pdf']:
-        group = begin(lower, expected=ext)
+    for ext in ['csv', 'xls', 'xlsx', 'pdf', 'CSV', 'XLS', 'XLSX', 'PDF', '.csv', '.xls', '.xlsx', '.pdf', '.CSV', '.XLS', '.XLSX', '.PDF']:
+        group = begin(extension, expected=ext)
         yes = ref(add('gettext', WFTextActionText='yes'), 'Text')
         add('setvariable', WFVariableName='BudgitSupported', WFInput=yes)
         end(group)
+    unsupported = begin(variable('BudgitSupported'), expected='no')
+    add('appendvariable', WFVariableName='BudgitSkipped', WFInput=text('\ufffc (\ufffc)', name, extension))
+    end(unsupported)
     supported = begin(variable('BudgitSupported'), expected='yes')
     add('appendvariable', WFVariableName='BudgitScanned', WFInput=name)
     count = ref(add('count', WFInput=variable('BudgitScanned'), WFCountType='Items'), 'Count')
@@ -225,7 +228,15 @@ def build(config=None, folder_input=True):
     end(supported)
     add('repeat.each', GroupingIdentifier=loop, WFControlFlowMode=2)
     uploaded = ref(add('count', WFInput=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
-    notice(text('הסריקה הסתיימה. נמסרו \ufffc מקורות חדשים. קבצים נשמרים כברירת מחדל; ניקוי מופעל דורש קליטה מלאה ואישור המכשיר. יש לבדוק את המצב בתוך Budgit.', uploaded))
+    examined = ref(add('count', WFInput=variable('BudgitExamined'), WFCountType='Items'), 'Count')
+    supported_count = ref(add('count', WFInput=variable('BudgitScanned'), WFCountType='Items'), 'Count')
+    skipped_count = ref(add('count', WFInput=variable('BudgitSkipped'), WFCountType='Items'), 'Count')
+    notice(text('נבדקו \ufffc פריטים; נתמכים: \ufffc; דולגו: \ufffc; נמסרו עכשיו: \ufffc. קבצים שכבר נמסרו אינם נשלחים שוב. המקורות נשארים במכשיר. בדקו את תיבת הסנכרון ב־Budgit.', examined, supported_count, skipped_count, uploaded))
+    skipped_text = ref(add('gettext', WFTextActionText=text('\ufffc', skipped_count)), 'Text')
+    skipped = begin(skipped_text, expected='0')
+    add('conditional', GroupingIdentifier=skipped, WFControlFlowMode=1)
+    notice(text('פריטים שדולגו (שם וסיומת): \ufffc', variable('BudgitSkipped')))
+    end(skipped)
     return {'WFWorkflowName': setup.get('qaName', 'Budgit-Incoming-QA-v2') if config else ('Budgit — סנכרון תיקייה' if folder_input else 'Budgit — שליחת דוחות'), 'WFWorkflowClientVersion': '5037.0.19', 'WFWorkflowMinimumClientVersion': 900, 'WFWorkflowMinimumClientVersionString': '900', 'WFQuickActionSurfaces': [], 'WFWorkflowTypes': [] if folder_input else ['ActionExtension'], 'WFWorkflowHasShortcutInputVariables': not folder_input, 'WFWorkflowInputContentItemClasses': [] if folder_input else ['WFFileContentItem'], 'WFWorkflowOutputContentItemClasses': [], 'WFWorkflowImportQuestions': questions, 'WFWorkflowIcon': {'WFWorkflowIconGlyphNumber': 61440, 'WFWorkflowIconStartColor': -23508481}, 'WFWorkflowActions': actions}
 
 
