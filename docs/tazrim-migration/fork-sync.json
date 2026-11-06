@@ -1,19 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "fc1cf20ddd5fe70988037d8cd567513d5e80910a",
+  "sourceCommit": "fe0e9808ff315edf1cbd49ba50c2ba6395366b44",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published application remains 46ab406. Owner Native-Inputs manual Mac run confirmed 2 examined/supported, 0 skipped, 1 new delivery; read-only server confirms 2 incoming sources/deliveries and no upload error. Native parameter schema/3 synthetic counts/23 focused tests/build/typecheck/signing passed. iPhone/scheduled/locked execution and explicit financial workflow remain pending. No deployment.",
+  "status": "Published transaction evidence before classification for individual/group bank and card reviews, including previously verified native Shortcut parameter corrections. Running version, access, installer, records and local/runtime hashes verified. Physical iPhone/scheduled/locked-device acceptance remains pending.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1270,
+    "regressionTests": 1272,
     "coreChecks": 15,
-    "browser": "Synthetic inbox approval/routing retry/account isolation/responsive checks passed on final candidate.",
-    "release": "Verified backup/source/financial/access/decryption/startup/rollback/intake restore/retained assets/runtime/public preservation; see release-incoming-pilot-2026-11-06.json"
+    "browser": "Synthetic individual/group bank/card evidence, all rows, keyboard focus, classification, 320/390/430px/desktop, dark/reduced-motion and actor isolation passed.",
+    "release": "Verified backup/872 source matches/financial/access/15-source decryption/startup/rollback/intake restore/68 retained assets/9 runtime hashes/public access and 47 authoritative tables preserved; see release-transaction-details-2026-11-06.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "46ab40643b2b8a94c7994a4c665e9e91ca7ffa8d"
+  "productionApplicationCommit": "eb772e18de8d62f8d525961f19dafed2fbc84a65",
+  "productionImage": "sha256:c6425ff26ada496c2233bf5f4e9e28e9b3d033a66bf07f57282bb6ec088f043b"
 }

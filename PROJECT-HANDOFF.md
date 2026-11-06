@@ -1,5 +1,13 @@
 # Monthly Flow — project handoff
 
+## Transaction details before classification published — 2026-11-06
+
+Application `eb772e18de8d62f8d525961f19dafed2fbc84a65` is verified live on the existing server. Native individual and grouped bank/card review displays transaction description, date, signed amount and available reader details before the type/category control. Every group row is accessible; controls explain when a choice covers the whole group. Existing classification, optional categories, progress and explicit financial save behavior are preserved. The previously validated native Shortcut parameter fixes are included in the public installer.
+
+Build/typecheck, 1,272 regression tests and 15 core checks pass. Synthetic 320/390/430px and desktop checks cover individual/group evidence, all rows, expand/collapse keyboard focus, classification, dark/reduced-motion and private evidence isolation. All 872 prior source files matched. Fresh verified SQLite backup, isolated financial/access/15-source-decryption/startup/rollback/intake-restore/68 retained-asset gates passed. All nine runtime hashes match the validated local build; public health/auth/deep routes/root/manifest and installer bytes pass. All 47 authoritative tables, keys and adjacent services were preserved. No production financial edits, Sites or paid-resource changes. Physical iPhone acceptance was not repeated; scheduled/locked Shortcut execution remains unverified.
+
+Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`. Evidence: `docs/ui-redesign/evidence/release-transaction-details-2026-11-06.json`; behavior: `docs/ui-redesign/TRANSACTION-DETAILS-2026-11-06.md`. This publication supersedes earlier local-only/current-production notes; it does not complete physical-device automation acceptance. Save any review progress before using the existing guarded refresh to load this release.
+
 ## Phase 1 sync local checkpoint — 2026-11-06
 
 The private incoming inbox, exact-file parsing approval, identifier routing, guarded staging-copy cleanup and existing backup tracking are implemented locally in `work/budgit-household-ui`. Financial review/save remains explicit. The Shortcut retains originals; native folder execution and actual iPhone 17 Pro/iOS 27 `Downloads/Budgit` scheduling remain unverified. This is a source checkpoint, not a production release or Phase 1 acceptance. Details and validation: `docs/ui-redesign/PHASE1-LOCAL-CHECKPOINT-2026-11-06.md`. Production remains the verified category-management release; preserve unrelated outer/older checkouts.

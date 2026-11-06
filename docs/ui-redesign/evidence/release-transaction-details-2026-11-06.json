@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-06",
+  "status": "published",
+  "applicationCommit": "eb772e18de8d62f8d525961f19dafed2fbc84a65",
+  "previousApplicationCommit": "46ab40643b2b8a94c7994a4c665e9e91ca7ffa8d",
+  "entry": "https://budgit.duckdns.org/next",
+  "image": "sha256:c6425ff26ada496c2233bf5f4e9e28e9b3d033a66bf07f57282bb6ec088f043b",
+  "sourceArchiveSha256": "918c6d3b99a8a88e515a882566548bda299e4df128595b019c08bc2f0d67ad5a",
+  "behavior": {
+    "transactionEvidenceBeforeClassification": true,
+    "individualAndGroupedBankAndCard": true,
+    "allGroupRowsAccessible": true,
+    "existingClassificationAndFinancialCommandsPreserved": true,
+    "includesPreviouslyValidatedNativeShortcutParameterFixes": true
+  },
+  "validation": {
+    "buildTypecheck": true,
+    "tests": 1272,
+    "coreChecks": 15,
+    "syntheticBrowser": {
+      "evidenceBeforeBankChoice": true,
+      "allGroupRowsAvailable": true,
+      "expandCollapseKeepsFocus": true,
+      "layouts": [
+        {
+          "width": 320,
+          "page": 320
+        },
+        {
+          "width": 390,
+          "page": 390
+        },
+        {
+          "width": 430,
+          "page": 430
+        },
+        {
+          "width": 1440,
+          "page": 1425
+        }
+      ],
+      "darkReducedMotion": true,
+      "classificationStillWorks": true,
+      "singleBankEvidence": true,
+      "groupCardEvidence": true,
+      "singleCardEvidence": true,
+      "viewerCannotReadPrivateEvidence": true,
+      "financialAndSourcesUnchanged": true,
+      "runtimeErrors": 0
+    },
+    "priorSourceFilesMatched": 872,
+    "freshVerifiedBackup": true,
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "existingEncryptedSourcesDecrypted": 15,
+    "intakeFiveTableRestoreAndEncryptedOriginalAndConnectionReceipt": true,
+    "priorAssetsVerified": 68,
+    "runtimeHashesMatchValidatedLocalBuild": 9,
+    "public": {
+      "checkedAt": "2026-11-06T16:56:57.588Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/incoming",
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "publishedInstallerMatchesSignedBytes": true,
+    "invalidUploadKeyRefused": true
+  },
+  "preservation": {
+    "authoritativeTables": 47,
+    "integrityAndForeignKeys": true,
+    "configKeysAndAdjacentServices": true,
+    "productionFinancialEdits": false,
+    "sitesOrPaidResourcesChanged": false
+  },
+  "limits": [
+    "Physical iPhone acceptance was not repeated.",
+    "iPhone folder delivery, scheduled and locked-device Shortcut execution remain unverified.",
+    "Financial parsing approval, review and save remain explicit; automatic financial application is not enabled."
+  ],
+  "notes": [
+    "Activation completed before the user paused. Public checks completed successfully; resumed read-only checks reconfirmed running version, public access and all nine validated local/runtime hashes.",
+    "Private backup paths, credentials and financial records are excluded from this source evidence."
+  ]
+}
