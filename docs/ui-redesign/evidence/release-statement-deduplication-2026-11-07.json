@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-07",
+  "status": "published",
+  "applicationCommit": "42c84a02f8bbb8dc8ec9e2f7f1f65a002ec892d5",
+  "applicationBranch": "codex/statement-evidence-release",
+  "sourceCheckpoint": "a30d00b3bd0d86a9087d56b3a65b88adf76ae36e",
+  "sourceBranch": "codex/budgit-household-ui",
+  "previousApplicationCommit": "de5fc197ff88f5ccb667522d01d347a17d98e275",
+  "image": "sha256:5b00c2aab9da741479397d6a8d302b300f5263953c4db3e0ff8d5e806a49e466",
+  "sourceArchiveSha256": "6dd31566282431bcb976691017e072758844a4b0dc516162705dc600c0292642",
+  "behavior": {
+    "identity": "Existing SHA-256 IDs remain stable; evidence matching supplements exact identity within the same card/billing date.",
+    "crossFormat": "Normalize presentation punctuation/parentheses, compare signed billed cents/date/merchant, protect installment and transaction-reference evidence, and recognize the exact legacy Cal foreign-original representation.",
+    "multiplicity": "One saved transaction can match only one incoming occurrence; exact matches reserve rows before evidence matching.",
+    "duplicates": "Whole duplicate group is excluded from another financial import; no replacement or additional financial approval is needed. Source files remain available.",
+    "partialOverlap": "Only excess/new rows proceed through the original explicit review and atomic import.",
+    "guardrails": "Changed amounts/originals/installments/known currencies/references, missing rows and ambiguous evidence remain reviewable; unchanged IDs/categories/records are retained.",
+    "scope": "Only five duplicate-matching/UI/test files differ from previous live source; Stage 2 remains excluded."
+  },
+  "validation": {
+    "buildTypecheck": true,
+    "isolatedRegressions": 1286,
+    "activeSourceRegressions": 1300,
+    "coreChecks": 15,
+    "syntheticBrowser": {
+      "duplicateRecognized": true,
+      "noReplacementPrompt": true,
+      "noFinancialApprovalNeeded": true,
+      "returnToLibrary": true,
+      "widths": [
+        320,
+        390,
+        430,
+        1440
+      ],
+      "darkReducedMotion": true,
+      "financialUnchanged": true,
+      "commits": 0
+    },
+    "readOnlyScopedStatement": {
+      "saved": 19,
+      "incoming": 19,
+      "matched": 19,
+      "newTransactions": 0,
+      "replacementRequired": false,
+      "privateEvidenceCommitted": false
+    },
+    "priorSourceFilesMatched": 886,
+    "freshVerifiedBackup": true,
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "existingEncryptedSourcesDecrypted": 20,
+    "intakeRestore": true,
+    "retainedAssetsVerified": 68,
+    "runtimeFilesMatchValidatedLocalBuild": 84,
+    "authoritativeTablesPreserved": 47,
+    "configurationKeysAndAdjacentServicesPreserved": true,
+    "public": {
+      "checkedAt": "2026-11-07T06:23:40.872Z",
+      "routes": {
+        "/api/health": {
+          "status": 200,
+          "location": null
+        },
+        "/api/plan": {
+          "status": 401,
+          "location": null
+        },
+        "/next": {
+          "status": 200,
+          "location": null
+        },
+        "/next/incoming": {
+          "status": 200,
+          "location": null
+        },
+        "/next/upload/group": {
+          "status": 200,
+          "location": null
+        },
+        "/manifest.webmanifest": {
+          "status": 200,
+          "location": null
+        },
+        "/": {
+          "status": 303,
+          "location": "/next"
+        }
+      }
+    }
+  },
+  "productionFinancialEdits": false,
+  "physicalDeviceAcceptanceRepeated": false,
+  "sitesChanged": false,
+  "paidResourcesChanged": false
+}

@@ -3,6 +3,34 @@ import {cents,clone,validatePlan,detailCategories,creditCards,analyticalExpenseD
 export const statementMerchant=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase();
 async function statementDigest(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
 export function statementCycleExists(p,cardId,month){return (p.details??[]).some(e=>e.method===cardId&&e.month===month&&['cal','isracard'].includes(e.statement?.issuer));}
+// Cross-format evidence supplements the persisted fingerprint; existing IDs stay stable.
+const evidenceMerchant=value=>statementMerchant(value).replace(/[()]/g,'').replace(/[״“”]/g,'"').replace(/[׳‘’]/g,"'").replace(/[–—−]/g,'-').replace(/\s*([.\-"'])\s*/g,'$1').replace(/\s+/g,' ').trim();
+const installment=notes=>{const match=String(notes??'').match(/תשלום\s*(\d+)\s*(?:מתוך|מ)\s*(\d+)/);return match?match[1]+':'+match[2]:'';};
+const transactionReference=notes=>String(notes??'').match(/(?:אסמכת[אה]|מספר\s*עסקה|transaction\s*(?:id|ref(?:erence)?))\s*[:#-]?\s*([a-z0-9][a-z0-9/-]{2,})/i)?.[1]?.toLowerCase()??'';
+const evidenceKey=(date,merchant,amount)=>JSON.stringify([date,evidenceMerchant(merchant),amount]);
+const savedEvidence=row=>JSON.stringify([row.statement.originalCents,row.statement.originalCurrency??'',row.statement.foreignCents??null,installment(row.statement.notes),transactionReference(row.statement.notes)]);
+function compatibleEvidence(saved,entry,issuer){
+ const previous=saved.statement;
+ if(previous.issuer!==issuer||installment(previous.notes)!==installment(entry.notes)||transactionReference(previous.notes)!==transactionReference(entry.notes))return false;
+ if(previous.originalCurrency&&entry.originalCurrency&&previous.originalCurrency!==entry.originalCurrency)return false;
+ if(previous.foreignCents!==undefined&&entry.foreignCents!==undefined&&previous.foreignCents!==entry.foreignCents)return false;
+ if(previous.originalCents===entry.originalCents)return true;
+ // Older Cal Excel records stored the foreign original in originalCents,
+ // before currency/foreignCents were retained separately. Require exact evidence.
+ return issuer==='cal'&&!previous.originalCurrency&&previous.foreignCents===undefined&&entry.originalCurrency&&entry.originalCurrency!=='ILS'&&Number.isSafeInteger(entry.foreignCents)&&previous.originalCents===entry.foreignCents&&entry.originalCents===entry.amountCents;
+}
+function matchStatementEvidence(saved,rows,issuer){
+ const used=new Set(rows.filter(row=>row.existing).map(row=>row.id)),groups=new Map();
+ for(const row of saved){const key=evidenceKey(row.date,row.name,cents(row.amount));if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
+ for(const row of rows){
+  if(row.existing)continue;
+  const entry=row.entry,candidates=(groups.get(evidenceKey(entry.date,entry.merchant,entry.amountCents))??[]).filter(old=>!used.has(old.id)&&compatibleEvidence(old,entry,issuer));
+  // Indistinguishable repeats are a multiset, never one transaction. Different
+  // original/currency/installment evidence remains a question instead of a guess.
+  if(!candidates.length||new Set(candidates.map(savedEvidence)).size!==1)continue;
+  const existing=candidates[0];used.add(existing.id);row.parsedId=row.id;row.id=existing.id;row.key=existing.statement.key;row.existing=clone(existing);row.category=existing.category;row.candidates=[];row.matchedBy='statement-evidence';
+ }
+}
 export async function prepareCardStatement(p,report,cardId,merchantRules=[],{replacementToken}={}){
  if(!['cal','isracard'].includes(report?.issuer)||!Array.isArray(report.entries)||!report.entries.length||report.entries.length>5000||report.entries.reduce((n,r)=>n+r.amountCents,0)!==cents(report.amount)||!creditCards(p).some(c=>c.id===cardId))throw Error('פירוט הדוח אינו תקין.');
  const seen=new Map(),rows=[],categories=new Map(),add=(name,category)=>{if(!category||category==='לסיווג')return;const k=statementMerchant(name);if(!categories.has(k))categories.set(k,new Set());categories.get(k).add(category);};
@@ -10,13 +38,14 @@ export async function prepareCardStatement(p,report,cardId,merchantRules=[],{rep
  for(const r of merchantRules)add(r.merchant,r.category);
  for(const entry of report.entries){
   const identity=JSON.stringify([cardId,report.dueDate,entry.date,statementMerchant(entry.merchant),entry.amountCents,entry.originalCents,entry.notes,...(report.issuer==='isracard'?[entry.originalCurrency??'',entry.foreignCents??null]:[])]),occurrence=(seen.get(identity)??0)+1;seen.set(identity,occurrence);
-  const key=await statementDigest(identity+'#'+occurrence),id=report.issuer+'-'+key,existing=(p.details??[]).find(e=>e.id===id);
+  const key=await statementDigest(identity+'#'+occurrence),id=report.issuer+'-'+key,found=(p.details??[]).find(e=>e.id===id),existing=found&&compatibleEvidence(found,entry,report.issuer)?found:null;
   const candidates=existing?[]:(p.details??[]).filter(e=>!e.statement&&e.accounting==='included'&&e.status!=='cancelled'&&e.method===cardId&&e.month===report.dueDate.slice(0,7)&&e.date===entry.date&&statementMerchant(e.name)===statementMerchant(entry.merchant));
   const known=categories.get(statementMerchant(entry.merchant)),category=existing?.category??(known?.size===1?[...known][0]:'');
   rows.push({id,key,entry,category,existing:existing?clone(existing):null,candidates:clone(candidates)});
  }
- const ids=new Set(rows.map(r=>r.id));
- const saved=(p.details??[]).filter(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate),removed=saved.filter(e=>!ids.has(e.id));
+ const saved=(p.details??[]).filter(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate);
+ matchStatementEvidence(saved,rows,report.issuer);
+ const matched=new Set(rows.filter(r=>r.existing).map(r=>r.id)),removed=saved.filter(e=>!matched.has(e.id));
  let replacement=null;
  if(removed.length){
   const billing=(p.cardBilling?.reports??[]).filter(r=>r.cardId===cardId&&r.dueDate===report.dueDate),token=await statementDigest(JSON.stringify({cardId,report,saved,billing}));
