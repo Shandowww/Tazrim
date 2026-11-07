@@ -43,3 +43,8 @@ Native supported CLI listed the imported QA copy as **`Budgit-Incoming-QA`** (no
 ## Continued implementation and owner clarification — 2026-11-06
 
 Tal confirmed that no other session currently owns this work and directed continuation. The original discussion began in the outer canonical checkout; active work remains in the isolated household checkout to preserve unrelated outer work. Native QA is installed according to the supplied screenshot, with no visible run/access prompt. See `PHASE1-LOCAL-CHECKPOINT-2026-11-06.md` for the reviewed private cleanup, branch-sensitive readers, destination witnesses, streaming revocation, backup tracking, completion evidence and remaining native/phone/release gates. Historical statements above about missing full test evidence are superseded only within the explicitly recorded current checkpoint.
+
+
+## Phase 2 takeover checkpoint — 2026-11-07
+
+The current implementation/validation boundary is [AUTO-PREPARE-LOCAL-CHECKPOINT-2026-11-07.md](AUTO-PREPARE-LOCAL-CHECKPOINT-2026-11-07.md). It supersedes the historical Phase 1-only source/pending lists above. Phase 2 remains disabled in production; the separately published changed-statement repair remains live. Continue remaining acceptance and release gates from that checkpoint without rebuilding completed original workflows.

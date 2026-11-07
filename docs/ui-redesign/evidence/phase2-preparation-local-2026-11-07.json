@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-07",
+  "status": "local-disabled-by-default",
+  "phase": 2,
+  "automaticFinancialWrites": false,
+  "buildAndTypecheck": "passed",
+  "regressionTests": 1296,
+  "coreChecks": 15,
+  "preparationContracts": 14,
+  "browser": {
+    "syntheticOnly": true,
+    "explicitConsent": true,
+    "readyBankProposal": true,
+    "beforeAfterSummary": true,
+    "originalReviewFinalConfirmationUnchecked": true,
+    "rejectionDraftGuard": true,
+    "rejectionPreservesFinancialData": true,
+    "pause": true,
+    "budgetSwitchGuardAndConsentReset": true,
+    "finalNoOverflowWidths": [
+      320,
+      390,
+      1440
+    ],
+    "lightAndDarkBounded": true,
+    "financialHashUnchanged": true,
+    "reportCommits": 0
+  },
+  "productionPhase2Enabled": false,
+  "physicalDeviceSchedulingVerified": false
+}

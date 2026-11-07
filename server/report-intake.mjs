@@ -14,7 +14,7 @@ async function sourceBytes(request){
 
 /** Phase 1 transport and durable approval only. No parser, notices or financial
  * command is imported here. Identifiers are read on-device after approval. */
-export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date.now()}={}){
+export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date.now(),onStored}={}){
  db.exec(`CREATE TABLE IF NOT EXISTS report_intake_privacy(user_id TEXT PRIMARY KEY,consented_at TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS report_intake_connections(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,token_hash TEXT NOT NULL UNIQUE,label TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0,last_attempt TEXT,last_success TEXT,last_error TEXT,created_at TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS report_intake_submissions(connection_id TEXT NOT NULL,report_id TEXT NOT NULL,PRIMARY KEY(connection_id,report_id));
@@ -54,7 +54,9 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
   if(request.method==='PUT'){
    requireConsent(user);const bytes=await sourceBytes(request);let name;try{name=decodeURIComponent(request.headers.get('x-report-name')??'')}catch{throw serviceError('שם קובץ לא תקין.')}
    bound(request,user);const stored=reportStore.upload({scope:scope(user),plan:null},bytes,name),row=record(user,stored.receiptId);
-   return serviceJSON({...receipt(row,!!approval(user,row.id)),duplicate:!!stored.duplicate},201);
+   const result={...receipt(row,!!approval(user,row.id)),duplicate:!!stored.duplicate};
+   try{await onStored?.(user,row.id);}catch{/* Source receipt remains durable. */}
+   return serviceJSON(result,201);
   }
   if(request.method!=='POST')throw serviceError('הפעולה אינה נתמכת.',405);
   const input=await boundedJSON(request);bound(request,user);
@@ -142,8 +144,8 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
     db.prepare('INSERT OR IGNORE INTO report_intake_submissions VALUES(?,?)').run(connection.id,stored.receiptId);
     db.prepare('UPDATE report_intake_connections SET last_success=?,last_error=NULL WHERE id=?').run(stamp(),connection.id);
     const row=record(user,stored.receiptId),result={...deliveryReceipt(user,connection,row),duplicate:!!stored.duplicate};
-    db.exec('COMMIT');return serviceJSON(result,201);
-   }catch(error){db.exec('ROLLBACK');throw error}
+    db.exec('COMMIT');try{await onStored?.(user,row.id);}catch{/* Delivery remains durable even if preparation is unavailable. */}return serviceJSON(result,201);
+   }catch(error){if(db.isTransaction)db.exec('ROLLBACK');throw error}
   }catch(error){db.prepare('UPDATE report_intake_connections SET last_error=? WHERE id=?').run(error.safeToExpose?error.message:'העלאת הדוח לא אושרה. יש לנסות שוב.',connection.id);throw error}
  };
  const safe=fn=>async(...args)=>{try{return await fn(...args)}catch(error){return serviceJSON({error:error.safeToExpose?error.message:'תיבת הסנכרון אינה זמינה כרגע. המקור נשמר במכשיר.'},error.safeToExpose?error.status:503)}};

@@ -1,3 +1,4 @@
+import {createReportAutomation} from './report-automation.mjs';
 import {createSpaceMigrations} from './space-migrations.mjs';
 import {createPlanHistory} from './plan-history.mjs';
 import {createGmailImport} from './gmail-import.mjs';
@@ -28,7 +29,7 @@ const redirect=(url,setCookie)=>response(null,303,{Location:url,...(setCookie?{'
 const json=(body,status)=>response(JSON.stringify(body),status,{'Content-Type':'application/json; charset=utf-8'});
 const safeReturn=value=>value?.startsWith('/')&&!value.startsWith('//')&&!value.includes('\\')?value:'/';
 const loginPage=(message,returnTo='/')=>`<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Budgit · כניסה</title><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-v1.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon-v1.png"><link rel="manifest" href="/manifest.webmanifest"><style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:light-dark(#f8f5f0,#1b1e27);color:light-dark(#272735,#eee);font-family:-apple-system,BlinkMacSystemFont,system-ui}main{margin:20px;padding:32px;max-width:360px;border-radius:24px;background:light-dark(#fff,#282c38)}h1{font-size:28px}p{line-height:1.6}a{display:block;text-align:center;padding:14px;background:#7056b2;color:white;border-radius:16px;text-decoration:none;font-weight:600}.error{color:light-dark(#b52c25,#ffb3ae)}</style><main><h1>Budgit</h1><p>מתחברים כדי לפתוח את התקציב הפרטי, או תקציב משותף שהוזמנת אליו.</p>${message?'<p class="error" role="alert">'+message+'</p>':''}<a href="${returnTo==='/'?'/auth/google':'/auth/google?returnTo='+encodeURIComponent(safeReturn(returnTo))}">כניסה עם Google</a><p>הכניסה נותנת גישה לפרופיל ולאימייל בלבד, ללא גישה לבנק או לקבצי Google.</p></main></html>`;
-export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],adminEmails=[],rates,push,backup,oauth,gmailOAuthFactory,reactAssetArchiveRoot,reportOptions={},now=()=>Date.now()}){
+export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],adminEmails=[],rates,push,backup,oauth,gmailOAuthFactory,reactAssetArchiveRoot,reportOptions={},reportAutomationEnabled=false,automationOptions={},now=()=>Date.now()}){
  const base=new URL(origin);if(base.protocol!=='https:'||base.pathname!=='/'||base.search||base.hash)throw Error('APP_ORIGIN must be an HTTPS origin');
  const normalize=value=>(Array.isArray(value)?value:String(value).split(/[,\s]+/)).map(email=>email.trim().toLowerCase()).filter(Boolean);
  const admins=new Set(normalize(adminEmails));
@@ -38,11 +39,13 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const reportStore=createReportStore(db,{...reportOptions,DB,origin:base.origin,isAllowed,now,savePlan:(user,budget,plan,revision,storage)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(storage,user,budget,'report-import')})});
  const history=createPlanHistory(db,{isAllowed,secret:reportStore.secret,now,savePlan:(user,budget,plan,revision,kind)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(DB,user,budget,kind)})});
  const gmail=createGmailImport(db,{origin:base.origin,clientId,clientSecret,isAllowed,reportStore,now,...(gmailOAuthFactory?{oauthFactory:gmailOAuthFactory}:{})});
- const reportIntake=createReportIntake(db,{reportStore,origin:base.origin,isAllowed,now});
+ let reportAutomation;
+ const reportIntake=createReportIntake(db,{reportStore,origin:base.origin,isAllowed,now,onStored:(user,id)=>reportAutomation?.deliver(user,id)});
  const migrations=createSpaceMigrations(db,{isAllowed,secret:reportStore.secret,now});
  const migrationReview=createSpaceMigrationReview(db,{isAllowed});
  const transferMatches=createTransferMatches(db,{isAllowed,secret:reportStore.secret,now});
  const statementNotices=createStatementNotices(db,{isAllowed,secret:reportStore.secret,now});
+ if(reportAutomationEnabled)reportAutomation=createReportAutomation(db,{origin:base.origin,isAllowed,reportStore,intake:reportIntake,notices:statementNotices,now,...automationOptions});
  const actions=createActions(db,{isAllowed,now,reports:reportStore.list,incomingReports:reportIntake.pending,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
  origin=base.origin;const wallet=createApplePay(db,{origin,now,isAllowed});const configured=!!(clientId&&clientSecret);oauth??=new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback');
  const handle=async function handle(request,{ip='unknown'}={}){
@@ -104,7 +107,8 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  }
  if(path==='/api/card-push'||path==='/api/card-push/schedule'||path==='/api/card-push/test'){if(!push)return json({error:'התראות אינן זמינות כרגע.'},503);return push.handle(request,user);}
  if(path==='/api/plan-history')return history.handle(request,user);
- if(path==='/api/reports')return reportStore.handle(request,user);
+ if(path==='/api/reports'){const response=await reportStore.handle(request,user);if(reportAutomation&&request.method==='POST'&&response.ok)try{const value=await response.clone().json();if(Number.isSafeInteger(value.revision))reportAutomation.observe(user,u.searchParams.get('budget')??'personal',value.revision);}catch{/* An observation cannot undo a successful original save. */}return response;}
+ if(path==='/api/report-automation')return reportAutomation?reportAutomation.handle(request,user):json({available:false,phase:1,automaticFinancialWrites:false},request.method==='GET'?200:409);
  if(path==='/api/report-intake')return reportIntake.handle(request,user);
  if(path==='/api/statement-notices')return statementNotices.handle(request,user);
  if(path==='/api/space-migrations')return migrations(request,user);
@@ -141,5 +145,5 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  if(path==='/'&&r.ok){h.set('Content-Type','text/html; charset=utf-8');const html=(await r.text()).replace('<head>','<head><script>window.monthlyFlowStandalone=true;window.monthlyFlowAdmin='+JSON.stringify(admins.has(user.email))+';</script>');h.set('Content-Security-Policy',scriptReportPolicy(html));return new Response(html,{status:r.status,headers:h});}
  return new Response(r.body,{status:r.status,headers:h});
  };
- return Object.assign(handle,{tickGmail:gmail.tick});
+ return Object.assign(handle,{tickGmail:gmail.tick,tickReportAutomation:async()=>{await reportAutomation?.tick();}});
 }

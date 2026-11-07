@@ -1,20 +1,22 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "6e82745122e0c845a21c6190455cf45d3825a7f2",
+  "sourceCommit": "8c5a91ac45951f4f03751ae95b9766a580fcd857",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published visible changed-statement comparison and explicit version-bound replacement through the original atomic report workflow. Unfinished Stage 2 development excluded.",
+  "status": "Local Phase 2 preparation checkpoint; disabled by default with explicit owner consent and original financial approval. Production retains only the separately published statement-review repair.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1282,
+    "regressionTests": 1296,
     "coreChecks": 15,
-    "browser": "Exact-release synthetic comparison, replacement/undo/retain/progress reload, 320/390/430/1440px and dark/reduced motion; finances unchanged.",
-    "release": "883 prior files matched; verified backup; isolated financial/access/20-source decryption/startup/rollback/intake restore/68 retained assets; 84 validated runtime files; 47 tables/keys/adjacent services preserved."
+    "browser": "Synthetic owner consent, ready bank proposal and before/after summary, original unchecked financial review, guarded rejection, pause, budget-switch consent reset, unchanged financial hash and zero commits; bounded final 320 Dark, 390 Light and 1440 layouts pass.",
+    "release": "883 prior files matched; verified backup; isolated financial/access/20-source decryption/startup/rollback/intake restore/68 retained assets; 84 validated runtime files; 47 tables/keys/adjacent services preserved.",
+    "localPreparationEvidence": "docs/ui-redesign/evidence/phase2-preparation-local-2026-11-07.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "de5fc197ff88f5ccb667522d01d347a17d98e275",
-  "productionImage": "sha256:537ce3b8d47c51df624143428fae235f66ec74cced8a906da86f0f8cc871cd77"
+  "productionImage": "sha256:537ce3b8d47c51df624143428fae235f66ec74cced8a906da86f0f8cc871cd77",
+  "phase2ProductionEnabled": false
 }
