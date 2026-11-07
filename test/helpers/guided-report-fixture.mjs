@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import {createHash,randomBytes,randomUUID,generateKeyPairSync} from 'node:crypto';
+import {openDatabase} from '../../server/database.mjs';
+import {createApp} from '../../server/app.mjs';
+import {zero} from '../../src/budget.js';
+import {buildReportInbox,reportInboxDraftForWrite,reportInboxDraft} from '../../src/report-inbox-controller.js';
+import {sealReport} from '../../server/report-crypto.mjs';
+import {readReportPDF} from '../../tools/bank-csv/pdf-reader.mjs';
+import {calPDFFixture} from '../../tools/bank-csv/cal-pdf-fixture.mjs';
+import {loadBudgetSnapshot} from '../../frontend/src/app/budget-api.ts';
+import {loadReportGroup} from '../../frontend/src/app/report-group-loader.ts';
+import {saveStoredReportGroupDraft,commitStoredReportGroup} from '../../frontend/src/app/report-review-api.ts';
+import * as classifier from '../../tools/bank-csv/classifier.mjs';
+import * as activityAPI from '../../tools/bank-csv/cal-activity.mjs';
+export const hash=v=>createHash('sha256').update(v).digest('hex');
+export const pair=generateKeyPairSync('rsa',{modulusLength:3072,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});
+export const plan=()=>({startMonth:'2026-01',opening:1000,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false,setupCompleted:true,creditCards:[{id:'card1',name:'בדיקה',alias:'1234',provider:'cal'}],cashPlanning:{accounts:[{id:'bank-a',label:'חשבון בדיקה',bankName:'hapoalim',buffer:0}],months:{},cardAccounts:{card1:'bank-a'},transfers:[]}});
+export async function guidedFixture({retention=true,sourceBytes,sourceName='cal.pdf',activityCycle,activityTotal,...options}={}){
+ const {db,DB}=openDatabase(':memory:'),key=randomBytes(32),origin='https://guided.test';let clock=Date.parse('2026-11-07T10:00:00Z');
+ for(const id of ['alice','bob']){db.prepare('INSERT INTO auth_users VALUES(?,?,?,?)').run(id,id,id+'@example.test',clock);db.prepare('INSERT INTO auth_sessions VALUES(?,?,?)').run(hash(id),id,clock+365*86400000);}
+ const app=createApp({db,DB,origin,now:()=>clock,allowedEmails:['alice@example.test','bob@example.test'],reportOptions:{key,recoveryPublicKey:pair.publicKey},reportRetentionEnabled:retention,...options});
+ const req=(user,path,init={})=>app(new Request(origin+path,{...init,headers:{origin,cookie:'__Host-mf_session='+user,'x-budget-account-id':user,...Object.fromEntries(new Headers(init.headers))}}));
+ const fetcher=(path,init)=>req('alice',path,init),post=(path,body,user='alice')=>req(user,path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ for(const id of ['alice','bob'])assert.equal((await req(id,'/api/plan',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:plan(),revision:0})})).status,200);
+ const bytes=sourceBytes??calPDFFixture();await post('/api/report-intake',{action:'consent',confirmServerRead:true});const secret=randomBytes(32).toString('base64url'),connectionId=randomUUID();await post('/api/report-intake',{action:'connect',id:connectionId,secret,label:'Synthetic'});
+ const receive=(body=bytes,name=sourceName)=>app(new Request(origin+'/api/imports/incoming?name='+name,{method:'POST',headers:{authorization:'Bearer '+secret},body}));
+ const received=await(await receive()).json(),privateId=received.receiptId;assert.equal((await post('/api/report-intake',{action:'approve',id:privateId,sourceHash:hash(bytes),revision:1,confirm:true})).status,200);
+ const parsed=sourceBytes?(await import('../../server/report-automation.mjs').then(m=>m.readAutomaticSource(sourceName,bytes))).parsed:(await readReportPDF(bytes.slice(),{includeAccountIdentity:true})).intake;
+ const routed=await(await post('/api/report-intake',{action:'route',id:privateId,sourceHash:hash(bytes),revision:1,confirm:true,budget:'personal',budgetRevision:1,kind:parsed.kind,target:parsed.kind==='bank'?'bank-a':'card1',identityKey:hash('cal:1234'),remember:true,bindingRevision:0})).json();assert.ok(routed.reportId,JSON.stringify(routed));const id=routed.reportId;
+ const item={...parsed,id,name:sourceName,size:bytes.length,hash:hash(bytes),identityKey:hash('cal:1234'),target:parsed.kind==='bank'?'bank-a':'card1',payer:parsed.kind==='bank'?'':'bank-a',...(activityCycle?{activityCycle,activityTotal,activityConfirmed:true}:{}),decisions:{},directIncluded:{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false,storedId:id,storedRevision:1};
+ const prepared=reportInboxDraft({groupId:randomUUID(),items:[item],newAccounts:[],newCards:[],categoryChoices:new Map(),bankChoices:new Map(),startMonth:'2026-01'},'fixture-original-reader');
+ db.prepare("UPDATE report_sources SET draft=?,state='ready',kind=?,target=? WHERE id=?").run(sealReport(key,Buffer.from(JSON.stringify(prepared)),'personal:alice|'+id+'|draft'),parsed.kind,item.target,id);
+ const lifecycle=async()=>{const response=await req('alice','/api/report-lifecycle?budget=personal&id='+id);assert.equal(response.status,200);return response.json();};
+ const load=async()=>{const base=(await loadBudgetSnapshot('personal',new AbortController().signal,fetcher)).value,group=await loadReportGroup('personal',base,[id],new AbortController().signal,fetcher);return{base,group};};
+ const progress=async(categories='resolved')=>{const {base,group}=await load();group.ui.guided={version:1,step:'summary',done:['account','figures','categories'],categories,budgetRevision:base.revision};await buildReportInbox(base.plan,group.ui,{month:'2026-11',today:'2026-11-07',classifier,activityAPI});assert.ok(group.ui.build,JSON.stringify({error:group.ui.error,issues:group.ui.issues,items:group.ui.items.map(i=>({kind:i.kind,error:i.error,warning:i.warning,target:i.target,payer:i.payer}))}));const draft=reportInboxDraftForWrite(group.ui,group.ui.items,'guided-test');await saveStoredReportGroupDraft('personal',base,group.sources,draft,'ready',fetcher);};
+ const commit=async()=>{const {base,group}=await load();await buildReportInbox(base.plan,group.ui,{month:'2026-11',today:'2026-11-07',classifier,activityAPI});assert.ok(group.ui.build,JSON.stringify({error:group.ui.error,issues:group.ui.issues,items:group.ui.items.map(i=>({kind:i.kind,error:i.error,warning:i.warning,target:i.target,payer:i.payer}))}));return commitStoredReportGroup('personal',base,group.sources,reportInboxDraftForWrite(group.ui,group.ui.items,'guided-test'),group.ui.build,randomUUID(),fetcher);};
+ const financial=()=>JSON.stringify({plans:db.prepare('SELECT * FROM plans ORDER BY user_id').all(),budgets:db.prepare('SELECT * FROM budgets ORDER BY id').all(),commits:db.prepare('SELECT * FROM report_commits ORDER BY scope,action_id').all(),history:db.prepare('SELECT * FROM plan_history ORDER BY id').all()});
+ const sourceRow=()=>db.prepare('SELECT * FROM report_sources WHERE id=?').get(id);
+ const catalog=()=>app(new Request(origin+'/api/imports/incoming?catalog=1',{headers:{authorization:'Bearer '+secret}}));
+ return{db,DB,app,key,origin,bytes,id,privateId,connectionId,secret,fetcher,req,post,lifecycle,load,progress,commit,financial,sourceRow,receive,catalog,now:()=>clock,setTime:v=>clock=v,advance:ms=>clock+=ms};
+}

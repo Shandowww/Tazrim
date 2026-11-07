@@ -87,3 +87,16 @@ test('Share-sheet input retains originals because it cannot re-enumerate a nativ
  const w=JSON.parse(execFileSync('python3',['-B','-c',"import importlib.util,json;s=importlib.util.spec_from_file_location('builder','scripts/build-incoming-shortcut.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(json.dumps(m.build(folder_input=False)))"],{encoding:'utf8'}));
  assert.ok(!w.WFWorkflowActions.some(a=>['is.workflow.actions.file.delete','is.workflow.actions.file.getfoldercontents'].includes(a.WFWorkflowActionIdentifier)));
 });
+
+test('Generated receipt graph accepts truthful removed acknowledgments and refuses forged or mismatched receipts',async()=>{
+ const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),w=workflow();
+ // Setup token is synthetic and never written to the public installer.
+ const tokenQuestion=w.WFWorkflowImportQuestions.find(q=>q.ParameterKey==='WFTextActionText');w.WFWorkflowActions[tokenQuestion.ActionIndex].WFWorkflowActionParameters.WFTextActionText='x'.repeat(43);
+ const connectionId='synthetic-connection',sourceHash='a'.repeat(64),removed={receiptId:'synthetic-receipt',sourceHash,connectionId,stored:false,completed:true,completionAcknowledged:true,originalRemoved:true,cleanupEligible:false,processingState:'completed-original-removed'};
+ for(const cached of [false,true]){
+  const run=r=>runIncomingWorkflow(w,{catalog:{version:2,connectionId,receipts:cached?{[sourceHash]:r}:{}},receipt:r});
+  assert.equal(run(removed).exited,false);assert.equal(run({...removed,stored:true,originalRemoved:false}).exited,false);
+  for(const patch of [{stored:'false'},{stored:undefined},{completed:'true'},{completed:false},{completionAcknowledged:false},{originalRemoved:false},{cleanupEligible:true},{connectionId:'another'},{sourceHash:'b'.repeat(64)},{receiptId:''},{processingState:'received'}])assert.equal(run({...removed,...patch}).exited,true,JSON.stringify({cached,patch}));
+ }
+ assert.equal(runIncomingWorkflow(w,{catalog:{version:1,receipts:{}},receipt:removed}).exited,true);
+});

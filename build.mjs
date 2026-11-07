@@ -33,6 +33,7 @@ mkdirSync('dist/server',{recursive:true});
 const copiedAutomaticModels=new Set();
 function copyAutomaticModel(name){if(copiedAutomaticModels.has(name))return;copiedAutomaticModels.add(name);const source=readFileSync('src/'+name,'utf8');copyFileSync('src/'+name,'dist/server/'+name);for(const match of source.matchAll(/from ['"]\.\/([^'"]+\.js)['"]/g))copyAutomaticModel(match[1]);}
 copyAutomaticModel('report-automation-model.js');
+copyAutomaticModel('report-lifecycle-model.js');
 cpSync('tools/bank-csv','dist/import-readers',{recursive:true,filter:path=>!/(?:node_modules|\.test\.mjs$|fixture|serve\.mjs$)/.test(path)});
 writeFileSync('dist/server/report-parser-version.mjs','export const parserVersion = '+JSON.stringify(buildId)+';\n');
 

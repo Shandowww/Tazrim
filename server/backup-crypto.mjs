@@ -1,3 +1,4 @@
+import {mergeReportRetentionTombstones} from './report-retention-restore.mjs';
 // Full-server recovery archive: encrypt on Hetzner with a public key only.
 // The private recovery key must stay outside Hetzner and outside cloud backup folders.
 import {createCipheriv,createDecipheriv,createHash,createPublicKey,createPrivateKey,publicEncrypt,privateDecrypt,randomBytes,constants} from 'node:crypto';
@@ -48,11 +49,11 @@ export async function encryptedDatabaseBackup({source,publicKeyFile,directory,re
  }catch(e){if(handle){await handle.close();await rm(output,{force:true});}throw e;}finally{key.fill(0);}
  }finally{await rm(temporary,{force:true});}
 }
-export async function restoreBackupToNewFile({backup,privateKeyFile,output,reportKeyOutput}){
+export async function restoreBackupToNewFile({backup,privateKeyFile,output,reportKeyOutput,trustedRetentionDatabase}){
  const bytes=await readFile(backup),key=recoveryPrivateKey(await readFile(privateKeyFile,'utf8')),plain=decryptBackup(bytes,key),header=JSON.parse(bytes.toString()).header;
  if(createHash('sha256').update(plain).digest('hex')!==header.sha256)throw Error('Backup checksum mismatch');
  await mkdir(dirname(output),{recursive:true,mode:0o700});await writeFile(output,plain,{mode:0o600,flag:'wx'});
  let reportSources=0;
- try{checkDatabase(output);const restored=new DatabaseSync(output,{readOnly:true});try{const reportKey=recoverReportKey(restored,key);if(reportKey){try{reportSources=verifyStoredReports(restored,reportKey);if(reportKeyOutput)await writeFile(reportKeyOutput,reportKey,{mode:0o600,flag:'wx'});}finally{reportKey.fill(0);}}else if(['report_sources','gmail_connections','bank_mail_notices','plan_history'].some(table=>restored.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table)&&restored.prepare('SELECT 1 FROM '+table+(table==='plan_history'?' WHERE data IS NOT NULL':'')+' LIMIT 1').get()))throw Error('Report recovery key missing');}finally{restored.close();}}catch(error){await rm(output,{force:true});throw error;}
+ try{checkDatabase(output);const restored=new DatabaseSync(output);try{const reportKey=recoverReportKey(restored,key);if(reportKey){try{if(trustedRetentionDatabase){if(resolve(trustedRetentionDatabase)===resolve(output))throw Error('Trusted retention database must be separate');const trusted=new DatabaseSync(trustedRetentionDatabase,{readOnly:true});try{mergeReportRetentionTombstones(restored,trusted,reportKey);}finally{trusted.close();}}reportSources=verifyStoredReports(restored,reportKey);if(reportKeyOutput)await writeFile(reportKeyOutput,reportKey,{mode:0o600,flag:'wx'});}finally{reportKey.fill(0);}}else if(['report_sources','gmail_connections','bank_mail_notices','plan_history'].some(table=>restored.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table)&&restored.prepare('SELECT 1 FROM '+table+(table==='plan_history'?' WHERE data IS NOT NULL':'')+' LIMIT 1').get()))throw Error('Report recovery key missing');}finally{restored.close();}}catch(error){await rm(output,{force:true});throw error;}
  return{file:output,release:header.release,createdAt:header.createdAt,reportSources};
 }

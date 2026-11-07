@@ -24,12 +24,13 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
  const authorize=user=>{const current=user&&db.prepare('SELECT email FROM auth_users WHERE id=?').get(user.id);if(!current||current.email!==user.email||!isAllowed(current.email))throw serviceError('הגישה לחשבון אינה מורשית.',403)};
  const consented=user=>!!db.prepare('SELECT 1 FROM report_intake_privacy WHERE user_id=?').get(user.id);
  const requireConsent=user=>{if(!consented(user))throw serviceError('יש לאשר שמירת דוחות בתיבה הפרטית שהשרת יכול לקרוא.',409)};
- const record=(user,id)=>db.prepare('SELECT id,source_hash,revision,state,source_bytes,created_at FROM report_sources WHERE scope=? AND id=?').get(scope(user),id);
+ const record=(user,id)=>db.prepare('SELECT id,source_hash,revision,state,source_bytes,created_at,original_removed_at FROM report_sources WHERE scope=? AND id=?').get(scope(user),id);
  const approval=(user,id)=>db.prepare('SELECT * FROM report_intake_approvals WHERE user_id=? AND intake_id=?').get(user.id,id);
- const receipt=(row,verified)=>({receiptId:row.id,sourceHash:row.source_hash,stored:true,processingState:verified?'verified':'awaiting_verification',budgetState:'not-committed',revision:row.revision,cleanupEligible:false});
+ const receipt=(row,verified)=>row.original_removed_at!==null&&row.original_removed_at!==undefined?({receiptId:row.id,sourceHash:row.source_hash,stored:false,completed:true,completionAcknowledged:true,originalRemoved:true,processingState:'completed-original-removed',budgetState:'previously-recorded',revision:row.revision,cleanupEligible:false,fullImportComplete:false}):({receiptId:row.id,sourceHash:row.source_hash,stored:true,processingState:verified?'verified':'awaiting_verification',budgetState:'not-committed',revision:row.revision,cleanupEligible:false});
  const deliveryReceipt=(user,connection,row)=>{
+  try{reportStore.lifecycle.ensureOriginal(scope(user),row.id);}catch(error){if(error.status!==410)throw error;}row=record(user,row.id);
   const approved=approval(user,row.id),result={...receipt(row,!!approved),connectionId:connection.id,fullImportComplete:false};
-  if(approved?.source_hash===row.source_hash&&approved.report_id)try{
+  if(row.original_removed_at===null&&approved?.source_hash===row.source_hash&&approved.report_id)try{
    const access=budgetAccess(db,user,approved.budget,{isAllowed,write:true});
    if(reportStore.cleanupComplete(access,approved.report_id,row.source_hash,approved))Object.assign(result,{processingState:'imported',budgetState:'committed',fullImportComplete:true,cleanupEligible:true});
   }catch{/* Revoked/locked/inaccessible destinations never authorize cleanup. */}
@@ -37,7 +38,7 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
  };
  const snapshot=user=>{
   const rows=new Map(db.prepare('SELECT id,source_hash,source_bytes FROM report_sources WHERE scope=?').all(scope(user)).map(row=>[row.id,row]));
-  return {accountId:user.id,accountEmail:user.email,intakeIdentityBound:true,storageConsented:consented(user),reports:reportStore.list(scope(user)).map(row=>{const raw=rows.get(row.id),a=approval(user,row.id);return {...row,sourceHash:raw.source_hash,size:raw.source_bytes,verificationState:a?.report_id?'routed':a?'verified':'awaiting_verification',approvedAt:a?.approved_at??null,route:a?.report_id?{budget:a.budget,kind:a.kind,target:a.target,reportId:a.report_id}:null}}),connections:db.prepare('SELECT id,label,revoked,last_attempt,last_success,last_error,created_at FROM report_intake_connections WHERE user_id=? ORDER BY created_at DESC').all(user.id),bindings:db.prepare('SELECT identity_key AS identityKey,kind,budget,target,revision FROM report_intake_bindings WHERE user_id=?').all(user.id)};
+  return {accountId:user.id,accountEmail:user.email,intakeIdentityBound:true,storageConsented:consented(user),reports:reportStore.list(scope(user)).filter(row=>!row.originalRemoved).map(row=>{const raw=rows.get(row.id),a=approval(user,row.id);return {...row,sourceHash:raw.source_hash,size:raw.source_bytes,verificationState:a?.report_id?'routed':a?'verified':'awaiting_verification',approvedAt:a?.approved_at??null,route:a?.report_id?{budget:a.budget,kind:a.kind,target:a.target,reportId:a.report_id}:null}}),connections:db.prepare('SELECT id,label,revoked,last_attempt,last_success,last_error,created_at FROM report_intake_connections WHERE user_id=? ORDER BY created_at DESC').all(user.id),bindings:db.prepare('SELECT identity_key AS identityKey,kind,budget,target,revision FROM report_intake_bindings WHERE user_id=?').all(user.id)};
  };
  const bound=(request,user)=>{authorize(user);if(request.headers.get('x-budget-account-id')!==user.id)throw serviceError('החשבון השתנה. יש לפתוח מחדש את תיבת הסנכרון.',403)};
  const manage=async(request,user)=>{
@@ -55,8 +56,8 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
    requireConsent(user);const bytes=await sourceBytes(request);let name;try{name=decodeURIComponent(request.headers.get('x-report-name')??'')}catch{throw serviceError('שם קובץ לא תקין.')}
    bound(request,user);const stored=reportStore.upload({scope:scope(user),plan:null},bytes,name),row=record(user,stored.receiptId);
    const result={...receipt(row,!!approval(user,row.id)),duplicate:!!stored.duplicate};
-   try{await onStored?.(user,row.id);}catch{/* Source receipt remains durable. */}
-   return serviceJSON(result,201);
+   if(stored.stored)try{await onStored?.(user,row.id);}catch{/* Source receipt remains durable. */}
+   return serviceJSON({...receipt(record(user,row.id),!!approval(user,row.id)),duplicate:!!stored.duplicate},201);
   }
   if(request.method!=='POST')throw serviceError('הפעולה אינה נתמכת.',405);
   const input=await boundedJSON(request);bound(request,user);
@@ -77,7 +78,7 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
    if(!uuid.test(input.id??'')||!hash.test(input.sourceHash??'')||!Number.isSafeInteger(input.revision)||input.revision<1||input.confirm!==true)throw serviceError('יש לאשר מחיקת עותק מהתיבה הפרטית.');
    const current=record(user,input.id);
    if(!current)return serviceJSON({deleted:true,id:input.id,recovered:true});
-   if(current.source_hash!==input.sourceHash||current.revision!==input.revision)throw serviceError('המקור השתנה. יש לבדוק אותו מחדש לפני מחיקה.',409);
+   if(current.original_removed_at!==null||current.source_hash!==input.sourceHash||current.revision!==input.revision)throw serviceError('המקור השתנה. יש לבדוק אותו מחדש לפני מחיקה.',409);
    // Only the actor's staging copy is removed. Budget sources, remembered
    // mappings, import receipts and financial records retain their own lifecycle.
    db.exec('BEGIN IMMEDIATE');try{
@@ -123,9 +124,9 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
   if(db.prepare('SELECT count FROM report_limits WHERE connection_id=?').get(connection.id).count>100)throw serviceError('יותר מדי בקשות. נסו מאוחר יותר.',429);
   const url=new URL(request.url);
   if(request.method==='GET'){
-   if(url.searchParams.get('catalog')==='1'){
+   if(['1','2'].includes(url.searchParams.get('catalog'))){
     const rows=db.prepare('SELECT r.id,r.source_hash,r.revision FROM report_sources r JOIN report_intake_submissions s ON s.report_id=r.id WHERE r.scope=? AND s.connection_id=? LIMIT 500').all(scope(user),connection.id);
-    return serviceJSON({version:1,receipts:Object.fromEntries(rows.map(row=>[row.source_hash,deliveryReceipt(user,connection,row)]))});
+    return serviceJSON({version:new URL(request.url).searchParams.get('catalog')==='2'?2:1,...(url.searchParams.get('catalog')==='2'?{connectionId:connection.id}:{}),receipts:Object.fromEntries(rows.map(row=>[row.source_hash,deliveryReceipt(user,connection,row)]))});
    }
    const receiptId=url.searchParams.get('receipt'),sourceHash=url.searchParams.get('hash');
    if(!receiptId&&!sourceHash)throw serviceError('יש לבחור קבלה או חתימת מקור.',400);
@@ -144,7 +145,7 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
     db.prepare('INSERT OR IGNORE INTO report_intake_submissions VALUES(?,?)').run(connection.id,stored.receiptId);
     db.prepare('UPDATE report_intake_connections SET last_success=?,last_error=NULL WHERE id=?').run(stamp(),connection.id);
     const row=record(user,stored.receiptId),result={...deliveryReceipt(user,connection,row),duplicate:!!stored.duplicate};
-    db.exec('COMMIT');try{await onStored?.(user,row.id);}catch{/* Delivery remains durable even if preparation is unavailable. */}return serviceJSON(result,201);
+    db.exec('COMMIT');if(stored.stored)try{await onStored?.(user,row.id);}catch{/* Delivery remains durable even if preparation is unavailable. */}return serviceJSON({...deliveryReceipt(user,connection,record(user,row.id)),duplicate:!!stored.duplicate},201);
    }catch(error){if(db.isTransaction)db.exec('ROLLBACK');throw error}
   }catch(error){db.prepare('UPDATE report_intake_connections SET last_error=? WHERE id=?').run(error.safeToExpose?error.message:'העלאת הדוח לא אושרה. יש לנסות שוב.',connection.id);throw error}
  };

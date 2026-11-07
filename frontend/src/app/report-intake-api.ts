@@ -3,7 +3,7 @@ import {isVault} from '../../../src/vault.js'
 import {reportFileEligibility} from './report-library-api.ts'
 import {inboxHash} from '../../../src/report-inbox-model.js'
 import type {IncomingBinding,RoutingBudget} from './incoming-report-routing.ts'
-export interface IncomingReport {id:string;name:string;sourceHash:string;size:number;revision:number;createdAt:string;verificationState:'awaiting_verification'|'verified'|'routed';approvedAt:string|null;route:null|{budget:string;kind:string;target:string;reportId:string}}
+export interface IncomingReport {lifecycle?:'new'|'partial'|'digested';removalAt?:number|null;automaticRemovalEnabled?:boolean;retentionReason?:string|null;originalRemoved?:boolean;applied?:boolean;id:string;name:string;sourceHash:string;size:number;revision:number;createdAt:string;verificationState:'awaiting_verification'|'verified'|'routed';approvedAt:string|null;route:null|{budget:string;kind:string;target:string;reportId:string}}
 export interface IncomingConnection {id:string;label:string;revoked:number;last_attempt:string|null;last_success:string|null;last_error:string|null;created_at:string}
 export interface IncomingSnapshot {accountId:string;accountEmail:string;intakeIdentityBound:true;storageConsented:boolean;reports:IncomingReport[];connections:IncomingConnection[];bindings:IncomingBinding[]}
 const idOK=(id:any)=>typeof id==='string'&&/^[a-f0-9-]{36}$/.test(id),hashOK=(value:any)=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value)
@@ -26,6 +26,7 @@ export function incomingConnectionDraft(label:string){const bytes=crypto.getRand
 export async function storeIncomingSource(accountId:string,file:File,fetcher:typeof fetch=fetch){
  reportFileEligibility(file.name,file.size);const bytes=new Uint8Array(await file.arrayBuffer()),hash=await inboxHash(bytes)
  const value=await request(accountId,'',{method:'PUT',headers:{'Content-Type':'application/octet-stream','x-report-name':encodeURIComponent(file.name)},body:bytes as BodyInit},fetcher)
+ if(value?.stored===false&&value.completed===true&&value.completionAcknowledged===true&&value.originalRemoved===true&&value.cleanupEligible===false&&value.processingState==='completed-original-removed'&&idOK(value.receiptId)&&value.sourceHash===hash)return value
  if(value?.stored!==true||!idOK(value.receiptId)||value.sourceHash!==hash)throw Error('אישור הקבלה אינו תואם לקובץ. המקור נשאר במכשיר; יש לבדוק את התיבה לפני המשך.')
  return value
 }

@@ -38,6 +38,7 @@ export function createDriveBackup({db,origin,clientId,clientSecret,admins,source
  function trackTables(){
   const tables=new Set(db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map(r=>r.name));
   const tracked={report_intake_privacy:null,report_intake_connections:['token_hash','user_id','label','revoked'],report_intake_submissions:null,report_intake_approvals:null,report_intake_bindings:null,plan_history:null,gmail_connections:['data','enabled','since','until_time','page_token'],bank_mail_notices:null,statement_notice_scans:null,report_submissions:null,report_sources:null,report_store_keys:null,report_privacy:null,report_expectations:null,report_commits:null,report_connections:['token_hash','revoked','budget','user_id'],plans:['data'],budgets:['data','name'],auth_users:['email'],budget_members:null,budget_member_roles:null,budget_invitation_roles:null,budget_invitations:null,auth_access:null,wallet_events:null,wallet_connections:['hash','user_id','budget_id','scope','card_id','label','revoked'],wallet_merchant_categories:null,push_devices:['subscription','user_id'],push_schedules:['cards']};
+  tracked.report_lifecycle=['source_hash','revision','reviewed_at','completed_at','removed_at','data','needs_verification'];
   tracked.report_automation_policies=['enabled','revision'];
   tracked.report_automation_jobs=['source_hash','status','revision','data'];
   for(const [table,selected]of Object.entries(tracked))if(tables.has(table))for(const event of ['INSERT','UPDATE','DELETE']){

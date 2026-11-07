@@ -110,15 +110,43 @@ def build(config=None, folder_input=True):
         {'WFItemType': 0, 'WFKey': text('Authorization'), 'WFValue': text('Bearer \ufffc', secret)},
         {'WFItemType': 0, 'WFKey': text('Content-Type'), 'WFValue': text('application/octet-stream')},
     ]}}
-    catalog = ref(add('downloadurl', WFURL=endpoint + '?catalog=1', WFHTTPMethod='GET', ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
+    catalog = ref(add('downloadurl', WFURL=endpoint + '?catalog=2', WFHTTPMethod='GET', ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
     version = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='version'), 'Dictionary Value')
     version_text = ref(add('gettext', WFTextActionText=text('\ufffc', version)), 'Text')
-    equal_or_stop(version_text, '1', 'קטלוג הקבלות לא התקבל בגרסה נתמכת. הסריקה נעצרה; המקורות נשארו במכשיר.')
+    equal_or_stop(version_text, '2', 'קטלוג הקבלות לא התקבל בגרסה נתמכת. הסריקה נעצרה; המקורות נשארו במכשיר.')
+    catalog_connection = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='connectionId'), 'Dictionary Value')
+    require(catalog_connection, 'חסר מזהה חיבור בקטלוג. המקורות נשארים במכשיר.')
     receipts = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='receipts'), 'Dictionary Value')
     expected_json = ref(add('gettext', WFTextActionText='{"expected":true}'), 'Text')
     expected_bool = ref(add('getvalueforkey', WFInput=expected_json, WFDictionaryKey='expected'), 'Dictionary Value')
     expected_type = ref(add('getitemtype', WFInput=expected_bool), 'Type')
     expected_text = ref(add('gettext', WFTextActionText=text('\ufffc', expected_bool)), 'Text')
+    false_json = ref(add('gettext', WFTextActionText='{"expected":false}'), 'Text')
+    false_bool = ref(add('getvalueforkey', WFInput=false_json, WFDictionaryKey='expected'), 'Dictionary Value')
+    false_text = ref(add('gettext', WFTextActionText=text('\ufffc', false_bool)), 'Text')
+
+    def boolean_receipt(receipt, key, expected):
+        value = ref(add('getvalueforkey', WFInput=receipt, WFDictionaryKey=key), 'Dictionary Value')
+        value_type = ref(add('getitemtype', WFInput=value), 'Type')
+        equal_or_stop(value_type, text('\ufffc', expected_type), 'אישור הקבלה אינו בוליאני תקין. המקור נשאר במכשיר.')
+        equal_or_stop(value, text('\ufffc', expected), 'אישור הקבלה אינו תואם. המקור נשאר במכשיר.')
+
+    def storage_or_completion(receipt):
+        stored = ref(add('getvalueforkey', WFInput=receipt, WFDictionaryKey='stored'), 'Dictionary Value')
+        value_type = ref(add('getitemtype', WFInput=stored), 'Type')
+        equal_or_stop(value_type, text('\ufffc', expected_type), 'לא התקבל מצב שמירה תקין. המקור נשאר במכשיר.')
+        retained = begin(stored, expected=text('\ufffc', expected_text))
+        add('conditional', GroupingIdentifier=retained, WFControlFlowMode=1)
+        boolean_receipt(receipt, 'stored', false_text)
+        for key in ['completed', 'completionAcknowledged', 'originalRemoved']:
+            boolean_receipt(receipt, key, expected_text)
+        boolean_receipt(receipt, 'cleanupEligible', false_text)
+        state = ref(add('getvalueforkey', WFInput=receipt, WFDictionaryKey='processingState'), 'Dictionary Value')
+        equal_or_stop(state, 'completed-original-removed', 'מצב השלמה לא מוכר. המקור נשאר במכשיר.')
+        end(retained)
+        connection = ref(add('getvalueforkey', WFInput=receipt, WFDictionaryKey='connectionId'), 'Dictionary Value')
+        equal_or_stop(connection, text('\ufffc', catalog_connection), 'הקבלה שייכת לחיבור אחר. המקור נשאר במכשיר.')
+
     files = ref(add('file.getfoldercontents', WFFolder=incoming, Recursive=False), 'Folder Contents') if folder_input else incoming
     for name in ['BudgitUploaded', 'BudgitScanned', 'BudgitExamined', 'BudgitSkipped']:
         empty = ref(add('list', WFItems=[]), 'List')
@@ -167,11 +195,7 @@ def build(config=None, folder_input=True):
     notice(text('העלאת \ufffc לא אושרה: \ufffc. המקור נשאר במכשיר.', upload_name, server_error))
     add('exit')
     end(no_error)
-    stored = ref(add('getvalueforkey', WFInput=response, WFDictionaryKey='stored'), 'Dictionary Value')
-    received_type = ref(add('getitemtype', WFInput=stored), 'Type')
-    equal_or_stop(received_type, text('\ufffc', expected_type), 'לא התקבל אישור שמירה בוליאני תקין. יש לבדוק את תיבת הסנכרון לפני ניסיון נוסף.')
-    received_text = ref(add('gettext', WFTextActionText=text('\ufffc', stored)), 'Text')
-    equal_or_stop(received_text, text('\ufffc', expected_text), 'שמירת המקור לא אושרה. המקור נשאר במכשיר.')
+    storage_or_completion(response)
     receipt_id = ref(add('getvalueforkey', WFInput=response, WFDictionaryKey='receiptId'), 'Dictionary Value')
     require(receipt_id, 'חסר מזהה קבלת שמירה. המקור נשאר במכשיר.')
     received_hash = ref(add('getvalueforkey', WFInput=response, WFDictionaryKey='sourceHash'), 'Dictionary Value')
@@ -185,11 +209,7 @@ def build(config=None, folder_input=True):
     add('exit')
     end(batch)
     add('conditional', GroupingIdentifier=absent, WFControlFlowMode=1)
-    old_stored = ref(add('getvalueforkey', WFInput=old, WFDictionaryKey='stored'), 'Dictionary Value')
-    old_type = ref(add('getitemtype', WFInput=old_stored), 'Type')
-    equal_or_stop(old_type, text('\ufffc', expected_type), 'קבלה קודמת אינה תקינה. יש לבדוק את החיבור בתיבת הסנכרון.')
-    old_text = ref(add('gettext', WFTextActionText=text('\ufffc', old_stored)), 'Text')
-    equal_or_stop(old_text, text('\ufffc', expected_text), 'הקבלה הקודמת אינה מאשרת שמירה. יש לבדוק את התיבה.')
+    storage_or_completion(old)
     old_id = ref(add('getvalueforkey', WFInput=old, WFDictionaryKey='receiptId'), 'Dictionary Value')
     require(old_id, 'לקבלה הקודמת חסר מזהה. יש לבדוק את התיבה.')
     old_hash = ref(add('getvalueforkey', WFInput=old, WFDictionaryKey='sourceHash'), 'Dictionary Value')

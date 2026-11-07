@@ -53,7 +53,6 @@ const ReportExpectationsPage = lazy(async () => ({ default: (await import('./app
 const ReportHistoryPage = lazy(async () => ({ default: (await import('./app/report-history-page')).ReportHistoryPage }))
 const ReportGroupPage = lazy(async () => ({ default: (await import('./app/report-group-page')).ReportGroupPage }))
 const ReportStatePage = lazy(async () => ({ default: (await import('./app/report-state-page')).ReportStatePage }))
-const CardReportPage = lazy(async () => ({ default: (await import('./app/card-report-page')).CardReportPage }))
 const ReportLibraryPage = lazy(async () => ({ default: (await import('./app/report-library-page')).ReportLibraryPage }))
 const IncomingReportsPage = lazy(async () => ({default:(await import('./app/incoming-reports-page')).IncomingReportsPage}))
 const SpacesPage = lazy(async () => ({ default: (await import('./app/spaces-page')).SpacesPage }))
@@ -275,7 +274,7 @@ function App() {
               <Route path="/upload/group" element={<ReportGroupPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/:id/group" element={<ReportGroupPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload/:id/state" element={<ReportStatePage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
-              <Route path="/upload/:id/review" element={<CardReportPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
+              <Route path="/upload/:id/review" element={<ReportGroupPage key={budgetId + pathname + search} fixture={fixture} budget={budget} />} />
               <Route path="/upload" element={<ReportLibraryPage key={budgetId} fixture={fixture} budget={budget} />} />
               <Route path="/incoming" element={<IncomingReportsPage fixture={fixture} budget={budget}/>} />
               <Route path="/categories" element={<ExpenseDetailsPage key={budgetId + search} mode="categories" fixture={fixture} budget={budget} />} />

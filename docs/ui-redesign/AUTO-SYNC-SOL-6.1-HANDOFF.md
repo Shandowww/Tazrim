@@ -1,5 +1,7 @@
 # Auto-sync continuation — Sol 6.1 Medium — 2026-11-06
 
+> **Current next increment — 2026-11-07:** Stage 2 opt-in preparation is published as `beb4f46`; see the latest release section below. Tal now requests a guided Next/Finish review, New/Partly digested/Digested sync labels, and removal of completed reports **including stored originals** after 30 days. Implement [the accepted amendment](REPORT-GUIDED-REVIEW-AND-RETENTION-2026-11-07.md), reusing existing commands. These new capabilities are not yet implemented. This supersedes historical local-only, Phase 2-disabled and indefinite server-original-retention statements below. Keep implementation with Sol 6.1; no provider/model switch is authorized by this documentation update.
+
 Execution is active and authorized. Work only in `work/budgit-household-ui` on `codex/budgit-household-ui`; retain all existing uncommitted work. Last committed HEAD at task start: `a542ba74ed21c3abb634caf800fe52eceddbe593`. The sync implementation remains a local draft. Production remains the category release `0b830c5dce2460d21a2e3076f51dba440eb44c99`, image `sha256:2c7fa7e55e042f894f9696f6806c7c5401a592eef652860710dd5cbcf4e8f829`. No production/Sites/real-record operation was performed.
 
 ## Agreed workflow

@@ -1,5 +1,9 @@
 # Monthly Flow — project handoff
 
+## Guided review and retention implementation — 2026-11-07
+
+The accepted guided Next/Finish flow, durable lifecycle labels, resumable re-review, category-only follow-up and verified 30-day original-retention transition are implemented. Build/typecheck, 1,316 regressions and 15 core checks pass, with synthetic 390px browser and native Shortcut schema/receipt-graph checks. The signed installer now handles truthful removed-original acknowledgments; install its new revision with the same folder/key. Stage 3 financial application stays disabled. Publication is tracked separately; do not infer deployment from this implementation note. Read `docs/ui-redesign/GUIDED-REVIEW-RETENTION-2026-11-07.md` for preservation, restore/rollback requirements and physical-device limits.
+
 ## Stage 2 preparation published — 2026-11-07
 
 Application `beb4f467cbd46ca2aea6aa7665210f57537bcc4c` is verified live at https://budgit.duckdns.org/next/incoming. Each budget owner can explicitly enable or pause preparation; no budget is opted in by deployment. Supported plaintext bank/card sources use confirmed mappings and original parsers/controller/drafts/notices. Encrypted proposals show before/after values and open the original review/financial confirmation. Unknown, mixed, locked or unsupported sources remain manual. No automatic financial application or Phase 3 mode is enabled. The existing signed Shortcut is unchanged. A missing current financial receipt now requires history review instead of a false imported status; the separate cross-format duplicate repair is retained.

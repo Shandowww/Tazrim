@@ -56,7 +56,9 @@ export async function commitStoredReportGroup(budgetId:string,base:BudgetRespons
  if(sources.some(source=>source.state==='committed')){
   const source=sources[0],item=draft?.items?.[0]
   if(sources.length!==1||source.state!=='committed'||current[0].state!=='committed'||current[0].revision!==source.revision||draft?.version!==1||draft.items.length!==1||item.storedId!==source.id||item.hash!==source.sourceHash||item.storedRevision!==source.revision||item.storedCommitted!==true)throw Error('בדיקה מחודשת דורשת מקור שכבר נקלט וקבלה תואמת; אין שילוב עם קבוצה אחרת.')
-  return savePreparedPlan({budgetId,base,plan},fetcher)
+  const result=await savePreparedPlan({budgetId,base,plan},fetcher)
+  try{await import('./report-lifecycle-api').then(api=>api.updateReportLifecycle(budgetId,result.value,source,'verify-completion',{},fetcher))}catch{/* Financial success remains confirmed; incomplete original stays retained. */}
+  return result
  }
 
  if(snapshot.value.revision===base.revision+1&&same(snapshot.value.plan,plan)&&current.every(source=>source.state==='committed'))return{...snapshot,recovered:true}
