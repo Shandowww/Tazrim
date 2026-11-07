@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-07",
+  "applicationCommit": "beb4f467cbd46ca2aea6aa7665210f57537bcc4c",
+  "previousApplicationCommit": "42c84a02f8bbb8dc8ec9e2f7f1f65a002ec892d5",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "runtimeImage": "sha256:3ad165fb7c580efa541108737205725f3a0371491485ad69c07197e9fdd7a99a",
+  "sourceArchiveSha256": "376dcc03f783cf70630a7bbc08b61266154cf9522c9f29d6178f77881195b435",
+  "phase": 2,
+  "capabilityEnabled": true,
+  "perBudgetOwnerOptInRequired": true,
+  "defaultPoliciesEnabled": false,
+  "automaticFinancialWrites": false,
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressionTests": 1302,
+    "coreChecks": 15,
+    "previousSourceFilesMatched": 887,
+    "freshVerifiedSQLiteBackup": true,
+    "isolatedFinancialAllRecordAccessHTTPAndSourceDecryption": true,
+    "storedSourcesDecrypted": 20,
+    "candidateAndRollbackStartup": true,
+    "retainedPriorAssets": 68,
+    "intakeTablesRestore": 5,
+    "automationTablesRestore": 2,
+    "syntheticBankAndCalPDFProposals": true,
+    "issuerNoticesSeparate": true,
+    "encryptedProposalBackupRoundTrip": true,
+    "candidateRuntimeFilesMatched": 163,
+    "liveRuntimeFilesMatched": 163,
+    "healthy": true,
+    "loginConfigured": true,
+    "anonymousAndForgedAPIsDenied": true,
+    "existingAuthoritativeTablesPreserved": 47,
+    "newEmptyAutomationTables": 2,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true,
+    "shortcutInstallerBytesUnchanged": true,
+    "productionCapabilityFlagVerified": true,
+    "productionPoliciesAtActivation": 0,
+    "productionJobsAtActivation": 0
+  },
+  "changes": [
+    "Owner opt-in and pause for automatic preparation using original readers and original report workflow",
+    "Encrypted versioned proposals, before/after review, rejection, guarded regeneration and bounded durable queue recovery",
+    "Current receipt verification before reporting import success; missing receipt requires original history review",
+    "Existing duplicate matching and financial approval safeguards retained"
+  ],
+  "limits": [
+    "Financial import still requires explicit original review and confirmation.",
+    "Server-side preparation supports plaintext budgets with confirmed single-source mappings; encrypted, ambiguous, unsupported or mixed sources retain manual handling.",
+    "Real iPhone scheduled/locked-device/provider behavior remains unverified; this release does not change the Shortcut or certify scheduling.",
+    "Already-open app pages need guarded refresh after saving drafts.",
+    "Phase 3 automatic financial application is not implemented or enabled."
+  ],
+  "sitesChanged": false,
+  "paidResourcesChanged": false,
+  "productionFinancialEdits": false,
+  "validationNotes": [
+    "Frozen-original parity tests in the isolated source archive used read-only access to the existing Git history; the final full suite passed.",
+    "Initial isolated helper access failed because of the release directory mode; corrected helper directory access and reran the full release gate set successfully before activation."
+  ]
+}

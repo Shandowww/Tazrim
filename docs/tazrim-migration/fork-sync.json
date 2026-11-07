@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "beb4f467cbd46ca2aea6aa7665210f57537bcc4c",
+  "sourceCommit": "2a04a504b0f686c5974bc1642b6e39ca2c6d81c3",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Stage 2 opt-in release candidate with current duplicate matching and verified financial receipt status; activation pending preservation and rollback gates.",
+  "status": "Published Stage 2 preparation capability with explicit per-budget owner opt-in; original manual financial approval remains required. Current duplicate matching and current-receipt verification retained. No Phase 3 financial application.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
@@ -13,13 +13,14 @@
     "isolatedReleaseRegressions": 1286,
     "coreChecks": 15,
     "browser": "Exact-release duplicate recognition, no replacement or additional financial approval, return to library, 320/390/430/1440px, dark/reduced motion; zero commits and unchanged financial hash.",
-    "release": "886 prior files matched; verified backup; isolated financial/access/20-source decryption/startup/rollback/intake restore/68 retained assets; 84 validated runtime files; 47 tables/keys/adjacent services preserved.",
+    "release": "887 prior source files matched; fresh verified backup; isolated financial/all-record/access/20-source decryption/startup/rollback/intake restore/68 retained assets and two-table encrypted proposal round trip; 163 candidate/live runtime files; 47 prior tables, keys and adjacent services preserved.",
     "localPreparationEvidence": "docs/ui-redesign/evidence/phase2-preparation-local-2026-11-07.json",
-    "productionEvidence": "docs/ui-redesign/evidence/release-statement-deduplication-2026-11-07.json"
+    "productionEvidence": "docs/ui-redesign/evidence/release-statement-deduplication-2026-11-07.json",
+    "releaseEvidence": "docs/ui-redesign/evidence/release-stage2-2026-11-07.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "42c84a02f8bbb8dc8ec9e2f7f1f65a002ec892d5",
-  "productionImage": "sha256:5b00c2aab9da741479397d6a8d302b300f5263953c4db3e0ff8d5e806a49e466",
-  "phase2ProductionEnabled": false,
+  "productionApplicationCommit": "beb4f467cbd46ca2aea6aa7665210f57537bcc4c",
+  "productionImage": "sha256:3ad165fb7c580efa541108737205725f3a0371491485ad69c07197e9fdd7a99a",
+  "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/statement-evidence-release"
 }

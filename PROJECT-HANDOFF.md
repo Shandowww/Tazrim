@@ -1,5 +1,13 @@
 # Monthly Flow — project handoff
 
+## Stage 2 preparation published — 2026-11-07
+
+Application `beb4f467cbd46ca2aea6aa7665210f57537bcc4c` is verified live at https://budgit.duckdns.org/next/incoming. Each budget owner can explicitly enable or pause preparation; no budget is opted in by deployment. Supported plaintext bank/card sources use confirmed mappings and original parsers/controller/drafts/notices. Encrypted proposals show before/after values and open the original review/financial confirmation. Unknown, mixed, locked or unsupported sources remain manual. No automatic financial application or Phase 3 mode is enabled. The existing signed Shortcut is unchanged. A missing current financial receipt now requires history review instead of a false imported status; the separate cross-format duplicate repair is retained.
+
+Exact build/typecheck, 1,302 regressions and 15 core checks pass. All 887 prior source files matched. Fresh verified SQLite backup, isolated financial/all-record/access/20-source decryption/startup/rollback/intake restore/68 retained-asset gates passed. A disposable actual-backup copy prepared bank and Cal PDF proposals with separate notices and zero financial changes, and both new automation tables and encrypted proposals survived encrypted backup round-trip. All 163 candidate and live runtime files match the validated local build. Health/auth/deep routes/root/manifest/unchanged installer passed. All 47 existing authoritative tables, private configuration keys and adjacent services were preserved; the two new automation tables began empty. No real financial edits, Sites or paid-resource changes occurred. Physical iPhone scheduling/locked-device/provider outcomes remain unverified.
+
+Save open drafts, use guarded refresh, choose the budget in **סנכרון דוחות**, then explicitly consent and select **הפעלת הכנה לתקציב הזה**. Subsequent arrivals use the same Shortcut; original final financial approval remains mandatory. Evidence: `docs/ui-redesign/evidence/release-stage2-2026-11-07.json`. Current source remains `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
 ## Cross-format statement duplicates published — 2026-11-07
 
 Application `42c84a02f8bbb8dc8ec9e2f7f1f65a002ec892d5` is verified live at https://budgit.duckdns.org/next. The isolated `codex/statement-evidence-release` tree contains only the five duplicate-matching/UI/test changes from active source checkpoint `a30d00b`. Stage 2 remains separate and was excluded; continue development on `codex/budgit-household-ui` in `work/budgit-household-ui`, with this release as the authoritative live baseline for reconciliation.

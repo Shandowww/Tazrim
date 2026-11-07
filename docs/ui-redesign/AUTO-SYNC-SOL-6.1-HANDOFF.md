@@ -48,3 +48,8 @@ Tal confirmed that no other session currently owns this work and directed contin
 ## Phase 2 takeover checkpoint — 2026-11-07
 
 The current implementation/validation boundary is [AUTO-PREPARE-LOCAL-CHECKPOINT-2026-11-07.md](AUTO-PREPARE-LOCAL-CHECKPOINT-2026-11-07.md). It supersedes the historical Phase 1-only source/pending lists above. Phase 2 remains disabled in production; the separately published changed-statement repair remains live. Continue remaining acceptance and release gates from that checkpoint without rebuilding completed original workflows.
+
+
+## Stage 2 capability published — 2026-11-07
+
+Application `beb4f46` is verified live, including the cross-format duplicate repair and current financial-receipt verification. The server capability is available; every budget starts paused until its owner explicitly opts in. No financial application is automatic. Use `evidence/release-stage2-2026-11-07.json` for the exact source/backup/isolated preservation/rollback/runtime gates and remaining plaintext/single-source/device limitations. Historical local-only publication notes above are superseded for this bounded release only. The existing signed Shortcut is unchanged.

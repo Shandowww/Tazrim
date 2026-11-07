@@ -1,5 +1,7 @@
 # Phase 2 preparation checkpoint — 2026-11-07
 
+> Superseded for publication status: the bounded capability is live as `beb4f46`; per-budget owner opt-in remains required. See [release evidence](evidence/release-stage2-2026-11-07.json). Historical local-only and remaining-release notes below describe the pre-release checkpoint. Device/unsupported-source limitations remain.
+
 Active source remains `work/budgit-household-ui`, branch `codex/budgit-household-ui`. The separately published statement-comparison repair is retained through parent checkpoint `6e82745`. This continuation does not deploy or activate Phase 2. Unrelated outer checkout edits remain preserved.
 
 ## Implemented boundary
