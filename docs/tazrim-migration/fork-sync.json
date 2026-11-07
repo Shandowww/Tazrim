@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "8c5a91ac45951f4f03751ae95b9766a580fcd857",
+  "sourceCommit": "afd2d988e80d26a6b0c069f69efc745f02d16373",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Local Phase 2 preparation checkpoint; disabled by default with explicit owner consent and original financial approval. Production retains only the separately published statement-review repair.",
+  "status": "Stage 2 opt-in capability candidate; exact-source local validation passed, production activation pending isolated release gates.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
