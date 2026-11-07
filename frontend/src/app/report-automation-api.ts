@@ -1,7 +1,7 @@
 import {AccessError} from './budget-api'
 export interface AutomationJob {
  id:string;status:'queued'|'working'|'review'|'attention'|'rejected'|'imported';revision:number
- budget?:string;target?:string;kind?:string;reportId?:string;stale?:boolean;message?:string;noticeState?:string
+ budget?:string;target?:string;kind?:string;reportId?:string;stale?:boolean;manualOnly?:boolean;message?:string;noticeState?:string
  summary?:{months:string[];counts:{new:number;duplicates:number;conflicts:number;questions:number};warnings:string[];before:{month:string;values:Record<string,number>}[];after:{month:string;values:Record<string,number>}[]|null;cardTotal:number|null}
 }
 export interface AutomationSnapshot {available:boolean;accountId?:string;automaticFinancialWrites:false;policies?:{budget:string;enabled:number;revision:number}[];jobs?:AutomationJob[]}

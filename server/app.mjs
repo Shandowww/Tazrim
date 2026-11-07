@@ -107,7 +107,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  }
  if(path==='/api/card-push'||path==='/api/card-push/schedule'||path==='/api/card-push/test'){if(!push)return json({error:'התראות אינן זמינות כרגע.'},503);return push.handle(request,user);}
  if(path==='/api/plan-history')return history.handle(request,user);
- if(path==='/api/reports'){const response=await reportStore.handle(request,user);if(reportAutomation&&request.method==='POST'&&response.ok)try{const value=await response.clone().json();if(Number.isSafeInteger(value.revision))reportAutomation.observe(user,u.searchParams.get('budget')??'personal',value.revision);}catch{/* An observation cannot undo a successful original save. */}return response;}
+ if(path==='/api/reports'){let operation=null;if(reportAutomation&&request.method==='POST')try{operation=await request.clone().json();}catch{}const response=await reportStore.handle(request,user);if(reportAutomation&&operation?.action==='commit'&&response.ok)try{const value=await response.clone().json();if(Number.isSafeInteger(value.revision))reportAutomation.observe(user,u.searchParams.get('budget')??'personal',value.revision,(operation.reports??[]).map(r=>r.id));}catch{/* An observation cannot undo a successful original save. */}return response;}
  if(path==='/api/report-automation')return reportAutomation?reportAutomation.handle(request,user):json({available:false,phase:1,automaticFinancialWrites:false},request.method==='GET'?200:409);
  if(path==='/api/report-intake')return reportIntake.handle(request,user);
  if(path==='/api/statement-notices')return statementNotices.handle(request,user);

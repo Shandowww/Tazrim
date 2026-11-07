@@ -1,15 +1,15 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "ecb3da9ad1521db7579dbd08e473823d68364b97",
+  "sourceCommit": "beb4f467cbd46ca2aea6aa7665210f57537bcc4c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published cross-format statement duplicate matching through isolated release 42c84a0. Active source retains the separately developed Stage 2 capability, which remains outside this production release.",
+  "status": "Stage 2 opt-in release candidate with current duplicate matching and verified financial receipt status; activation pending preservation and rollback gates.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1300,
+    "regressionTests": 1302,
     "isolatedReleaseRegressions": 1286,
     "coreChecks": 15,
     "browser": "Exact-release duplicate recognition, no replacement or additional financial approval, return to library, 320/390/430/1440px, dark/reduced motion; zero commits and unchanged financial hash.",

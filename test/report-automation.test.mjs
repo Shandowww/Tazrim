@@ -128,6 +128,26 @@ test('A budget encrypted after preparation hides old summaries and refuses autom
   assert.equal(c.financial(),financial);assert.equal(c.db.prepare('SELECT COUNT(*) n FROM report_commits').get().n,0);
  }finally{c.db.close()}
 });
+test('A legacy committed source without a current financial receipt is attention, never financial success',async()=>{
+ const c=await setup();try{
+  c.binding();await c.enable();const secret=await c.connect(),before=c.financial();await c.receive(secret,csv);const j=(await c.snapshot()).jobs[0];
+  c.db.prepare("UPDATE report_sources SET state='committed' WHERE id=?").run(j.reportId);
+  assert.equal((await c.call('alice','/api/report-automation',{action:'prepare',id:j.id,revision:j.revision})).status,200);
+  const checked=(await c.snapshot()).jobs[0];assert.equal(checked.status,'attention');assert.match(checked.message,/אין קבלה כספית/);assert.equal(c.financial(),before);
+ }finally{c.db.close()}
+});
+test('Removal of an imported financial receipt makes the proposal require history review instead of reporting success',async()=>{
+ const c=await setup();try{
+  c.binding();await c.enable();const secret=await c.connect();await c.receive(secret,csv);const j=(await c.snapshot()).jobs[0],base=(await loadBudgetSnapshot('personal',new AbortController().signal,c.fetcher)).value,loaded=await loadReportGroup('personal',base,[j.reportId],new AbortController().signal,c.fetcher);
+  await buildReportInbox(base.plan,loaded.ui,{month:'2026-11',today:'2026-11-07',classifier,activityAPI});
+  const draft=reportInboxDraftForWrite(loaded.ui,loaded.ui.items,j.parserVersion),result=await commitStoredReportGroup('personal',base,loaded.sources,draft,loaded.ui.build,randomUUID(),c.fetcher);
+  assert.equal((await c.snapshot()).jobs[0].status,'imported');
+  const changed=structuredClone(result.value.plan);changed.reportInbox.receipts=changed.reportInbox.receipts.filter(r=>r.hash!==digest(csv));
+  assert.equal((await c.call('alice','/api/plan',{plan:changed,revision:2},'PUT')).status,200);
+  const checked=(await c.snapshot()).jobs[0];assert.equal(checked.status,'attention');assert.equal(checked.manualOnly,true);assert.match(checked.message,/היסטוריית הקליטה/);
+  assert.equal(c.db.prepare('SELECT COUNT(*) n FROM report_commits').get().n,1);
+ }finally{c.db.close()}
+});
 test('Manual incoming uploads follow explicit opt-in and proposal rejection cannot contradict a committed source',async()=>{
  const c=await setup();try{c.binding();await c.enable();const before=c.financial();const response=await c.app(new Request(origin+'/api/report-intake',{method:'PUT',headers:{origin,cookie:'__Host-mf_session=alice','x-budget-account-id':'alice','x-report-name':'report.csv'},body:csv}));assert.equal(response.status,201);
  const j=(await c.snapshot()).jobs[0];assert.equal(j.status,'review');assert.equal(c.financial(),before);
