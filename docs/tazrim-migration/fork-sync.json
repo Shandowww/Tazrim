@@ -1,20 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "d9619bf4403a289220d39bf51df9701339b2c20e",
+  "sourceCommit": "6e82745122e0c845a21c6190455cf45d3825a7f2",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published Cal digital monthly PDF routing, visible parsing feedback and separate issuer messages through the existing encrypted notice scan and notification bell. Private source inspection artifacts excluded.",
+  "status": "Published visible changed-statement comparison and explicit version-bound replacement through the original atomic report workflow. Unfinished Stage 2 development excluded.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1279,
+    "regressionTests": 1282,
     "coreChecks": 15,
-    "browser": "Synthetic Cal worker/service routing, two notices reaching bell action data, inline failure and approval refresh, 320/390/430/1440px without overflow; private/shared financial hashes unchanged.",
-    "release": "878 prior files matched; verified backup; isolated financial/access/17-source decryption/startup/rollback/intake restore/68 retained assets; 11 runtime hashes/public checks; 47 authoritative tables/keys/adjacent services preserved. See release-cal-pdf-2026-11-06.json."
+    "browser": "Exact-release synthetic comparison, replacement/undo/retain/progress reload, 320/390/430/1440px and dark/reduced motion; finances unchanged.",
+    "release": "883 prior files matched; verified backup; isolated financial/access/20-source decryption/startup/rollback/intake restore/68 retained assets; 84 validated runtime files; 47 tables/keys/adjacent services preserved."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "ab8310a96c4abd235c738e125ed43fdd5186264b",
-  "productionImage": "sha256:e59b8cb8eed91a8ccba0bb999aa66dd439bc9023b24857a080ed64e9188d37ec"
+  "productionApplicationCommit": "de5fc197ff88f5ccb667522d01d347a17d98e275",
+  "productionImage": "sha256:537ce3b8d47c51df624143428fae235f66ec74cced8a906da86f0f8cc871cd77"
 }

@@ -1,5 +1,13 @@
 # Monthly Flow project context
 
+## Changed-statement review published — 2026-11-07
+
+Application `de5fc197ff88f5ccb667522d01d347a17d98e275` is verified live at https://budgit.duckdns.org/next. A changed statement for an existing card/billing date now exposes the exact pending check: saved-only and incoming-only rows, unchanged count, signed amounts, dates, notes and totals. Users can retain the saved report or explicitly select the new statement as its replacement, then use the original final approval and atomic import. Replacement consent is bound to the current source/report and saved rows/billing data; changes require another review. Unchanged details retain their annotations; other cards, source evidence, receipts and save history remain intact. Saved decisions resume and lost-success retry imports once.
+
+The isolated committed release passed build/typecheck, 1,282 regressions, 15 core checks and synthetic 320/390/430/1440px comparison/replace/undo/retain/progress-reload/dark/reduced-motion checks with unchanged financial data. All 883 previous-live files matched; fresh verified SQLite backup, isolated financial/access/20-source decryption/startup/rollback/intake restore/68 retained-asset gates passed. All 84 checked runtime files match the local validated build; activation hashes, health/auth/deep routes/root/manifest passed. All 47 authoritative tables, configuration keys and adjacent services were preserved. No real financial replacement/import, Sites or paid-resource change. Physical-device acceptance was not repeated.
+
+Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`. Uncommitted Stage 2 automation and other unrelated edits remain local and were excluded from this release. Save any open draft before guarded refresh, then reopen the report. Evidence: `docs/ui-redesign/evidence/release-statement-conflict-2026-11-07.json`.
+
 ## Cal monthly PDF and issuer messages published — 2026-11-06
 
 Application `ab8310a96c4abd235c738e125ed43fdd5186264b` is verified live. The shared reader now supports the verified digital Cal monthly PDF template, reconciles all numbered pages and billed ILS totals, preserves original installment/foreign evidence and reaches the existing card routing/review. Card destinations show suffix and linked bank. Parsing progress/errors appear in the approval panel, and successful approval refreshes even when extraction fails. Explicit incoming routing also invokes the existing encrypted issuer-notice scan: separate Cal message bullets feed the existing bell, with scoped updates/retry access. Financial import still requires the existing explicit review/save.

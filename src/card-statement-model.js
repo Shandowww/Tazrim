@@ -3,7 +3,7 @@ import {cents,clone,validatePlan,detailCategories,creditCards,analyticalExpenseD
 export const statementMerchant=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase();
 async function statementDigest(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
 export function statementCycleExists(p,cardId,month){return (p.details??[]).some(e=>e.method===cardId&&e.month===month&&['cal','isracard'].includes(e.statement?.issuer));}
-export async function prepareCardStatement(p,report,cardId,merchantRules=[]){
+export async function prepareCardStatement(p,report,cardId,merchantRules=[],{replacementToken}={}){
  if(!['cal','isracard'].includes(report?.issuer)||!Array.isArray(report.entries)||!report.entries.length||report.entries.length>5000||report.entries.reduce((n,r)=>n+r.amountCents,0)!==cents(report.amount)||!creditCards(p).some(c=>c.id===cardId))throw Error('פירוט הדוח אינו תקין.');
  const seen=new Map(),rows=[],categories=new Map(),add=(name,category)=>{if(!category||category==='לסיווג')return;const k=statementMerchant(name);if(!categories.has(k))categories.set(k,new Set());categories.get(k).add(category);};
  for(const e of analyticalExpenseDetails(p))add(e.name,e.category);
@@ -16,11 +16,25 @@ export async function prepareCardStatement(p,report,cardId,merchantRules=[]){
   rows.push({id,key,entry,category,existing:existing?clone(existing):null,candidates:clone(candidates)});
  }
  const ids=new Set(rows.map(r=>r.id));
- if((p.details??[]).some(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate&&!ids.has(e.id)))throw Error('הדוח שונה מפירוט שכבר נשמר לאותו חיוב. הנתונים נשמרו ללא שינוי; יש לבדוק את ההבדלים לפני החלפה.');
- return {cardId,dueDate:report.dueDate,amount:report.amount,rows,issuer:report.issuer};
+ const saved=(p.details??[]).filter(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate),removed=saved.filter(e=>!ids.has(e.id));
+ let replacement=null;
+ if(removed.length){
+  const billing=(p.cardBilling?.reports??[]).filter(r=>r.cardId===cardId&&r.dueDate===report.dueDate),token=await statementDigest(JSON.stringify({cardId,report,saved,billing}));
+  const conflict={token,cardId,dueDate:report.dueDate,savedTotal:billing.length===1?billing[0].amount:null,incomingTotal:report.amount,savedOnly:clone(removed),incomingOnly:clone(rows.filter(r=>!r.existing)),unchanged:rows.filter(r=>r.existing).length};
+  if(replacementToken!==token)throw Object.assign(Error('כבר נשמר דוח שונה לאותו חיוב. יש לבדוק את השורות שיוסרו ויתווספו ולבחור איזה דוח לשמור.'),{statementConflict:conflict});
+  replacement=conflict;
+ }
+ return {cardId,dueDate:report.dueDate,amount:report.amount,rows,issuer:report.issuer,...(replacement?{replacement}:{})};
 }
 export function applyCardStatement(p,preview,choices,{deferCategories=false}={}){
  const next=clone(p),used=new Set(),allowed=new Set([...(deferCategories?['לסיווג']:[]),...detailCategories,...(p.details??[]).map(e=>e.category),...Object.keys(p.categoryGoals??{}),...preview.rows.map(r=>r.category).filter(c=>typeof c==='string'&&c.trim()&&c.length<=60)]);next.details??=[];
+ // An exact reviewed replacement removes only superseded statement rows.
+ // Unchanged rows keep their categories, splits and annotations.
+ for(const removed of preview.replacement?.savedOnly??[]){
+  const current=next.details.find(e=>e.id===removed.id);
+  if(!current||current.method!==preview.cardId||current.statement?.dueDate!==preview.dueDate||JSON.stringify(current)!==JSON.stringify(removed))throw Error('הפירוט השתנה מאז בדיקת ההחלפה. יש לבדוק שוב את ההבדלים.');
+  next.details=next.details.filter(e=>e.id!==removed.id);
+ }
  for(const row of preview.rows){
   const choice=choices[row.id],category=(choice?.category??row.category)||(deferCategories?'לסיווג':'');
   if(row.existing){const existing=next.details.find(e=>e.id===row.id);if(JSON.stringify(existing)!==JSON.stringify(row.existing))throw Error('הפירוט השתנה בזמן הבדיקה. יש לטעון את הדוח מחדש.');continue;}

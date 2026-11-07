@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-07",
+  "status": "published",
+  "applicationCommit": "de5fc197ff88f5ccb667522d01d347a17d98e275",
+  "previousApplicationCommit": "ab8310a96c4abd235c738e125ed43fdd5186264b",
+  "entry": "https://budgit.duckdns.org/next/upload",
+  "image": "sha256:537ce3b8d47c51df624143428fae235f66ec74cced8a906da86f0f8cc871cd77",
+  "sourceArchiveSha256": "c196eb2de5b7a479ac2aefffba4c06bc71be08d33c20b60c1435049b346ddcf9",
+  "behavior": {
+    "conflict": "Visible saved-only/incoming-only transaction comparison, signed amounts, dates, notes and billing totals",
+    "decision": "Explicit retain/skip or exact reviewed replacement; original final financial approval remains required",
+    "staleness": "Replacement decision bound to incoming report, saved statement rows and billing data; changed data requires review again",
+    "preservation": "Unchanged transaction annotations, other cards, source files, existing receipts and save history retained",
+    "automation": "Stage 2 uncommitted development excluded from release"
+  },
+  "validation": {
+    "buildTypecheck": true,
+    "regressions": 1282,
+    "coreChecks": 15,
+    "syntheticBrowser": {
+      "comparisonVisible": true,
+      "explicitReplacementAndUndo": true,
+      "progressReload": true,
+      "keepSaved": true,
+      "widths": [
+        320,
+        390,
+        430,
+        1440
+      ],
+      "darkReducedMotion": true,
+      "financialUnchanged": true
+    },
+    "priorSourceFilesMatched": 883,
+    "freshVerifiedBackup": true,
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "existingEncryptedSourcesDecrypted": 20,
+    "intakeRestore": true,
+    "retainedAssetsVerified": 68,
+    "runtimeFilesMatchValidatedLocalBuild": 84,
+    "runtimeActivationHashes": 11,
+    "authoritativeTablesPreserved": 47,
+    "configurationKeysAndAdjacentServicesPreserved": true,
+    "public": {
+      "checkedAt": "2026-11-07T05:57:15.075Z",
+      "routes": {
+        "/api/health": {
+          "status": 200,
+          "location": null
+        },
+        "/api/plan": {
+          "status": 401,
+          "location": null
+        },
+        "/next": {
+          "status": 200,
+          "location": null
+        },
+        "/next/incoming": {
+          "status": 200,
+          "location": null
+        },
+        "/next/upload/group": {
+          "status": 200,
+          "location": null
+        },
+        "/manifest.webmanifest": {
+          "status": 200,
+          "location": null
+        },
+        "/": {
+          "status": 303,
+          "location": "/next"
+        }
+      }
+    }
+  },
+  "limits": [
+    "No physical-device acceptance repeated.",
+    "No real financial import or replacement performed."
+  ],
+  "productionFinancialEdits": false,
+  "sitesChanged": false,
+  "paidResourcesChanged": false
+}
