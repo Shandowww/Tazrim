@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-07",
+  "applicationCommit": "63ab8cafbb80016dfccfb5fb4c3d064bdf10f22c",
+  "previousApplicationCommit": "beb4f467cbd46ca2aea6aa7665210f57537bcc4c",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "runtimeImage": "sha256:2fb0df8709f173561d73c68a8f7936bbac6bae834c139094e6ae63da78d042b3",
+  "sourceArchiveSha256": "2afa22b1c03b6b5f287a37cc8655ec0042b6f3ceaf9c54c0df74df2d1244436f",
+  "phase": 2,
+  "automaticFinancialWrites": false,
+  "retentionEnabled": true,
+  "perBudgetPreparationConsentPreserved": true,
+  "validation": {
+    "buildAndTypecheck": "passed",
+    "regressionTests": 1316,
+    "coreChecks": 15,
+    "previousSourceFilesMatched": 897,
+    "candidateRuntimeFilesMatched": 133,
+    "liveRuntimeFilesMatched": 133,
+    "freshVerifiedSQLiteBackup": true,
+    "isolatedFinancialAccessAndSourceDecryption": true,
+    "storedSourcesDecrypted": 20,
+    "candidateAndRollbackStartup": true,
+    "retainedPriorAssets": 68,
+    "intakeRestore": true,
+    "encryptedProposalBackupRoundTrip": true,
+    "retentionContractsOnCandidateBackend": 13,
+    "authoritativeTablesPreserved": 49,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true,
+    "integrityAndForeignKeys": true
+  },
+  "browser": {
+    "syntheticOnly": true,
+    "viewports": [
+      1280,
+      390
+    ],
+    "nextProgressOnly": true,
+    "newToPartial": true,
+    "focusedHeadings": true,
+    "savedCategory": "verified",
+    "categoryDeferralAndReload": "verified",
+    "financialFinishCommits": 1,
+    "otherUserRevisionUnchanged": true,
+    "categoryFollowupCommits": 0,
+    "digestedWithRemovalDate": true,
+    "rtl": true,
+    "noHorizontalOverflow": true,
+    "controlHeightPx": 44,
+    "lightAndSystemDark": true,
+    "physicalIPhone": false,
+    "snapshotLimit": "Two preview snapshots timed out; DOM and actual UI actions used for remaining checks."
+  },
+  "shortcut": {
+    "nativeParameterSchemaActions": 271,
+    "nativeCharacterCounts": 3,
+    "receiptGraphCases": "retained/removed acknowledgments; forged/missing/string flags, wrong connection/hash/receipt and old catalog refused",
+    "signedInstallerSha256": "133846808f5d9f03b14b33fff23af49b0fd5691c7f24ec772fda07a566a29113",
+    "publicDeviceDeletionActions": 0,
+    "nativeEndToEndExecution": false,
+    "physicalIPhone": false
+  },
+  "public": {
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "anonymousAndForgedAPIsDenied": true,
+    "deepRoutesRequireLogin": true,
+    "defaultRoot": true,
+    "manifest": true,
+    "signedInstallerBytesMatch": true,
+    "installerSha256": "133846808f5d9f03b14b33fff23af49b0fd5691c7f24ec772fda07a566a29113"
+  },
+  "liveCapabilities": {
+    "preparationEnabled": true,
+    "retentionEnabled": true,
+    "phase3Enabled": false,
+    "newDeletionTimestampsAtActivation": 0,
+    "originalsRemovedAtActivation": 0
+  },
+  "restoreAndRollback": [
+    "Deadlines are rechecked before source access and by bounded existing maintenance.",
+    "For an older archive, merge authenticated newer tombstones from an explicitly supplied trusted current database before activation; an old archive alone cannot know future removals.",
+    "Historical encrypted backups may retain originals until normal expiry.",
+    "Pre-policy rollback image was tested before any original removal; later rollback must retain retention-aware server endpoints."
+  ],
+  "limits": [
+    "Physical iPhone new-installer execution, scheduling, locked-device and provider behavior remain unverified.",
+    "Install the updated signed Shortcut using the same folder and upload key; default device-file retention is unchanged.",
+    "Unsupported/unknown whole-file coverage and incomplete activity cycles remain Partial and never expire.",
+    "Existing preparation opt-ins are preserved; deployment does not opt in other budgets.",
+    "Save drafts and use guarded refresh to load this release."
+  ],
+  "noProductionFinancialEdits": true,
+  "sitesChanged": false,
+  "paidResourcesChanged": false
+}
