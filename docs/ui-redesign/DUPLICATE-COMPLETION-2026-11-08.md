@@ -1,0 +1,21 @@
+# Completing a duplicate report
+
+Application `d6faccb` is verified live on 2026-11-09. [Release evidence](evidence/release-duplicate-completion-2026-11-09.json) records the exact build, backup and preservation gates. The user still explicitly acknowledges and finishes the duplicate in the app; deployment did not complete the reported source automatically.
+
+The original reader's exact-receipt shortcut returned a skipped item without parsed rows. That shortcut now remains the default for other consumers, while report review explicitly rereads the original so it can prove complete duplicate coverage. Previously saved shortcut drafts resume through the same path. Migration exclusions remain blocked.
+
+The guided group review now has a focused duplicate screen with the report/account/period, original download, explicit acknowledgment and **סיום טיפול בדוח כפול**. A duplicate needs no new categorization decision. Partial committed bank reports open the existing re-review path directly; card category follow-up retains its original annotation workflow. The ordinary detailed review remains accessible.
+
+Completion first saves a stable resolved review, then calls the existing server `complete-duplicate` action. Unknown progress/completion responses are retried by reading stored results. A partly completed group completes all remaining members without resetting earlier completion deadlines. The caller never invokes a financial import command.
+
+A scoped diagnostic on an isolated backup copy reproduced a second issue in the reported bank workbook: every row was already recorded, but no single current report receipt covered the entire parsed date range. The old receipt-only check rejected completion. The candidate completed the copied report successfully with financial data/history byte-identical; production records were not changed by the diagnostic. Private source contents and identifiers are excluded from this document and Git evidence.
+
+The bank-only fallback now proves each freshly parsed row against current normalized bank entries using the original duplicate preview. Every row must be an existing duplicate with an exact key/fingerprint, the same target account and a surviving source batch. Migrated, missing, new, invalid and conflicting rows fail closed. The encrypted lifecycle record stores bounded keys and a digest of the complete recorded entries and their batch provenance. Later status/retention checks revalidate that digest; edits, undo, removed batches or migration guards reopen the report and prevent timed original removal. This does not write a replacement financial receipt or modify the budget.
+
+Existing receipt proof remains authoritative when available. Source/budget revisions and permissions are rechecked after parsing and immediately before completion. Proof storage uses the existing lifecycle scope/global limits. Activity-cycle and selected-sheet cases cannot be promoted to whole-file completion.
+
+Validation includes bank XLSX/card PDF duplicate completion, exact-receipt recovery, committed-bank continuation, old/deferred category choices, lost progress/completion responses, partial group recovery, source/revision refusal, receipt-less legacy bank evidence, evidence invalidation and the 30-day removal boundary. Build/typecheck,1,343 regressions,15 core checks and10 new duplicate contracts pass. The13 focused mobile-browser checks reproduce an already-committed Partial bank workbook without a covering receipt, verify the acknowledgment gate and lost-response retry, and confirm Digested status with zero financial PUTs. The21 existing Sync Center browser checks also pass. Physical iPhone acceptance was not repeated.
+
+Rollback after users have created the new bank-evidence completion records must retain `bank-duplicate-proof.mjs` and its lifecycle validation. Prefer rolling back presentation code with the current retention-aware backend; an older validator may reopen these reports because it cannot interpret the added evidence. Original normalized financial records remain preserved.
+
+Stage 3 is unchanged and disabled. This fix adds explicit completion of proven duplicates; it does not automatically accept other reports or change the app's global appearance/navigation.

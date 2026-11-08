@@ -10,7 +10,8 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
  if(!base.plan||base.plan.format||!ids.length||ids.length>10||new Set(ids).size!==ids.length)throw Error('יש לפתוח תקציב גלוי ולבחור עד עשרה דוחות שונים.')
  const library=await loadReportLibrary(budgetId,base,signal,fetcher),roots=await Promise.all(ids.map(id=>loadStoredReport(budgetId,base,id,signal,fetcher))),drafts=roots.filter(source=>source.state!=='committed').map(source=>source.draft).filter(Boolean)
  const activityFollowup=roots.length===1&&roots[0].state==='committed'&&roots[0].lifecycle==='partial'&&roots[0].draft?.items?.find((item:any)=>item.storedId===roots[0].id)?.activity&&roots[0].review?.categories!=='later'
- if(roots.length===1&&roots[0].state==='committed'&&(roots[0].activeDraft||activityFollowup))reimport=true
+ const bankFollowup=roots.length===1&&roots[0].state==='committed'&&roots[0].lifecycle==='partial'&&roots[0].kind==='bank'
+ if(roots.length===1&&roots[0].state==='committed'&&(roots[0].activeDraft||activityFollowup||bankFollowup))reimport=true
  if(!reimport&&roots.every(source=>source.originalRemoved||source.lifecycle==='digested'||source.state==='committed'))return{ui:null as any,sources:roots,resultOnly:true,activitySupported:library.activityCycleReceipts===true,storageAllowed:false}
  if(reimport&&(ids.length!==1||roots[0].state!=='committed'))throw Error('יש לבחור מקור יחיד שכבר נקלט לבדיקה מחודשת.')
  if(reimport&&roots[0].lifecycle==='digested')await updateReportLifecycle(budgetId,base,roots[0],'reopen',{},fetcher)
@@ -27,7 +28,7 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
   const saved=draft?.items.find((item:any)=>item.storedId===source.id)
   if(saved&&(saved.storedRevision!==source.revision||saved.hash!==source.sourceHash))throw Error('קבוצת הדוחות השתנתה; החלטות שמורות לא הוחלפו.')
   let item:any=saved?clone(saved):{id:source.id,name:source.name,size:bytes.length,target:'',payer:'',decisions:{},directIncluded:{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false,storedId:source.id,storedRevision:source.revision,storedCommitted:source.state==='committed'}
-  if(!saved||saved.error){try{Object.assign(item,await inspectReportSource(base.plan,source.name,bytes,signal));delete item.error;item.target||=inboxTarget(base.plan,item);if(!saved&&item.kind===hint.kind)item.target=inboxHintTarget(base.plan,item,{cardId:hint.target,accountId:hint.target});item.payer||=reportInboxPayer(base.plan,item.target)}catch(e){item.error=e instanceof Error?e.message:'לא ניתן לפענח את המקור.'}}
+  if(!saved||saved.error||saved.skip&&saved.reason==='המקור כבר נקלט ונמצא בתקציב.'&&!saved.records&&!saved.report){try{Object.assign(item,await inspectReportSource(base.plan,source.name,bytes,signal,{reviewRecordedSource:true}));delete item.error;item.target||=inboxTarget(base.plan,item);if(!saved&&!item.recordedSource&&item.kind===hint.kind)item.target=inboxHintTarget(base.plan,item,{cardId:hint.target,accountId:hint.target});item.payer||=reportInboxPayer(base.plan,item.target)}catch(e){item.error=e instanceof Error?e.message:'לא ניתן לפענח את המקור.'}}
   ui.items.push(item)
  }
  if(ui.items.some((item:any)=>item.kind==='card'))ui.merchantRules=await loadReportMerchantRules(budgetId,base,signal,fetcher)

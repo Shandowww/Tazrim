@@ -1,6 +1,7 @@
 import {budgetAccess,boundedJSON,serviceError,serviceJSON} from './budget-access.mjs';
 import {sealReport,openReport,reportHash} from './report-crypto.mjs';
 import {fullReportReceipt} from './report-cleanup.mjs';
+import {bankDuplicateProof,bankDuplicateProofCurrent} from './bank-duplicate-proof.mjs';
 import {isVault} from '../dist/server/vault.js';
 import {reportLifecycleState,validReportReview,REPORT_RETENTION_MS} from '../dist/server/report-lifecycle-model.js';
 import {buildReportInbox} from '../dist/server/report-inbox-controller.js';
@@ -36,7 +37,7 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
    const access=accessFor(data);if(access.scope!==row.scope)return false;
    return data.completion.members.every(member=>{
     const current=source(row.scope,member.id);
-    return current&&current.source_hash===member.hash&&(current.original_removed_at!==null||current.revision===member.revision)&&fullReportReceipt(access.plan,{...member,hash:member.financialHash??member.hash});
+    return current&&current.source_hash===member.hash&&(current.original_removed_at!==null||current.revision===member.revision)&&(data.completion.kind==='duplicate'&&member.kind==='bank'&&member.bankProof?member.target===member.bankProof.target&&!access.plan.importMigrationGuards?.receipts?.includes(member.hash)&&bankDuplicateProofCurrent(access.plan,member.bankProof):fullReportReceipt(access.plan,{...member,hash:member.financialHash??member.hash}));
    });
   }catch{return false;}
  };
@@ -109,11 +110,15 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
   if(ui.issues||!item.already||item.preview?.replacement)throw serviceError('נמצאו שינויים או בדיקות נדרשות; יש להמשיך בסקירה לפני שמירה.',409);
   const candidates=(access.plan.reportInbox?.receipts??[]).filter(r=>r.kind===item.kind&&r.target===item.target&&fullReportReceipt(access.plan,r));
   const receipt=item.kind==='card'?candidates.find(r=>r.reference===item.report?.dueDate):candidates.find(r=>access.plan.bankImport?.batches?.some(b=>b.id===r.reference&&b.accountId===item.target&&b.from<=item.from&&b.to>=item.to));
-  if(!receipt)throw serviceError('אין קבלה כספית עדכנית להשלמה ללא שינוי.',409);
-  const member={id,hash:row.source_hash,revision,kind:item.kind,target:item.target,reference:receipt.reference,financialHash:receipt.hash};
-  const prior=reuseRemoved?db.prepare('SELECT * FROM report_lifecycle WHERE scope=? AND removed_at IS NOT NULL ORDER BY removed_at DESC').all(access.scope).find(entry=>{const previous=read(entry);return previous.completion?.verified&&previous.review?.categories!=='later'&&previous.completion.members.some(m=>(m.financialHash??m.hash)===receipt.hash&&m.kind===item.kind&&m.target===item.target&&m.reference===receipt.reference);}):null;
+  const bankProof=!receipt&&item.kind==='bank'?bankDuplicateProof(access.plan,item):null;
+  if(!receipt&&!bankProof)throw serviceError('אין עדות כספית עדכנית להשלמה ללא שינוי.',409);
+  const reference=receipt?.reference??'bank-evidence:'+bankProof.digest,financialHash=receipt?.hash??bankProof.digest;
+  const member={id,hash:row.source_hash,revision,kind:item.kind,target:item.target,reference,financialHash,...(bankProof?{bankProof}:{})};
+  const prior=reuseRemoved?db.prepare('SELECT * FROM report_lifecycle WHERE scope=? AND removed_at IS NOT NULL ORDER BY removed_at DESC').all(access.scope).find(entry=>{const previous=read(entry);return previous.completion?.verified&&previous.review?.categories!=='later'&&previous.completion.members.some(m=>(m.financialHash??m.hash)===financialHash&&m.kind===item.kind&&m.target===item.target&&m.reference===reference);}):null;
   if(reuseRemoved&&!prior)return null;
-  const refreshed=budgetAccess(db,user,budget,{isAllowed,write:true});if(source(access.scope,id)?.revision!==revision||refreshed.revision!==access.revision||!fullReportReceipt(refreshed.plan,receipt))throw serviceError('התקציב השתנה בזמן הבדיקה. יש לבדוק שוב.',409);
+  const refreshed=budgetAccess(db,user,budget,{isAllowed,write:true});if(source(access.scope,id)?.revision!==revision||refreshed.revision!==access.revision||!(bankProof?bankDuplicateProofCurrent(refreshed.plan,bankProof):fullReportReceipt(refreshed.plan,receipt)))throw serviceError('התקציב השתנה בזמן הבדיקה. יש לבדוק שוב.',409);
+  const proofBytes=Buffer.byteLength(JSON.stringify(member)),used=db.prepare('SELECT COALESCE(SUM(length(data)),0) bytes FROM report_lifecycle WHERE scope=?').get(access.scope).bytes,all=db.prepare('SELECT COALESCE(SUM(length(data)),0) bytes FROM report_lifecycle').get().bytes;
+  if(proofBytes>1024*1024||used+proofBytes>20*1024*1024||all+proofBytes>100*1024*1024)throw serviceError('אחסון אישורי ההשלמה מלא. המקור נשמר לבדיקה.',413);
   write(current,{...old,actorId:user.id,budget,activeDraft:null,review:reuseRemoved?read(prior).review:saved.guided??null,completion:{kind:'duplicate',verified:true,members:[member]},retentionReason:null},{reviewedAt:record(id)?.reviewed_at??now(),completedAt:prior?.completed_at??record(id)?.completed_at??now()});
   if(prior)purge(access.scope,id);
   return state(access.scope,id);

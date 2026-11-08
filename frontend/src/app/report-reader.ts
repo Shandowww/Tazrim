@@ -3,13 +3,13 @@ import {inboxHash,inboxReceiptPresent} from '../../../src/report-inbox-model.js'
 import {decodeCSV,inspectCSV} from '../../../tools/bank-csv/parser.mjs'
 import {inspectIntake} from '../../../tools/bank-csv/intake-reader.mjs'
 import {reportFileEligibility} from './report-library-api.ts'
-export interface ReportReaderOptions{workerFactory?:(url:string)=>Worker;timeoutMs?:number;includeAccountIdentity?:boolean}
+export interface ReportReaderOptions{workerFactory?:(url:string)=>Worker;timeoutMs?:number;includeAccountIdentity?:boolean;reviewRecordedSource?:boolean}
 /** Reuse the existing bounded readers. This inspects source bytes only; it never stores or applies financial data. */
 export async function inspectReportSource(plan:any,name:string,bytes:Uint8Array,signal:AbortSignal,options:ReportReaderOptions={}){
  reportFileEligibility(name,bytes.byteLength);if(!validatePlan(plan)||plan.format)throw Error('יש לפתוח תקציב גלוי כדי לבדוק את המקור בתצוגה הזו.');if(signal.aborted)throw Error('קריאת הדוח בוטלה.')
  const hash=await inboxHash(bytes);if(signal.aborted)throw Error('קריאת הדוח בוטלה.')
  if(plan.importMigrationGuards?.receipts.includes(hash))return{hash,skip:true,kind:'bank',reason:'המקור סומן במעבר חשבון. קליטה חוזרת במרחב הזה חסומה.'}
- const receipt=plan.reportInbox?.receipts.find((r:any)=>r.hash===hash);if(receipt&&await inboxReceiptPresent(plan,receipt))return{hash,skip:true,kind:receipt.kind,target:receipt.target,reason:'המקור כבר נקלט ונמצא בתקציב.'}
+ const receipt=plan.reportInbox?.receipts.find((r:any)=>r.hash===hash);if(receipt&&await inboxReceiptPresent(plan,receipt)){if(options.reviewRecordedSource)return {...await readReportContent(name,bytes,signal,options),target:receipt.target,recordedSource:true};return{hash,skip:true,kind:receipt.kind,target:receipt.target,reason:'המקור כבר נקלט ונמצא בתקציב.'}}
  return readReportContent(name,bytes,signal,options)
 }
 

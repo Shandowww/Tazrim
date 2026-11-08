@@ -1,6 +1,13 @@
 # Monthly Flow — project handoff
 
 
+## Duplicate report completion published — 2026-11-09
+
+Application `d6faccb` is verified live at https://budgit.duckdns.org/next/incoming. Whole-file duplicates now have an explicit acknowledgment and **סיום טיפול בדוח כפול**, without another financial import or unrelated categorization step. Continue on a Partial committed bank report reuses the original review; exact-receipt sources are parsed for completion instead of remaining skipped. Lost-response and partial-group retries recover recorded completion. A bounded encrypted bank-evidence proof handles legacy rows without a covering report receipt and revalidates recorded amounts/months/account/identity and surviving batch provenance before retaining completion or deleting an original. Changes or undo reopen the report and block expiry.
+
+Build/typecheck,1,343 tests,15 core checks,10 new duplicate contracts,13 focused mobile-browser checks and the21 Sync Center browser checks pass. The reported workbook succeeded on an isolated backup copy with financial/history bytes unchanged; the agent did not complete it in production. All926 prior source files matched; fresh verified backup, financial/access/20-source decryption/startup/rollback/intake/automation restore,68 retained assets and42 candidate backend contracts passed. All167 candidate/live runtime files and50 authoritative tables/keys/adjacent services were verified. Global appearance/navigation and financial import commands are unchanged; Stage3 stays disabled. Evidence: `docs/ui-redesign/evidence/release-duplicate-completion-2026-11-09.json`; details and retention-aware rollback guidance: `docs/ui-redesign/DUPLICATE-COMPLETION-2026-11-08.md`. Physical iPhone acceptance remains a user follow-up. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
+
 ## Focused mobile Sync Center published — 2026-11-08
 
 Application `ac2a05b` is verified live at https://budgit.duckdns.org/next/incoming. Sync Center remains in its existing menu entry; global tabs, menus, theme, colors and typography are unchanged. Four internal views separate attention, missing reports, report browsing and settings. Lists are bounded to six rows with whole-inbox search/filtering; selected reports use focused source/proposal/action screens and return from the original guided review with filters/page retained. The restored six-month bank/card map reuses original coverage and expected-delivery facts, with the oldest month at the right and direct review/upload actions. Connection setup is separate and staged.

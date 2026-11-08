@@ -1,0 +1,125 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "d6faccb603329feeaf2da23d5514c6256ad23acf",
+  "implementationCommit": "1e393ee2d8e73e53026309252843a082d0086218",
+  "previousApplicationCommit": "ac2a05bac2b28b67ef9127b25d4beb241b405e52",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "runtimeImage": "sha256:cefc29af0ab41fc5af443ab63fde85068d886078c5e4ffc58625a1c71e8a9382",
+  "sourceArchiveSha256": "6c2d37e356faf0a630c845919929917c6d93f0e9b3157b32a07b837fa2877ad4",
+  "changes": [
+    "Explicit acknowledgment and Finish for proven whole-file duplicates",
+    "Reparse exact-receipt sources for review while preserving ordinary skip behavior elsewhere",
+    "Continue Partial committed bank reports through the original review path",
+    "Recover lost progress/completion responses and complete every unfinished group member",
+    "Independently prove legacy bank duplicates against exact recorded rows and surviving batch provenance when a covering receipt is unavailable",
+    "Revalidate bounded encrypted bank evidence before continued completion status or original retention"
+  ],
+  "scope": {
+    "globalAppearanceAndNavigationUnchanged": true,
+    "financialImportCommandsUnchanged": true,
+    "shortcutUnchanged": true,
+    "stage3Enabled": false
+  },
+  "diagnostic": {
+    "isolatedBackupCopyOnly": true,
+    "reportedBankSourceReproduced": true,
+    "oldCompletionRejected": true,
+    "candidateCompletionDigested": true,
+    "financialRecordsUnchanged": true,
+    "productionSourceContentOrIdentifiersExported": false
+  },
+  "validation": {
+    "regressions": 1343,
+    "newDuplicateContracts": 10,
+    "buildTypecheck": "passed",
+    "coreChecks": 15,
+    "browser": {
+      "checks": [
+        "duplicate finish requires explicit acknowledgment",
+        "duplicate does not require an irrelevant category decision",
+        "duplicate heading receives keyboard focus",
+        "no overflow at 320",
+        "no overflow at 390",
+        "no overflow at 430",
+        "no overflow at 1440",
+        "server saved duplicate completion before the lost response",
+        "retry reads the successful result without replay",
+        "duplicate leaves Partial and becomes Digested",
+        "completion starts the existing 30-day retention notice",
+        "financial records and history remain byte-identical",
+        "no browser runtime errors"
+      ],
+      "errors": [],
+      "financialUnchanged": true,
+      "financialWrites": 0
+    },
+    "syncCenterBrowserRegressionChecks": 21,
+    "priorSourceFilesMatched": 926,
+    "freshVerifiedSQLiteBackup": true,
+    "backupSha256": "df53be665a452f7038b2c38744c5d8f62e3aa5b0d1be9f431f9c686670de2dcb",
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "storedSourcesDecrypted": 20,
+    "intakeRestore": true,
+    "automationBackupRoundTrip": true,
+    "retainedAssets": 68,
+    "candidateBackendContracts": 42,
+    "candidateRuntimeFilesMatched": 167,
+    "liveRuntimeFilesMatched": 167,
+    "authoritativeTablesPreserved": 50,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true,
+    "integrityAndForeignKeys": true
+  },
+  "public": {
+    "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+    "installerBytes": 68851,
+    "checkedAt": "2026-11-08T22:07:11.130Z",
+    "origin": "https://budgit.duckdns.org",
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "anonymousAndForgedAPIRefused": true,
+    "anonymousDeepRoutesShowLogin": [
+      "/next/more",
+      "/next/settings",
+      "/next/notices",
+      "/next/actions",
+      "/next",
+      "/next/accounts",
+      "/next/checks",
+      "/next/loans",
+      "/next/savings",
+      "/next/plans/scenario",
+      "/next/details/new",
+      "/next/settings/security",
+      "/next/upload/group",
+      "/next/analysis",
+      "/next/categories/manage",
+      "/next/incoming"
+    ],
+    "htmlNoStore": true,
+    "framingProtection": true,
+    "defaultGetHeadRootLaunch": true,
+    "preferredOriginalRootLaunch": true,
+    "manifest": {
+      "id": "/",
+      "scope": "/",
+      "start_url": "/next"
+    }
+  },
+  "productionFinancialEdits": false,
+  "productionDuplicateAcceptancePerformed": false,
+  "sitesChanged": false,
+  "paidResourceUpgrade": false,
+  "rollback": {
+    "beforeNewEvidence": "Previous verified image retained with compatible startup and financial/access checks",
+    "afterNewEvidence": "Keep bank-duplicate-proof.mjs and the current lifecycle validator when rolling back presentation; older validators can reopen new evidence-based completions"
+  },
+  "limits": [
+    "The user still explicitly acknowledges and finishes the duplicate in the app",
+    "Physical iPhone acceptance was not repeated",
+    "Activity-cycle and selected-sheet reports cannot use whole-file duplicate completion",
+    "Stage 3 automatic financial application remains disabled"
+  ]
+}
