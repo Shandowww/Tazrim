@@ -27,9 +27,18 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
  const record=(user,id)=>db.prepare('SELECT id,source_hash,revision,state,source_bytes,created_at,original_removed_at FROM report_sources WHERE scope=? AND id=?').get(scope(user),id);
  const approval=(user,id)=>db.prepare('SELECT * FROM report_intake_approvals WHERE user_id=? AND intake_id=?').get(user.id,id);
  const receipt=(row,verified)=>row.original_removed_at!==null&&row.original_removed_at!==undefined?({receiptId:row.id,sourceHash:row.source_hash,stored:false,completed:true,completionAcknowledged:true,originalRemoved:true,processingState:'completed-original-removed',budgetState:'previously-recorded',revision:row.revision,cleanupEligible:false,fullImportComplete:false}):({receiptId:row.id,sourceHash:row.source_hash,stored:true,processingState:verified?'verified':'awaiting_verification',budgetState:'not-committed',revision:row.revision,cleanupEligible:false});
- const deliveryReceipt=(user,connection,row)=>{
+ const deliveryReceipt=(user,connection,row,{verifyStorage=false}={})=>{
+  authorize(user);requireConsent(user);
+  if(!db.prepare('SELECT 1 FROM report_intake_connections WHERE id=? AND user_id=? AND revoked=0').get(connection.id,user.id))throw serviceError('חיבור ההעלאה בוטל.',401);
   try{reportStore.lifecycle.ensureOriginal(scope(user),row.id);}catch(error){if(error.status!==410)throw error;}row=record(user,row.id);
-  const approved=approval(user,row.id),result={...receipt(row,!!approved),connectionId:connection.id,fullImportComplete:false};
+  const approved=approval(user,row.id),result={...receipt(row,!!approved),connectionId:connection.id,fullImportComplete:false,deviceCleanupVersion:1,storageVerified:false,deviceCopyRemovable:false};
+  // A fresh, connection-owned read-back proves storage independently of parsing
+  // or financial completion. Catalog snapshots never authorize device deletion.
+  if(verifyStorage&&row.original_removed_at===null){
+   const source=reportStore.source(scope(user),row.id);
+   if(!source||source.sourceHash!==row.source_hash||source.bytes.length!==row.source_bytes||reportHash(source.bytes)!==row.source_hash)throw serviceError('לא ניתן לאמת עותק שמור של המקור. הקובץ נשאר במכשיר.',503);
+   Object.assign(result,{storageVerified:true,deviceCopyRemovable:true,originalRemoved:false,storageVerifiedAt:stamp()});
+  }
   if(row.original_removed_at===null&&approved?.source_hash===row.source_hash&&approved.report_id)try{
    const access=budgetAccess(db,user,approved.budget,{isAllowed,write:true});
    if(reportStore.cleanupComplete(access,approved.report_id,row.source_hash,approved))Object.assign(result,{processingState:'imported',budgetState:'committed',fullImportComplete:true,cleanupEligible:true});
@@ -131,7 +140,10 @@ export function createReportIntake(db,{reportStore,origin,isAllowed,now=()=>Date
    const receiptId=url.searchParams.get('receipt'),sourceHash=url.searchParams.get('hash');
    if(!receiptId&&!sourceHash)throw serviceError('יש לבחור קבלה או חתימת מקור.',400);
    const row=db.prepare("SELECT r.id,r.source_hash,r.revision FROM report_sources r JOIN report_intake_submissions s ON s.report_id=r.id WHERE r.scope=? AND s.connection_id=? AND (?='' OR r.id=?) AND (?='' OR r.source_hash=?)").get(scope(user),connection.id,receiptId??'',receiptId??'',sourceHash??'',hash.test(sourceHash??'')?sourceHash:'invalid');
-   if(!row)throw serviceError('קבלת ההעלאה אינה זמינה לחיבור הזה.',404);return serviceJSON(deliveryReceipt(user,connection,row));
+   if(!row)throw serviceError('קבלת ההעלאה אינה זמינה לחיבור הזה.',404);
+   const verifyStorage=url.searchParams.get('verifyStorage')==='1';
+   if(verifyStorage&&(!uuid.test(receiptId??'')||!hash.test(sourceHash??'')))throw serviceError('לאימות שמירה נדרשים מזהה קבלה וחתימת מקור מדויקים.',400);
+   return serviceJSON(deliveryReceipt(user,connection,row,{verifyStorage}));
   }
   if(request.method!=='POST')throw serviceError('הפעולה אינה נתמכת.',405);
   db.prepare('UPDATE report_intake_connections SET last_attempt=? WHERE id=?').run(stamp(),connection.id);

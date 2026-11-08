@@ -201,3 +201,33 @@ test('Local cleanup requires a durable full original-workflow group, current rec
   }finally{c.db.close()}
  }
 });
+
+test('Day-0 device cleanup proves stored bytes before parsing without financial completion',async()=>{
+ const c=await setup();try{
+  const connection=await c.connect(),bytes='unrecognized synthetic CSV retained for manual review',before=c.db.prepare('SELECT * FROM plans ORDER BY user_id').all();
+  const posted=await(await c.receive(connection.secret,bytes)).json();
+  assert.equal(posted.deviceCleanupVersion,1);assert.equal(posted.storageVerified,false);assert.equal(posted.deviceCopyRemovable,false);assert.equal(posted.cleanupEligible,false);
+  const url='/api/imports/incoming?receipt='+posted.receiptId+'&hash='+posted.sourceHash;
+  const read=(secret=connection.secret,suffix='&verifyStorage=1')=>c.app(new Request(origin+url+suffix,{headers:{authorization:'Bearer '+secret}}));
+  const normal=await(await read(connection.secret,'')).json();assert.equal(normal.storageVerified,false);
+  const checked=await read();assert.equal(checked.status,200);assert.match(checked.headers.get('cache-control'),/no-store/);
+  const proof=await checked.json();assert.equal(proof.deviceCopyRemovable,true);assert.equal(proof.storageVerified,true);assert.equal(proof.originalRemoved,false);assert.equal(proof.connectionId,connection.id);assert.equal(proof.sourceHash,digest(bytes));assert.ok(proof.storageVerifiedAt);
+  assert.equal(proof.processingState,'awaiting_verification');assert.equal(proof.cleanupEligible,false);assert.equal(proof.fullImportComplete,false);assert.equal(proof.budgetState,'not-committed');
+  const catalog=await(await c.app(new Request(origin+'/api/imports/incoming?catalog=2',{headers:{authorization:'Bearer '+connection.secret}}))).json();assert.equal(catalog.receipts[posted.sourceHash].deviceCopyRemovable,false);
+  const original=await c.call('alice','/api/report-intake?id='+posted.receiptId+'&purpose=original');assert.equal(await original.text(),bytes);
+  assert.equal((await c.call('alice','/api/report-intake?id='+posted.receiptId+'&purpose=parse')).status,409);
+  assert.deepEqual(c.db.prepare('SELECT * FROM plans ORDER BY user_id').all(),before);
+  assert.equal(c.db.prepare('SELECT COUNT(*) n FROM report_intake_approvals').get().n,0);assert.equal(c.db.prepare('SELECT COUNT(*) n FROM report_commits').get().n,0);assert.equal(c.db.prepare('SELECT draft FROM report_sources').get().draft,null);
+  const other=await c.connect();assert.equal((await read(other.secret)).status,404);
+  const bob=await c.connect('bob');assert.equal((await read(bob.secret)).status,404);
+  assert.equal((await c.app(new Request(origin+'/api/imports/incoming?verifyStorage=1&receipt='+posted.receiptId,{headers:{authorization:'Bearer '+connection.secret}}))).status,400);
+  assert.equal((await c.app(new Request(origin+url.replace(posted.sourceHash,'0'.repeat(64))+'&verifyStorage=1',{headers:{authorization:'Bearer '+connection.secret}}))).status,404);
+  // An authenticated envelope that fails read-back cannot authorize deletion.
+  const stored=c.db.prepare('SELECT source,source_bytes FROM report_sources WHERE id=?').get(posted.receiptId);
+  c.db.prepare('UPDATE report_sources SET source_bytes=source_bytes+1 WHERE id=?').run(posted.receiptId);assert.equal((await read()).status,503);
+  c.db.prepare('UPDATE report_sources SET source_bytes=? ,source=? WHERE id=?').run(stored.source_bytes,Buffer.from('corrupted encrypted bytes'),posted.receiptId);assert.equal((await read()).status,503);
+  c.db.prepare('UPDATE report_sources SET source=? WHERE id=?').run(stored.source,posted.receiptId);
+  await c.call('alice','/api/report-intake',{action:'delete',id:posted.receiptId,sourceHash:posted.sourceHash,revision:1,confirm:true});assert.equal((await read()).status,404);
+  await c.call('alice','/api/report-intake',{action:'revoke',id:connection.id});assert.equal((await read()).status,401);
+ }finally{c.db.close()}
+});

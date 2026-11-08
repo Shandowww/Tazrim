@@ -1,10 +1,10 @@
 # Budgit report automation — three-phase plan
 
-Requested by Tal, 2026-11-05; amended 2026-11-07. **This document describes the rollout; editing it does not enable any policy.**
+Requested by Tal, 2026-11-05; amended 2026-11-08. **This document describes the rollout; editing it does not enable any policy.**
 
-**Current baseline:** bounded Stage 2 preparation is published as `beb4f46`, with explicit owner opt-in per budget and mandatory financial review/save. See [release evidence](evidence/release-stage2-2026-11-07.json). Phase 3 is not enabled; physical iPhone scheduling/locked-device outcomes remain unverified.
+**Current baseline:** bounded Stage 2 preparation, guided review, lifecycle labels and 30-day server-original retention are published as `63ab8ca`; see [release evidence](evidence/release-guided-retention-2026-11-07.json). Owners explicitly opt in per budget and financial approval remains mandatory. The published Shortcut still retains device files. Phase 3 is not enabled; physical iPhone scheduling/locked-device outcomes remain unverified.
 
-**Execution handoff:** implementation remains assigned to **Sol 6.1**. Resume using [the handoff](AUTO-SYNC-SOL-6.1-HANDOFF.md). The accepted next increment is [guided report review, lifecycle labels and 30-day original deletion](REPORT-GUIDED-REVIEW-AND-RETENTION-2026-11-07.md); these new screens and retention behavior are planned, not claimed live.
+**Execution handoff:** implementation remains assigned to **Sol 6.1**. Resume using [the handoff](AUTO-SYNC-SOL-6.1-HANDOFF.md). The next amendment is [day-0 device cleanup after verified upload](REPORT-GUIDED-REVIEW-AND-RETENTION-2026-11-07.md#day-0-device-cleanup-amendment--2026-11-08), while retaining Budgit's copy until 30 days after complete handling. This device cleanup is not yet live.
 
 ## Meaning of each operation
 
@@ -24,7 +24,9 @@ The server has encrypted report storage, private intake connections, hash dedupl
 
 Legacy report connections are bound to one user and one budget. The current **user-private incoming inbox** adds a narrowly scoped intake connection for a folder containing both personal and shared reports. The intake token can upload and check its own receipts; it cannot choose arbitrary budgets, read financial records or approve changes. After routing is authorized, hand the original into the existing target-budget report workflow. Preserve a stable intake receipt linked to the target report; moving scope must not break acknowledgement/retry behavior.
 
-Retain local originals by default. Tal explicitly requested optional local cleanup after Budgit has fully imported and saved the report. Only an opted-in Shortcut may request deletion, after a fresh receipt from its own active connection proves a durable full import for the exact current file hash and every report cycle/group member. Recheck on subsequent Shortcut runs; do not assume immediate server callbacks. Uploaded, parsed, routed, partial, ambiguous, failed, pending-review, inaccessible or revoked reports never authorize deletion. The accepted 2026-11-07 retention amendment deletes app-stored originals 30 days after complete handling; until then retain them. Coordinate receipt/tombstone changes before that policy is enabled: never claim a purged original is still stored or authorize local deletion through the old retained-original contract. Rehash immediately before the native Delete File action and honor Files/provider permission or confirmation requirements. Activity-cycle exports remain ineligible until whole-file coverage is proven. Interrupted uploads, changed bytes, missing permissions and quotas leave files available to retry.
+**Device cleanup — amended 2026-11-08:** Tal prefers deleting the source file during the same successful Shortcut run after Budgit confirms durable, retrievable storage of the exact original in the user's private inbox. Offer this as explicit setup with a retain option; existing installations must not silently start deleting. Full digestion is no longer a prerequisite for local cleanup. Use a fresh connection-owned storage receipt and re-enumerate/hash the current file before native deletion. An upload error, uncertain/mismatched receipt, changed source or unavailable/removed server copy leaves the local file intact. Honor Files permissions; deletion in an iCloud folder may propagate to other devices. A completed-but-removed acknowledgment prevents duplicate import but does not prove a retained copy for local deletion.
+
+**Server retention is separate:** New and Partly digested originals stay in Budgit until finished. Full completion starts a 30-day timer; then the server removes the sync entry and stored originals, preserving financial data/history and deduplication evidence. There is no device timer and no need to wait for another Shortcut run on day 30. Read the linked day-0 receipt/native acceptance contract before changing the signed installer; do not weaken existing financial-completion proof or Phase 1's approval-before-parsing gate.
 
 ## Phase 1 — auto-sync; verify before digestion
 
@@ -128,7 +130,7 @@ Official product documentation was checked on 2026-11-05. These products supply 
 
 Build a **Paperless-style incoming inbox + n8n-style approval gates + explicit folder rules** on the existing Budgit backend. Reuse the verified parts of our native Shortcut generator and current upload/import services. Implement Phase 1 first, retain the same pipeline for Phase 2, then add narrowly scoped automatic-application eligibility for Phase 3.
 
-The remaining device uncertainty is scheduled/locked-folder delivery. Bounded Phase 2 preparation is now published; guided review and lifecycle/retention are the next increment. Phase 3 still requires operational proof and safe recovery, beyond removing an approval button.
+The remaining device uncertainty is scheduled/locked-folder delivery. Bounded Phase 2 preparation, guided review and lifecycle/retention are now published; verified same-run device cleanup is the next increment. Phase 3 still requires operational proof and safe recovery, beyond removing an approval button.
 
 ### Sources
 
@@ -143,6 +145,6 @@ The Paperless documentation site returned HTTP 403 during this research; its off
 
 ## Historical cleanup checkpoint — 2026-11-06
 
-Superseded for publication status by the Stage 2 release above, and for indefinite original retention by the accepted 2026-11-07 amendment. The following records the earlier local test boundary.
+Superseded for publication status by the guided-review release above, for indefinite original retention by the accepted 2026-11-07 amendment, and for local deletion eligibility by the 2026-11-08 verified-upload amendment. The following records the earlier local test boundary.
 
 The local draft now records full-group completion witnesses in encrypted source metadata in the existing atomic financial transaction. Token receipts recheck current authorization, exact source/connection, every group member and financial evidence. The generated workflow retains by default; explicit `delete-after-saved` opts into a fresh receipt, exact hash recheck and native confirmed deletion. Service tests cover actual original parser/review/group saves and rollback. Native QA is already added; a supported CLI run of the listed `Budgit-Incoming-QA` copy timed out with zero requests. Native folder/delete permissions and physical iPhone scheduled/locked runs remain unaccepted. No production sync or later-phase policy was enabled.

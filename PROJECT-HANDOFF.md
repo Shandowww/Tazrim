@@ -1,5 +1,9 @@
 # Monthly Flow — project handoff
 
+## Day-0 device cleanup candidate — 2026-11-08
+
+Opt-in `delete-after-upload` is implemented locally with a fresh decrypted exact-byte storage proof, native current-file recheck and signed installer candidate. Build/typecheck, 1,322 regressions, 15 core checks and 400 native action-schema checks pass. Current production remains `63ab8ca`; no publication or real-file deletion is claimed. Actual iPhone execution is pending through the isolated HTTPS synthetic test, not the Mac-only loopback installer. Continue from `docs/ui-redesign/DAY0-DEVICE-CLEANUP-2026-11-08.md`; retain the existing full-digestion/30-day server retention policy and financial approval guards.
+
 ## Guided report review and 30-day retention published — 2026-11-07
 
 Application `63ab8ca` is verified live at https://budgit.duckdns.org/next/incoming. Single/group reports use guided Next/Finish, server-derived New/Partly digested/Digested states and resumable decisions. Deferred categories use existing annotation commands without reimport. Verified whole-file completion starts a full 30-day notice before removal of target/private originals, drafts and obsolete proposals; normalized finances, attribution, commits and history remain. Unsupported or incomplete coverage never expires. Existing preparation opt-ins are preserved; Stage 3 automatic financial application remains disabled.

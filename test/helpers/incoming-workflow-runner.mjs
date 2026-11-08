@@ -1,7 +1,8 @@
 // A bounded semantic check of the generated native graph. This is not an iOS
 // execution claim: it covers branches, references and strict receipt values.
-export function runIncomingWorkflow(workflow,{catalog,receipt,bytes=Buffer.from('synthetic')}={}){
- const outputs=new Map(),variables=new Map(),notifications=[],requests=[];let exited=false;
+export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=receipt,bytes=Buffer.from('synthetic'),files,freshFiles,hashFile=()=> 'a'.repeat(64),deleteFile}={}){
+ const outputs=new Map(),variables=new Map(),notifications=[],requests=[],deleted=[];let exited=false,enumerations=0;
+ const initialFiles=files??[{name:'synthetic.csv',extension:'csv',bytes}];
  const native=v=>v===true?'Yes':v===false?'No':v==null?'':Array.isArray(v)?v.map(native).join('\n'):typeof v==='object'?'Dictionary':String(v);
  const value=v=>{
   if(v?.WFSerializationType==='WFTextTokenAttachment')return value(v.Value);
@@ -21,7 +22,8 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,bytes=Buffer.from(
   switch(name){
    case 'comment':break;
    case 'file':result='synthetic-folder';break;
-   case 'file.getfoldercontents':result=[{name:'synthetic.csv',extension:'csv',bytes}];break;
+   case 'file.getfoldercontents':result=enumerations++===0?initialFiles:(freshFiles??initialFiles).filter(file=>!deleted.includes(file));break;
+   case 'file.delete':{const items=value(p.WFInput);for(const item of items){deleteFile?.(item);deleted.push(item);}break;}
    case 'gettext':result=native(value(p.WFTextActionText));break;
    case 'getvalueforkey':{let input=value(p.WFInput);if(typeof input==='string'){try{input=JSON.parse(input)}catch{input={}}}result=input?.[value(p.WFDictionaryKey)];break;}
    case 'getitemtype':{const input=value(p.WFInput);result=typeof input==='boolean'?'Boolean':typeof input==='string'?'Text':typeof input==='number'?'Number':input==null?'Nothing':'Dictionary';break;}
@@ -32,13 +34,13 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,bytes=Buffer.from(
    case 'properties.files':result=p.WFContentItemPropertyName==='Name'?value(p.WFInput).name:value(p.WFInput).extension;break;
    case 'text.replace':result=native(value(p.WFInput)).replace(new RegExp(p.WFReplaceTextFind.replace('(?i)',''),p.WFReplaceTextCaseSensitive?'':'i'),p.WFReplaceTextReplace);break;
    case 'urlencode':result=encodeURIComponent(native(value(p.WFInput)));break;
-   case 'hash':result='a'.repeat(64);break;
-   case 'downloadurl':{const url=value(p.WFURL);requests.push({url,method:p.WFHTTPMethod});result=p.WFHTTPMethod==='GET'?catalog:receipt;break;}
+   case 'hash':{const input=value(p.WFInput);result=hashFile(Array.isArray(input)?input[0]:input);break;}
+   case 'downloadurl':{const url=value(p.WFURL);requests.push({url,method:p.WFHTTPMethod});result=p.WFHTTPMethod==='GET'?(url.includes('verifyStorage=1')?freshReceipt:catalog):receipt;break;}
    case 'notification':notifications.push(native(value(p.WFNotificationActionBody)));break;
    case 'exit':exited=true;break;
    default:throw Error('Unsupported generated action '+name);
   }
   outputs.set(p.UUID,result);
  }}
- block(0,actions.length);return{exited,notifications,requests,uploaded:variables.get('BudgitUploaded')??[],receipt:variables.get('BudgitReceipt')};
+ block(0,actions.length);return{exited,notifications,requests,deleted,uploaded:variables.get('BudgitUploaded')??[],receipt:variables.get('BudgitReceipt')};
 }

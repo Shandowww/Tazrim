@@ -1,5 +1,21 @@
 # Monthly Flow
 
+## Day-0 device cleanup candidate — 2026-11-08
+
+Opt-in `delete-after-upload` is implemented locally with a fresh decrypted exact-byte storage proof, native current-file recheck and signed installer candidate. Build/typecheck, 1,322 regressions, 15 core checks and 400 native action-schema checks pass. Current production remains `63ab8ca`; no publication or real-file deletion is claimed. Actual iPhone execution is pending through the isolated HTTPS synthetic test, not the Mac-only loopback installer. Continue from `docs/ui-redesign/DAY0-DEVICE-CLEANUP-2026-11-08.md`; retain the existing full-digestion/30-day server retention policy and financial approval guards.
+
+## Guided report review and 30-day retention published — 2026-11-07
+
+Application `63ab8ca` is verified live at https://budgit.duckdns.org/next/incoming. Single/group reports use guided Next/Finish, server-derived New/Partly digested/Digested states and resumable decisions. Deferred categories use existing annotation commands without reimport. Verified whole-file completion starts a full 30-day notice before removal of target/private originals, drafts and obsolete proposals; normalized finances, attribution, commits and history remain. Unsupported or incomplete coverage never expires. Existing preparation opt-ins are preserved; Stage 3 automatic financial application remains disabled.
+
+Build/typecheck, 1,316 regressions and 15 core checks pass. The 897 prior source files matched; fresh verified backup, isolated financial/access/20-source decryption/startup/rollback/intake restore/68 retained assets and 13 candidate-backend retention contracts passed. All 133 candidate/live runtime files matched. Activation preserved 49 authoritative tables, configuration keys and adjacent services. Health/auth/deep routes/root/manifest and signed installer bytes pass. No originals were removed at activation and no production financial edits, Sites or paid-resource changes occurred.
+
+Save drafts and use guarded refresh. Install the updated `/shortcuts/budgit-incoming.shortcut` using the same folder and upload key; it safely acknowledges removed originals and still retains files on the device. Native action schema and receipt-graph checks pass; physical iPhone/new-installer execution, scheduling and locked-device/provider behavior remain unverified. Historical backups can retain original bytes; read the trusted-tombstone restore and retention-aware rollback requirements in `docs/ui-redesign/GUIDED-REVIEW-RETENTION-2026-11-07.md`. Evidence: `docs/ui-redesign/evidence/release-guided-retention-2026-11-07.json`. This publication supersedes the implementation-only note below.
+
+## Guided review and retention implementation — 2026-11-07
+
+The accepted guided Next/Finish flow, durable lifecycle labels, resumable re-review, category-only follow-up and verified 30-day original-retention transition are implemented. Build/typecheck, 1,316 regressions and 15 core checks pass, with synthetic 390px browser and native Shortcut schema/receipt-graph checks. The signed installer now handles truthful removed-original acknowledgments; install its new revision with the same folder/key. Stage 3 financial application stays disabled. Publication is tracked separately; do not infer deployment from this implementation note. Read `docs/ui-redesign/GUIDED-REVIEW-RETENTION-2026-11-07.md` for preservation, restore/rollback requirements and physical-device limits.
+
 ## Stage 2 preparation published — 2026-11-07
 
 Application `beb4f467cbd46ca2aea6aa7665210f57537bcc4c` is verified live at https://budgit.duckdns.org/next/incoming. Each budget owner can explicitly enable or pause preparation; no budget is opted in by deployment. Supported plaintext bank/card sources use confirmed mappings and original parsers/controller/drafts/notices. Encrypted proposals show before/after values and open the original review/financial confirmation. Unknown, mixed, locked or unsupported sources remain manual. No automatic financial application or Phase 3 mode is enabled. The existing signed Shortcut is unchanged. A missing current financial receipt now requires history review instead of a false imported status; the separate cross-format duplicate repair is retained.

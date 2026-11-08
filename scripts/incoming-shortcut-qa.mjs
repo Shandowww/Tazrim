@@ -1,7 +1,7 @@
 // Development-only native Shortcut acceptance endpoint. Never used by the app.
 import {createServer} from 'node:http';
 import {randomBytes,generateKeyPairSync,randomUUID} from 'node:crypto';
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {pathToFileURL} from 'node:url';
@@ -10,8 +10,9 @@ import {createApp} from '../server/app.mjs';
 import {zero} from '../src/budget.js';
 import {reportHash} from '../server/report-crypto.mjs';
 
-export const qaModes=['success','missing-stored','stored-false','stored-string','wrong-hash','missing-receipt','malformed-json','unauthorized','unavailable','disconnect'];
+export const qaModes=['success','missing-stored','stored-false','stored-string','wrong-hash','missing-receipt','malformed-json','unauthorized','unavailable','disconnect','proof-missing','proof-false','proof-string','proof-wrong-hash','proof-unavailable','proof-disconnect','proof-local-changed'];
 const maxBytes=5*1024*1024;
+const changedMarker=Buffer.from('\nBUDGIT GENERATED LOCAL CHANGE FOR QA');
 const csv=Buffer.from('הפועלים\nמספר חשבון 999001\nתאריך,תיאור,סכום,יתרה\n01/05/2026,משכורת בדיקה סינתטית,100,1100');
 let publicKey;
 function recoveryKey(){return publicKey??=generateKeyPairSync('rsa',{modulusLength:3072,publicKeyEncoding:{type:'spki',format:'pem'}}).publicKey;}
@@ -58,7 +59,18 @@ export async function startIncomingShortcutQA({mode='success',port=0,token:qaTok
    const response=await app(new Request(appOrigin+url.pathname+url.search,{method:req.method,headers:{authorization:'Bearer '+token},...(bytes?{body:bytes}:{})}));
    const receipt=await response.json();
    if(!response.ok)return respond(res,response.status,receipt);
-   if(req.method==='GET')return respond(res,response.status,receipt);
+   if(req.method==='GET'){
+    if(url.searchParams.get('verifyStorage')==='1'){
+     if(mode==='proof-unavailable')return respond(res,503,{error:'Synthetic read-back failure'});
+     if(mode==='proof-disconnect'){req.socket.destroy();return;}
+     if(mode==='proof-local-changed')for(const name of filenames){const path=join(input,name);if(existsSync(path)&&readFileSync(path).equals(csv))writeFileSync(path,Buffer.concat([csv,changedMarker]));}
+     if(mode==='proof-missing')delete receipt.deviceCopyRemovable;
+     if(mode==='proof-false')receipt.storageVerified=false;
+     if(mode==='proof-string')receipt.deviceCopyRemovable='true';
+     if(mode==='proof-wrong-hash')receipt.sourceHash='0'.repeat(64);
+    }
+    return respond(res,response.status,receipt);
+   }
    if(mode==='disconnect'){req.socket.destroy();return;}
    if(mode==='malformed-json')return respond(res,200,'{ "stored": true,');
    if(mode==='missing-stored')delete receipt.stored;
@@ -85,6 +97,16 @@ export async function startIncomingShortcutQA({mode='success',port=0,token:qaTok
  return{
   origin,endpoint:origin+'/api/imports/incoming',token,input,uploaded,filenames,mode,sourceHash:reportHash(csv),
   stats:()=>({requests,rejectedBodies,arrivals,unauthorizedRequests,events:[...events],sources:db.prepare('SELECT COUNT(*) AS n FROM report_sources').get().n,budgets:db.prepare('SELECT COUNT(*) AS n FROM plans').get().n}),
+  resetFixtures:()=>{
+   for(const name of filenames){const path=join(input,name);if(existsSync(path)){const current=readFileSync(path);if(!current.equals(csv)&&!current.equals(Buffer.concat([csv,changedMarker])))throw Error('Refusing to overwrite unexpected fixture contents');}writeFileSync(path,csv,{mode:0o600});}
+  },
+  verifyStoredOriginal:async()=>{
+   const response=await app.qaCall('/api/report-intake'),snapshot=await response.json();
+   if(!response.ok||snapshot.reports.length!==1)return{verified:false,sources:snapshot.reports?.length??0};
+   const row=snapshot.reports[0],original=await app.qaCall('/api/report-intake?id='+row.id+'&purpose=original');
+   const bytes=Buffer.from(await original.arrayBuffer());
+   return{verified:original.ok&&bytes.equals(csv),sourceHashMatches:reportHash(bytes)===reportHash(csv),financialCommits:db.prepare('SELECT COUNT(*) n FROM report_commits').get().n,budgets:db.prepare('SELECT COUNT(*) n FROM plans').get().n};
+  },
   setMode:value=>{if(!qaModes.includes(value))throw Error('Unknown QA mode');mode=value;},
   completeSavedImport:async()=>{
    const call=app.qaCall,checked=async response=>{if(!response.ok)throw Error('Synthetic isolated action failed: '+response.status+' '+await response.text());return response.json();};

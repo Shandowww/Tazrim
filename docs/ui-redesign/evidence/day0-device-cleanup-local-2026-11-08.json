@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-08",
+  "status": "source-candidate-native-acceptance-pending",
+  "productionApplication": "63ab8cafbb80016dfccfb5fb4c3d064bdf10f22c",
+  "productionChanged": false,
+  "deviceDeletionOptIn": "delete-after-upload",
+  "defaultDeviceBehavior": "retain",
+  "serverRetention": "30 days after complete handling; unfinished reports retained",
+  "validation": {
+    "regressionTestsPassed": 1322,
+    "buildTypecheck": "passed",
+    "coreChecksPassed": 15,
+    "nativeSchemaActions": 400,
+    "nativeCharacterCounts": 3,
+    "nativeEndToEnd": "User reports HTTPS iPhone deletion succeeds after confirmation; repeat without Delete prompt pending",
+    "physicalIPhone": "Manual synthetic run with confirmation, user-reported",
+    "realFilesDeleted": 0,
+    "macAttempt": "catalog only; zero uploads; not accepted",
+    "phoneQA": "Fresh HTTPS synthetic session ready; automatic deletion confirmation pending",
+    "iosDeleteWithoutConfirmation": "Enabled by user; applies across Shortcuts"
+  },
+  "sourceSha256": {
+    "server/report-intake.mjs": "2d96481bbc7eb4c254da04363a679b828825124d00ec2ccfe0efcded04e4dfb3",
+    "scripts/build-incoming-shortcut.py": "1caa164fdc013d6c70ddab647d9e324e881d835bc93f887b1372de398ffcbd0e",
+    "scripts/incoming-shortcut-native-qa.mjs": "ea679b1eff446ee7b2043961e7699486612e2fead6c850df406e19db23e6f0b9",
+    "scripts/incoming-shortcut-qa.mjs": "fca164d5cc7ee357c6d0e35dbdcc9995760bf1d37bdaa44b86b1ca0d02ed4685",
+    "frontend/src/app/incoming-reports-page.tsx": "d0974b2a48152803b699f70e30fc717de8f806c98ed0da016fba46c2cc8e95e8",
+    "public/shortcuts/budgit-incoming.shortcut": "f33214648ff84e87e79070b0e4fdb17ff960cc0662986c3172b2c0627325e9ed",
+    "scripts/incoming-shortcut-iphone-qa.mjs": "d775e68a45f06cdb2120ccf3a0ae83e9699f5259920cb044512c4204270069a2"
+  }
+}

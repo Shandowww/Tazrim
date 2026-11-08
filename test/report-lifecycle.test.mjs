@@ -134,3 +134,16 @@ test('Stage 2 cross-format resend of an expired whole duplicate reuses its tombs
   const catalog=await c.app(new Request(c.origin+'/api/imports/incoming?catalog=2',{headers:{authorization:'Bearer '+c.secret}}));const listed=await catalog.json();assert.equal(listed.version,2);assert.equal(listed.connectionId,c.connectionId);assert.equal(listed.receipts[hash(duplicate)].completionAcknowledged,true);
  }finally{c.db.close()}
 });
+
+test('Storage-copy permission is independent of completion and becomes false after server retention removes originals',async()=>{
+ const c=await guidedFixture();try{
+  const proof=()=>c.app(new Request(c.origin+'/api/imports/incoming?verifyStorage=1&receipt='+c.privateId+'&hash='+hash(c.bytes),{headers:{authorization:'Bearer '+c.secret}}));
+  const pending=await(await proof()).json();assert.equal(pending.deviceCopyRemovable,true);assert.equal(pending.cleanupEligible,false);assert.equal(pending.fullImportComplete,false);
+  await c.progress('later');await c.commit();assert.equal((await c.lifecycle()).lifecycle,'partial');assert.equal((await(await proof()).json()).deviceCopyRemovable,true);
+  const state=await c.lifecycle();
+  await c.post('/api/report-lifecycle?budget=personal&id='+c.id,{action:'resolve-categories',budgetRevision:2,sourceHash:hash(c.bytes),revision:c.sourceRow().revision,confirmUncategorized:true});
+  assert.equal((await c.lifecycle()).lifecycle,'digested');const before=c.financial();
+  c.advance(REPORT_RETENTION_MS);const removed=await(await proof()).json();
+  assert.equal(removed.stored,false);assert.equal(removed.originalRemoved,true);assert.equal(removed.deviceCleanupVersion,1);assert.equal(removed.storageVerified,false);assert.equal(removed.deviceCopyRemovable,false);assert.equal(c.financial(),before);
+ }finally{c.db.close()}
+});

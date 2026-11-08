@@ -2,9 +2,9 @@
 
 The folder variant exposes its native folder selector in the setup block.
 No device-specific File bookmark is embedded in the generated workflow.
-Original files are retained by default; opt-in cleanup requires a fresh full-import
-receipt and an immediate byte-hash recheck. A connection-local catalog skips files
-already uploaded. --qa-config permits only the disposable loopback endpoint.
+Original files are retained by default; opt-in cleanup requires a fresh verified
+storage receipt and an immediate byte-hash recheck. Financial import is separate. A connection-local catalog skips files
+already uploaded. QA permits loopback or an explicitly enabled temporary synthetic HTTPS tunnel.
 """
 import argparse
 import json
@@ -20,12 +20,17 @@ def build(config=None, folder_input=True):
     endpoint = setup.get('endpoint', 'https://budgit.duckdns.org/api/imports/incoming')
     if config:
         url = urlsplit(endpoint)
-        if url.scheme != 'http' or url.hostname != '127.0.0.1' or url.path != '/api/imports/incoming' or url.query or url.fragment or url.username:
-            raise ValueError('QA accepts only the local synthetic incoming endpoint')
+        loopback = url.scheme == 'http' and url.hostname == '127.0.0.1'
+        phone_test = setup.get('syntheticHttps') is True and url.scheme == 'https' and re.fullmatch(r'[a-z0-9-]+\.trycloudflare\.com', url.hostname or '') and url.port is None
+        if not (loopback or phone_test) or url.path != '/api/imports/incoming' or url.query or url.fragment or url.username:
+            raise ValueError('QA accepts only loopback or an explicitly enabled disposable synthetic HTTPS endpoint')
         if not re.fullmatch(r'Budgit-Incoming-QA-[A-Za-z0-9-]+', setup.get('qaName', 'Budgit-Incoming-QA-v2')):
             raise ValueError('Invalid synthetic workflow name')
         if len(setup.get('token', '')) != 43:
             raise ValueError('Use the disposable QA token')
+    cleanup_mode = setup.get('cleanupMode', 'retain')
+    if cleanup_mode not in ['retain', 'delete-after-upload']:
+        raise ValueError('Invalid device cleanup mode')
     actions = []
 
     def add(name, **params):
@@ -101,8 +106,11 @@ def build(config=None, folder_input=True):
     secret = ref(add('gettext', WFTextActionText=setup.get('token', '')), 'Text')
     if not config:
         questions.append({'ActionIndex': token_index, 'Category': 'Parameter', 'ParameterKey': 'WFTextActionText', 'DefaultValue': '', 'Text': 'הדביקו רק את מפתח ההעלאה, בלי Bearer. אין להזין סיסמה או מפתח שחזור.'})
-    add('comment', WFCommentActionText='הגדרה 3/3 — שמירת קבצים. השאירו retain בפעולת Text שמתחת: המקורות נשארים במכשיר. הגרסה הזו אינה מוחקת או מעבירה קבצים; אין לשנות ערך זה.')
-    cleanup_setting = ref(add('gettext', WFTextActionText='retain'), 'Text')
+    add('comment', WFCommentActionText='הגדרה 3/3 — מחיקה אחרי העלאה. retain משאיר קבצים בתיקייה. כדי למחוק אחרי ש־Budgit אימת עותק שמור, בחרו delete-after-upload. כדי למנוע אישור מחיקה בכל הרצה, בהגדרות iOS > יישומים > קיצורים > מתקדם אפשר לאפשר מחיקה ללא אישור. ההגדרה חלה על כל הקיצורים; הרשאות ראשוניות ניתנות במכשיר. בתיקיית iCloud המחיקה מסתנכרנת גם למכשירים אחרים. Budgit שומר דוחות לא גמורים, ומסיר את המקור 30 יום אחרי השלמת הטיפול. אין מחיקה של מקור מגיליון שיתוף.')
+    cleanup_index = len(actions)
+    cleanup_setting = ref(add('gettext', WFTextActionText=cleanup_mode), 'Text')
+    if not config and folder_input:
+        questions.append({'ActionIndex': cleanup_index, 'Category': 'Parameter', 'ParameterKey': 'WFTextActionText', 'DefaultValue': 'retain', 'Text': 'retain לשמירת הקובץ, או delete-after-upload למחיקה מהתיקייה רק אחרי אימות עותק ב־Budgit. מחיקת iCloud מסתנכרנת לכל המכשירים.'})
     add('comment', WFCommentActionText='סוף ההגדרות — אין צורך לערוך את הפעולות שמתחת. הפענוח, השיוך והשמירה הכספית מחייבים אישור בתוך Budgit. תזמון מוגדר בנפרד רק לאחר בדיקה ידנית. גרסת QA עם כתובת 127.0.0.1 עובדת במחשב הבדיקה בלבד, לא ב־iPhone.')
     require(secret, 'חסר מפתח העלאה. מלאו את Text תחת הגדרה 2/3.')
     require(incoming, 'בחרו תיקייה בפעולת File תחת הגדרה 1/3.' if folder_input else 'יש להעביר קובצי דוח מגיליון השיתוף.', items=True)
@@ -148,7 +156,7 @@ def build(config=None, folder_input=True):
         equal_or_stop(connection, text('\ufffc', catalog_connection), 'הקבלה שייכת לחיבור אחר. המקור נשאר במכשיר.')
 
     files = ref(add('file.getfoldercontents', WFFolder=incoming, Recursive=False), 'Folder Contents') if folder_input else incoming
-    for name in ['BudgitUploaded', 'BudgitScanned', 'BudgitExamined', 'BudgitSkipped']:
+    for name in ['BudgitUploaded', 'BudgitScanned', 'BudgitExamined', 'BudgitSkipped', 'BudgitDeleted']:
         empty = ref(add('list', WFItems=[]), 'List')
         add('setvariable', WFVariableName=name, WFInput=empty)
     loop = str(uuid.uuid5(uuid.NAMESPACE_URL, 'budgit/incoming/files')).upper()
@@ -202,12 +210,6 @@ def build(config=None, folder_input=True):
     equal_or_stop(received_hash, text('\ufffc', source_hash), 'חתימת הקבלה אינה תואמת למקור. יש לבדוק את הקובץ בתיבה.')
     add('setvariable', WFVariableName='BudgitReceipt', WFInput=response)
     add('appendvariable', WFVariableName='BudgitUploaded', WFInput=name)
-    uploaded = ref(add('count', Input=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
-    uploaded_text = ref(add('gettext', WFTextActionText=text('\ufffc', uploaded)), 'Text')
-    batch = begin(uploaded_text, expected='10')
-    notice('נמסרו עשרה קבצים חדשים. יתר הקבצים ייבדקו בהרצה הבאה; הקבלות מאפשרות לדלג על מה שכבר נמסר.')
-    add('exit')
-    end(batch)
     add('conditional', GroupingIdentifier=absent, WFControlFlowMode=1)
     storage_or_completion(old)
     old_id = ref(add('getvalueforkey', WFInput=old, WFDictionaryKey='receiptId'), 'Dictionary Value')
@@ -217,39 +219,28 @@ def build(config=None, folder_input=True):
     add('setvariable', WFVariableName='BudgitReceipt', WFInput=old)
     end(absent)
     # Share-sheet inputs cannot be safely re-resolved by folder/name.
-    if folder_input and config:
-        cleanup_enabled = begin(cleanup_setting, expected='delete-after-saved')
+    if folder_input:
+        cleanup_enabled = begin(cleanup_setting, expected='delete-after-upload')
         # Recheck on every sweep, including previously uploaded files. The catalog
         # only skips uploads; it never authorizes removal from a stale snapshot.
         saved_id = ref(add('getvalueforkey', WFInput=variable('BudgitReceipt'), WFDictionaryKey='receiptId'), 'Dictionary Value')
         saved_connection = ref(add('getvalueforkey', WFInput=variable('BudgitReceipt'), WFDictionaryKey='connectionId'), 'Dictionary Value')
         require(saved_connection, 'חסר מזהה חיבור בקבלה הקודמת. הקובץ נשאר במכשיר.')
-        fresh = ref(add('downloadurl', WFURL=text(endpoint + '?hash=\ufffc&receipt=\ufffc', source_hash, saved_id), WFHTTPMethod='GET', ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
-        fresh_stored = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='stored'), 'Dictionary Value')
-        fresh_type = ref(add('getitemtype', WFInput=fresh_stored), 'Type')
-        equal_or_stop(fresh_type, text('\ufffc', expected_type), 'קבלת הניקוי אינה תקינה. הקובץ נשאר במכשיר.')
-        fresh_text = ref(add('gettext', WFTextActionText=text('\ufffc', fresh_stored)), 'Text')
-        equal_or_stop(fresh_text, text('\ufffc', expected_text), 'שמירת המקור לא אושרה. הקובץ נשאר במכשיר.')
+        fresh = ref(add('downloadurl', WFURL=text(endpoint + '?verifyStorage=1&hash=\ufffc&receipt=\ufffc', source_hash, saved_id), WFHTTPMethod='GET', ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
+        storage_or_completion(fresh)
         fresh_id = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='receiptId'), 'Dictionary Value')
         equal_or_stop(fresh_id, text('\ufffc', saved_id), 'מזהה הקבלה השתנה. הקובץ נשאר במכשיר.')
         fresh_hash = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='sourceHash'), 'Dictionary Value')
         equal_or_stop(fresh_hash, text('\ufffc', source_hash), 'הקבלה אינה תואמת למקור. הקובץ נשאר במכשיר.')
-        # An unrecognized/missing eligibility field keeps the file; strict type and
-        # true-value checks prevent a string such as "true" authorizing deletion.
-        eligible = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='cleanupEligible'), 'Dictionary Value')
-        eligible_type = ref(add('getitemtype', WFInput=eligible), 'Type')
-        typed = begin(eligible_type, expected=text('\ufffc', expected_type))
-        eligible_text = ref(add('gettext', WFTextActionText=text('\ufffc', eligible)), 'Text')
-        allowed = begin(eligible_text, expected=text('\ufffc', expected_text))
-        for key, expected in [('fullImportComplete', None), ('budgetState', 'committed'), ('processingState', 'imported')]:
-            value = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey=key), 'Dictionary Value')
-            if expected is None:
-                value_type = ref(add('getitemtype', WFInput=value), 'Type')
-                equal_or_stop(value_type, text('\ufffc', expected_type), 'חסר אישור קליטה מלאה. הקובץ נשאר במכשיר.')
-                value = ref(add('gettext', WFTextActionText=text('\ufffc', value)), 'Text')
-            equal_or_stop(value, expected if expected is not None else text('\ufffc', expected_text), 'הקליטה המלאה טרם אושרה. הקובץ נשאר במכשיר.')
         connection = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='connectionId'), 'Dictionary Value')
         equal_or_stop(connection, text('\ufffc', saved_connection), 'החיבור בקבלה השתנה. הקובץ נשאר במכשיר.')
+        fresh_stored = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='stored'), 'Dictionary Value')
+        retained_for_cleanup = begin(fresh_stored, expected=text('\ufffc', expected_text))
+        proof_version = ref(add('getvalueforkey', WFInput=fresh, WFDictionaryKey='deviceCleanupVersion'), 'Dictionary Value')
+        equal_or_stop(proof_version, '1', 'גרסת אימות השמירה אינה נתמכת. הקובץ נשאר במכשיר.')
+        for key in ['storageVerified', 'deviceCopyRemovable']:
+            boolean_receipt(fresh, key, expected_text)
+        boolean_receipt(fresh, 'originalRemoved', false_text)
         # A File content item may cache bytes. Resolve a new item by exact name
         # before hashing/deleting; hashing the original item again is insufficient.
         empty = ref(add('list', WFItems=[]), 'List')
@@ -260,7 +251,10 @@ def build(config=None, folder_input=True):
         candidate = variable('Repeat Item')
         candidate_name = ref(add('properties.files', WFInput=candidate, WFContentItemPropertyName='Name'), 'Name')
         same_name = begin(candidate_name, expected=text('\ufffc', name))
+        candidate_extension = ref(add('properties.files', WFInput=candidate, WFContentItemPropertyName='File Extension'), 'File Extension')
+        same_extension = begin(candidate_extension, expected=text('\ufffc', extension))
         add('appendvariable', WFVariableName='BudgitFreshMatches', WFInput=candidate)
+        end(same_extension)
         end(same_name)
         add('repeat.each', GroupingIdentifier=fresh_loop, WFControlFlowMode=2)
         matches = ref(add('count', Input=variable('BudgitFreshMatches'), WFCountType='Items'), 'Count')
@@ -268,17 +262,28 @@ def build(config=None, folder_input=True):
         equal_or_stop(matches_text, '1', 'הקובץ אינו זמין באופן חד־משמעי. לא בוצעה מחיקה.')
         current_hash = ref(add('hash', WFInput=variable('BudgitFreshMatches'), WFHashType='SHA256'), 'Hash')
         equal_or_stop(current_hash, text('\ufffc', source_hash), 'הקובץ השתנה בזמן הסריקה. הוא נשאר במכשיר.')
-        add('file.delete', WFInput=variable('BudgitFreshMatches'), WFDeleteFileConfirm=True)
-        end(allowed)
-        end(typed)
+        # False preserves Trash/Recently Deleted where supported. This parameter
+        # controls permanent deletion, not iOS privacy confirmation. Repeated
+        # prompts are governed by the owner's Shortcuts settings.
+        add('file.delete', WFInput=variable('BudgitFreshMatches'), WFDeleteImmediatelyDelete=False)
+        add('appendvariable', WFVariableName='BudgitDeleted', WFInput=name)
+        add('conditional', GroupingIdentifier=retained_for_cleanup, WFControlFlowMode=1)
+        notice('Budgit כבר הסיר את המקור לפי מדיניות השמירה. הקובץ נשאר בתיקייה במכשיר.')
+        end(retained_for_cleanup)
         end(cleanup_enabled)
+    uploaded = ref(add('count', Input=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
+    batch = begin(uploaded, expected='10')
+    notice('נמסרו עשרה קבצים חדשים. הניקוי שבחרתם נבדק גם לקובץ העשירי. יתר הקבצים ייבדקו בהרצה הבאה; הסריקה אינה מלאה.')
+    add('exit')
+    end(batch)
     end(supported)
     add('repeat.each', GroupingIdentifier=loop, WFControlFlowMode=2)
     uploaded = ref(add('count', Input=variable('BudgitUploaded'), WFCountType='Items'), 'Count')
     examined = ref(add('count', Input=variable('BudgitExamined'), WFCountType='Items'), 'Count')
     supported_count = ref(add('count', Input=variable('BudgitScanned'), WFCountType='Items'), 'Count')
     skipped_count = ref(add('count', Input=variable('BudgitSkipped'), WFCountType='Items'), 'Count')
-    notice(text('נבדקו \ufffc פריטים; נתמכים: \ufffc; דולגו: \ufffc; נמסרו עכשיו: \ufffc. קבצים שכבר נמסרו אינם נשלחים שוב. המקורות נשארים במכשיר. בדקו את תיבת הסנכרון ב־Budgit.', examined, supported_count, skipped_count, uploaded))
+    deleted = ref(add('count', Input=variable('BudgitDeleted'), WFCountType='Items'), 'Count')
+    notice(text('נבדקו \ufffc פריטים; נתמכים: \ufffc; דולגו: \ufffc; נמסרו עכשיו: \ufffc; נמחקו מהתיקייה אחרי אימות שמירה: \ufffc. בדקו את תיבת הסנכרון ב־Budgit.', examined, supported_count, skipped_count, uploaded, deleted))
     skipped_text = ref(add('gettext', WFTextActionText=text('\ufffc', skipped_count)), 'Text')
     skipped = begin(skipped_text, expected='0')
     add('conditional', GroupingIdentifier=skipped, WFControlFlowMode=1)
