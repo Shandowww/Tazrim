@@ -1,27 +1,27 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "2208e67d489dfe8a21ee40e480730e5098565b01",
+  "sourceCommit": "c6fa2fd3afafcc680fb7dd2c78a702f438e971f2",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Corrected catalog/setup errors and nested multi-file cleanup candidate; native Mac accepted; publication pending",
+  "status": "Published Mac Shortcut catalog and nested multi-file cleanup repair; production key reusable across platforms",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1326,
     "coreChecks": 15,
     "nativeShortcutSchemaActions": 419,
-    "receiptGraph": "Key normalization, actionable auth errors, explicit nested repeat outputs and multi-file distinct-hash proof passed.",
-    "browser": "Native Mac multi-file upload/deletion, strict bad-proof refusal, retry and empty-folder pass; exact server bytes verified and zero financial commits. No new browser or iPhone execution claimed.",
-    "physicalDevice": "Native Mac two-file cleanup, bad-proof refusal and successful retry with exact retained server bytes passed. Prior iPhone acceptance applies to 0a5ab68; revised bindings not newly tested on iPhone. Scheduling/locked-device unverified.",
-    "release": "docs/ui-redesign/evidence/mac-shortcut-candidate-2026-11-08.json",
-    "productionEvidence": "docs/ui-redesign/evidence/release-day0-device-cleanup-2026-11-08.json"
+    "receiptGraph": "passed; format/whitespace guards, actionable catalog errors and explicit nested repeats",
+    "browser": "Native Mac two-file cleanup/refusal/retry/empty-folder passed with exact retained bytes and zero financial commits. No new iPhone or browser execution claimed.",
+    "physicalDevice": "Native Mac two-file cleanup/refusal/retry/empty-folder accepted with exact retained bytes and zero financial commits. Prior iPhone 0a5ab68 acceptance retained; revised bindings not newly claimed tested on iPhone. Scheduling/locked-device unverified.",
+    "release": "914 prior source files, fresh verified backup, isolated financial/access/20-source decryption/startup/rollback/intake/automation restore, 67 retained assets, 25 candidate backend contracts, 165 candidate/live runtime files; all 50 current authoritative tables, keys and adjacent services preserved.",
+    "productionEvidence": "docs/ui-redesign/evidence/release-mac-shortcut-2026-11-08.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301",
-  "productionImage": "sha256:95af19eef4449ecb00549258119c7638c63ff30427d24d87b2d1ed11edbc1a19",
+  "productionApplicationCommit": "2208e67d489dfe8a21ee40e480730e5098565b01",
+  "productionImage": "sha256:7defa0a67044b9491006bc4c1e3244b71e1505945c5c8a3a75f7f9d9592a11fd",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301"
+  "applicationCommit": "2208e67d489dfe8a21ee40e480730e5098565b01"
 }

@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-08",
+  "applicationCommit": "2208e67d489dfe8a21ee40e480730e5098565b01",
+  "previousApplicationCommit": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301",
+  "runtimeImage": "sha256:7defa0a67044b9491006bc4c1e3244b71e1505945c5c8a3a75f7f9d9592a11fd",
+  "sourceArchiveSha256": "f1fb3a947be64b6b876d8b02a5abeaa32049849281e4db691e207974d86b60e7",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "changes": [
+    "Validate and normalize upload-key clipboard whitespace without echoing secrets",
+    "Surface authentication, consent and rate errors before catalog-version checks",
+    "Bind nested repeat outputs explicitly for safe multi-file cleanup",
+    "Explain shared production keys and device-specific folder selection"
+  ],
+  "nativeMac": {
+    "syntheticOnly": true,
+    "twoFilesDeleted": true,
+    "badProofRetainsBoth": true,
+    "successRetryDeletesBothWithoutAnotherUpload": true,
+    "emptyFolderOnlyFetchesCatalog": true,
+    "storedSources": 1,
+    "exactStoredOriginalVerified": true,
+    "sourceHashMatched": true,
+    "financialCommits": 0,
+    "budgets": 0,
+    "qaSessionClosed": true
+  },
+  "validation": {
+    "regressions": 1326,
+    "coreChecks": 15,
+    "buildTypecheck": "passed",
+    "nativeSchemaActions": 419,
+    "nativeCharacterCounts": 3,
+    "priorSourceFilesMatched": 914,
+    "freshVerifiedSQLiteBackup": true,
+    "isolatedFinancialAccessAndSourceDecryption": true,
+    "storedSourcesDecrypted": 20,
+    "candidateAndRollbackStartup": true,
+    "intakeRestore": true,
+    "automationBackupRoundTrip": true,
+    "retainedAssets": 67,
+    "candidateBackendContracts": 25,
+    "candidateRuntimeFilesMatched": 165,
+    "liveRuntimeFilesMatched": 165,
+    "authoritativeTablesPreserved": 50,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true,
+    "integrityAndForeignKeys": true
+  },
+  "public": {
+    "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+    "installerBytes": 68851,
+    "checkedAt": "2026-11-08T09:50:29.709Z",
+    "origin": "https://budgit.duckdns.org",
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "anonymousAndForgedAPIRefused": true,
+    "anonymousDeepRoutesShowLogin": [
+      "/next/more",
+      "/next/settings",
+      "/next/notices",
+      "/next/actions",
+      "/next",
+      "/next/accounts",
+      "/next/checks",
+      "/next/loans",
+      "/next/savings",
+      "/next/plans/scenario",
+      "/next/details/new",
+      "/next/settings/security",
+      "/next/upload/group",
+      "/next/analysis",
+      "/next/categories/manage",
+      "/next/incoming"
+    ],
+    "htmlNoStore": true,
+    "framingProtection": true,
+    "defaultGetHeadRootLaunch": true,
+    "preferredOriginalRootLaunch": true,
+    "manifest": {
+      "id": "/",
+      "scope": "/",
+      "start_url": "/next"
+    }
+  },
+  "perDeviceKeysRequired": false,
+  "automaticFinancialApplicationEnabled": false,
+  "productionFinancialEdits": false,
+  "sitesChanged": false,
+  "paidResourcesChanged": false,
+  "limits": [
+    "Revised nested references were tested natively on Mac; prior iPhone manual no-confirmation acceptance remains recorded for 0a5ab68, and no new iPhone execution is claimed here.",
+    "Scheduled, locked-device and every file-provider outcome remain unverified.",
+    "Each device needs its own granted folder permissions; separate copies are useful for different selectors/settings, while the same production connection key may be reused."
+  ]
+}

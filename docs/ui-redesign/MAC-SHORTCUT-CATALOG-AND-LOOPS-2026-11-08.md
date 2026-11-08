@@ -1,5 +1,7 @@
 # Mac Shortcut connection and multi-file cleanup repair
 
+> **Published:** application `2208e67` is live after exact-source backup, financial/access/restore/rollback gates, runtime and installer verification. All 50 current authoritative tables, settings/keys and adjacent services were preserved. See [release evidence](evidence/release-mac-shortcut-2026-11-08.json). Candidate notes below describe the earlier implementation boundary.
+
 The first reported catalog error came from using a temporary QA key against the production endpoint. Tal confirmed that replacing it with a production connection key removed that error. Connections are scoped to the user and can be reused on Mac and iPhone; separate device keys are optional labels/revocation boundaries. The same workflow can have separate device copies when its folder selectors differ. A shared logical folder is selected from iCloud Drive on each device, never by pasting a Mac filesystem path into the iPhone setup.
 
 The installer now validates a 43-character URL-safe upload key before requesting the catalog. Surrounding clipboard whitespace is trimmed, internal invalid characters and a pasted Bearer prefix are refused, and the key is never echoed. Server authentication, rate and consent errors are surfaced before version validation. Invalid production keys point to the actual sync-center connection screen; temporary QA builds instruct restarting QA rather than asking for a personal key.

@@ -1,5 +1,15 @@
 # Monthly Flow
 
+## Mac Shortcut catalog and multi-file repair published — 2026-11-08
+
+Application `2208e67` is verified live at https://budgit.duckdns.org/next/incoming. The signed installer validates upload-key format, trims outer clipboard whitespace and surfaces actual catalog auth/consent/rate errors. A production connection key can be reused on Mac and iPhone; temporary QA keys cannot connect to production. Each device selects its folder through the native picker; iCloud Drive/Budgit can be the same logical folder despite different device paths. Separate device copies are optional for different selectors/settings.
+
+Nested file scans now bind their own repeat outputs by UUID while preserving exact-name/extension, uniqueness and fresh-hash checks. Actual native Mac two-file deletion, bad-proof refusal, retry without re-upload and empty-folder scanning passed on generated files. Direct read-back verified the stored original with zero financial commits. Build/typecheck, 1,326 regressions, 15 core checks and 419 native schema actions pass. Current iPhone acceptance remains the prior 0a5ab68 test; these revised bindings are not newly claimed tested on iPhone. Scheduling/locked-device/provider limits remain.
+
+All 914 prior source files matched; fresh verified backup, isolated financial/access/20-source decryption/startup/rollback/intake/automation restore, 67 retained assets and 25 candidate backend contracts passed. All 165 candidate/live runtime files match. Activation preserved all 50 current authoritative tables, configuration keys and adjacent services; public health/auth/deep routes/root/manifest/installer bytes pass. No real financial edits, Sites or paid-resource changes.
+
+Install the updated `/shortcuts/budgit-incoming.shortcut`, retaining your production key and selecting the correct folder. The same key is valid on both platforms; do not copy a QA key. Evidence: `docs/ui-redesign/evidence/release-mac-shortcut-2026-11-08.json`. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
 ## Day-0 device cleanup published — 2026-11-08
 
 Application `0a5ab68` is verified live at https://budgit.duckdns.org/next/incoming. The updated signed folder Shortcut offers `retain` (default) or explicit `delete-after-upload`: a fresh connection-owned receipt decrypts and hashes the stored original, then the Shortcut re-resolves and hashes the exact current device file before deletion. No financial import is required for device cleanup. Existing 30-day retention still starts only after full digestion; unfinished reports and normalized finances/history are preserved. Stage 3 automatic financial application remains disabled.

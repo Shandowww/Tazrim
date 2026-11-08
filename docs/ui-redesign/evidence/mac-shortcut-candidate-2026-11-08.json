@@ -1,6 +1,6 @@
 {
   "date": "2026-11-08",
-  "status": "candidate-native-mac-accepted",
+  "status": "superseded-by-verified-release",
   "previousProduction": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301",
   "productionChanged": false,
   "catalogCause": "Temporary QA key used against production; user confirmed production key resolves it",
@@ -31,5 +31,6 @@
     "test/helpers/incoming-workflow-runner.mjs": "163d71ab97ca19d5713fcbeec66ab6489f29a62826f896de8a27932571cc3560",
     "test/incoming-shortcut.test.mjs": "b20bcfc77767435b145f66c76a88dcd668912cc1d79d72b860b0a6d7e699d73e",
     "public/shortcuts/budgit-incoming.shortcut": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8"
-  }
+  },
+  "releaseEvidence": "release-mac-shortcut-2026-11-08.json"
 }
