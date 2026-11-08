@@ -1,5 +1,7 @@
 # Device cleanup after verified upload — local checkpoint
 
+> **Published:** application `0a5ab68` is verified live. Tal confirmed the iPhone sample was deleted without another Delete prompt; the exact stored original was directly verified with zero financial commits. All 165 runtime files match, and 50 authoritative tables/settings/keys and adjacent services were preserved. See [release evidence](evidence/release-day0-device-cleanup-2026-11-08.json). Historical candidate/pending statements below record the earlier test boundary; scheduling and locked-device limits remain.
+
 Implements the day-0 amendment from `1b57d6a`. This is a tested source candidate; publication and native end-to-end acceptance are separate gates. Current production remains guided-review release `63ab8ca`.
 
 The updated signed folder Shortcut offers a third setup question: `retain` (default) or `delete-after-upload`. Existing installed copies do not change automatically. Choosing deletion transfers responsibility for the original to Budgit after confirmed storage; report parsing, categorization and financial approval can happen later. The user-facing setup explains Files confirmation and that deletion in an iCloud folder can synchronize to other devices. Share-sheet input retains files because the original cannot be safely resolved from a temporary shared copy.

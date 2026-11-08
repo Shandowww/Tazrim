@@ -2,9 +2,9 @@
 
 Requested by Tal, 2026-11-05; amended 2026-11-08. **This document describes the rollout; editing it does not enable any policy.**
 
-**Current baseline:** bounded Stage 2 preparation, guided review, lifecycle labels and 30-day server-original retention are published as `63ab8ca`; see [release evidence](evidence/release-guided-retention-2026-11-07.json). Owners explicitly opt in per budget and financial approval remains mandatory. The published Shortcut still retains device files. Phase 3 is not enabled; physical iPhone scheduling/locked-device outcomes remain unverified.
+**Current baseline:** bounded Stage 2 preparation, guided review, lifecycle labels and 30-day server-original retention and opt-in verified-upload device cleanup are published as `0a5ab68`; see [release evidence](evidence/release-day0-device-cleanup-2026-11-08.json). Owners explicitly opt in per budget and financial approval remains mandatory. The published Shortcut defaults to retain and offers explicit `delete-after-upload` after a fresh exact-byte storage proof. Phase 3 is not enabled; physical iPhone scheduling/locked-device outcomes remain unverified.
 
-**Execution handoff:** implementation remains assigned to **Sol 6.1**. Resume using [the handoff](AUTO-SYNC-SOL-6.1-HANDOFF.md). The next amendment is [day-0 device cleanup after verified upload](REPORT-GUIDED-REVIEW-AND-RETENTION-2026-11-07.md#day-0-device-cleanup-amendment--2026-11-08), while retaining Budgit's copy until 30 days after complete handling. This device cleanup is not yet live.
+**Execution handoff:** implementation remains assigned to **Sol 6.1**. Resume using [the handoff](AUTO-SYNC-SOL-6.1-HANDOFF.md). The implemented amendment is [day-0 device cleanup after verified upload](REPORT-GUIDED-REVIEW-AND-RETENTION-2026-11-07.md#day-0-device-cleanup-amendment--2026-11-08), while retaining Budgit's copy until 30 days after complete handling. This device cleanup is live; Tal confirmed a manual iPhone run without Delete confirmation after enabling the device setting. Scheduled/locked-device/provider acceptance remains separate.
 
 ## Meaning of each operation
 
@@ -130,7 +130,7 @@ Official product documentation was checked on 2026-11-05. These products supply 
 
 Build a **Paperless-style incoming inbox + n8n-style approval gates + explicit folder rules** on the existing Budgit backend. Reuse the verified parts of our native Shortcut generator and current upload/import services. Implement Phase 1 first, retain the same pipeline for Phase 2, then add narrowly scoped automatic-application eligibility for Phase 3.
 
-The remaining device uncertainty is scheduled/locked-folder delivery. Bounded Phase 2 preparation, guided review and lifecycle/retention are now published; verified same-run device cleanup is the next increment. Phase 3 still requires operational proof and safe recovery, beyond removing an approval button.
+The remaining device uncertainty is scheduled/locked-folder delivery. Bounded Phase 2 preparation, guided review and lifecycle/retention are now published; verified same-run device cleanup is now published with explicit opt-in. Phase 3 still requires operational proof and safe recovery, beyond removing an approval button.
 
 ### Sources
 

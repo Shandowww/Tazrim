@@ -1,10 +1,10 @@
 # Guided report review and 30-day retention
 
-Tal's requested amendment, 2026-11-07, updated 2026-11-08. **Guided review and server retention are published; the day-0 device cleanup amendment below is planned, not yet implemented.** Implementation remains assigned to Sol 6.1. This extends the three-phase sync plan and reuses the existing parsers, report controller, saved drafts, classification, duplicate handling and atomic financial commands.
+Tal's requested amendment, 2026-11-07, updated 2026-11-08. **Guided review, server retention and opt-in day-0 cleanup are published as `0a5ab68`; see [release evidence](evidence/release-day0-device-cleanup-2026-11-08.json).** Implementation remains assigned to Sol 6.1. This extends the three-phase sync plan and reuses the existing parsers, report controller, saved drafts, classification, duplicate handling and atomic financial commands.
 
 ## Current baseline and what changes
 
-Guided review, lifecycle labels and verified 30-day server-original retention are published as `63ab8ca`; see [release evidence](evidence/release-guided-retention-2026-11-07.json) and [implementation notes](GUIDED-REVIEW-RETENTION-2026-11-07.md). The release passed 1,316 regressions, build/typecheck and 15 core checks. These checks do not validate the new day-0 cleanup behavior. The published Shortcut has no device deletion action. Physical iPhone/new-installer execution, scheduling and locked-device behavior remain unverified. Stage 3 automatic financial application remains disabled.
+Guided review, lifecycle labels and verified 30-day server-original retention are published as `63ab8ca`; see [release evidence](evidence/release-guided-retention-2026-11-07.json) and [implementation notes](GUIDED-REVIEW-RETENTION-2026-11-07.md). The release passed 1,316 regressions, build/typecheck and 15 core checks. The earlier release checks below describe the prior baseline; current day-0 acceptance is recorded in the newer release evidence. The public Shortcut now offers opt-in device deletion after verified upload. The newer release passed 1,322 tests and manual iPhone deletion without a repeated Delete prompt; its fresh server copy was directly verified. Physical iPhone/new-installer execution, scheduling and locked-device behavior remain unverified. Stage 3 automatic financial application remains disabled.
 
 Owners still explicitly opt in per budget for Stage 2 preparation. Supported reports use confirmed identity mappings and the original review/save commands; unsupported, mixed, ambiguous or locked destinations remain manual. Continue from this implementation rather than rebuilding the guided screens or server retention.
 
@@ -25,7 +25,7 @@ Tal prefers the Shortcut to delete the source file during the same successful up
 5. File deletion is deletion from the selected Files folder, not merely eviction of an iPhone download. If that folder is in iCloud Drive, deletion can synchronize to other devices. Explain this in setup and test the actual selected provider. No unattended deletion, schedule or locked-device success may be claimed from graph tests alone.
 6. Preserve the server copy for review/re-download without a new upload. Existing explicit user deletion inside Budgit remains a separate action, with wording that the device copy may already have been removed. Background staging cleanup must not discard the last recoverable original of an incomplete report.
 
-### Next work for Sol 6.1
+### Day-0 implementation contract for Sol 6.1 (published)
 
 Extend current receipts and the signed Shortcut for opt-in deletion after verified storage, reusing the current upload and retention services. Test upload-only deletion eligibility with zero parser/financial writes, exact source/connection binding, missing/false/string flags, quota/error/lost-response recovery, changed bytes and inaccessible/removed originals. Native synthetic tests must prove actual same-run upload followed by deletion, retained server bytes, retained failure files and safe retry after deletion is refused. Then verify actual iPhone folder permissions and behavior before publication. Preserve current guided review, server completion timers, finance/history and Phase 3-disabled behavior. No real device report is to be deleted during QA.
 

@@ -1,6 +1,6 @@
 {
   "date": "2026-11-08",
-  "status": "source-candidate-native-acceptance-pending",
+  "status": "superseded-by-verified-release",
   "productionApplication": "63ab8cafbb80016dfccfb5fb4c3d064bdf10f22c",
   "productionChanged": false,
   "deviceDeletionOptIn": "delete-after-upload",
@@ -27,5 +27,6 @@
     "frontend/src/app/incoming-reports-page.tsx": "d0974b2a48152803b699f70e30fc717de8f806c98ed0da016fba46c2cc8e95e8",
     "public/shortcuts/budgit-incoming.shortcut": "f33214648ff84e87e79070b0e4fdb17ff960cc0662986c3172b2c0627325e9ed",
     "scripts/incoming-shortcut-iphone-qa.mjs": "d775e68a45f06cdb2120ccf3a0ae83e9699f5259920cb044512c4204270069a2"
-  }
+  },
+  "releaseEvidence": "release-day0-device-cleanup-2026-11-08.json"
 }

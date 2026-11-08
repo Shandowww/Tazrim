@@ -1,27 +1,27 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301",
+  "sourceCommit": "0c693a61d71c265f224ee300f93d1e1f6fb924bd",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Day-0 verified-upload device cleanup source candidate; explicit opt-in; release pending",
+  "status": "Published verified-upload device cleanup with explicit opt-in; manual iPhone no-Delete-prompt acceptance passed",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1322,
     "coreChecks": 15,
     "nativeShortcutSchemaActions": 400,
-    "receiptGraph": "passed; opt-in verified-upload deletion, retain default",
-    "browser": "No new browser acceptance claimed; native schema and strict receipt graph pass; user reports iPhone deletion after confirmation, repeat without confirmation pending.",
-    "physicalDevice": "User reports manual iPhone deletion after confirmation; run without Delete confirmation pending. Scheduling/locked-device unverified.",
-    "release": "docs/ui-redesign/evidence/day0-device-cleanup-local-2026-11-08.json",
-    "productionEvidence": "docs/ui-redesign/evidence/release-guided-retention-2026-11-07.json"
+    "receiptGraph": "passed; explicit opt-in deletes after fresh verified storage; retain default",
+    "browser": "No new browser acceptance claimed; native schema and strict receipt graph pass. User confirmed manual iPhone deletion without Delete confirmation; exact stored copy verified, zero financial commits. Scheduling/locked-device unverified.",
+    "physicalDevice": "User confirmed manual iPhone deletion without Delete confirmation after explicit iOS setting; exact original directly verified with zero financial commits. Scheduling/locked-device/other providers unverified.",
+    "release": "910 prior source files, fresh verified backup, isolated financial/access/20-source decryption/startup/rollback/intake/automation restore, 67 retained assets, 25 candidate backend contracts, 165 candidate/live runtime files; all 50 current authoritative tables, keys and adjacent services preserved.",
+    "productionEvidence": "docs/ui-redesign/evidence/release-day0-device-cleanup-2026-11-08.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "63ab8cafbb80016dfccfb5fb4c3d064bdf10f22c",
-  "productionImage": "sha256:2fb0df8709f173561d73c68a8f7936bbac6bae834c139094e6ae63da78d042b3",
+  "productionApplicationCommit": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301",
+  "productionImage": "sha256:95af19eef4449ecb00549258119c7638c63ff30427d24d87b2d1ed11edbc1a19",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "63ab8cafbb80016dfccfb5fb4c3d064bdf10f22c"
+  "applicationCommit": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301"
 }

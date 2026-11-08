@@ -1,5 +1,15 @@
 # Monthly Flow — project handoff
 
+## Day-0 device cleanup published — 2026-11-08
+
+Application `0a5ab68` is verified live at https://budgit.duckdns.org/next/incoming. The updated signed folder Shortcut offers `retain` (default) or explicit `delete-after-upload`: a fresh connection-owned receipt decrypts and hashes the stored original, then the Shortcut re-resolves and hashes the exact current device file before deletion. No financial import is required for device cleanup. Existing 30-day retention still starts only after full digestion; unfinished reports and normalized finances/history are preserved. Stage 3 automatic financial application remains disabled.
+
+Tal confirmed successful iPhone sample deletion without another Delete prompt after enabling iOS Shortcuts → Advanced → Allow Deleting Without Confirmation. That device setting applies across Shortcuts; the native Delete Immediately option remains false to preserve Recently Deleted/Trash behavior where supported. The exact original was verified in the isolated test inbox with zero financial commits. Temporary test infrastructure is closed. Initial access permissions, scheduling, locked-device and other providers remain distinct acceptance limits.
+
+Build/typecheck, 1,322 regressions, 15 core checks, 400 native schema actions, 910 prior-source files, fresh verified SQLite backup, isolated financial/access/20-source decryption/startup/rollback/intake restore/automation backup checks, 67 retained assets and 25 candidate-backend contracts pass. All 165 candidate/live runtime files match the validated build. Activation preserved all 50 current authoritative tables, configuration keys and adjacent services; public health/auth/deep routes/root/manifest and installer bytes pass. No real financial edits, Sites or paid-resource changes.
+
+Save drafts and use guarded refresh. Install `/shortcuts/budgit-incoming.shortcut` with the same folder/key and select `delete-after-upload` if wanted. Existing copies stay as configured; scheduled automations must use Run Immediately and should be tested on the chosen device/provider. Evidence: `docs/ui-redesign/evidence/release-day0-device-cleanup-2026-11-08.json`. Current source remains `work/budgit-household-ui`, branch `codex/budgit-household-ui`. This release supersedes the local-only checkpoint below.
+
 ## Day-0 device cleanup candidate — 2026-11-08
 
 Opt-in `delete-after-upload` is implemented locally with a fresh decrypted exact-byte storage proof, native current-file recheck and signed installer candidate. Build/typecheck, 1,322 regressions, 15 core checks and 400 native action-schema checks pass. Current production remains `63ab8ca`; no publication or real-file deletion is claimed. Actual iPhone execution is pending through the isolated HTTPS synthetic test, not the Mac-only loopback installer. Continue from `docs/ui-redesign/DAY0-DEVICE-CLEANUP-2026-11-08.md`; retain the existing full-digestion/30-day server retention policy and financial approval guards.
