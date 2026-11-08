@@ -1,5 +1,12 @@
 # Monthly Flow — project handoff
 
+## Notification labels and bank/card marks published — 2026-11-09
+
+Application `5648a24` is verified live at https://budgit.duckdns.org/next/accounts. The bell and notification page now say **התראות**, including related links and accessibility labels in both interfaces. Legacy bank display names select the existing official local Hapoalim logo; Hebrew/English ONE ZERO aliases and its card-program display are repaired. Household cards show the existing payment-network mark at the bottom, with an accessible name. Explicit saved metadata/network choices take precedence; ONE ZERO uses the requested Mastercard display default. No stored financial values, card metadata, payer links or source evidence were edited.
+
+Build/typecheck,1,346 regressions,15 core checks and static React logo/network rendering pass. All474 prior application-source files,167 candidate/live runtime files, fresh verified backup, isolated financial/access/21-source decryption/startup/rollback/intake/automation restore,68 retained assets and42 candidate contracts pass. Activation preserved all50 authoritative tables, configuration keys and adjacent services; public health/auth/deep routes/root/manifest pass. No new browser/physical-iPhone acceptance, Sites or paid-resource change. Save drafts and use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-notification-brands-2026-11-09.json`. Current source remains `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
+
 
 ## Duplicate report completion published — 2026-11-09
 

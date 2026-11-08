@@ -1,0 +1,144 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "5648a242856d052c824e16811a12668bb459d047",
+  "implementationCommit": "418f7cb01502946d1cff5720f10c76bbfe76dcad",
+  "previousApplicationCommit": "d6faccb603329feeaf2da23d5514c6256ad23acf",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:f5a102b46d0c2667109125bd3bbea69e223787c68ceb8bf0a60481328fc84f5c",
+  "sourceArchiveSha256": "51314b80112f80a1681b5dc873670f2369a3312130683718d92647c99bde1fc3",
+  "changes": [
+    "Rename bell, notification page, related links and accessible labels to התראות in both interfaces",
+    "Select existing local Hapoalim logo for unambiguous legacy bank labels without changing saved metadata",
+    "Resolve Hebrew/English ONE ZERO aliases and display its card program separately from imported processing-issuer evidence",
+    "Show the existing payment-network mark at the bottom of household cards with an accessible name; explicit saved networks win, ONE ZERO uses the requested Mastercard display default"
+  ],
+  "validation": {
+    "buildTypecheck": "passed",
+    "regressions": 1346,
+    "coreChecks": 15,
+    "newDisplayContracts": 3,
+    "staticReactLogoAliases": 6,
+    "mastercardPublishedArtwork": "rendered",
+    "newBrowserAcceptance": false,
+    "previousSourceFilesMatched": 474,
+    "candidateRuntimeFilesMatched": 167,
+    "liveRuntimeFilesMatched": 167,
+    "freshVerifiedSQLiteBackup": true,
+    "backupSha256": "f5d6e386822827089f7027e671e528fbaca683a02da2a52553d58d760370d4ce",
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 42,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 21,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "5168da84a983cb27303167eb1d614fc2ff6d7232cf5cd441347054e3d0183c0e",
+          "reactHTMLSha256": "7b78c133c0381c11d8353bb245b7843a39e6bdbcaa294a9c861dd51ed71bcb28"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 21,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "ac496dcd12409cee8ab04bcd56cce9ce4d1c24f8741c6dbf16ec9a0c8916abd5",
+          "reactHTMLSha256": "b3f3537437ba808328e66e11193be58a78ce00a0ab91d7f2d9f88e4585760173"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "d6faccb"
+          ],
+          "originalAssetsVerified": 68,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "authoritativeTablesPreserved": 50,
+    "integrityAndForeignKeys": true,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true
+  },
+  "public": {
+    "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+    "installerBytes": 68851,
+    "checkedAt": "2026-11-08T22:27:30.254Z",
+    "origin": "https://budgit.duckdns.org",
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "anonymousAndForgedAPIRefused": true,
+    "anonymousDeepRoutesShowLogin": [
+      "/next/more",
+      "/next/settings",
+      "/next/notices",
+      "/next/actions",
+      "/next",
+      "/next/accounts",
+      "/next/checks",
+      "/next/loans",
+      "/next/savings",
+      "/next/plans/scenario",
+      "/next/details/new",
+      "/next/settings/security",
+      "/next/upload/group",
+      "/next/analysis",
+      "/next/categories/manage",
+      "/next/incoming"
+    ],
+    "htmlNoStore": true,
+    "framingProtection": true,
+    "defaultGetHeadRootLaunch": true,
+    "preferredOriginalRootLaunch": true,
+    "manifest": {
+      "id": "/",
+      "scope": "/",
+      "start_url": "/next"
+    }
+  },
+  "productionFinancialEdits": false,
+  "sitesChanged": false,
+  "paidResourceUpgrade": false,
+  "limits": [
+    "No new browser or physical-iPhone acceptance is claimed.",
+    "Bank/program/network decoration does not alter saved card metadata, financial values, payer links or source evidence.",
+    "Save open edits and use guarded refresh to load the published interface."
+  ]
+}

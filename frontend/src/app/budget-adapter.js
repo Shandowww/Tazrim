@@ -5,13 +5,13 @@ import { tazrimDisplaySnapshot } from '../../../src/tazrim-display-model.js'
 export function budgetNavigation(plan) {
   const banks = cashAccountList(plan).map(account => ({
     id: account.id, kind: 'BANK', displayName: account.label,
-    cardLastFour: null, provider: account.bankName || '', cardNetwork: null,
+    cardLastFour: null, provider: savedBankProvider(account), cardNetwork: null,
     color: account.color || null,
   }))
   const cards = creditCards(plan).filter(card => !card.removedFrom).map(card => ({
     id: card.id, kind: 'CREDIT_CARD', displayName: card.name,
     cardLastFour: /^\d{4}$/.test(card.lastFour || '') ? card.lastFour : /^\d{4}$/.test(card.alias || '') ? card.alias : null, provider: savedCardProvider(plan,card),
-    cardNetwork: card.network || null, color: card.color || null,
+    cardNetwork: savedCardNetwork(plan,card), color: card.color || null,
   }))
   return [...banks, ...cards]
 }
@@ -63,11 +63,29 @@ export function summarizeBankBalances(banks) {
     reported:reported.length,total:banks.length,from:dates[0]??null,to:dates.at(-1)??null}
 }
 
-/** Decorative issuer evidence only; never infers a paying account. */
+/** Decorative issuer/program evidence only; never infers or changes a paying account. */
 export function savedCardProvider(plan,card){
  if(card.provider)return card.provider
- const issuers=new Set((plan.details??[]).filter(row=>row.method===card.id&&row.status!=='cancelled'&&['cal','isracard'].includes(row.statement?.issuer)).map(row=>row.statement.issuer))
  const name=String(card.name??'').toLowerCase()
- for(const [pattern,key]of [[/ישראכרט|\bisracard\b/,'isracard'],[/כאל|כ[״"']אל|\bcal\b/,'cal'],[/מקס|\bmax\b/,'max'],[/וואן\s*זירו|ואן\s*זירו|\bone[ -]?zero\b/,'one-zero']])if(pattern.test(name))issuers.add(key)
+ const payer=cashAccountList(plan).find(account=>account.id===plan.cashPlanning?.cardAccounts?.[card.id])
+ // ONE ZERO is the bank's card program, distinct from the report's processing issuer.
+ if(/וואן\s*זירו|ואן\s*זירו|\bone[ -]?zero\b/.test(name)||payer&&/^(?:one[ -]?zero|(?:בנק\s+)?ו?ואן\s*זירו)$/i.test(savedBankProvider(payer).trim()))return 'one-zero'
+ const issuers=new Set((plan.details??[]).filter(row=>row.method===card.id&&row.status!=='cancelled'&&['cal','isracard'].includes(row.statement?.issuer)).map(row=>row.statement.issuer))
+ for(const [pattern,key]of [[/ישראכרט|\bisracard\b/,'isracard'],[/כאל|כ[״"']אל|\bcal\b/,'cal'],[/מקס|\bmax\b/,'max']])if(pattern.test(name))issuers.add(key)
  return issuers.size===1?[...issuers][0]:''
+}
+
+/** Decorative bank identity; explicit metadata wins and no stored account is edited. */
+export function savedBankProvider(account){
+ if(String(account.bankName??'').trim())return account.bankName
+ const label=String(account.label??'').toLowerCase(),brands=[]
+ for(const [pattern,key]of [[/בנק\s+הפועלים|(?:^|[\s–—-])ה?פועלים(?:$|[\s–—-])|\b(?:bank\s+)?hapoalim\b/,'hapoalim'],[/וואן\s*זירו|ואן\s*זירו|\bone[ -]?zero\b/,'one-zero'],[/לאומי|\bleumi\b/,'leumi'],[/דיסקונט|\bdiscount\b/,'discount'],[/מזרחי|\bmizrahi\b/,'mizrahi']])if(pattern.test(label))brands.push(key)
+ return brands.length===1?brands[0]:''
+}
+/** ONE ZERO's Mastercard is the user's requested display default; saved networks win. */
+export function savedCardNetwork(plan,card){
+ if(card.network)return card.network
+ if(/מאסטר\s*[כק]ארד|\bmaster\s*card\b/i.test(String(card.name??'')))return 'mastercard'
+ const provider=String(savedCardProvider(plan,card)).trim().toLowerCase()
+ return /^(?:one[ -]?zero|(?:בנק\s+)?ו?ואן\s*זירו)$/.test(provider)?'mastercard':null
 }

@@ -86,3 +86,8 @@ body,.font-sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sa
  @keyframes budgit-refresh-spin{to{transform:rotate(360deg)}}
  @media(prefers-reduced-motion:reduce){.budgit-refresh-indicator[data-refreshing=true] svg{animation:none}}
 .household-notices bdi{white-space:normal;overflow-wrap:anywhere}
+
+.household-card-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;min-width:0;direction:ltr}
+.household-card-bottom .household-payer{direction:rtl;min-width:0;flex:1;justify-content:flex-start}
+.household-card-network{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:30px;direction:ltr}
+.household-card-network svg{display:block;width:100%;height:100%}

@@ -88,6 +88,12 @@ export const NEUTRAL_FACE: Face = { key: 'neutral', stops: ['#5d6878', '#363e4b'
 const PROVIDER_ALIASES: Record<string, string> = {
   לאומי: 'leumi',
   'בנק לאומי': 'leumi',
+  'וואן זירו': 'one-zero',
+  'ואן זירו': 'one-zero',
+  'בנק וואן זירו': 'one-zero',
+  'one zero': 'one-zero',
+  onezero: 'one-zero',
+  'one–zero': 'one-zero',
   הפועלים: 'hapoalim',
   'בנק הפועלים': 'hapoalim',
   פועלים: 'hapoalim',

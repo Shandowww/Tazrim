@@ -17,7 +17,7 @@ const nativeWorkflows=[
  ['/overview','תמונה כוללת · חשבונות ומטרות'],
  ['/settings/device-draft','טיוטה שמורה במכשיר'],
  ['/settings/security','הצפנה, נעילה, שחזור וייבוא גיבוי'],
- ['/actions','לטיפול ותזכורות אישיות'],
+ ['/actions','התראות ותזכורות אישיות'],
  ['/notices','עדכוני בנקים ומנפיקים'],
  ['/upload','מרכז הדוחות והמקורות השמורים'],
  ['/settings/report-expectations','דוחות צפויים ומועדי הגעה'],

@@ -3,6 +3,8 @@ import {useEffect,useLayoutEffect,useRef} from 'react'
 import {flushSync} from 'react-dom'
 import {useLocation,useNavigate} from 'react-router-dom'
 import {ChevronLeft,ChevronRight,ShoppingBasket,Pill,Fuel,ShoppingBag,House,Landmark,Tag} from 'lucide-react'
+import {networkLabel} from '../tazrim/lib/accounts/brands'
+import {NetworkMark} from '../tazrim/components/accounts/network-mark'
 import {ProviderLogo,hasProviderLogo} from '../tazrim/components/accounts/provider-logo'
 import {householdAccounts,selectedWalletCard,nextWalletCard,walletSwipe,cardDetailCoverage} from './household-accounts-model'
 import {householdCategory} from './household-categories'
@@ -75,7 +77,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
    {card.cardLastFour&&<bdi dir="ltr">•••• {card.cardLastFour}</bdi>}
   </div>
   <span className="household-card-name"><bdi dir="auto">{card.displayName}</bdi></span>
-  <div className="household-payer">{card.payer?<><span>מחויב מ־<bdi>{card.payer.name}</bdi></span><ProviderLogo provider={card.payer.provider}/></>:<span>אין שיוך לחשבון משלם</span>}</div>
+  <div className="household-card-bottom">{card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}<div className="household-payer">{card.payer?<><span>מחויב מ־<bdi>{card.payer.name}</bdi></span><ProviderLogo provider={card.payer.provider}/></>:<span>אין שיוך לחשבון משלם</span>}</div></div>
  </div>
  const peeks=selected&&view.cards.length>1?[{id:nextWalletCard(view.cards,selected.id,-1),side:'right'},...(view.cards.length>2?[{id:nextWalletCard(view.cards,selected.id,1),side:'left'}]:[])]:[]
  const coverage=selected?cardDetailCoverage(selected):null

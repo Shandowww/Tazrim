@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import {accountWorkflows} from '../frontend/src/app/account-workflows.js'
 import {openingViewSearch,withViewQuery} from '../frontend/src/app/navigation-query.js'
-import {savedCardProvider} from '../frontend/src/app/budget-adapter.js'
+import {savedCardProvider,savedBankProvider,savedCardNetwork,budgetNavigation} from '../frontend/src/app/budget-adapter.js'
 const main=readFileSync('frontend/src/main.tsx','utf8')
 const routes=[...main.matchAll(/<Route path="([^"]+)"/g)].map(m=>m[1])
 function matched(href){const path=href.split('?')[0];return routes.some(route=>new RegExp('^'+route.replace(/:[^/]+/g,'[^/]+')+'$').test(path))}
@@ -30,4 +30,31 @@ test('Fresh native launch selects current month while explicit annual, historica
 test('Card display uses original issuer evidence and refuses conflicting brands without mutating records',()=>{
  const plan={details:[{method:'card1',statement:{issuer:'isracard'}}]},before=JSON.stringify(plan)
  assert.equal(savedCardProvider(plan,{id:'card1',name:'אישי'}),'isracard');assert.equal(savedCardProvider(plan,{id:'card1',name:'כאל'}),'');assert.equal(savedCardProvider(plan,{id:'other',name:'כרטיס וואן זירו'}),'one-zero');assert.equal(savedCardProvider(plan,{id:'other',name:'אישי'}),'');assert.equal(JSON.stringify(plan),before)
+})
+
+test('Legacy bank labels resolve decorative logos without changing accounts or accepting conflicting bank names',()=>{
+ for(const [label,expected]of [['בנק הפועלים - פרטי','hapoalim'],['הפועלים – משותף','hapoalim'],['Bank Hapoalim personal','hapoalim'],['וואן זירו','one-zero'],['בנק לאומי','leumi'],['מזרחי / הפועלים',''],['פרטי','']]){
+  const account={id:'bank',label,bankName:''},before=JSON.stringify(account)
+  assert.equal(savedBankProvider(account),expected,label);assert.equal(JSON.stringify(account),before)
+ }
+ assert.equal(savedBankProvider({label:'הפועלים',bankName:'one-zero'}),'one-zero')
+})
+test('ONE ZERO card brand and Mastercard use display metadata and explicit payer links without overwriting saved issuer or network',()=>{
+ const plan={creditCards:[{id:'card1',name:'אישי',alias:'1234'}],cashPlanning:{accounts:[{id:'one',label:'וואן זירו',bankName:''},{id:'poalim',label:'בנק הפועלים - פרטי',bankName:''}],cardAccounts:{card1:'one'}}},before=JSON.stringify(plan),card=plan.creditCards[0]
+ assert.equal(savedCardProvider(plan,card),'one-zero');assert.equal(savedCardNetwork(plan,card),'mastercard')
+ assert.equal(budgetNavigation(plan).find(a=>a.id==='poalim').provider,'hapoalim')
+ assert.equal(budgetNavigation(plan).find(a=>a.id==='card1').cardNetwork,'mastercard')
+ assert.equal(savedCardNetwork(plan,{...card,network:'visa'}),'visa')
+ assert.equal(savedCardProvider(plan,{...card,provider:'cal'}),'cal');assert.equal(savedCardNetwork(plan,{...card,provider:'cal'}),null)
+ assert.equal(savedCardNetwork(plan,{...card,provider:'וואן זירו'}),'mastercard')
+ assert.equal(savedCardProvider(plan,{id:'other',name:'אישי'}),'');assert.equal(savedCardNetwork(plan,{id:'other',name:'אישי'}),null)
+ assert.equal(JSON.stringify(plan),before)
+})
+
+test('ONE ZERO program remains visible alongside original processing-issuer evidence without false brand conflicts',()=>{
+ const plan={details:[{method:'card1',statement:{issuer:'isracard'}}]},card={id:'card1',name:'כרטיס וואן זירו'},before=JSON.stringify(plan)
+ assert.equal(savedCardProvider(plan,card),'one-zero');assert.equal(savedCardNetwork(plan,card),'mastercard')
+ assert.equal(savedCardNetwork(plan,{id:'other',name:'כאל Mastercard'}),'mastercard')
+ assert.equal(savedCardNetwork(plan,{id:'other',name:'מאסטרכארד'}),'mastercard')
+ assert.equal(JSON.stringify(plan),before)
 })

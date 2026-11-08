@@ -1,5 +1,5 @@
 import {cashAccountList,cashCardAccount} from '../../../src/budget.js'
-import {budgetAccountOverview} from './budget-adapter.js'
+import {budgetAccountOverview,savedBankProvider} from './budget-adapter.js'
 import {budgetDetailView} from './detail-adapter.js'
 /** Single read-only composition of existing account, payer and detail models. */
 export function householdAccounts(plan,period){
@@ -7,7 +7,7 @@ export function householdAccounts(plan,period){
  const overview=budgetAccountOverview(plan,scope),banks=cashAccountList(plan)
  return {...overview,cards:overview.cards.map(card=>{
   const payerId=cashCardAccount(plan,card.id),payer=banks.find(a=>a.id===payerId)??null
-  return {...card,payer:payer?{id:payer.id,name:payer.label,provider:payer.bankName||''}:null,
+  return {...card,payer:payer?{id:payer.id,name:payer.label,provider:savedBankProvider(payer)}:null,
    details:budgetDetailView(plan,{...scope,card:card.id})}
  })}
 }
