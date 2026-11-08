@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {randomBytes,generateKeyPairSync} from 'node:crypto';
-import {extractStatementNotices,pdfNoticePages} from '../tools/bank-csv/statement-notices.mjs';
-import {openDatabase} from '../server/database.mjs';import {createReportStore} from '../server/report-store.mjs';import {createStatementNotices} from '../server/statement-notices.mjs';import {verifyStoredReports} from '../server/report-crypto.mjs';
+import {extractStatementNotices,pdfNoticePages,currentStatementNotices} from '../tools/bank-csv/statement-notices.mjs';
+import {openDatabase} from '../server/database.mjs';import {createReportStore} from '../server/report-store.mjs';import {createStatementNotices} from '../server/statement-notices.mjs';import {verifyStoredReports,sealReport} from '../server/report-crypto.mjs';
 import {actionIssues,validActionTarget} from '../src/action-center-model.js';import {createDemoPlan} from '../src/budget.js';
 import {pdfFixture} from '../tools/bank-csv/pdf-fixture.mjs';import {readPDFPages} from '../tools/bank-csv/pdf-reader.mjs';
 const pages=[{page:1,text:'ישראכרט\nהודעות חשובות\nהחל מתאריך 01.12.2026 תחויב עמלה בסך 25.50 ₪ עבור השירות.\nנדרש להסדיר את מסגרת החשבון עד לתאריך 15.12.2026.\nשינוי בתנאי השירות החל מ 01.01.2027 מפורט באתר המנפיק.\nהטבה מיוחדת: הנחה ברכישה עד לתאריך 31.12.2026.\nעדכונים\nשעות שירות הלקוחות יתעדכנו בחודש הבא.\nפירוט עסקאות\n01/11/2026,מבצע בחנות,100,200'}];
@@ -42,3 +42,38 @@ test('Shared viewers can read notices; write downgrade/revocation and source has
  context.db.prepare("DELETE FROM budget_members WHERE user_id='bob'").run();assert.equal((await call(context,bob,undefined,'house')).status,404);
  }finally{context.db.close()}
 });
+
+test('Salary transfers and transaction actors never become promotions, including table continuations and legacy stored discoveries',()=>{
+ const salary='56321 משכורת-נט "המבצע: חברה לדוגמה בע״מ" 654321 12,345.67 23,456.78',transfer='98234 העברה נכנסת המבצע: חברה לדוגמה 1,000.00 9,000.00'
+ for(const row of [salary,transfer,'משכורת נטו 1000.00','המבצע: חברה לדוגמה בע״מ']){
+  assert.equal(extractStatementNotices([{page:1,text:'הפועלים\nהודעות\n'+row}]).notices.length,0,row)
+  assert.deepEqual(currentStatementNotices([{text:row,category:'promotion',attention:false}]),[])
+ }
+ const result=extractStatementNotices([{page:1,text:'ישראכרט\nפירוט עסקאות\nמבצע בלעדי בבית עסק\n56321 העברה 100.00 200.00\nהודעות חשובות\nהטבה מיוחדת: 15% הנחה ברכישה באתר המועדון.'}]);assert.equal(result.notices.length,1);assert.equal(result.notices[0].category,'club')
+ assert.equal(extractStatementNotices([{page:1,text:'מבצע: 20% הנחה ברכישה הבאה עד סוף החודש.'}]).notices[0].category,'promotion')
+ assert.equal(extractStatementNotices([{page:1,text:'תנאי המבצע: הנחה ברכישה במחיר 100.00 ₪ במקום 200.00 ₪.'}]).notices[0].category,'promotion')
+ // A real salary-linked customer benefit remains a notice, rather than a transfer row.
+ assert.equal(extractStatementNotices([{page:1,text:'הטבה מיוחדת ללקוחות המעבירים משכורת: 10% הנחה ברכישה.'}]).notices[0].category,'promotion')
+})
+test('Isracard and Cal notices distinguish limit changes, interest, earned points and club benefits with original page and dates',()=>{
+ for(const issuer of ['ישראכרט','כאל']){
+  const rows=['מסגרת האשראי שלך תוגדל החל מתאריך 01.12.2026 לסך 30,000 ₪.','הריבית על האשראי תעודכן החל מתאריך 01.01.2027 לריבית פריים בתוספת 2%.','בחודש האחרון צברת 120 נקודות למימוש ברכישה הבאה.','חברי מועדון לדוגמה זכאים להטבות ולמימוש קופון אישי.']
+  const notices=extractStatementNotices([{page:2,text:issuer+'\nהודעות חשובות\n'+rows.join('\n')}]).notices
+  assert.deepEqual(notices.map(n=>n.category),['limit','interest','points','club']);assert.deepEqual(notices.map(n=>n.attention),[true,true,false,false]);assert.deepEqual(notices.map(n=>n.text),rows);assert.ok(notices.every(n=>n.page===2));assert.equal(notices[0].dates[0].date,'2026-12-01')
+  const issues=actionIssues(null,{scope:'alice/personal',asOf:'2026-11',statementNotices:notices.map((n,i)=>({...n,id:String(i).repeat(64),evidence:String(i)}))});assert.deepEqual(issues.map(i=>i.title),['עדכון מסגרת אשראי','עדכון ריבית','צבירת נקודות','הטבות מועדון']);assert.deepEqual(issues.map(i=>i.severity),['incomplete','incomplete','info','info'])
+ }
+})
+test('Real readable Hebrew PDF bytes retain the four issuer-announcement categories outside transaction rows',async()=>{
+ globalThis.DOMMatrix??=class{};
+ const rows=['ישראכרט','הודעות חשובות','מסגרת האשראי שלך הוגדלה לסך 30,000 ₪.','הריבית על האשראי תעודכן החל מתאריך 01.01.2027.','יתרת הנקודות שצברת עומדת על 120 נקודות.','חברי מועדון זכאים להטבות ולמימוש קופון אישי.'],document=[{width:595,height:842,items:rows.map((text,index)=>({str:text.replace(/\d+(?:[./]\d+)*/g,run=>[...run].reverse().join('')),dir:'rtl',transform:[10,0,0,10,550-text.length*5,780-index*22],width:text.length*5,height:10}))}]
+ const result=extractStatementNotices(pdfNoticePages(await readPDFPages(pdfFixture(document))));assert.deepEqual(result.notices.map(n=>n.category),['limit','interest','points','club'])
+})
+test('Reading old encrypted scans hides payroll false positives and reclassifies valid notices without rewriting any stored bytes',async()=>{
+ const context=setup();try{
+  const source=context.store.upload({scope:'personal:alice',plan:null},Buffer.from('synthetic old notice source'),'legacy.pdf'),scope='personal:alice',old={version:1,issuer:'hapoalim',status:'complete',notices:[{category:'promotion',issuer:'hapoalim',text:'56321 משכורת-נט המבצע: חברה לדוגמה בע״מ 12,345.67 23,456.78',page:1,dates:[],amounts:[],attention:false,needsReview:true},{category:'terms',issuer:'isracard',text:'מסגרת האשראי שלך תוגדל החל מתאריך 01.12.2026 לסך 30,000 ₪.',page:2,dates:[],amounts:[],attention:true,needsReview:true}]},encrypted=sealReport(context.store.secret(),Buffer.from(JSON.stringify(old)),scope+'|'+source.receiptId+'|notices')
+  context.db.prepare('INSERT INTO statement_notice_scans VALUES(?,?,?,?,?,?)').run(source.receiptId,scope,source.sourceHash,encrypted,7,123)
+  const before=context.db.prepare('SELECT * FROM statement_notice_scans').all(),financial=context.db.prepare('SELECT * FROM plans').all(),sources=context.db.prepare('SELECT * FROM report_sources').all()
+  for(let i=0;i<2;i++){const value=await(await call(context)).json();assert.equal(value.notices.length,1);assert.equal(value.notices[0].category,'limit');assert.equal(value.scans[0].count,1);assert.equal(value.scans[0].revision,7)}
+  assert.deepEqual(context.db.prepare('SELECT * FROM statement_notice_scans').all(),before);assert.deepEqual(context.db.prepare('SELECT * FROM plans').all(),financial);assert.deepEqual(context.db.prepare('SELECT * FROM report_sources').all(),sources)
+ }finally{context.db.close()}
+})

@@ -1,5 +1,12 @@
 # Monthly Flow — project handoff
 
+## Issuer notices, card positions and partial wording published — 2026-11-09
+
+Application `86f4857` is verified live at https://budgit.duckdns.org/next. Transfer actor/payroll rows no longer become promotional notices. Credit-limit, interest, points and club-benefit messages have explicit labels; original source text/pages remain. Older encrypted discoveries are filtered/reclassified at read time without rewriting them. An isolated actual-backup check confirms the reported payroll false positive is filtered. Household cards now place the paying bank above the processing issuer, retain network marks below, and preserve separate ONE ZERO program/issuer evidence. **נקלט חלקית** replaces **עוכל חלקית** across the Sync Center and guided-review wording; internal lifecycle/approval/retention behavior is unchanged.
+
+Build/typecheck,1,352 regressions and15 core checks pass, including six new contracts and actual Hebrew/Cal PDF bytes. All474 prior application-source files,167 candidate/live runtime files, fresh verified backup, financial/access/21-source decryption/startup/rollback/intake/automation restore,68 retained assets and18 candidate notice/PDF contracts pass. Activation preserved all50 authoritative tables, configuration keys and adjacent services; public health/auth/deep routes/root/manifest pass. No financial edits, scan-row rewrite, new browser/physical-iPhone acceptance, Sites or paid-resource change. Save drafts and use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-issuer-notices-card-labels-2026-11-09.json`. Current source remains `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
+
 ## Notification labels and bank/card marks published — 2026-11-09
 
 Application `5648a24` is verified live at https://budgit.duckdns.org/next/accounts. The bell and notification page now say **התראות**, including related links and accessibility labels in both interfaces. Legacy bank display names select the existing official local Hapoalim logo; Hebrew/English ONE ZERO aliases and its card-program display are repaired. Household cards show the existing payment-network mark at the bottom, with an accessible name. Explicit saved metadata/network choices take precedence; ONE ZERO uses the requested Mastercard display default. No stored financial values, card metadata, payer links or source evidence were edited.

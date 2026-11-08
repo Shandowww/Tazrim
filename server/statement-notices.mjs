@@ -1,6 +1,6 @@
 import {budgetAccess,serviceJSON,boundedJSON,serviceError} from './budget-access.mjs';
 import {sealReport,openReport,reportHash} from './report-crypto.mjs';
-import {extractStatementNotices,normalizeNoticeText} from '../dist/server/statement-notices.mjs';
+import {extractStatementNotices,normalizeNoticeText,currentStatementNotices} from '../dist/server/statement-notices.mjs';
 import {isVault} from '../dist/server/vault.js';
 export function createStatementNotices(db,{isAllowed,secret,now=()=>Date.now()}={}){
  db.exec('CREATE TABLE IF NOT EXISTS statement_notice_scans(source_id TEXT PRIMARY KEY REFERENCES report_sources(id) ON DELETE CASCADE,scope TEXT NOT NULL,source_hash TEXT NOT NULL,data BLOB NOT NULL,revision INTEGER NOT NULL,updated_at INTEGER NOT NULL)');
@@ -12,8 +12,9 @@ export function createStatementNotices(db,{isAllowed,secret,now=()=>Date.now()}=
   for(const source of sources(scope)){
    const row=db.prepare('SELECT * FROM statement_notice_scans WHERE source_id=? AND scope=? AND source_hash=?').get(source.id,scope,source.source_hash),data=row?read(row):null,name=reportName(source);
    const sourceInfo={id:source.id,name,revision:source.revision,state:source.state,kind:source.kind,target:source.target,month:source.month,createdAt:source.created_at,sourceHash:source.source_hash};
-   scans.push({source:sourceInfo,status:data?.status??'pending',revision:row?.revision??0,count:data?.notices.length??0});
-   for(const notice of data?.notices??[]){
+   const visible=currentStatementNotices(data?.notices);
+   scans.push({source:sourceInfo,status:data?.status??'pending',revision:row?.revision??0,count:visible.length});
+   for(const notice of visible){
     const fingerprint=reportHash(JSON.stringify([notice.issuer,source.target??(notice.issuer!=='unknown'&&notice.accountReference?notice.accountReference:source.id),normalizeNoticeText(notice.text),notice.dates]));
     if(seen.has(fingerprint)){seen.get(fingerprint).sources.push({id:source.id,name,page:notice.page});continue}
     const value={...notice,id:fingerprint,sourceId:source.id,sourceName:name,target:source.target,sourceHash:source.source_hash,sources:[{id:source.id,name,page:notice.page}],evidence:fingerprint};seen.set(fingerprint,value);notices.push(value);

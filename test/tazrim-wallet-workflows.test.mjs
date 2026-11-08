@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import {accountWorkflows} from '../frontend/src/app/account-workflows.js'
 import {openingViewSearch,withViewQuery} from '../frontend/src/app/navigation-query.js'
-import {savedCardProvider,savedBankProvider,savedCardNetwork,budgetNavigation} from '../frontend/src/app/budget-adapter.js'
+import {savedCardProvider,savedCardIssuer,savedBankProvider,savedCardNetwork,budgetNavigation} from '../frontend/src/app/budget-adapter.js'
 const main=readFileSync('frontend/src/main.tsx','utf8')
 const routes=[...main.matchAll(/<Route path="([^"]+)"/g)].map(m=>m[1])
 function matched(href){const path=href.split('?')[0];return routes.some(route=>new RegExp('^'+route.replace(/:[^/]+/g,'[^/]+')+'$').test(path))}
@@ -56,5 +56,12 @@ test('ONE ZERO program remains visible alongside original processing-issuer evid
  assert.equal(savedCardProvider(plan,card),'one-zero');assert.equal(savedCardNetwork(plan,card),'mastercard')
  assert.equal(savedCardNetwork(plan,{id:'other',name:'כאל Mastercard'}),'mastercard')
  assert.equal(savedCardNetwork(plan,{id:'other',name:'מאסטרכארד'}),'mastercard')
+ assert.equal(JSON.stringify(plan),before)
+})
+
+test('Bank card program and processing issuer remain separate decorations from original scoped evidence',()=>{
+ const plan={details:[{method:'card1',statement:{issuer:'isracard'}},{method:'card2',statement:{issuer:'cal'}}]},one={id:'card1',name:'כרטיס וואן זירו'},cal={id:'card2',name:'כרטיס פרטי'},before=JSON.stringify(plan)
+ assert.equal(savedCardProvider(plan,one),'one-zero');assert.equal(savedCardIssuer(plan,one),'isracard');assert.equal(savedCardIssuer(plan,cal),'cal')
+ assert.equal(savedCardIssuer(plan,{id:'unknown',name:'כרטיס וואן זירו'}),'');assert.equal(savedCardIssuer(plan,{...one,provider:'cal'}),'cal');assert.equal(savedCardIssuer(plan,{...one,name:'כאל'}),'')
  assert.equal(JSON.stringify(plan),before)
 })

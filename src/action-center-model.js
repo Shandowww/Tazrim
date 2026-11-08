@@ -11,7 +11,7 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
  if(Number.isSafeInteger(incomingReports?.count)&&incomingReports.count>0)add('import.incoming','private','דוחות חדשים ממתינים לאישור פענוח',incomingReports.count+' קבצים בתיבת הסנכרון הפרטית. חשבון היעד יזוהה אחרי האישור.','פתיחת תיבת הסנכרון',{screen:'incoming'},[incomingReports.count,incomingReports.latest]);
  if(locked){add('import.unlock','vault','התקציב נעול','פתחו אותו כדי לבדוק את הנתונים והפעולות התלויות בתוכנו.','פתיחת התקציב',{screen:'unlock'},'locked');return issues;}
  for(const notice of statementNotices){
-  const title={charge:'חיוב או עמלה צפויים',account:'נדרש טיפול בחשבון',promotion:'הטבה או מבצע',terms:'שינוי בתנאים',update:'עדכון מהמנפיק'}[notice.category];
+  const title={charge:'חיוב או עמלה צפויים',account:'נדרש טיפול בחשבון',promotion:'הטבה או מבצע',terms:'שינוי בתנאים',limit:'עדכון מסגרת אשראי',interest:'עדכון ריבית',points:'צבירת נקודות',club:'הטבות מועדון',update:'עדכון מהמנפיק'}[notice.category];
   if(!title||!/^[a-f0-9]{64}$/.test(notice.id??'')||typeof notice.text!=='string')continue;
   add('statement.notice',notice.id,title,notice.text.slice(0,240),'קריאת ההודעה והמקור',{screen:'statement-notice',noticeId:notice.id},notice.evidence,notice.attention?'incomplete':'info');
  }

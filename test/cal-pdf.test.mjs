@@ -12,6 +12,18 @@ test('Unrelated PDF remains available to existing bank/Isracard readers',()=>{co
 
 test('Actual synthetic Cal PDF bytes pass the shared reader with a card routing identity',async()=>{const result=await readReportPDF(calPDFFixture());assert.equal(result.intake.kind,'card');assert.equal(result.intake.identity,'cal:1234');assert.equal(result.intake.report.amount,50);assert.equal(result.intake.report.count,2);});
 
-test('Cal notice scan preserves two page-two bullets and excludes ads and financial table content',async()=>{const notices=extractStatementNotices(pdfNoticePages(await readPDFPages(calPDFFixture()))).notices;assert.equal(notices.length,2);assert.deepEqual(notices.map(n=>n.category),['promotion','terms']);assert.ok(notices.every(n=>n.issuer==='cal'&&n.page===2&&n.needsReview));assert.match(notices[0].text,/יתרת ההטבה/);assert.match(notices[1].text,/מסגרת הכרטיס/);assert.ok(!notices.some(n=>/עסק לדוגמה|50.00/.test(n.text)));});
+test('Cal notice scan preserves two page-two bullets and excludes ads and financial table content',async()=>{const notices=extractStatementNotices(pdfNoticePages(await readPDFPages(calPDFFixture()))).notices;assert.equal(notices.length,2);assert.deepEqual(notices.map(n=>n.category),['promotion','limit']);assert.ok(notices.every(n=>n.issuer==='cal'&&n.page===2&&n.needsReview));assert.match(notices[0].text,/יתרת ההטבה/);assert.match(notices[1].text,/מסגרת הכרטיס/);assert.ok(!notices.some(n=>/עסק לדוגמה|50.00/.test(n.text)));});
 
 test('Latin merchant words and their numeric identifiers keep their visual order',()=>{const p=fixture(),page=p[0];page.items=page.items.filter(i=>!(i.transform[5]===500&&i.transform[4]>=420&&i.transform[4]<500));page.items.push(...glyphs('SHOP EXAMPLE 42',498,500));assert.equal(inspectCalPDF(p).entries[0].merchant,'SHOP EXAMPLE 42');});
+
+test('Actual Cal PDF message area classifies limit, rate, points and club notices without reading transaction rows as notices',async()=>{
+ const pages=fixture();pages[1].items=pages[1].items.filter(row=>!row.str.startsWith('•'))
+ const messages=['• מסגרת האשראי שלך הוגדלה לסך 30000 ₪.','• הריבית על האשראי תעודכן החל מתאריך 01.01.2027.','• החודש צברת 120 נקודות למימוש בהמשך.','• חברי מועדון זכאים להטבות ולקופון אישי.']
+ pages[1].items.push(...messages.map((text,index)=>item(text,160,540-index*25,360)))
+ assert.deepEqual(extractStatementNotices(pdfNoticePages(pages)).notices.map(n=>n.category),['limit','interest','points','club'])
+ const {pdfFixture}=await import('../tools/bank-csv/pdf-fixture.mjs')
+ for(const page of pages)for(const row of page.items){row.transform[0]=row.width*2/row.str.length;if(/[א-ת]/.test(row.str))row.str=row.str.replace(/\d+(?:[./]\d+)*/g,value=>[...value].reverse().join(''))}
+ const bytes=pdfFixture(pages),read=await readPDFPages(bytes.slice()),notices=extractStatementNotices(pdfNoticePages(read)).notices
+ assert.deepEqual(notices.map(n=>n.category),['limit','interest','points','club']);assert.ok(notices.every(n=>n.page===2&&n.issuer==='cal'))
+ const report=await readReportPDF(bytes);assert.equal(report.intake.report.amount,50);assert.equal(report.intake.report.count,2)
+})

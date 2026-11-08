@@ -73,11 +73,11 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
  }
  const face=(card:typeof selected)=>card&&<div className="household-card-face" data-bank={card.payer?.provider}>
   <div className="household-card-top">
-   {hasProviderLogo(card.provider)?<ProviderLogo provider={card.provider}/>:<span>{card.provider||'כרטיס אשראי'}</span>}
+   {card.payer&&hasProviderLogo(card.payer.provider)?<ProviderLogo provider={card.payer.provider}/>:<span><bdi>{card.payer?.name||'כרטיס אשראי'}</bdi></span>}
    {card.cardLastFour&&<bdi dir="ltr">•••• {card.cardLastFour}</bdi>}
   </div>
   <span className="household-card-name"><bdi dir="auto">{card.displayName}</bdi></span>
-  <div className="household-card-bottom">{card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}<div className="household-payer">{card.payer?<><span>מחויב מ־<bdi>{card.payer.name}</bdi></span><ProviderLogo provider={card.payer.provider}/></>:<span>אין שיוך לחשבון משלם</span>}</div></div>
+  <div className="household-card-bottom">{card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}<div className="household-payer">{card.payer?<span>מחויב מ־<bdi>{card.payer.name}</bdi></span>:<span>אין שיוך לחשבון משלם</span>}{hasProviderLogo(card.issuer)&&<ProviderLogo provider={card.issuer}/>} </div></div>
  </div>
  const peeks=selected&&view.cards.length>1?[{id:nextWalletCard(view.cards,selected.id,-1),side:'right'},...(view.cards.length>2?[{id:nextWalletCard(view.cards,selected.id,1),side:'left'}]:[])]:[]
  const coverage=selected?cardDetailCoverage(selected):null

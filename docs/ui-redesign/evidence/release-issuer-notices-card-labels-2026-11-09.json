@@ -1,0 +1,152 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "86f485774629c8f315a20a71d23c3c5d8ca65456",
+  "initialNoticeCommit": "a3c53eb3aa7df4c17debfcd3022e68e7fb4f76f7",
+  "previousApplicationCommit": "5648a242856d052c824e16811a12668bb459d047",
+  "entry": "https://budgit.duckdns.org/next",
+  "runtimeImage": "sha256:70c11d9fe6840f66f9e9aa66815333ab9cd366ae5e1b52c25415eebb7a07b205",
+  "sourceArchiveSha256": "25d679ae1d9bb657ccf1fc36a752e42cb54de76a3c9004ce489d74a3b33e5382",
+  "changes": [
+    "Exclude salary/transfer actor rows and transaction-table continuations from issuer notices while retaining genuine promotional offers",
+    "Distinguish credit-limit, interest, earned points and club-benefit notices with original source/page/date evidence",
+    "Filter and reclassify older encrypted scan discoveries at read time without rewriting records",
+    "Place paying-bank logo above processing-issuer logo on household card faces; retain network marks below",
+    "Use נקלט חלקית for partial report lifecycle wording and retain internal lifecycle states and original confirmation/retention rules"
+  ],
+  "validation": {
+    "buildTypecheck": "passed",
+    "regressions": 1352,
+    "coreChecks": 15,
+    "newContracts": 6,
+    "actualHebrewAndCalPDFBytes": true,
+    "newBrowserAcceptance": false,
+    "previousSourceFilesMatched": 474,
+    "candidateRuntimeFilesMatched": 167,
+    "liveRuntimeFilesMatched": 167,
+    "freshVerifiedSQLiteBackup": true,
+    "backupSha256": "b354c25b1d6687ac35fd92d1e650b6ec4396fc4c3bbe72ecc8aff96838e4f00a",
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 18,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 21,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "ac94e1d352581ed979f007785047a72d492f5eba708bf9d71b17cde786f83e0f",
+          "reactHTMLSha256": "30c86443b2cf58ff20e44fd6e48fcc6a402357cf576892957a0a05ed7a1d8c57"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 21,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "5168da84a983cb27303167eb1d614fc2ff6d7232cf5cd441347054e3d0183c0e",
+          "reactHTMLSha256": "7b78c133c0381c11d8353bb245b7843a39e6bdbcaa294a9c861dd51ed71bcb28"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "5648a24"
+          ],
+          "originalAssetsVerified": 68,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "actualBackupReadOnlyNoticeCheck": {
+      "storedNotices": 1,
+      "visibleNotices": 0,
+      "payrollFalsePositivesFiltered": 1,
+      "readOnlyBackup": true,
+      "productionRecordsChanged": false
+    },
+    "authoritativeTablesPreserved": 50,
+    "integrityAndForeignKeys": true,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true
+  },
+  "public": {
+    "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+    "installerBytes": 68851,
+    "checkedAt": "2026-11-08T22:43:11.134Z",
+    "origin": "https://budgit.duckdns.org",
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "anonymousAndForgedAPIRefused": true,
+    "anonymousDeepRoutesShowLogin": [
+      "/next/more",
+      "/next/settings",
+      "/next/notices",
+      "/next/actions",
+      "/next",
+      "/next/accounts",
+      "/next/checks",
+      "/next/loans",
+      "/next/savings",
+      "/next/plans/scenario",
+      "/next/details/new",
+      "/next/settings/security",
+      "/next/upload/group",
+      "/next/analysis",
+      "/next/categories/manage",
+      "/next/incoming"
+    ],
+    "htmlNoStore": true,
+    "framingProtection": true,
+    "defaultGetHeadRootLaunch": true,
+    "preferredOriginalRootLaunch": true,
+    "manifest": {
+      "id": "/",
+      "scope": "/",
+      "start_url": "/next"
+    }
+  },
+  "productionFinancialEdits": false,
+  "storedNoticeRowsRewritten": false,
+  "sitesChanged": false,
+  "paidResourceUpgrade": false,
+  "limits": [
+    "No new browser or physical-iPhone acceptance is claimed.",
+    "Cal retains its bounded supported message-section extraction; unsupported/unreadable documents still require source review.",
+    "Save open edits and use guarded refresh to load the published interface."
+  ]
+}

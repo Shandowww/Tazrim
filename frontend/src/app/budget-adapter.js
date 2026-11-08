@@ -70,6 +70,14 @@ export function savedCardProvider(plan,card){
  const payer=cashAccountList(plan).find(account=>account.id===plan.cashPlanning?.cardAccounts?.[card.id])
  // ONE ZERO is the bank's card program, distinct from the report's processing issuer.
  if(/וואן\s*זירו|ואן\s*זירו|\bone[ -]?zero\b/.test(name)||payer&&/^(?:one[ -]?zero|(?:בנק\s+)?ו?ואן\s*זירו)$/i.test(savedBankProvider(payer).trim()))return 'one-zero'
+ return savedCardIssuer(plan,card)
+}
+
+/** The processing issuer remains distinct from a bank-branded card program. */
+export function savedCardIssuer(plan,card){
+ const explicit=String(card.provider??'').trim()
+ if(explicit&&!/^(?:one[ -]?zero|(?:בנק\s+)?ו?ואן\s*זירו)$/i.test(explicit))return explicit
+ const name=String(card.name??'').toLowerCase()
  const issuers=new Set((plan.details??[]).filter(row=>row.method===card.id&&row.status!=='cancelled'&&['cal','isracard'].includes(row.statement?.issuer)).map(row=>row.statement.issuer))
  for(const [pattern,key]of [[/ישראכרט|\bisracard\b/,'isracard'],[/כאל|כ[״"']אל|\bcal\b/,'cal'],[/מקס|\bmax\b/,'max']])if(pattern.test(name))issuers.add(key)
  return issuers.size===1?[...issuers][0]:''
