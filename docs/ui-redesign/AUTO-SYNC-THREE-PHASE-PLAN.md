@@ -2,6 +2,10 @@
 
 Requested by Tal, 2026-11-05; amended 2026-11-08. **This document describes the rollout; editing it does not enable any policy.**
 
+**Latest published UI — 2026-11-08:** `ac2a05b` completes the approved mobile Sync Center views and restored bank/card missing-month map, inside the existing menu and appearance. [Implementation and release evidence](SYNC-CENTER-IMPLEMENTATION-2026-11-08.md). The design-approval wait below is historical and superseded; scheduled/locked-device delivery and Stage 2 comparison evidence remain separate work. Stage 3 remains disabled.
+
+**Mobile sync-center correction — 2026-11-08:** Tal requested focused pages/tabs for the center itself, bounded report lists and restoration of the visual missing-month overview for banks and cards. Read [the design and Sol execution plan](SYNC-CENTER-MOBILE-PLAN-2026-11-08.md) and its interactive prototype. Await design approval; execution belongs to Sol. This UI increment precedes Stage 3 activation and reuses the already published guided report workflow.
+
 **Current baseline:** bounded Stage 2 preparation, guided review, lifecycle labels and 30-day server-original retention and opt-in verified-upload device cleanup are published as `0a5ab68`; see [release evidence](evidence/release-day0-device-cleanup-2026-11-08.json). Owners explicitly opt in per budget and financial approval remains mandatory. The published Shortcut defaults to retain and offers explicit `delete-after-upload` after a fresh exact-byte storage proof. Phase 3 is not enabled; physical iPhone scheduling/locked-device outcomes remain unverified.
 
 **Execution handoff:** implementation remains assigned to **Sol 6.1**. Resume using [the handoff](AUTO-SYNC-SOL-6.1-HANDOFF.md). The implemented amendment is [day-0 device cleanup after verified upload](REPORT-GUIDED-REVIEW-AND-RETENTION-2026-11-07.md#day-0-device-cleanup-amendment--2026-11-08), while retaining Budgit's copy until 30 days after complete handling. This device cleanup is live; Tal confirmed a manual iPhone run without Delete confirmation after enabling the device setting. Scheduled/locked-device/provider acceptance remains separate.

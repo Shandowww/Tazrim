@@ -19,6 +19,7 @@ import { AccessError, type BudgetResponse } from './budget-api';
 import type { BudgetState } from './use-budget';
 import { useFinancialDraft } from './draft-guard';
 import { useCreatedEditorRoute } from './use-created-editor-route';
+import {syncReturnHref} from './sync-center-model';
 import { usePeriodHref } from '../tazrim/components/layout/period-context';
 const input = 'mt-1 min-h-11 w-full rounded-xl border bg-card px-3 py-2 text-sm',
   button = 'min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50',
@@ -256,7 +257,8 @@ export function ReportGroupPage({
     [loading, setLoading] = useState(true),
     base = budget.status === 'ready' ? budget.value : null,
     viewer = budget.status === 'ready' && budget.spaces.find(s => s.id === budget.budgetId)?.role === 'viewer';
-  useCreatedEditorRoute(done ? href('/incoming') : null, done);
+  const returnToSync=syncReturnHref(search);
+  useCreatedEditorRoute(done ? returnToSync??href('/incoming') : null, done);
   useEffect(() => {
     if (!base || fixture || viewer || done) return;
     const abort = new AbortController();
@@ -280,5 +282,5 @@ export function ReportGroupPage({
   if (fixture) return <p>קבוצות דוחות אינן זמינות בדוגמה.</p>;
   if (budget.status === 'loading') return <p role="status">טוען חשבון…</p>;
   if (budget.status === 'error') return <p role="alert">{budget.message}</p>;
-  return <div className="household-page household-report-page"><PageHeading className="text-2xl font-semibold">{reimport ? 'בדיקה מחודשת של מקור שמור' : 'בדיקת קבוצת דוחות'}</PageHeading>{viewer ? <p>המרחב פתוח לצפייה בלבד. קליטת דוחות דורשת הרשאת עריכה.</p> : done ? <p role="status">{done}</p> : <>{loading && <p role="status">טוען מקורות והחלטות שמורות…</p>}{error && <p role="alert">{error}</p>}{data && (data.resultOnly?<ReportResult budget={budget} base={budget.value} sources={data.sources}/>:<GroupEditor budget={budget} base={budget.value} initial={data} onDone={setDone} />)}</>}</div>;
+  return <div className="household-page household-report-page">{returnToSync&&<Link className="inline-flex min-h-11 items-center text-sm text-primary" href={returnToSync}>חזרה למרכז הסנכרון</Link>}<PageHeading className="text-2xl font-semibold">{reimport ? 'בדיקה מחודשת של מקור שמור' : 'בדיקת קבוצת דוחות'}</PageHeading>{viewer ? <p>המרחב פתוח לצפייה בלבד. קליטת דוחות דורשת הרשאת עריכה.</p> : done ? <p role="status">{done}</p> : <>{loading && <p role="status">טוען מקורות והחלטות שמורות…</p>}{error && <p role="alert">{error}</p>}{data && (data.resultOnly?<ReportResult budget={budget} base={budget.value} sources={data.sources}/>:<GroupEditor budget={budget} base={budget.value} initial={data} onDone={setDone} />)}</>}</div>;
 }

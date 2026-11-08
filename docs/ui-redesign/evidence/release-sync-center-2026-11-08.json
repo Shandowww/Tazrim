@@ -1,0 +1,117 @@
+{
+  "date": "2026-11-08",
+  "applicationCommit": "ac2a05bac2b28b67ef9127b25d4beb241b405e52",
+  "previousApplicationCommit": "2208e67d489dfe8a21ee40e480730e5098565b01",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "runtimeImage": "sha256:878757720410271e2f090efe0015a42fd8dba43839cda8dbaabf5f08ab6ff265",
+  "sourceArchiveSha256": "ec2aa2872428729b224c875e1244312116dde577ce0be461b6fd2c6c15936abb",
+  "changes": [
+    "Four internal Sync Center views reached through the existing menu entry",
+    "Bounded six-row report lists, whole-inbox search and lifecycle/destination filters",
+    "Focused report/file/proposal screens and original guided-review return",
+    "Restored bank/card six-month map with original coverage/expectation facts",
+    "Focused folder connection setup and separate preparation policy"
+  ],
+  "scope": {
+    "globalThemeMenuAndNavigationUnchanged": true,
+    "mainSyncTabAdded": false,
+    "backendParserFinancialAndShortcutSourcesUnchanged": true,
+    "stage3Enabled": false
+  },
+  "validation": {
+    "regressions": 1333,
+    "newBehaviorContracts": 7,
+    "buildTypecheck": "passed",
+    "coreChecks": 15,
+    "browser": {
+      "checks": [
+        "six compact rows",
+        "return preserves list page",
+        "filename search covers all pages",
+        "tab draft guard retains approval choices",
+        "six month cells for one selected account",
+        "oldest month at right in RTL",
+        "missing month has a direct upload action",
+        "no horizontal overflow at 320",
+        "no horizontal overflow at 390",
+        "no horizontal overflow at 430",
+        "no horizontal overflow at 1440",
+        "RTL retained with dark/reduced motion",
+        "settings contains no report feed",
+        "connection setup has a focused key screen",
+        "original progress saves before returning to the report list",
+        "verified upload opens that exact report",
+        "confirmed synthetic private-copy deletion returns to the list",
+        "other user private inbox is isolated",
+        "viewer coverage uses the selected shared budget",
+        "financial data unchanged",
+        "no runtime page errors"
+      ],
+      "errors": [],
+      "financialUnchanged": true,
+      "financialWrites": 0
+    },
+    "priorSourceFilesMatched": 917,
+    "freshVerifiedSQLiteBackup": true,
+    "backupSha256": "7e5fe95ccc9df02be0a822b77b3d6ae8dda8c56c83e7e65cd2c9a9b876bcef2e",
+    "isolatedFinancialAccessDecryptionStartupRollback": true,
+    "storedSourcesDecrypted": 20,
+    "intakeRestore": true,
+    "automationBackupRoundTrip": true,
+    "retainedAssets": 67,
+    "candidateBackendContracts": 32,
+    "candidateRuntimeFilesMatched": 166,
+    "liveRuntimeFilesMatched": 166,
+    "authoritativeTablesPreserved": 50,
+    "configurationKeysUnchanged": true,
+    "adjacentServicesUnchanged": true,
+    "integrityAndForeignKeys": true
+  },
+  "public": {
+    "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+    "installerBytes": 68851,
+    "checkedAt": "2026-11-08T19:21:59.872Z",
+    "origin": "https://budgit.duckdns.org",
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "anonymousAndForgedAPIRefused": true,
+    "anonymousDeepRoutesShowLogin": [
+      "/next/more",
+      "/next/settings",
+      "/next/notices",
+      "/next/actions",
+      "/next",
+      "/next/accounts",
+      "/next/checks",
+      "/next/loans",
+      "/next/savings",
+      "/next/plans/scenario",
+      "/next/details/new",
+      "/next/settings/security",
+      "/next/upload/group",
+      "/next/analysis",
+      "/next/categories/manage",
+      "/next/incoming"
+    ],
+    "htmlNoStore": true,
+    "framingProtection": true,
+    "defaultGetHeadRootLaunch": true,
+    "preferredOriginalRootLaunch": true,
+    "manifest": {
+      "id": "/",
+      "scope": "/",
+      "start_url": "/next"
+    }
+  },
+  "productionFinancialEdits": false,
+  "sitesChanged": false,
+  "paidResourceUpgrade": false,
+  "limits": [
+    "Physical iPhone acceptance was not repeated",
+    "Scheduled and locked-device delivery remain separate acceptance work",
+    "Unassigned or unknown-period files are not inferred to cover an account/month",
+    "Stage 3 automatic financial application remains disabled"
+  ]
+}

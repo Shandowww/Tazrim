@@ -1,5 +1,12 @@
 # Monthly Flow — project handoff
 
+
+## Focused mobile Sync Center published — 2026-11-08
+
+Application `ac2a05b` is verified live at https://budgit.duckdns.org/next/incoming. Sync Center remains in its existing menu entry; global tabs, menus, theme, colors and typography are unchanged. Four internal views separate attention, missing reports, report browsing and settings. Lists are bounded to six rows with whole-inbox search/filtering; selected reports use focused source/proposal/action screens and return from the original guided review with filters/page retained. The restored six-month bank/card map reuses original coverage and expected-delivery facts, with the oldest month at the right and direct review/upload actions. Connection setup is separate and staged.
+
+Build/typecheck, 1,333 regressions and 15 core checks pass. Synthetic browser checks cover paging/search/draft guards, exact upload/deletion return, original progress save/return, RTL/no overflow at320/390/430/1440px, dark/reduced motion and private/shared viewer isolation with zero financial PUTs. All917 prior source files matched; fresh verified backup, isolated financial/access/20-source decryption/startup/rollback/intake/automation restore,67 retained assets and32 candidate backend contracts passed. All166 candidate/live runtime files match; all50 authoritative tables, keys and adjacent services were preserved. Stage3 remains disabled; physical iPhone and scheduled/locked-device acceptance remain separate. Evidence: `docs/ui-redesign/evidence/release-sync-center-2026-11-08.json`. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
 ## Mac Shortcut catalog and multi-file repair published — 2026-11-08
 
 Application `2208e67` is verified live at https://budgit.duckdns.org/next/incoming. The signed installer validates upload-key format, trims outer clipboard whitespace and surfaces actual catalog auth/consent/rate errors. A production connection key can be reused on Mac and iPhone; temporary QA keys cannot connect to production. Each device selects its folder through the native picker; iCloud Drive/Budgit can be the same logical folder despite different device paths. Separate device copies are optional for different selectors/settings.
