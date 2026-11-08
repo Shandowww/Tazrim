@@ -164,3 +164,34 @@ test('Phone QA endpoints require explicit synthetic HTTPS opt-in and never accep
  assert.ok(JSON.parse(build(config)).WFWorkflowActions.length>0);
  for(const patch of [{syntheticHttps:false},{endpoint:'https://budgit.duckdns.org/api/imports/incoming'},{endpoint:'https://example.test/api/imports/incoming'},{endpoint:'https://budgit-synthetic-test.trycloudflare.com:444/api/imports/incoming'},{endpoint:'https://budgit-synthetic-test.trycloudflare.com/api/imports/incoming?redirect=1'},{endpoint:'https://user@budgit-synthetic-test.trycloudflare.com/api/imports/incoming'},{endpoint:'http://budgit-synthetic-test.trycloudflare.com/api/imports/incoming'}])assert.throws(()=>build({...config,...patch}));
 });
+
+test('Catalog authentication and service errors give actionable messages before any file scan or deletion',async()=>{
+ const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),w=configuredWorkflow();
+ const auth=runIncomingWorkflow(w,{catalog:{error:'חיבור ההעלאה אינו תקין או בוטל.'}});
+ assert.equal(auth.exited,true);assert.equal(auth.requests.length,1);assert.equal(auth.deleted.length,0);assert.equal(auth.uploaded.length,0);
+ assert.match(auth.notifications.join('\n'),/מפתח החיבור לא התקבל/);assert.match(auth.notifications.join('\n'),/QA/);assert.match(auth.notifications.join('\n'),/https:\/\/budgit\.duckdns\.org\/next\/incoming/);assert.ok(!auth.notifications.join('\n').includes('x'.repeat(43)));
+ for(const error of ['יותר מדי בקשות. נסו מאוחר יותר.','יש לאשר שמירת דוחות בתיבה הפרטית שהשרת יכול לקרוא.']){
+  const result=runIncomingWorkflow(w,{catalog:{error}});assert.equal(result.exited,true);assert.equal(result.deleted.length,0);assert.equal(result.requests.length,1);assert.ok(result.notifications.some(n=>n.includes(error)));
+ }
+});
+test('Upload-key setup accepts surrounding clipboard whitespace and refuses malformed keys without a request',async()=>{
+ const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs');
+ const run=key=>{const w=configuredWorkflow('retain'),q=w.WFWorkflowImportQuestions.find(q=>q.ParameterKey==='WFTextActionText');w.WFWorkflowActions[q.ActionIndex].WFWorkflowActionParameters.WFTextActionText=key;return runIncomingWorkflow(w,{catalog:{version:2,connectionId:'synthetic',receipts:{}},files:[]});};
+ for(const key of ['x'.repeat(43),' \n'+'x'.repeat(43)+'\r\n ']){const r=run(key);assert.equal(r.exited,false);assert.equal(r.requests.length,1);assert.equal(r.requests[0].authorization,'Bearer '+'x'.repeat(43));}
+ for(const key of ['', 'Bearer '+'x'.repeat(43),'x'.repeat(42),'x'.repeat(44),'x'.repeat(42)+'!']){const r=run(key);assert.equal(r.exited,true);assert.equal(r.requests.length,0);assert.equal(r.deleted.length,0);assert.ok(r.notifications.length);assert.ok(r.notifications.every(n=>!n.includes('x'.repeat(20))));}
+});
+
+test('Nested native file scans bind their own repeat outputs rather than an ambiguous Repeat Item name',()=>{
+ const w=workflow(),loops=w.WFWorkflowActions.filter(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.repeat.each'&&a.WFWorkflowActionParameters.WFControlFlowMode===0);
+ assert.equal(loops.length,2);const [outer,inner]=loops.map(a=>a.WFWorkflowActionParameters.UUID);
+ const source=w.WFWorkflowActions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.setvariable'&&a.WFWorkflowActionParameters.WFVariableName==='BudgitSource');assert.equal(source.WFWorkflowActionParameters.WFInput.Value.OutputUUID,outer);
+ const fresh=w.WFWorkflowActions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.appendvariable'&&a.WFWorkflowActionParameters.WFVariableName==='BudgitFreshMatches');assert.equal(fresh.WFWorkflowActionParameters.WFInput.Value.OutputUUID,inner);
+ assert.ok(!JSON.stringify(w).includes('"VariableName":"Repeat Item"'));
+});
+test('A multi-file folder deletes only the fresh matching item for each independently verified hash',async()=>{
+ const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),connectionId='synthetic';
+ const files=[{name:'bank.csv',extension:'csv',hash:'a'.repeat(64)},{name:'card.pdf',extension:'pdf',hash:'b'.repeat(64)},{name:'notes.txt',extension:'txt',hash:'c'.repeat(64)}];
+ const r=hash=>({receiptId:'receipt-'+hash[0],sourceHash:hash,connectionId,stored:true,originalRemoved:false,deviceCleanupVersion:1,storageVerified:true,deviceCopyRemovable:true});
+ const result=runIncomingWorkflow(configuredWorkflow(),{catalog:{version:2,connectionId,receipts:{}},files,hashFile:file=>file.hash,receipt:(_url,file)=>r(file.hash),freshReceipt:url=>r(new URL(url).searchParams.get('hash'))});
+ assert.equal(result.exited,false);assert.deepEqual(result.deleted,files.slice(0,2));assert.deepEqual(result.uploaded,files.slice(0,2).map(f=>f.name));assert.ok(!result.deleted.includes(files[2]));
+});

@@ -15,7 +15,7 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=recei
  function block(start,end){for(let i=start;i<end&&!exited;i++){
   const {WFWorkflowActionIdentifier:id,WFWorkflowActionParameters:p}=actions[i],name=id.replace('is.workflow.actions.','');let result;
   if(['conditional','repeat.each'].includes(name)&&p.WFControlFlowMode===0){let depth=1,otherwise=-1,close=i+1;for(;close<end;close++){const next=actions[close].WFWorkflowActionParameters;if(next.GroupingIdentifier===p.GroupingIdentifier){if(next.WFControlFlowMode===1)otherwise=close;if(next.WFControlFlowMode===2){depth--;if(!depth)break;}}}if(close>=end)throw Error('Unclosed native control block');
-   if(name==='repeat.each'){for(const item of value(p.WFInput)??[]){variables.set('Repeat Item',item);block(i+1,close);}}
+   if(name==='repeat.each'){for(const item of value(p.WFInput)??[]){variables.set('Repeat Item',item);outputs.set(p.UUID,item);block(i+1,close);}}
    else{const match=native(value(p.WFInput))===native(value(p.WFConditionalActionString));if(p.WFCondition!==4)throw Error('Unsupported test condition');if(match)block(i+1,otherwise<0?close:otherwise);else if(otherwise>=0)block(otherwise+1,close);}
    i=close;continue;
   }
@@ -35,7 +35,7 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=recei
    case 'text.replace':result=native(value(p.WFInput)).replace(new RegExp(p.WFReplaceTextFind.replace('(?i)',''),p.WFReplaceTextCaseSensitive?'':'i'),p.WFReplaceTextReplace);break;
    case 'urlencode':result=encodeURIComponent(native(value(p.WFInput)));break;
    case 'hash':{const input=value(p.WFInput);result=hashFile(Array.isArray(input)?input[0]:input);break;}
-   case 'downloadurl':{const url=value(p.WFURL);requests.push({url,method:p.WFHTTPMethod});result=p.WFHTTPMethod==='GET'?(url.includes('verifyStorage=1')?freshReceipt:catalog):receipt;break;}
+   case 'downloadurl':{const url=value(p.WFURL);const header=p.WFHTTPHeaders?.Value?.WFDictionaryFieldValueItems?.find(h=>value(h.WFKey)==='Authorization');requests.push({url,method:p.WFHTTPMethod,authorization:header?value(header.WFValue):undefined});result=p.WFHTTPMethod==='GET'?(url.includes('verifyStorage=1')?(typeof freshReceipt==='function'?freshReceipt(url):freshReceipt):catalog):(typeof receipt==='function'?receipt(url,value(p.WFRequestVariable)):receipt);break;}
    case 'notification':notifications.push(native(value(p.WFNotificationActionBody)));break;
    case 'exit':exited=true;break;
    default:throw Error('Unsupported generated action '+name);

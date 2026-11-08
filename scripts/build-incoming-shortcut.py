@@ -94,14 +94,14 @@ def build(config=None, folder_input=True):
         end(group)
 
     questions = []
-    add('comment', WFCommentActionText='הגדרה 1/3 — תיקיית הדוחות. בפעולת File שמתחת בחרו את Downloads/Budgit דרך בורר הקבצים של iPhone. אין לבחור תיקייה דרך Receive … from. בחרו תיקייה בלבד, ולא קובץ יחיד.')
+    add('comment', WFCommentActionText='הגדרה 1/3 — תיקיית הדוחות. בפעולת File שמתחת בחרו את תיקיית הדוחות דרך בורר הקבצים ב־Mac או ב־iPhone. אין לבחור תיקייה דרך Receive … from. בחרו תיקייה בלבד, ולא קובץ יחיד.')
     if folder_input:
         folder_index = len(actions)
         incoming = ref(add('file'), 'File')
-        questions.append({'ActionIndex': folder_index, 'Category': 'Parameter', 'ParameterKey': 'WFFile', 'Text': 'בחרו את תיקיית Downloads/Budgit במכשיר שלכם.'})
+        questions.append({'ActionIndex': folder_index, 'Category': 'Parameter', 'ParameterKey': 'WFFile', 'Text': 'בחרו את תיקיית הדוחות. לשיתוף בין המכשירים אפשר לבחור iCloud Drive/Budgit דרך הבורר בכל מכשיר.'})
     else:
         incoming = {'WFSerializationType': 'WFTextTokenAttachment', 'Value': {'Type': 'ExtensionInput'}}
-    add('comment', WFCommentActionText='הגדרה 2/3 — מפתח העלאה. הדביקו בפעולת Text שמתחת רק מפתח חיבור מסנכרון דוחות ב־Budgit. אין להזין סיסמה או מפתח שחזור ואין לשתף עותק עם מפתח.')
+    add('comment', WFCommentActionText='הגדרה 2/3 — מפתח העלאה. הדביקו בפעולת Text שמתחת רק מפתח חיבור פעיל מסנכרון דוחות ב־Budgit. מפתח מקיצור QA זמני אינו מפתח לחיבור הרגיל. אין להזין סיסמה או מפתח שחזור ואין לשתף עותק עם מפתח.')
     token_index = len(actions)
     secret = ref(add('gettext', WFTextActionText=setup.get('token', '')), 'Text')
     if not config:
@@ -112,16 +112,36 @@ def build(config=None, folder_input=True):
     if not config and folder_input:
         questions.append({'ActionIndex': cleanup_index, 'Category': 'Parameter', 'ParameterKey': 'WFTextActionText', 'DefaultValue': 'retain', 'Text': 'retain לשמירת הקובץ, או delete-after-upload למחיקה מהתיקייה רק אחרי אימות עותק ב־Budgit. מחיקת iCloud מסתנכרנת לכל המכשירים.'})
     add('comment', WFCommentActionText='סוף ההגדרות — אין צורך לערוך את הפעולות שמתחת. הפענוח, השיוך והשמירה הכספית מחייבים אישור בתוך Budgit. תזמון מוגדר בנפרד רק לאחר בדיקה ידנית. גרסת QA עם כתובת 127.0.0.1 עובדת במחשב הבדיקה בלבד, לא ב־iPhone.')
-    require(secret, 'חסר מפתח העלאה. מלאו את Text תחת הגדרה 2/3.')
+    require(secret, 'חסר מפתח העלאה. מלאו את Text תחת הגדרה 2/3 ממסך סנכרון דוחות ב־Budgit.')
+    # Clipboard line breaks around a key are harmless; never accept a full
+    # Authorization header or transform characters inside the actual token.
+    for edge in [r'^\s+', r'\s+$']:
+        secret = ref(add('text.replace', WFInput=text('\ufffc', secret), WFReplaceTextFind=edge, WFReplaceTextReplace='', WFReplaceTextRegularExpression=True, WFReplaceTextCaseSensitive=True), 'Updated Text')
+    token_length = ref(add('count', Input=secret, WFCountType='Characters'), 'Count')
+    equal_or_stop(token_length, '43', 'מפתח ההעלאה צריך לכלול 43 תווים בלבד. בסנכרון דוחות ב־Budgit צרו חיבור והדביקו רק את המפתח ב־Text תחת הגדרה 2/3, בלי Bearer. אל תשתמשו במפתח QA או בסיסמה.')
+    valid_chars = ref(add('text.replace', WFInput=text('\ufffc', secret), WFReplaceTextFind=r'[^A-Za-z0-9_-]', WFReplaceTextReplace='', WFReplaceTextRegularExpression=True, WFReplaceTextCaseSensitive=True), 'Updated Text')
+    equal_or_stop(valid_chars, text('\ufffc', secret), 'מפתח ההעלאה מכיל תווים לא נתמכים. העתיקו רק מפתח חיבור מסנכרון דוחות ל־Text תחת הגדרה 2/3.')
     require(incoming, 'בחרו תיקייה בפעולת File תחת הגדרה 1/3.' if folder_input else 'יש להעביר קובצי דוח מגיליון השיתוף.', items=True)
     headers = {'WFSerializationType': 'WFDictionaryFieldValue', 'Value': {'WFDictionaryFieldValueItems': [
         {'WFItemType': 0, 'WFKey': text('Authorization'), 'WFValue': text('Bearer \ufffc', secret)},
         {'WFItemType': 0, 'WFKey': text('Content-Type'), 'WFValue': text('application/octet-stream')},
     ]}}
     catalog = ref(add('downloadurl', WFURL=endpoint + '?catalog=2', WFHTTPMethod='GET', ShowHeaders=True, WFHTTPHeaders=headers), 'Contents of URL')
+    # Auth/rate/consent errors are JSON too. Surface their actual safe message
+    # before testing the catalog version, without echoing the upload token.
+    catalog_error = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='error'), 'Dictionary Value')
+    unauthorized = begin(catalog_error, expected='חיבור ההעלאה אינו תקין או בוטל.')
+    notice('מפתח החיבור לא התקבל או בוטל. פתחו https://budgit.duckdns.org/next/incoming, העתיקו מפתח חיבור פעיל מסנכרון דוחות ל־Text תחת הגדרה 2/3. אפשר להשתמש באותו מפתח ייצור ב־Mac וב־iPhone; מפתח QA זמני לא מתאים לחיבור הרגיל. הקבצים נשארו במכשיר.' if not config else 'חיבור הבדיקה הזמני אינו זמין. נדרשת בדיקת QA חדשה; אין להכניס מפתח אישי לקיצור בדיקה. הקבצים נשארו במכשיר.')
+    add('exit')
+    end(unauthorized)
+    no_catalog_error = empty_text(catalog_error)
+    add('conditional', GroupingIdentifier=no_catalog_error, WFControlFlowMode=1)
+    notice(text('Budgit לא אישר את הסריקה: \ufffc. בדקו את סנכרון הדוחות ב־Budgit ונסו שוב. הקבצים נשארו במכשיר.', catalog_error))
+    add('exit')
+    end(no_catalog_error)
     version = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='version'), 'Dictionary Value')
     version_text = ref(add('gettext', WFTextActionText=text('\ufffc', version)), 'Text')
-    equal_or_stop(version_text, '2', 'קטלוג הקבלות לא התקבל בגרסה נתמכת. הסריקה נעצרה; המקורות נשארו במכשיר.')
+    equal_or_stop(version_text, '2', 'תשובת קטלוג הקבלות אינה נתמכת. התקינו קיצור מעודכן מתוך סנכרון דוחות ב־Budgit. אם התקלה נמשכת, בדקו את החיבור; המקורות נשארו במכשיר.')
     catalog_connection = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='connectionId'), 'Dictionary Value')
     require(catalog_connection, 'חסר מזהה חיבור בקטלוג. המקורות נשארים במכשיר.')
     receipts = ref(add('getvalueforkey', WFInput=catalog, WFDictionaryKey='receipts'), 'Dictionary Value')
@@ -160,8 +180,8 @@ def build(config=None, folder_input=True):
         empty = ref(add('list', WFItems=[]), 'List')
         add('setvariable', WFVariableName=name, WFInput=empty)
     loop = str(uuid.uuid5(uuid.NAMESPACE_URL, 'budgit/incoming/files')).upper()
-    add('repeat.each', WFInput=files, GroupingIdentifier=loop, WFControlFlowMode=0)
-    add('setvariable', WFVariableName='BudgitSource', WFInput=variable('Repeat Item'))
+    file_loop_output = add('repeat.each', WFInput=files, GroupingIdentifier=loop, WFControlFlowMode=0)
+    add('setvariable', WFVariableName='BudgitSource', WFInput=ref(file_loop_output, 'Repeat Item'))
     current = variable('BudgitSource')
     name = ref(add('properties.files', WFInput=current, WFContentItemPropertyName='Name'), 'Name')
     extension = ref(add('properties.files', WFInput=current, WFContentItemPropertyName='File Extension'), 'File Extension')
@@ -247,8 +267,10 @@ def build(config=None, folder_input=True):
         add('setvariable', WFVariableName='BudgitFreshMatches', WFInput=empty)
         fresh_files = ref(add('file.getfoldercontents', WFFolder=incoming, Recursive=False), 'Folder Contents')
         fresh_loop = str(uuid.uuid5(uuid.NAMESPACE_URL, 'budgit/incoming/fresh-files')).upper()
-        add('repeat.each', WFInput=fresh_files, GroupingIdentifier=fresh_loop, WFControlFlowMode=0)
-        candidate = variable('Repeat Item')
+        fresh_loop_output = add('repeat.each', WFInput=fresh_files, GroupingIdentifier=fresh_loop, WFControlFlowMode=0)
+        # Bind the exact nested repeat output. A generic named Repeat Item can
+        # resolve to the outer item on import and falsely match every file.
+        candidate = ref(fresh_loop_output, 'Repeat Item')
         candidate_name = ref(add('properties.files', WFInput=candidate, WFContentItemPropertyName='Name'), 'Name')
         same_name = begin(candidate_name, expected=text('\ufffc', name))
         candidate_extension = ref(add('properties.files', WFInput=candidate, WFContentItemPropertyName='File Extension'), 'File Extension')

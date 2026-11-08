@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-08",
+  "status": "candidate-native-mac-accepted",
+  "previousProduction": "0a5ab6852f4a8eff547e3a3fa28c466e7068e301",
+  "productionChanged": false,
+  "catalogCause": "Temporary QA key used against production; user confirmed production key resolves it",
+  "perDeviceKeysRequired": false,
+  "nativeMac": {
+    "syntheticOnly": true,
+    "twoFilesDeleted": true,
+    "badProofRetainsBoth": true,
+    "successRetryDeletesBoth": true,
+    "exactStoredBytesVerified": true,
+    "sourceHashMatched": true,
+    "storedSources": 1,
+    "financialCommits": 0,
+    "budgets": 0,
+    "newUploadsAcrossRetry": 0,
+    "schedulingVerified": false,
+    "lockedDeviceVerified": false
+  },
+  "validation": {
+    "regressions": 1326,
+    "coreChecks": 15,
+    "buildTypecheck": "passed",
+    "nativeSchemaActions": 419,
+    "syntheticCharacterCounts": 3
+  },
+  "sourceSha256": {
+    "scripts/build-incoming-shortcut.py": "59efb9227245ab015566d911c3101a937e0657fe372cc4985e6a76cba6d45074",
+    "test/helpers/incoming-workflow-runner.mjs": "163d71ab97ca19d5713fcbeec66ab6489f29a62826f896de8a27932571cc3560",
+    "test/incoming-shortcut.test.mjs": "b20bcfc77767435b145f66c76a88dcd668912cc1d79d72b860b0a6d7e699d73e",
+    "public/shortcuts/budgit-incoming.shortcut": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8"
+  }
+}
