@@ -797,3 +797,8 @@ Final payer compatibility — 2026-10-28: shared original payer extraction reads
 
 
 UI wording follow-up — 2026-10-28: native group review, uncommitted-source deletion and billing text now describe user actions without implementation/migration wording. Copy only; original commands, restrictions and save behavior are unchanged. Build/typecheck and15 checks pass; prior906 functional regressions and bounded browser evidence remain current. Production/Sites unchanged.
+
+
+## Bank activity display repair published — 2026-11-09
+
+Application `a56f2b3` is verified live. Bank wallet “תנועות ופירוט שמור” now opens the original stored bank movements in the exact account/space/period, rather than empty expense-detail analytics. Read-only signed entries, search/pagination, basic-mode access and a separate expense-category link preserve all financial/source data. Clean build/typecheck,1,289 regressions,15 core checks and47 isolated runtime contracts pass.412 prior-source and168 runtime files matched; fresh verified backup, rollback and financial/access/source-decryption gates preceded activation. All50 authoritative tables, keys/settings and adjacent services were preserved. No new browser/physical-iPhone acceptance. Evidence: docs/ui-redesign/evidence/release-bank-activity-2026-11-09.json.

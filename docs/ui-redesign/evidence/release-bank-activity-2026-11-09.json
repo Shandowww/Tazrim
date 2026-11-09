@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "a56f2b3eb809090ed49aabe5787d664036050159",
+  "previousApplicationCommit": "f07d51a0906a5486f862d5940bfc652783bee280",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:1b01864ae8aa6fd80c9117507d0df15fb71532d6929b0d723bb04668eef8ff19",
+  "sourceArchiveSha256": "3d8c1b6453f1ade8850f31b7477a1a8dcb6724c6a1a32c17cc5ca542631d85cc",
+  "changes": [
+    "Bank wallet action opens original stored bank movements rather than expense-detail analytics",
+    "Exact account/space/period, signed entries, search, pagination, separate debit/credit/net figures and basic-mode access",
+    "Existing expense-category analytics remain available separately; no financial or source mutations"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed",
+    "regressions": 1289,
+    "coreChecks": 15,
+    "previousSource": {
+      "files": 412,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 168,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 47,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 21,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "617bb15fc453edb1d3a7f3a65524bf60e266a594995075573c22297a0a2da96e",
+          "reactHTMLSha256": "51fd27c5bc0fe7c1c0fe38ab5d9de607467cac97f6b1572e85cdef45731b77d3"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 21,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "d3ac4b273be547687db9783a3cc9ced53ce2be855b614ccb87b6bd616f1a1ac4",
+          "reactHTMLSha256": "e1393b11fa2ca9deea0664b538002bf09476e2a37be71aaa7600429227e5a66c"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "f07d51a"
+          ],
+          "originalAssetsVerified": 68,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 168,
+      "extra": [],
+      "mismatched": []
+    },
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "authoritativeTablesPreserved": 50,
+    "integrity": true,
+    "foreignKeys": true,
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "anonymousAndForgedPlan": 401,
+    "anonymousActivityShowsLogin": true,
+    "deepRouteNoStore": true,
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No fresh browser or physical iPhone acceptance; no preview tools used.",
+    "Rows require originally stored bank movements; a saved balance alone does not create statement rows.",
+    "Already-open pages need guarded app refresh and reopening the account action."
+  ]
+}

@@ -1,0 +1,9 @@
+# Bank activity destination repair — 2026-11-09
+
+The bank wallet's “תנועות ופירוט שמור” action incorrectly opened cleared expense-detail analytics (`/categories?account=…`). Imported bank entries live in `bankImport.entries`, separately from optional purchase details; a bank statement could therefore produce an empty screen despite saved movements and a balance.
+
+The action now opens `/accounts/:id/activity`, a read-only projection of the original stored bank entries. Exact account, selected space, month/year and current-month cutoff are retained. Income, card settlements, internal transfers, excluded entries, signed refunds and legacy entries without source evidence remain visible without becoming purchase-detail records. Search, 50-row pagination, separate debit/credit/net figures and explicit partial/no-row messaging avoid implying complete coverage or a known zero. Original expense-category analytics remain linked separately. No storage, financial rules, report import commands or write endpoints change.
+
+Validation: build/typecheck, full regression suite and 15 core checks. Dedicated contracts reproduce empty expense details with imported bank movements, preserve original financial/source bytes, and cover account isolation, months, annual scope, signed cents, search and missing legacy source evidence. Viewer navigation exposes the same read-only destination. Physical iPhone and new browser acceptance are not claimed. Release evidence is recorded separately after production gates pass.
+
+Published application `a56f2b3` passed the complete isolated release and runtime-preservation gates. See `evidence/release-bank-activity-2026-11-09.json`. Exact validation: 1,289 regressions, 15 core checks and 47 candidate-runtime contracts; 412 previous source files and 168 runtime files matched; all 50 authoritative tables preserved. Existing pages require guarded app refresh and reopening the account action.

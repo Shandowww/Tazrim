@@ -8,7 +8,7 @@ export function accountWorkflows(kind, id = '', readOnly = false) {
   ['/categories?card='+key,'עסקאות ופירוט שמור',false],['/card-setup/'+key,'עריכת פרטי הכרטיס',true],
   ['/cards/'+key+'/billing','עדכון סך החיוב',true],['/cards/'+key+'/payer','שיוך חשבון משלם',true],
   ['/cards/'+key+'/no-activity','חודש ללא פעילות · אישור וביטול',true],['/cards/'+key+'/stop','הפסקת הערכות עתידיות',true],
- ]:[['/categories?account='+key,'תנועות ופירוט שמור',false],['/accounts/'+key+'/edit','עריכת פרטי החשבון והיתרה',true],
+ ]:[['/accounts/'+key+'/activity','תנועות ופירוט שמור',false],['/accounts/'+key+'/edit','עריכת פרטי החשבון והיתרה',true],
   ['/accounts/'+key+'/monthly','דיווח חודשי לחשבון',true],['/accounts/'+key+'/assign-remainder','שיוך סכומים חודשיים ללא חשבון',true],
   ['/accounts/transfers?account='+key,'העברות של החשבון',true]]
  return (id?specific:[...common,['/monthly','עדכון נתוני החודש',true],['/upload','דוחות ומקורות שמורים',false],['/upload/history','היסטוריית קליטה וביטול',false]])
