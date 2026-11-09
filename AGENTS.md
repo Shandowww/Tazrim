@@ -1,5 +1,11 @@
 # Monthly Flow project context
 
+## Pending-report notification dismissal published — 2026-11-09
+
+Application `bae2597` is verified live. Both interfaces offer **הסרת התראה** for pending stored reports and the private incoming-inbox summary. Dismissal is personal, persists through reloads, and can be restored through **הצגת נדחות ומוסתרות → החזרת התראה**. Changed report/inbox evidence can show a new notification. Stored reports, review progress and budget data are retained.
+
+Build/typecheck, 1,368 regressions, 15 core checks and 61 built-candidate contracts pass. All 463 prior-live source files and 168 candidate/live runtime files matched. Fresh verified backup, isolated financial/access/19-source decryption/startup/rollback/intake/automation restore and 69 retained-asset checks passed. Activation preserved all 50 authoritative tables, keys/configuration and adjacent services. Public health/auth/deep routes/root/manifest/installer pass. No real financial/report edits, Sites or resource changes; no new browser/physical-iPhone acceptance. Use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-report-notification-dismissal-2026-11-09.json`. Continue in `work/budgit-household-ui`.
+
 ## Inline report comparisons and reversible decisions published — 2026-11-09
 
 Application `f07d51a` is verified live at https://budgit.duckdns.org/next/incoming. Matching review now compares incoming bank/card movements with saved records inside the form, including saved classification, dates, signed amounts, references and source evidence. Account-scoped search and bounded lists keep all forty synthetic checks accessible. Clear unresolved/same/additional-record choices stay visible and editable after progress save/reload and when all decisions are resolved. Reset restores the original pending check. Similar records are inspection evidence; only the original matcher authorizes a same-record link. Original financial, actor/revision/source and uncertain-write guards remain.

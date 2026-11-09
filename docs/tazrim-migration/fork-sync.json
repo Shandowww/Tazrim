@@ -1,24 +1,24 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "bae2597cf6249596d83c5597a312d2bcb92cf27e",
+  "sourceCommit": "b03eb5a786e3afc026c03adca7137ac1fccf1a3c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Pending report bell-notification dismissal implemented and tested; publication pending server SSH access. Reports, review progress and budget data are retained. See docs/ui-redesign/REPORT-NOTIFICATION-DISMISSAL-2026-11-09.md.",
+  "status": "Report notification dismissal verified live: personal, persistent and reversible, retaining reports and financial data. Full release evidence: docs/ui-redesign/evidence/release-report-notification-dismissal-2026-11-09.json.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1368,
     "coreChecks": 15,
-    "candidateRuntimeContracts": 47,
-    "browser": "No new browser or physical iPhone acceptance.",
-    "release": "Not deployed; configured SSH key rejected."
+    "candidateRuntimeContracts": 61,
+    "browser": "No new browser or physical iPhone acceptance; live runtime/public checks passed.",
+    "release": "docs/ui-redesign/evidence/release-report-notification-dismissal-2026-11-09.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "a56f2b3eb809090ed49aabe5787d664036050159",
-  "productionImage": "sha256:7defa0a67044b9491006bc4c1e3244b71e1505945c5c8a3a75f7f9d9592a11fd",
+  "productionApplicationCommit": "bae2597cf6249596d83c5597a312d2bcb92cf27e",
+  "productionImage": "sha256:4686be29cce00274936fd5fff0ef2d02975720a9497e1700350d96df36b92bc9",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "2208e67d489dfe8a21ee40e480730e5098565b01"
+  "applicationCommit": "bae2597cf6249596d83c5597a312d2bcb92cf27e"
 }
