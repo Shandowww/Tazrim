@@ -1,0 +1,236 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "f07d51a0906a5486f862d5940bfc652783bee280",
+  "previousApplicationCommit": "f96c2776ff963cb89c748a6e7e589549323edadf",
+  "verifiedAt": "2026-11-09T10:05:54.232Z",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "changes": [
+    "Incoming movements and existing account records compared inside the review, including saved classification and source evidence",
+    "Local account-only search and bounded lists supporting forty matching checks",
+    "Clear unresolved, supported same-record and additional-record choices",
+    "Selected matching decisions remain visible, reversible and resettable through progress save/reload until import"
+  ],
+  "scope": {
+    "originalFinancialMatcherAndCommandsPreserved": true,
+    "noServerEndpointOrSchemaChange": true,
+    "concurrentCardReleasePreserved": true,
+    "productionFinancialEdits": false,
+    "productionReportDecisions": false,
+    "sitesChanged": false,
+    "paidResourceUpgrade": false
+  },
+  "validation": {
+    "buildTypecheck": "passed",
+    "regressions": 1361,
+    "coreChecks": 15,
+    "browser": {
+      "checks": [
+        "existing bank source is visible beside the incoming row without leaving review",
+        "saved classification is included in the inline comparison",
+        "similar date and amount do not enable an unverified financial match",
+        "in-place search finds another saved account row",
+        "new choice remains visible and editable",
+        "reset restores the unresolved check",
+        "an older saved New decision is restored with its editable comparison",
+        "reset survives progress save and reload",
+        "forty checks start with a bounded comparison list",
+        "all forty comparisons and choices are accessible inside the form",
+        "inline comparisons fit RTL viewport 320",
+        "inline comparisons fit RTL viewport 390",
+        "inline comparisons fit RTL viewport 430",
+        "inline comparisons fit RTL viewport 1440",
+        "dark and reduced-motion comparisons remain readable",
+        "the original exact-match choice remains available with its saved evidence",
+        "a confirmed Same choice can be changed back to New",
+        "fully resolved matching decisions do not disappear into the duplicate shortcut",
+        "even the last resolved group can be reopened before import",
+        "existing card detail is shown beside the incoming purchase",
+        "card New/link/reset decisions remain reversible",
+        "comparisons and decision editing preserve every financial record and history with zero financial writes",
+        "no browser runtime errors"
+      ],
+      "errors": [],
+      "financialUnchanged": true,
+      "financialWrites": 0
+    },
+    "priorClassificationBrowser": {
+      "checks": [
+        "no completion declaration without visible classifications",
+        "matching conflict shows status and unconfirmed suggestion",
+        "initial transaction list is bounded",
+        "all source transactions remain accessible",
+        "pending checks have an explanatory checklist",
+        "transaction action opens and focuses the exact matching decision",
+        "resolved matching row stays visible with its saved classification",
+        "classification RTL layout has no overflow at 320",
+        "classification RTL layout has no overflow at 390",
+        "classification RTL layout has no overflow at 430",
+        "classification RTL layout has no overflow at 1440",
+        "dark and reduced-motion review remains usable",
+        "jumping to a later classification expands and retains that row",
+        "automatically classified movement stays visible",
+        "automatic classification can be changed",
+        "original grouped choice clearly affects all eligible group rows",
+        "uncertain progress locks choices for the same retry",
+        "retrying the identical progress request advances the source revision once",
+        "reloading restores the visible bank choices",
+        "failed review retains the last rows read-only and blocks stale saving",
+        "review retry preserves and rebuilds the intended unsaved choice",
+        "final financial approval is still explicit",
+        "optional categories have an explicit defer action",
+        "leaving categories empty is a distinct explicit action",
+        "deferred categories retain the existing partial lifecycle",
+        "intentional uncategorized completion is preserved separately",
+        "shared viewer has no classification write controls",
+        "all financial records and history remain byte-identical with zero financial writes",
+        "no browser runtime errors"
+      ],
+      "errors": [],
+      "financialUnchanged": true,
+      "financialWrites": 0
+    },
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T10:05:54.232Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "release": {
+      "applicationCommit": "f07d51a0906a5486f862d5940bfc652783bee280",
+      "runtimeImage": "sha256:2ace2d3b3d3d4faec92d7a49cd4a988f4c52bab74b0814903ce9ef8ebe7c1bce",
+      "runtime": {
+        "runtimeFilesMatched": 167,
+        "extra": [],
+        "mismatched": []
+      },
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "preservation": {
+        "authoritativeTablesPreserved": 50,
+        "integrity": true,
+        "foreignKeys": true,
+        "referenceInterestCacheExcluded": true,
+        "backupAttemptTimestampExcluded": true
+      },
+      "sourceReconciliation": {
+        "files": 477,
+        "mismatched": []
+      },
+      "candidateVerification": {
+        "files": 167,
+        "mismatched": [],
+        "extra": []
+      },
+      "releaseGates": {
+        "allReleaseGatesPassed": true,
+        "candidateBackendContracts": 35,
+        "backupVerified": true,
+        "sourceArchiveVerified": true,
+        "receipts": {
+          "access": {
+            "startupPreservesAllExistingRecords": true,
+            "anonymousAndForgedAPIsDenied": true,
+            "anonymousDeepRoutesShowLogin": true,
+            "authenticatedDeepRoutes": true,
+            "privateImmutableAssetsAndMime": true,
+            "framingProtection": true,
+            "freshActorBoundAndEmpty": true,
+            "nonadministratorDenied": true,
+            "existingSpacesPrivate": true,
+            "apiNotSwallowedBySPA": true,
+            "allExistingRecordsPreservedAfterReadChecks": true,
+            "storedSourcesDecrypted": 21,
+            "defaultAndPreferredRootLaunch": true,
+            "originalHTMLSha256": "d3ac4b273be547687db9783a3cc9ced53ce2be855b614ccb87b6bd616f1a1ac4",
+            "reactHTMLSha256": "e1393b11fa2ca9deea0664b538002bf09476e2a37be71aaa7600429227e5a66c"
+          },
+          "rollback-access": {
+            "startupPreservesAllExistingRecords": true,
+            "anonymousAndForgedAPIsDenied": true,
+            "anonymousDeepRoutesShowLogin": true,
+            "authenticatedDeepRoutes": true,
+            "privateImmutableAssetsAndMime": true,
+            "framingProtection": true,
+            "freshActorBoundAndEmpty": true,
+            "nonadministratorDenied": true,
+            "existingSpacesPrivate": true,
+            "apiNotSwallowedBySPA": true,
+            "allExistingRecordsPreservedAfterReadChecks": true,
+            "storedSourcesDecrypted": 21,
+            "defaultAndPreferredRootLaunch": true,
+            "originalHTMLSha256": "9d74990efbd8a9516697f7d366efe82132c712bf21072666ea7e5a81e9db47d2",
+            "reactHTMLSha256": "252faa6cc43cc1a289c8c6c2252575432f10167ccfb7f9d7e6c9c8de9a89a540"
+          },
+          "retained-assets": {
+            "priorReleases": [
+              "f96c277"
+            ],
+            "originalAssetsVerified": 68,
+            "currentAndPriorBytesMatch": true
+          },
+          "intake-restore": {
+            "intakeFiveTablesRestored": true,
+            "encryptedOriginalDecrypted": true,
+            "restoredConnectionReceipt": true,
+            "productionDatabaseUntouched": true
+          },
+          "automation": {
+            "startupAndRepeatedStartupPreserveExistingRecords": true,
+            "newTables": 2,
+            "activationPolicies": 0,
+            "syntheticBankAndCalPDFProposals": 2,
+            "calNoticesSeparate": true,
+            "noAutomaticFinancialWrites": true,
+            "rejectionAndPause": true,
+            "encryptedBackupRoundTripAndProposalDecryption": true
+          }
+        }
+      },
+      "backupSha256": "d16b79a43700317c020ebb1473d29dd79bd4f308e4a14546592587900617e1d0",
+      "sourceArchiveSha256": "56a9a12bc5ae9e2c7c7b63903236a505427eec62c33d72c17cd39f0e1bb7edff",
+      "configurationKeysPreserved": true,
+      "adjacentServicesPreserved": true,
+      "verifiedPreviousSourceAndImage": "f96c2776ff963cb89c748a6e7e589549323edadf"
+    }
+  },
+  "limitations": [
+    "Physical iPhone acceptance remains unverified.",
+    "Similar records are comparison evidence; only the original engine can authorize a same-record match.",
+    "Uncertain-write locks require the same-action retry before editing resumes.",
+    "Use guarded app refresh to load the update; import remains an explicit user action."
+  ]
+}

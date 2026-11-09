@@ -12,7 +12,7 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
  if(ui.blank)ui.startMonth=[plan.startMonth,...ui.items.filter(i=>!i.skip&&!i.error).map(i=>(i.from??i.report?.dueDate??i.activityCycle??plan.startMonth).slice(0,7))].sort()[0];
  let working=reportInboxBase(plan,ui),banks=[],cards=[],receipts=[],bindings=[],issues=0,bankGroups=new Map(),bankReviewGroups=new Map();ui.cardGroups=[];ui.skipped=ui.duplicates;ui.readyRows=0;ui.base=working;
  for(const item of ui.items){
-  item.preview=null;item.questions=[];item.warning='';item.already=false;item.statementConflict=null;
+  item.preview=null;item.questions=[];item.matchReviews=[];item.warning='';item.already=false;item.statementConflict=null;
   if(item.skip){ui.skipped++;continue;}
   if(item.activity){item.report=null;try{item.report=activityAPI.calActivityReport(item.activity,item.activityCycle,item.activityTotal,item.activityConfirmed);item.activityError='';}catch(error){item.activityError=error.message;}}
   if(item.error||['ambiguous','sheets'].includes(item.kind)||!item.target){issues++;continue;}
@@ -28,10 +28,13 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    let preview=bankPreview(working,records,options);
    if(preview.rows.some(r=>r.state==='migrated'))item.warning='בדוח יש מקור שסומן במעבר חשבון. קליטתו מחדש חסומה גם אם נבחר חשבון אחר; יש לבדוק את המקור לפני קליטה.';
    for(const row of preview.rows.filter(r=>r.state==='conflict')){
-    const decision=item.decisions[row.line],previous=working.bankImport?.entries.find(e=>e.key===row.key);
-    if(decision==='same'&&previous?.fingerprint===row.fingerprint)records=records.map(r=>r.line===row.line?{...r,missingReference:false}:r);
+    const decision=item.decisions[row.line],previous=working.bankImport?.entries.find(e=>e.key===row.key),canMatch=previous?.fingerprint===row.fingerprint;
+    const match={type:'duplicate',id:String(row.line),row,canMatch,previous,previousFile:working.bankImport?.batches.find(b=>b.id===previous?.batchId)?.file,decision:decision==='new'||decision==='same'&&canMatch?decision:'',storedDecision:decision??''};
+    // Keep the original evidence and every choice visible, including choices restored from older drafts.
+    item.matchReviews.push(match);
+    if(decision==='same'&&canMatch)records=records.map(r=>r.line===row.line?{...r,missingReference:false}:r);
     else if(decision==='new')records=await Promise.all(records.map(async r=>r.line===row.line?{...r,key:await inboxHash(item.hash+':'+r.line+':'+r.key),missingReference:false}:r));
-    else item.questions.push({type:'duplicate',row,canMatch:previous?.fingerprint===row.fingerprint,previous});
+    else item.questions.push({type:'duplicate',row,canMatch,previous});
    }
    preview=bankPreview(working,records,options);options.modes=bankDefaultMonthModes(working,preview,month,options.reportScope);
    for(const m of preview.months){if(item.monthDecisions[m.month]==='skip')options.modes[m.month]='skip';if(options.modes[m.month]==='skip'&&m.newCount&&item.monthDecisions[m.month]!=='skip')item.questions.push({type:'protected-month',month:m.month});if(options.modes[m.month]!=='skip'&&bankPlannedDirect(working,m.month,item.target).length&&typeof item.directIncluded[m.month]!=='boolean')item.questions.push({type:'direct',month:m.month});}
@@ -52,7 +55,7 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    try{const preview=item.report.entries?await prepareCardStatement(working,item.report,item.target,ui.merchantRules??[],{replacementToken:item.decisions.statementReplacement}):null;item.preview=preview;const previous=cards.find(c=>c.cardId===item.target&&c.dueDate===item.report.dueDate);if(previous){const same=previous.amount===item.report.amount&&JSON.stringify(previous.statement?.rows.map(r=>r.id).sort()??[])===JSON.stringify(preview?.rows.map(r=>r.id).sort()??[]);if(same){item.already=true;ui.skipped++;receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:item.report.dueDate});continue;}item.warning='שני דוחות שונים לאותו כרטיס ומועד חיוב. הסירו את הישן והשאירו את הדוח המעודכן.';issues++;continue;}if(!preview){cards.push({cardId:item.target,dueDate:item.report.dueDate,amount:item.report.amount,accountId:item.payer,statement:null,item});receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:item.report.dueDate});continue;}
     if(!preview.replacement&&preview.rows.every(r=>r.existing)&&working.cardBilling?.reports.some(r=>r.cardId===item.target&&r.dueDate===preview.dueDate&&r.amount===preview.amount)){item.already=true;item.reason='דוח כפול · כל העסקאות כבר קיימות ואין עסקאות חדשות לקליטה.';ui.skipped++;receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:preview.dueDate});continue;}
     const groups=statementGroups(preview);for(const g of groups){const key=statementMerchant(g.merchant),selected=ui.categoryChoices.get(key);if(ui.categoryChoices.has(key))for(const r of g.rows)r.category=selected;}
-    for(const r of preview.rows)if(r.candidates.length&&!item.decisions[r.id]){issues++;item.questions.push({type:'card-match',row:r});}
+    for(const r of preview.rows)if(r.candidates.length){const chosen=item.decisions[r.id],decision=chosen==='new'||r.candidates.some(c=>c.id===chosen)?chosen:'';item.matchReviews.push({type:'card-match',id:r.id,row:r,candidates:r.candidates,decision,storedDecision:chosen??''});if(!decision){issues++;item.questions.push({type:'card-match',row:r});}}
     cards.push({cardId:item.target,dueDate:preview.dueDate,amount:preview.amount,accountId:item.payer,statement:preview,item});receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:preview.dueDate});ui.readyRows+=preview.rows.filter(r=>!r.existing).length;
    }catch(error){item.warning=error.message;if(error.statementConflict){item.statementConflict=error.statementConflict;item.questions.push({type:'statement-conflict'});}issues++;}
   }
@@ -97,7 +100,7 @@ export async function changeReportInbox(plan,ui,e,reader=null){
    if(key==='from'||key==='to'){if(!item.inspection?.pdfReconciliation)item[key]=e.value;}
    if(key==='scope')item.bankOptions.scope=e.value;
    if(key==='direct')item.directIncluded[e.dataset.month]=e.value==='included';
-   if(key==='duplicate')item.decisions[e.dataset.row]=e.value;
+   if(key==='duplicate'){if(e.value)item.decisions[e.dataset.row]=e.value;else delete item.decisions[e.dataset.row];}
    if(key==='label'){const a=ui.newAccounts.find(a=>a.id===item.target),c=ui.newCards.find(c=>c.id===item.target);if(a)a.label=e.value.trim();if(c)c.name=e.value.trim();}
    if(key==='kind'){if(e.value==='card'){const total=item.records.reduce((n,r)=>n-r.amountCents,0)/100;if(item.records.some(r=>!r.valid||r.currency!=='ILS')||total<0)throw Error('לא זוהה סיכום חיובי כרטיס ברור. בחרו דוח כרטיס נתמך.');item.report={amount:total,dueDate:''};}item.kind=e.value;item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}
    if(key==='sheet'){const {inspectIntake}=reader;Object.assign(item,inspectIntake([item.sheets[Number(e.value)]]));item.identityKey=item.identity?await inboxHash(item.identity):'';item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}

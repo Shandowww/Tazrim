@@ -18,11 +18,11 @@ try{
  await page.getByRole('button',{name:'הצגת תנועות נוספות · 3'}).click();
  check(await page.locator('[id^="report-classification-"]').count()===13,'all source transactions remain accessible');
  check(await page.getByRole('heading',{name:'מה נשאר לבדוק · 13'}).count()===1,'pending checks have an explanatory checklist');await page.getByRole('heading',{name:'סיווג עסקאות',exact:true}).scrollIntoViewIfNeeded();await page.screenshot({path:'work/ui-redesign/classification-mobile.png'});
- await page.locator('#report-classification-0-0').getByRole('button',{name:'פתיחת הבדיקה הנדרשת'}).click();
+ const matchButton=page.locator('#report-classification-0-0').getByRole('button',{name:'השוואה לרישומים ושינוי ההחלטה'}),matchTarget=await matchButton.getAttribute('aria-controls');await matchButton.click();
  await page.getByRole('heading',{name:'בדיקות והחלטות',exact:true}).waitFor();
- await page.waitForFunction(()=>document.activeElement?.id==='report-check-0-0');
+ await page.waitForFunction(id=>document.activeElement?.id===id,matchTarget);
  check(true,'transaction action opens and focuses the exact matching decision');
- await page.locator('#report-check-0-0 select').selectOption('same');
+ await page.locator('[id="'+matchTarget+'"] input[value="same"]').check();
  await page.getByRole('heading',{name:'מה נשאר לבדוק · 12'}).waitFor();
  await page.getByRole('button',{name:'סיווג עסקאות',exact:true}).click();await page.locator('#report-classification-0-0').waitFor();
  check(await page.locator('#report-classification-0-0').innerText().then(text=>text.includes('כבר קיים בתקציב')),'resolved matching row stays visible with its saved classification');

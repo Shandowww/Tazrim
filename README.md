@@ -1,5 +1,11 @@
 # Monthly Flow
 
+## Inline report comparisons and reversible decisions published — 2026-11-09
+
+Application `f07d51a` is verified live at https://budgit.duckdns.org/next/incoming. Matching review now compares incoming bank/card movements with saved records inside the form, including saved classification, dates, signed amounts, references and source evidence. Account-scoped search and bounded lists keep all forty synthetic checks accessible. Clear unresolved/same/additional-record choices stay visible and editable after progress save/reload and when all decisions are resolved. Reset restores the original pending check. Similar records are inspection evidence; only the original matcher authorizes a same-record link. Original financial, actor/revision/source and uncertain-write guards remain.
+
+Build/typecheck, 1,361 regressions, 15 core checks, 23 new plus 29 prior synthetic interface checks and 35 candidate contracts pass. All 477 previous-source files and 167 candidate/live runtime files matched. Fresh verified SQLite backup, isolated financial/access/21-source decryption/startup/rollback/intake/automation restore and 68 retained-asset gates passed. Activation preserved all 50 authoritative tables, configuration keys and adjacent services. No production financial edits or report decisions, Sites changes or paid-resource upgrade. Physical iPhone acceptance remains unverified. Use guarded app refresh. Evidence: `docs/ui-redesign/evidence/release-matching-comparison-2026-11-09.json`; details: `docs/ui-redesign/MATCHING-COMPARISON-2026-11-09.md`. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
 ## Clear report classification published — 2026-11-09
 
 Application `f96c277` is verified live at https://budgit.duckdns.org/next/incoming. Report review now shows every transaction and its current classification/status, retains automatic and selected bank rows for original-command editing, explains pending checks with exact decision navigation, and replaces generic completion radios with explicit optional-category actions. Matching/conflicting/imported records retain their original guards. Failed recalculation keeps the last usable rows read-only and can retry the intended unsaved choice.

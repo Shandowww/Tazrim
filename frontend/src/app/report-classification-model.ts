@@ -5,6 +5,7 @@ import type {ReviewStep} from './report-guided-review'
 
 export type ReviewCheck={id:string;step:ReviewStep;label:string;source:string;row?:any;month?:string}
 export const classificationRowId=(item:number,row:number)=>`report-classification-${item}-${row}`
+export const matchReviewId=(item:number,id:string|number)=>`report-match-${item}-${encodeURIComponent(String(id))}`
 export const exceptionId=(item:number,question:number)=>`report-check-${item}-${question}`
 export const categoryMissing=(value:unknown)=>!String(value??'').trim()||value==='לסיווג'
 export function bankClassificationOptions(plan:any,rows:any[]){
@@ -24,9 +25,10 @@ export function reportClassificationRows(review:any){
    const monthQuestion=(item.questions??[]).findIndex((q:any)=>q.month===row.date?.slice(0,7))
    const contextQuestion=(item.questions??[]).findIndex((q:any)=>q.type==='statement-conflict'||row.state==='invalid'&&q.type==='invalid')
    const checkIndex=questionIndex>=0?questionIndex:monthQuestion>=0?monthQuestion:contextQuestion
+   const match=(item.matchReviews??[]).find((match:any)=>match.id===String(item.kind==='bank'?row.line:row.id))
    const editable=!item.skip&&!item.already&&(item.kind==='bank'?row.state==='new'&&groupIndex>=0:!row.existing&&!!group)
    const status=item.skip?'מחוץ לקליטה':item.statementConflict?'נדרשת השוואה לדוח שכבר נשמר':row.state==='conflict'?'נדרשת בדיקת התאמה':row.state==='migrated'?'מקור ממעבר חשבון — הקליטה חסומה':row.state==='invalid'?'נדרשת בדיקת נתוני המקור':row.existing||['duplicate','duplicate-file'].includes(row.state)||item.already?'כבר קיים בתקציב':item.kind==='bank'?groupIndex<0?'החודש מחוץ לקליטה':review.bankChoices.has(key)?'סיווג שבחרת':row.reviewed?'סווג אוטומטית':current?'הצעה לאישור':'נדרש סיווג':review.categoryChoices.has(key)?'קטגוריה שבחרת':categoryMissing(current)?'קטגוריה להשלמה':'קטגוריה מוצעת'
-   return {row,rowIndex,id:classificationRowId(itemIndex,rowIndex),key,groupIndex,group,current,status,editable,checkId:checkIndex>=0?exceptionId(itemIndex,checkIndex):null}
+   return {row,rowIndex,id:classificationRowId(itemIndex,rowIndex),key,groupIndex,group,current,status,editable,checkId:match?matchReviewId(itemIndex,match.id):checkIndex>=0?exceptionId(itemIndex,checkIndex):null}
   })}
  })
 }
@@ -46,7 +48,7 @@ export function reportReviewChecks(review:any):ReviewCheck[]{
   if(item.skip)continue
   for(const [qi,q]of (item.questions??[]).entries()){
    const label=q.type==='duplicate'?'בדיקה אם התנועה כבר נרשמה':q.type==='card-match'?'בדיקת התאמה לפירוט שכבר נשמר':q.type==='protected-month'?'בחירת טיפול בחודש מוגן':q.type==='direct'?'בדיקה אם התכנון כבר כלול בדוח':q.type==='statement-conflict'?'השוואה לדוח שכבר נשמר':'בדיקת נתוני המקור'
-   result.push({id:exceptionId(index,qi),step:'exceptions',label,source:item.name,row:q.row,month:q.month})
+   result.push({id:['duplicate','card-match'].includes(q.type)?matchReviewId(index,q.type==='duplicate'?q.row.line:q.row.id):exceptionId(index,qi),step:'exceptions',label,source:item.name,row:q.row,month:q.month})
   }
   if(item.warning&&!item.questions?.length)result.push({id:`report-warning-${index}`,step:'exceptions',label:item.warning,source:item.name})
   if(item.error)result.push({id:`report-source-${index}`,step:'account',label:item.error,source:item.name})
