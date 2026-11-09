@@ -30,6 +30,7 @@ export function excludeInternalBankTransfers(p,month){
  if(!validatePlan(next))throw Error('לא ניתן לתקן את סיווג ההעברות בתקציב הזה.');
  return next;
 }
+export const bankMovementSource=(r,lineEvidence=true)=>({...(lineEvidence&&Number.isInteger(r.line)&&r.line>0&&r.line<=30000?{line:r.line,parserVersion:1}:{}),date:r.date,valueDate:r.valueDate??null,description:r.description??'',details:r.details??'',beneficiary:r.beneficiary??'',purpose:r.purpose??'',reference:r.reference??'',currency:r.currency??'ILS',...(Number.isSafeInteger(r.balanceCents)?{balanceCents:r.balanceCents}:{})});
 export async function bankIdentity(record,accountId,digest=async text=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),n=>n.toString(16).padStart(2,'0')).join('')){
  const context=[record.date,record.amountCents,record.description,record.details,record.beneficiary,record.purpose].map(v=>String(v??'').normalize('NFKC').trim());
  const reference=record.reference?.trim();return {...record,key:await digest(JSON.stringify([accountId,'hapoalim',reference||context,record.date])),fingerprint:await digest(JSON.stringify(context)),missingReference:!reference};
@@ -115,7 +116,7 @@ export function applyBankImport(p,records,options){
  const bank=next.bankImport??={version:1,accounts:[],entries:[],batches:[]};if(bank.batches.some(b=>b.id===id))throw Error('הדוח כבר נקלט.');
  const accountIndex=bank.accounts.findIndex(a=>a.id===accountId),accountBefore=clone(bank.accounts.find(a=>a.id===accountId)??null),account={id:accountId,label,rules,personal:options.personal===true,...(options.bankName?{bankName:options.bankName}:{})};if(accountIndex<0)bank.accounts.push(account);else bank.accounts[accountIndex]=account;
  const accepted=preview.rows.filter(r=>r.state==='new'&&r.reviewed&&selected.some(m=>m.month===r.date.slice(0,7)));
- bank.entries.push(...accepted.map(r=>({key:r.key,fingerprint:r.fingerprint,month:r.date.slice(0,7),field:r.field,cents:r.amountCents,batchId:id,accountId,source:{...(Number.isInteger(r.line)&&r.line>0&&r.line<=30000?{line:r.line,parserVersion:1}:{}),date:r.date,valueDate:r.valueDate??null,description:r.description??'',details:r.details??'',beneficiary:r.beneficiary??'',purpose:r.purpose??'',reference:r.reference??'',currency:r.currency??'ILS',...(Number.isSafeInteger(r.balanceCents)?{balanceCents:r.balanceCents}:{})}})));
+ bank.entries.push(...accepted.map(r=>({key:r.key,fingerprint:r.fingerprint,month:r.date.slice(0,7),field:r.field,cents:r.amountCents,batchId:id,accountId,source:bankMovementSource(r)})));
  for(const r of accepted)if(r.field==='loanRepayment'){const match=loanBankMatch(p,accountId,r),loan=next.loans?.find(l=>l.id===match.loanId);if(loan){loan.repayments??={version:1,keys:[]};if(!loan.repayments.keys.some(x=>x.key===r.key))loan.repayments.keys.push({key:r.key,fingerprint:r.fingerprint,accountId});}}
  for(const h of history){h.after=clone(next.months[h.month]);h.afterCash=clone(next.cashPlanning?.months[h.month]??null);}
  bank.batches.push({id,accountId,file:options.fileName,from,to,months:history,beforeGoals,afterGoals:clone(next.savingsGoals??null),beforeTransfers,afterTransfers:clone(next.savingTransfers??null),accountBefore,accountIndex,accountAfter:account});

@@ -1,0 +1,161 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "9f4125f03d8888e02034f083c82a77e17893f8d2",
+  "previousApplicationCommit": "bafe41637f17ec3552c455526ff029f87ff7fd35",
+  "entry": "https://budgit.duckdns.org/next/loans",
+  "runtimeImage": "sha256:0b3f222609ee662ed55e910ec175ade1dbe205bc61d502c1afa20f274abb5ccb",
+  "sourceArchiveSha256": "9330684e3158812a404b65ea7c2e1967513b08a2c61a89ee10d28d57a5292b35",
+  "changes": [
+    "Legacy unsourced loan candidate rows are counted with an actionable explanation rather than silently hidden",
+    "Device-only original report reading proposes source enrichment for exact existing account/key/fingerprint/month/signed-cent matches inside the chosen period and loan term",
+    "An explicit guarded metadata-only save preserves amounts, classifications, monthly/default/cash records, batch histories and movement identities; unmatched or ambiguous rows stay untouched",
+    "Restored source rows enter existing loan search/link/future recognition; no financial reimport or stored original upload is performed"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed",
+    "regressions": 1306,
+    "coreChecks": 15,
+    "newRecoveryContracts": 4,
+    "actualBackupDiagnostic": {
+      "readOnly": true,
+      "legacyMissingSourceReproduced": true,
+      "retainedOriginalsCannotRecoverRequestedPeriod": true,
+      "noBudgetLinkOrRuleChanges": true,
+      "countsOnlyOutput": true
+    },
+    "staticRecoveryRoutes": "passed on actual legacy warning/file picker, period/loan-term and viewer boundaries; SSR-only registry snapshot, no browser effects or writes",
+    "previousSource": {
+      "files": 511,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 169,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 121,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "8843037649a1ac43989a7df833a38aa932a920406a978e3f56e0974e9a577eec",
+          "reactHTMLSha256": "0b402ae70122a2d3a23d7b77b3413463bc1bd1be4c153116b68501069b1e898d"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "3bea419ff33e41172ce0e1acc7f00e890f7e4a0d25a7269d03d9c16a0282748d",
+          "reactHTMLSha256": "2d758483e8b71187eb3ab969052c15589eac4076158e8a799135e9f32df05515"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "bafe416"
+          ],
+          "originalAssetsVerified": 69,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 169,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T20:18:06.731Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "The original report is required to recover missing facts; no dates/descriptions are inferred from monthly totals or amount-only matches",
+    "No actual source enrichment, financial/link/rule changes were performed on production by the agent",
+    "No new browser or physical-iPhone acceptance; guarded refresh required for already-open pages",
+    "Existing name-amount rule compatibility requirement remains when considering versions older than bafe416"
+  ]
+}
