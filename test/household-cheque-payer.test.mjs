@@ -9,7 +9,7 @@ import {zero,clone,forecast,cashAccountForecast,assignCashPayers} from '../src/b
 import {initialDetailDraft,prepareDetailSave} from '../frontend/src/app/detail-management-command.ts'
 import {needsChequePayer,prepareDetailWithPayer} from '../frontend/src/app/detail-payer-command.ts'
 const base=()=>({startMonth:'2026-01',opening:2000,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false,cashPlanning:{accounts:[{id:'a',label:'א',buffer:0,opening:1000},{id:'b',label:'ב',buffer:0,opening:1000}],months:{},cardAccounts:{},transfers:[]}})
-const draft=p=>({...initialDetailDraft(p,'','2026-10'),name:'צ׳ק',amount:'100.01',date:'2026-10-15'})
+const draft=p=>({...initialDetailDraft(p,'','2026-10'),accounting:'additional',name:'צ׳ק',amount:'100.01',date:'2026-10-15'})
 test('New cheque payer is exactly the original save followed by original assignment, with one cash outflow',()=>{
  const p=base(),d=draft(p),before=clone(p),expected=assignCashPayers(prepareDetailSave(p,'check',d,true),{details:{check:'b'}}),next=prepareDetailWithPayer(p,'check',d,true,'b')
  assert.deepEqual(next,expected);assert.deepEqual(p,before);assert.equal(cashAccountForecast(next,'a').find(r=>r.month==='2026-10').balance,1000);assert.equal(cashAccountForecast(next,'b').find(r=>r.month==='2026-10').balance,899.99);assert.equal(forecast(next).find(r=>r.month==='2026-10').balance,1899.99)

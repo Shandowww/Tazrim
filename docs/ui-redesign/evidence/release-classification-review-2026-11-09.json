@@ -1,0 +1,219 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "f96c2776ff963cb89c748a6e7e589549323edadf",
+  "previousApplicationCommit": "5d86c8b234d4bb45b220090a1f59ccc93cad6dbc",
+  "verifiedAt": "2026-11-09T09:26:01.375Z",
+  "entry": "https://budgit.duckdns.org/next/incoming",
+  "changes": [
+    "Full transaction classifications with automatic/manual/suggested/existing/conflicting states",
+    "Existing-command bank group editing with reviewed rows retained and explicit empty optional card categories",
+    "Actionable pending checks with exact decision focus and bounded complete lists",
+    "Explicit optional categorization deferral versus intentional uncategorized completion",
+    "Read-only last usable review during recalculation failure and retry of the intended unsaved choice"
+  ],
+  "diagnosis": {
+    "readOnlyExistingBackup": true,
+    "reportedSourceRows": 7,
+    "rowStates": {
+      "conflict": 7
+    },
+    "pendingClassificationGroups": 0,
+    "checkTypes": {
+      "duplicate": 7
+    },
+    "productionFinancialWrites": 0,
+    "privateSourceContentOrIdentifiersExported": false
+  },
+  "scope": {
+    "originalFinancialCommandsReused": true,
+    "noServerEndpointOrSchemaChange": true,
+    "concurrentCardReleasePreserved": true,
+    "productionFinancialEdits": false,
+    "sitesChanged": false,
+    "paidResourceUpgrade": false
+  },
+  "validation": {
+    "buildTypecheck": "passed",
+    "regressions": 1358,
+    "coreChecks": 15,
+    "browser": {
+      "checks": [
+        "no completion declaration without visible classifications",
+        "matching conflict shows status and unconfirmed suggestion",
+        "initial transaction list is bounded",
+        "all source transactions remain accessible",
+        "pending checks have an explanatory checklist",
+        "transaction action opens and focuses the exact matching decision",
+        "resolved matching row stays visible with its saved classification",
+        "classification RTL layout has no overflow at 320",
+        "classification RTL layout has no overflow at 390",
+        "classification RTL layout has no overflow at 430",
+        "classification RTL layout has no overflow at 1440",
+        "dark and reduced-motion review remains usable",
+        "jumping to a later classification expands and retains that row",
+        "automatically classified movement stays visible",
+        "automatic classification can be changed",
+        "original grouped choice clearly affects all eligible group rows",
+        "uncertain progress locks choices for the same retry",
+        "retrying the identical progress request advances the source revision once",
+        "reloading restores the visible bank choices",
+        "failed review retains the last rows read-only and blocks stale saving",
+        "review retry preserves and rebuilds the intended unsaved choice",
+        "final financial approval is still explicit",
+        "optional categories have an explicit defer action",
+        "leaving categories empty is a distinct explicit action",
+        "deferred categories retain the existing partial lifecycle",
+        "intentional uncategorized completion is preserved separately",
+        "shared viewer has no classification write controls",
+        "all financial records and history remain byte-identical with zero financial writes",
+        "no browser runtime errors"
+      ],
+      "errors": [],
+      "financialUnchanged": true,
+      "financialWrites": 0
+    },
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T09:26:01.375Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "release": {
+      "applicationCommit": "f96c2776ff963cb89c748a6e7e589549323edadf",
+      "runtimeImage": "sha256:a08ad234c5d14732d833cc5efa27e526b384ea02b9b79ca967316705a7ace017",
+      "runtime": {
+        "runtimeFilesMatched": 167,
+        "extra": [],
+        "mismatched": []
+      },
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "preservation": {
+        "authoritativeTablesPreserved": 50,
+        "integrity": true,
+        "foreignKeys": true,
+        "referenceInterestCacheExcluded": true,
+        "backupAttemptTimestampExcluded": true
+      },
+      "sourceReconciliation": {
+        "files": 474,
+        "mismatched": []
+      },
+      "candidateVerification": {
+        "files": 167,
+        "mismatched": [],
+        "extra": []
+      },
+      "releaseGates": {
+        "allReleaseGatesPassed": true,
+        "candidateBackendContracts": 32,
+        "backupVerified": true,
+        "sourceArchiveVerified": true,
+        "receipts": {
+          "access": {
+            "startupPreservesAllExistingRecords": true,
+            "anonymousAndForgedAPIsDenied": true,
+            "anonymousDeepRoutesShowLogin": true,
+            "authenticatedDeepRoutes": true,
+            "privateImmutableAssetsAndMime": true,
+            "framingProtection": true,
+            "freshActorBoundAndEmpty": true,
+            "nonadministratorDenied": true,
+            "existingSpacesPrivate": true,
+            "apiNotSwallowedBySPA": true,
+            "allExistingRecordsPreservedAfterReadChecks": true,
+            "storedSourcesDecrypted": 21,
+            "defaultAndPreferredRootLaunch": true,
+            "originalHTMLSha256": "9d74990efbd8a9516697f7d366efe82132c712bf21072666ea7e5a81e9db47d2",
+            "reactHTMLSha256": "252faa6cc43cc1a289c8c6c2252575432f10167ccfb7f9d7e6c9c8de9a89a540"
+          },
+          "rollback-access": {
+            "startupPreservesAllExistingRecords": true,
+            "anonymousAndForgedAPIsDenied": true,
+            "anonymousDeepRoutesShowLogin": true,
+            "authenticatedDeepRoutes": true,
+            "privateImmutableAssetsAndMime": true,
+            "framingProtection": true,
+            "freshActorBoundAndEmpty": true,
+            "nonadministratorDenied": true,
+            "existingSpacesPrivate": true,
+            "apiNotSwallowedBySPA": true,
+            "allExistingRecordsPreservedAfterReadChecks": true,
+            "storedSourcesDecrypted": 21,
+            "defaultAndPreferredRootLaunch": true,
+            "originalHTMLSha256": "0c444489c538c7c9fbc29f0c3fa300b07c7f6c9cbc2f4c4d0b31362f447f41a1",
+            "reactHTMLSha256": "5c969cb3ad56693f3629f87a9c4420f75e6654a8ee9d6fd57ae4ab8a9a4e792e"
+          },
+          "retained-assets": {
+            "priorReleases": [
+              "5d86c8b"
+            ],
+            "originalAssetsVerified": 68,
+            "currentAndPriorBytesMatch": true
+          },
+          "intake-restore": {
+            "intakeFiveTablesRestored": true,
+            "encryptedOriginalDecrypted": true,
+            "restoredConnectionReceipt": true,
+            "productionDatabaseUntouched": true
+          },
+          "automation": {
+            "startupAndRepeatedStartupPreserveExistingRecords": true,
+            "newTables": 2,
+            "activationPolicies": 0,
+            "syntheticBankAndCalPDFProposals": 2,
+            "calNoticesSeparate": true,
+            "noAutomaticFinancialWrites": true,
+            "rejectionAndPause": true,
+            "encryptedBackupRoundTripAndProposalDecryption": true
+          }
+        }
+      },
+      "backupSha256": "d16b79a43700317c020ebb1473d29dd79bd4f308e4a14546592587900617e1d0",
+      "sourceArchiveSha256": "0aee4db67a81032669e5946661507ee7706d6de7401affebd991f15916c6d6dd",
+      "configurationKeysPreserved": true,
+      "adjacentServicesPreserved": true,
+      "previousReleaseMarkerWasStale": true,
+      "verifiedPreviousSourceAndImage": "5d86c8b234d4bb45b220090a1f59ccc93cad6dbc"
+    }
+  },
+  "limitations": [
+    "No new physical iPhone acceptance.",
+    "Users must explicitly resolve matching decisions and approve financial import in the app.",
+    "Existing open pages need the guarded app refresh."
+  ]
+}

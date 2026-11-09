@@ -8,6 +8,7 @@ export function routeInterfaceMode(href){
  if(path==='/incoming')return 'basic'
  if(['/','/accounts','/banks','/cards','/checks','/loans','/savings','/categories','/more','/plans/scenario','/actions','/notices','/settings','/about','/start','/accounts/new','/card-setup/new','/settings/security','/settings/profile','/settings/spaces','/settings/gmail','/settings/drive','/settings/device-draft'].includes(path))return 'basic'
  if(/^\/(banks|cards)\/[^/]+$/.test(path)||/^\/notices\//.test(path)||/^\/settings\/gmail\/notices\//.test(path))return 'basic'
+ if(/^\/accounts\/[^/]+\/activity$/.test(path))return 'basic'
  if(path==='/upload'||/^\/upload\/(?!history(?:\/|$))[^/]+(?:\/(?:bank|card|group|review))?$/.test(path)||/^\/details\/(?!new$|manage$)[^/]+$/.test(path))return 'basic'
  if(path==='/upload/history'||/^\/upload\/.+\/(?:delete|state)$/.test(path))return 'expert'
  if(path==='/categories/manage')return 'advanced'

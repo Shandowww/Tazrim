@@ -3,13 +3,15 @@ import assert from 'node:assert/strict'
 import vm from 'node:vm'
 import {readFileSync} from 'node:fs'
 import {createHash} from 'node:crypto'
-import {zero,clone,forecast,validatePlan,saveExpenseDetail,removeExpenseDetail,clearExpenseCheque} from '../src/budget.js'
+import {zero,clone,forecast,cashAccountForecast,validatePlan,saveExpenseDetail,removeExpenseDetail,clearExpenseCheque} from '../src/budget.js'
 import {initialDetailDraft,prepareDetailSave,prepareDetailAction} from '../frontend/src/app/detail-management-command.ts'
+import {chequeRegister} from '../frontend/src/app/commitment-summary.js'
+import {needsChequePayer,prepareDetailWithPayer} from '../frontend/src/app/detail-payer-command.ts'
 import {openDatabase} from '../server/database.mjs'
 import {createApp} from '../server/app.mjs'
 import {loadBudgetSnapshot} from '../frontend/src/app/budget-api.ts'
 import {savePreparedPlan,SaveConflict,SaveUncertain} from '../frontend/src/app/plan-save.ts'
-const base=()=>({startMonth:'2026-01',opening:1000,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false}),draft=(p=base(),d={})=>({...initialDetailDraft(p,'','2026-10'),name:'צ׳ק לבדיקה',amount:'250.01',category:'חינוך',date:'2026-10-12',...d})
+const base=()=>({startMonth:'2026-01',opening:1000,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false}),draft=(p=base(),d={})=>({...initialDetailDraft(p,'','2026-10'),accounting:'additional',name:'צ׳ק לבדיקה',amount:'250.01',category:'חינוך',date:'2026-10-12',...d})
 function captured(p,id,d){const source=readFileSync('src/details.js','utf8'),start=source.indexOf('function captureDetailForm()'),end=source.indexOf('function handleDetailInput(',start),row=p.details?.find(e=>e.id===id),original=row??{id,name:'',amount:0,category:'אחר',method:'checks',month:'2026-10',date:'2026-10-01',number:'',status:'pending',accounting:'additional'},entries=Object.entries(d).map(([k,v])=>['detail-'+k,String(v)]),form={elements:{namedItem:()=>null}},ctx=vm.createContext({detailDraft:clone(original),document:{getElementById:()=>form},budgetFormData:()=>entries,readNumber:v=>Number(String(v).replaceAll(',',''))});vm.runInContext(source.slice(start,end),ctx);ctx.captureDetailForm();return JSON.parse(JSON.stringify(ctx.detailDraft))}
 test('Native manual detail input matches original capture and shared save for checks, included rows and direct refunds',()=>{
  for(const d of [draft(),draft(base(),{method:'variable',refund:true,amount:'25.02',status:'pending',accounting:'additional'}),draft(base(),{method:'card1',amount:'1,250.01',number:'ignored'})]){const p=base(),before=clone(p),next=prepareDetailSave(p,'stable',d,true),reference=captured(p,'stable',d);assert.deepEqual(next,saveExpenseDetail(p,reference));assert.deepEqual(p,before);assert.equal(next.details.length,1);if(d.method!=='checks'){assert.equal(next.details[0].status,'cleared');assert.equal(next.details[0].accounting,'included');assert.equal(next.details[0].number,'');assert.deepEqual(forecast(next),forecast(p))}}
@@ -34,4 +36,17 @@ test('Detail save/clear recover lost receipts once through original API, preserv
   const snapshot=(await loadBudgetSnapshot('personal',new AbortController().signal,fetcher)).value,plan=prepareDetailSave(snapshot.plan,'stable-cheque',draft(),true),input={budgetId:'personal',base:snapshot,plan};await assert.rejects(savePreparedPlan(input,fetcher),SaveUncertain);const saved=await savePreparedPlan(input,fetcher);assert.equal(saved.recovered,true);assert.equal(puts,1);assert.equal(saved.value.plan.details.length,1);assert.equal((await(await req('bob','/api/plan')).json()).revision,1);await assert.rejects(savePreparedPlan({...input,plan:prepareDetailSave(snapshot.plan,'other',draft(),true)},fetcher),SaveConflict);assert.equal(puts,1)
   lost=true;const clear={budgetId:'personal',base:saved.value,plan:prepareDetailAction(saved.value.plan,'stable-cheque','clear',true)};await assert.rejects(savePreparedPlan(clear,fetcher),SaveUncertain);const cleared=await savePreparedPlan(clear,fetcher);assert.equal(cleared.recovered,true);assert.equal(puts,2);assert.equal(cleared.value.plan.details[0].status,'cleared');assert.deepEqual(forecast(cleared.value.plan),forecast(saved.value.plan))
  }finally{db.close()}
+})
+
+test('New manual cheques retain planning evidence without another account charge before or after reporting',()=>{
+ const p=base();p.cashPlanning={accounts:[{id:'a',label:'א',opening:600,buffer:0},{id:'b',label:'ב',opening:400,buffer:0}],months:{},cardAccounts:{},transfers:[]}
+ const d={...initialDetailDraft(p,'','2026-10'),name:'גן ילדים',amount:'250.01',category:'חינוך',date:'2026-10-12',number:'0012'}
+ assert.equal(d.method,'checks');assert.equal(d.accounting,'included');assert.equal(needsChequePayer(p,d,true),false)
+ const created=prepareDetailWithPayer(p,'planning-cheque',d,true)
+ assert.deepEqual(forecast(created),forecast(p));for(const id of ['a','b'])assert.deepEqual(cashAccountForecast(created,id),cashAccountForecast(p,id))
+ const pending=chequeRegister(created,{year:'2026',month:'10'}).pending;assert.equal(pending.totalCents,25001);assert.equal(pending.rows[0].number,'0012');assert.equal(pending.rows[0].category,'חינוך')
+ const reported=clone(created);reported.months['2026-10']={values:{...zero(),checks:250.01},actual:true,includesPlannedCard:false}
+ const withoutManual=clone(reported);withoutManual.details=[];assert.deepEqual(forecast(reported),forecast(withoutManual))
+ const cleared=prepareDetailAction(reported,'planning-cheque','clear',true);assert.deepEqual(forecast(cleared),forecast(reported));assert.equal(chequeRegister(cleared,{year:'2026',month:'10'}).cleared.totalCents,25001)
+ assert.deepEqual(initialDetailDraft(created,'planning-cheque','2026-10').accounting,'included')
 })

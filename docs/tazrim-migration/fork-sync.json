@@ -1,27 +1,27 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "1112b817f4fb6fb9d1ed67dc334134a329aa1f2e",
+  "sourceCommit": "c13cc379a9ab07d5b57541f7083be79dfa1262e3",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published issuer notice repair, bank/issuer card positions and partial intake wording",
+  "status": "Published manual cheque planning without additional account deductions",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1352,
+    "regressionTests": 1293,
     "coreChecks": 15,
     "nativeShortcutSchemaActions": 419,
     "receiptGraph": "passed; format/whitespace guards, actionable catalog errors and explicit nested repeats",
-    "browser": "No new browser/device acceptance; actual Hebrew and Cal PDF parsing, legacy encrypted-scan read-only correction and separate bank/program/issuer contracts pass.",
+    "browser": "No new browser or physical-device acceptance; 24 focused cheque and 85 built-candidate contracts pass.",
     "physicalDevice": "Native Mac two-file cleanup/refusal/retry/empty-folder accepted with exact retained bytes and zero financial commits. Prior iPhone 0a5ab68 acceptance retained; revised bindings not newly claimed tested on iPhone. Scheduling/locked-device unverified.",
-    "release": "docs/ui-redesign/evidence/release-issuer-notices-card-labels-2026-11-09.json",
+    "release": "docs/ui-redesign/evidence/release-manual-cheques-2026-11-09.json",
     "productionEvidence": "docs/ui-redesign/evidence/release-mac-shortcut-2026-11-08.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "86f485774629c8f315a20a71d23c3c5d8ca65456",
-  "productionImage": "sha256:7defa0a67044b9491006bc4c1e3244b71e1505945c5c8a3a75f7f9d9592a11fd",
+  "productionApplicationCommit": "2607be36ffa8012f6949c07a4a24a5ea394dfc01",
+  "productionImage": "sha256:0c339dfd8ffb463268917d7c14648d3b2ca367fec309ae4393d3e3ca26b70ff0",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "2208e67d489dfe8a21ee40e480730e5098565b01"
+  "applicationCommit": "2607be36ffa8012f6949c07a4a24a5ea394dfc01"
 }

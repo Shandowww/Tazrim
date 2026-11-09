@@ -1,4 +1,32 @@
+## Manual cheque planning published — 2026-11-09
+
+Application `2607be3` is verified live at https://budgit.duckdns.org/next/checks. New manual cheques use a fixed cheque method and retain dated planning/analysis details without additional account deductions; actual charges come from bank reports. Both cheque forms hide redundant method/accounting choices. Existing standalone cheques retain their stored accounting unless explicitly edited; generic native manual-detail creation remains separate.
+
+Clean build/typecheck,1,293 regressions,15 core checks,24 focused cheque contracts and85 built-candidate contracts pass. All509 prior-source and168 runtime files matched. Fresh verified SQLite backup, isolated financial/access/19-source decryption/startup/rollback/intake/automation restore and69 retained-asset checks passed. Activation preserved all50 authoritative tables, keys/configuration and adjacent services; public health/auth/deep routes/root/manifest/installer pass. No real-record edits, Sites/resource changes or new browser/physical-iPhone acceptance. Use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-manual-cheques-2026-11-09.json`. Continue in `work/budgit-household-ui`.
+
 # Monthly Flow — project handoff
+
+## Pending-report notification dismissal published — 2026-11-09
+
+Application `bae2597` is verified live. Both interfaces offer **הסרת התראה** for pending stored reports and the private incoming-inbox summary. Dismissal is personal, persists through reloads, and can be restored through **הצגת נדחות ומוסתרות → החזרת התראה**. Changed report/inbox evidence can show a new notification. Stored reports, review progress and budget data are retained.
+
+Build/typecheck, 1,368 regressions, 15 core checks and 61 built-candidate contracts pass. All 463 prior-live source files and 168 candidate/live runtime files matched. Fresh verified backup, isolated financial/access/19-source decryption/startup/rollback/intake/automation restore and 69 retained-asset checks passed. Activation preserved all 50 authoritative tables, keys/configuration and adjacent services. Public health/auth/deep routes/root/manifest/installer pass. No real financial/report edits, Sites or resource changes; no new browser/physical-iPhone acceptance. Use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-report-notification-dismissal-2026-11-09.json`. Continue in `work/budgit-household-ui`.
+
+## Inline report comparisons and reversible decisions published — 2026-11-09
+
+Application `f07d51a` is verified live at https://budgit.duckdns.org/next/incoming. Matching review now compares incoming bank/card movements with saved records inside the form, including saved classification, dates, signed amounts, references and source evidence. Account-scoped search and bounded lists keep all forty synthetic checks accessible. Clear unresolved/same/additional-record choices stay visible and editable after progress save/reload and when all decisions are resolved. Reset restores the original pending check. Similar records are inspection evidence; only the original matcher authorizes a same-record link. Original financial, actor/revision/source and uncertain-write guards remain.
+
+Build/typecheck, 1,361 regressions, 15 core checks, 23 new plus 29 prior synthetic interface checks and 35 candidate contracts pass. All 477 previous-source files and 167 candidate/live runtime files matched. Fresh verified SQLite backup, isolated financial/access/21-source decryption/startup/rollback/intake/automation restore and 68 retained-asset gates passed. Activation preserved all 50 authoritative tables, configuration keys and adjacent services. No production financial edits or report decisions, Sites changes or paid-resource upgrade. Physical iPhone acceptance remains unverified. Use guarded app refresh. Evidence: `docs/ui-redesign/evidence/release-matching-comparison-2026-11-09.json`; details: `docs/ui-redesign/MATCHING-COMPARISON-2026-11-09.md`. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
+## Clear report classification published — 2026-11-09
+
+Application `f96c277` is verified live at https://budgit.duckdns.org/next/incoming. Report review now shows every transaction and its current classification/status, retains automatic and selected bank rows for original-command editing, explains pending checks with exact decision navigation, and replaces generic completion radios with explicit optional-category actions. Matching/conflicting/imported records retain their original guards. Failed recalculation keeps the last usable rows read-only and can retry the intended unsaved choice.
+
+A scoped read-only backup diagnostic confirmed that the reported `file.pdf` contained seven matching conflicts and no new-classification groups; the report was not imported or completed by the agent. Build/typecheck,1,358 regressions,15 core checks,29 synthetic interface checks and32 candidate contracts pass. All474 prior-source files and167 candidate/live runtime files matched; fresh verified backup, financial/access/21-source decryption/startup/rollback/intake/automation restore and68 retained-asset gates passed. Activation preserved all50 authoritative tables, configuration keys and adjacent services. Concurrent card-layout work is retained; Sites and paid resources are unchanged. Evidence: `docs/ui-redesign/evidence/release-classification-review-2026-11-09.json`; details: `docs/ui-redesign/CLASSIFICATION-REVIEW-2026-11-09.md`. Use guarded app refresh. No new physical iPhone acceptance. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
+## Card carousel and issuer marks published — 2026-11-09
+
+Application `5d86c8b` is verified live at https://budgit.duckdns.org/next/accounts. Switching cards preserves the vertical page position; the Isracard issuer mark no longer carries advertising copy; transparent Cal and the bank/issuer marks use aligned boxes. Build/typecheck, 1,276 regressions, 15 core checks, local 390px browser and isolated backup financial/access/HTTP gates pass. Live image, health, unauthenticated route behavior and database integrity were verified. No financial edit or Sites change. Physical iPhone retest remains. Evidence: `docs/ui-redesign/evidence/release-card-carousel-marks-2026-11-09.json`.
 
 ## Issuer notices, card positions and partial wording published — 2026-11-09
 
@@ -781,3 +809,8 @@ Final payer compatibility — 2026-10-28: shared original payer extraction reads
 
 
 UI wording follow-up — 2026-10-28: native group review, uncommitted-source deletion and billing text now describe user actions without implementation/migration wording. Copy only; original commands, restrictions and save behavior are unchanged. Build/typecheck and15 checks pass; prior906 functional regressions and bounded browser evidence remain current. Production/Sites unchanged.
+
+
+## Bank activity display repair published — 2026-11-09
+
+Application `a56f2b3` is verified live. Bank wallet “תנועות ופירוט שמור” now opens the original stored bank movements in the exact account/space/period, rather than empty expense-detail analytics. Read-only signed entries, search/pagination, basic-mode access and a separate expense-category link preserve all financial/source data. Clean build/typecheck,1,289 regressions,15 core checks and47 isolated runtime contracts pass.412 prior-source and168 runtime files matched; fresh verified backup, rollback and financial/access/source-decryption gates preceded activation. All50 authoritative tables, keys/settings and adjacent services were preserved. No new browser/physical-iPhone acceptance. Evidence: docs/ui-redesign/evidence/release-bank-activity-2026-11-09.json.

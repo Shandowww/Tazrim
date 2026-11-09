@@ -20,7 +20,7 @@ test('Every wallet action resolves to an existing native screen and preserves it
 })
 test('Viewer wallet areas expose reports and detail reads without edit entry points',()=>{
  assert.deepEqual(accountWorkflows('cards','card1',true).map(a=>a.href),['/categories?card=card1'])
- assert.deepEqual(accountWorkflows('banks','a',true).map(a=>a.href),['/categories?account=a'])
+ assert.deepEqual(accountWorkflows('banks','a',true).map(a=>a.href),['/accounts/a/activity'])
  for(const kind of ['cards','banks'])assert.deepEqual(accountWorkflows(kind,'',true).map(a=>a.href),['/upload','/upload/history'])
 })
 test('Fresh native launch selects current month while explicit annual, historical and scope links retain intent',()=>{

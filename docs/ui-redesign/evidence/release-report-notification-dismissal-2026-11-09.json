@@ -1,0 +1,157 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "bae2597cf6249596d83c5597a312d2bcb92cf27e",
+  "previousApplicationCommit": "a56f2b3eb809090ed49aabe5787d664036050159",
+  "entry": "https://budgit.duckdns.org/next/actions",
+  "runtimeImage": "sha256:4686be29cce00274936fd5fff0ef2d02975720a9497e1700350d96df36b92bc9",
+  "sourceArchiveSha256": "3a2c3275b51c8a39dadb1a10ab1c1137cd09f162da1603191d2cdcc6ca06a9e5",
+  "changes": [
+    "Personal dismissal of pending stored-report and private incoming-inbox bell notifications in both interfaces",
+    "Dismissal persists across reloads, can be restored, and changed evidence shows a new notification",
+    "Stored reports, review progress, financial data and other users notifications remain independent"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed",
+    "regressions": 1368,
+    "coreChecks": 15,
+    "previousSource": {
+      "files": 463,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 168,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 61,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "ab42842c04daec472187cc314cf6e5934b6da5fba7cc7546ed7f1d24858cd1e4",
+          "reactHTMLSha256": "d502bc74e13b7aa119549ce61e754254dae717f1328e82d221361a933133cb5c"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "617bb15fc453edb1d3a7f3a65524bf60e266a594995075573c22297a0a2da96e",
+          "reactHTMLSha256": "51fd27c5bc0fe7c1c0fe38ab5d9de607467cac97f6b1572e85cdef45731b77d3"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "a56f2b3"
+          ],
+          "originalAssetsVerified": 69,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 168,
+      "extra": [],
+      "mismatched": []
+    },
+    "health": {
+      "ok": true,
+      "loginConfigured": true
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T14:05:12.849Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "verificationNotes": [
+    "An omitted synthetic Cal PDF fixture initially stopped the isolated automation gate. The existing synthetic fixture was supplied, then automation/restore and all 61 candidate contracts passed. No application or production data repair was needed."
+  ],
+  "limitations": [
+    "No new browser or physical iPhone acceptance is claimed.",
+    "Already-open pages need guarded app refresh to receive the new interface code.",
+    "Dismissal is personal; new source revisions or private-inbox evidence can show the notification again."
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "2607be36ffa8012f6949c07a4a24a5ea394dfc01",
+  "previousApplicationCommit": "bae2597cf6249596d83c5597a312d2bcb92cf27e",
+  "entry": "https://budgit.duckdns.org/next/checks",
+  "runtimeImage": "sha256:0c339dfd8ffb463268917d7c14648d3b2ca367fec309ae4393d3e3ca26b70ff0",
+  "sourceArchiveSha256": "5141461ed5906475c88c15b35fdf540463c1937b74ed4b2460444273ec72eb82",
+  "changes": [
+    "Cheque payment method fixed in both interfaces",
+    "New manual cheques retain dated planning/analysis details without additional account deductions; reports supply actual charges",
+    "Existing standalone cheques keep their stored accounting; generic native detail creation remains separately accessible"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed",
+    "regressions": 1293,
+    "coreChecks": 15,
+    "focusedChequeContracts": 24,
+    "previousSource": {
+      "files": 509,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 168,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 85,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "0e305847353566d53a99996c1b5d5eb402633aec5f1c71f71183bdd390f10b09",
+          "reactHTMLSha256": "8f32ecb05240b63352998596658e2de9076f02bc548ce3821661eba4bb180f1c"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "ab42842c04daec472187cc314cf6e5934b6da5fba7cc7546ed7f1d24858cd1e4",
+          "reactHTMLSha256": "d502bc74e13b7aa119549ce61e754254dae717f1328e82d221361a933133cb5c"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "bae2597"
+          ],
+          "originalAssetsVerified": 69,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 168,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T16:27:50.880Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone acceptance",
+    "Already-open pages need guarded refresh",
+    "No existing financial records were migrated; no new chart or automatic cheque matching is claimed"
+  ]
+}

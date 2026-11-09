@@ -10,9 +10,9 @@ export function inboxBankGroupKey(item,r){return JSON.stringify([item.target,sta
 export async function buildReportInbox(plan,ui,{month,today,classifier,activityAPI}){
  const inboxAccounts=ui=>[...cashAccountList(plan),...ui.newAccounts],inboxCards=ui=>[...creditCards(plan),...ui.newCards];
  if(ui.blank)ui.startMonth=[plan.startMonth,...ui.items.filter(i=>!i.skip&&!i.error).map(i=>(i.from??i.report?.dueDate??i.activityCycle??plan.startMonth).slice(0,7))].sort()[0];
- let working=reportInboxBase(plan,ui),banks=[],cards=[],receipts=[],bindings=[],issues=0,bankGroups=new Map();ui.cardGroups=[];ui.skipped=ui.duplicates;ui.readyRows=0;ui.base=working;
+ let working=reportInboxBase(plan,ui),banks=[],cards=[],receipts=[],bindings=[],issues=0,bankGroups=new Map(),bankReviewGroups=new Map();ui.cardGroups=[];ui.skipped=ui.duplicates;ui.readyRows=0;ui.base=working;
  for(const item of ui.items){
-  item.preview=null;item.questions=[];item.warning='';item.already=false;item.statementConflict=null;
+  item.preview=null;item.questions=[];item.matchReviews=[];item.warning='';item.already=false;item.statementConflict=null;
   if(item.skip){ui.skipped++;continue;}
   if(item.activity){item.report=null;try{item.report=activityAPI.calActivityReport(item.activity,item.activityCycle,item.activityTotal,item.activityConfirmed);item.activityError='';}catch(error){item.activityError=error.message;}}
   if(item.error||['ambiguous','sheets'].includes(item.kind)||!item.target){issues++;continue;}
@@ -28,14 +28,18 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    let preview=bankPreview(working,records,options);
    if(preview.rows.some(r=>r.state==='migrated'))item.warning='בדוח יש מקור שסומן במעבר חשבון. קליטתו מחדש חסומה גם אם נבחר חשבון אחר; יש לבדוק את המקור לפני קליטה.';
    for(const row of preview.rows.filter(r=>r.state==='conflict')){
-    const decision=item.decisions[row.line],previous=working.bankImport?.entries.find(e=>e.key===row.key);
-    if(decision==='same'&&previous?.fingerprint===row.fingerprint)records=records.map(r=>r.line===row.line?{...r,missingReference:false}:r);
+    const decision=item.decisions[row.line],previous=working.bankImport?.entries.find(e=>e.key===row.key),canMatch=previous?.fingerprint===row.fingerprint;
+    const match={type:'duplicate',id:String(row.line),row,canMatch,previous,previousFile:working.bankImport?.batches.find(b=>b.id===previous?.batchId)?.file,decision:decision==='new'||decision==='same'&&canMatch?decision:'',storedDecision:decision??''};
+    // Keep the original evidence and every choice visible, including choices restored from older drafts.
+    item.matchReviews.push(match);
+    if(decision==='same'&&canMatch)records=records.map(r=>r.line===row.line?{...r,missingReference:false}:r);
     else if(decision==='new')records=await Promise.all(records.map(async r=>r.line===row.line?{...r,key:await inboxHash(item.hash+':'+r.line+':'+r.key),missingReference:false}:r));
-    else item.questions.push({type:'duplicate',row,canMatch:previous?.fingerprint===row.fingerprint,previous});
+    else item.questions.push({type:'duplicate',row,canMatch,previous});
    }
    preview=bankPreview(working,records,options);options.modes=bankDefaultMonthModes(working,preview,month,options.reportScope);
    for(const m of preview.months){if(item.monthDecisions[m.month]==='skip')options.modes[m.month]='skip';if(options.modes[m.month]==='skip'&&m.newCount&&item.monthDecisions[m.month]!=='skip')item.questions.push({type:'protected-month',month:m.month});if(options.modes[m.month]!=='skip'&&bankPlannedDirect(working,m.month,item.target).length&&typeof item.directIncluded[m.month]!=='boolean')item.questions.push({type:'direct',month:m.month});}
    preview=bankPreview(working,records,options);item.preview=preview;
+   for(const r of preview.rows.filter(r=>r.state==='new'&&options.modes[r.date?.slice(0,7)]!=='skip')){const key=inboxBankGroupKey(item,r);if(!bankReviewGroups.has(key))bankReviewGroups.set(key,{key,rows:[]});bankReviewGroups.get(key).rows.push({...r,fileName:item.name});}
    for(const r of preview.rows.filter(r=>r.state==='new'&&!r.reviewed&&options.modes[r.date?.slice(0,7)]!=='skip')){const key=inboxBankGroupKey(item,r);if(!bankGroups.has(key))bankGroups.set(key,{key,merchant:[r.description,r.beneficiary].filter(Boolean).join(' · '),rows:[],category:choices[r.line]?.field??'',reason:choices[r.line]?.reason??''});bankGroups.get(key).rows.push({...r,fileName:item.name});}
    if(preview.rows.some(r=>r.state==='invalid'))item.questions.push({type:'invalid'});
    const selected=preview.months.filter(m=>options.modes[m.month]!=='skip');
@@ -50,16 +54,16 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    const receiptHash=item.activity?await inboxHash(item.hash+':cal-cycle:'+item.report.dueDate):item.hash;
    try{const preview=item.report.entries?await prepareCardStatement(working,item.report,item.target,ui.merchantRules??[],{replacementToken:item.decisions.statementReplacement}):null;item.preview=preview;const previous=cards.find(c=>c.cardId===item.target&&c.dueDate===item.report.dueDate);if(previous){const same=previous.amount===item.report.amount&&JSON.stringify(previous.statement?.rows.map(r=>r.id).sort()??[])===JSON.stringify(preview?.rows.map(r=>r.id).sort()??[]);if(same){item.already=true;ui.skipped++;receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:item.report.dueDate});continue;}item.warning='שני דוחות שונים לאותו כרטיס ומועד חיוב. הסירו את הישן והשאירו את הדוח המעודכן.';issues++;continue;}if(!preview){cards.push({cardId:item.target,dueDate:item.report.dueDate,amount:item.report.amount,accountId:item.payer,statement:null,item});receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:item.report.dueDate});continue;}
     if(!preview.replacement&&preview.rows.every(r=>r.existing)&&working.cardBilling?.reports.some(r=>r.cardId===item.target&&r.dueDate===preview.dueDate&&r.amount===preview.amount)){item.already=true;item.reason='דוח כפול · כל העסקאות כבר קיימות ואין עסקאות חדשות לקליטה.';ui.skipped++;receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:preview.dueDate});continue;}
-    const groups=statementGroups(preview);for(const g of groups){const key=statementMerchant(g.merchant),selected=ui.categoryChoices.get(key);if(selected)for(const r of g.rows)r.category=selected;}
-    for(const r of preview.rows)if(r.candidates.length&&!item.decisions[r.id]){issues++;item.questions.push({type:'card-match',row:r});}
+    const groups=statementGroups(preview);for(const g of groups){const key=statementMerchant(g.merchant),selected=ui.categoryChoices.get(key);if(ui.categoryChoices.has(key))for(const r of g.rows)r.category=selected;}
+    for(const r of preview.rows)if(r.candidates.length){const chosen=item.decisions[r.id],decision=chosen==='new'||r.candidates.some(c=>c.id===chosen)?chosen:'';item.matchReviews.push({type:'card-match',id:r.id,row:r,candidates:r.candidates,decision,storedDecision:chosen??''});if(!decision){issues++;item.questions.push({type:'card-match',row:r});}}
     cards.push({cardId:item.target,dueDate:preview.dueDate,amount:preview.amount,accountId:item.payer,statement:preview,item});receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:preview.dueDate});ui.readyRows+=preview.rows.filter(r=>!r.existing).length;
    }catch(error){item.warning=error.message;if(error.statementConflict){item.statementConflict=error.statementConflict;item.questions.push({type:'statement-conflict'});}issues++;}
   }
   if(item.identityKey)bindings.push({key:item.identityKey,kind:item.kind,target:item.target});
  }
- ui.bankGroups=[...bankGroups.values()];issues+=ui.bankGroups.length;
+ ui.bankReviewGroups=[...bankReviewGroups.values()];ui.bankGroups=[...bankGroups.values()];issues+=ui.bankGroups.length;
  const grouped=statementBatchGroups(cards.map(c=>({statement:c.statement,name:c.item.name,cardId:c.cardId,cardName:inboxCards(ui).find(card=>card.id===c.cardId)?.name,dueDate:c.dueDate})));
- for(const g of grouped){const key=statementMerchant(g.merchant),selected=ui.categoryChoices.get(key);if(selected)g.category=selected;}
+ for(const g of grouped){const key=statementMerchant(g.merchant),selected=ui.categoryChoices.get(key);if(ui.categoryChoices.has(key))g.category=selected;}
  ui.cardGroups=grouped;ui.cards=cards;ui.banks=banks;ui.issues=issues;
  for(const c of cards){c.deferCategories=true;c.choices={};for(const row of c.statement?.rows??[]){if(row.existing)continue;const group=grouped.find(g=>g.rows.some(r=>r.id===row.id&&r.fileIndex===cards.indexOf(c)));c.choices[row.id]={category:group?.category??'',match:c.item.decisions[row.id]};}}
  ui.build=null;
@@ -75,7 +79,8 @@ export function reportInboxPayer(p,id){const mapped=p.cashPlanning?.cardAccounts
 export async function changeReportInbox(plan,ui,e,reader=null){
  const inboxBase=ui=>reportInboxBase(plan,ui),inboxAccounts=ui=>[...cashAccountList(plan),...ui.newAccounts],inboxCards=ui=>[...creditCards(plan),...ui.newCards],inboxPayer=reportInboxPayer;
   if(e.dataset.inboxCategory!==undefined)ui.categoryChoices.set(e.dataset.inboxCategory,e.value);
-  if(e.dataset.inboxBankGroup!==undefined){const g=ui.bankGroups[Number(e.dataset.inboxBankGroup)];if(e.value)ui.bankChoices.set(g.key,{field:e.value,refund:g.rows[0].amountCents>0&&!['salary','otherIncome','incomingTransfers','outgoingTransfers','exclude'].includes(e.value)});}
+  // Reviewed rows use the same original group choice; pending-only groups remain compatible.
+  if(e.dataset.inboxBankGroup!==undefined||e.dataset.inboxBankReviewGroup!==undefined){const g=e.dataset.inboxBankReviewGroup!==undefined?ui.bankReviewGroups?.[Number(e.dataset.inboxBankReviewGroup)]:ui.bankGroups[Number(e.dataset.inboxBankGroup)];if(!g)throw Error('קבוצת התנועות השתנתה; יש לפתוח את הסיווג מחדש.');if(e.value)ui.bankChoices.set(g.key,{field:e.value,refund:g.rows[0].amountCents>0&&!['salary','otherIncome','incomingTransfers','outgoingTransfers','exclude'].includes(e.value)});}
   const keys=['provider','target','payer','date','from','to','scope','direct','duplicate','kind','sheet','label','cycle','cycleTotal','cycleConfirmed','replacement','skip'],key=keys.find(k=>e.dataset['inbox'+k[0].toUpperCase()+k.slice(1)]!==undefined);
   if(key){const index=Number(e.dataset['inbox'+key[0].toUpperCase()+key.slice(1)]),item=ui.items[index];
    if(key==='replacement')item.decisions.statementReplacement=e.value;
@@ -95,7 +100,7 @@ export async function changeReportInbox(plan,ui,e,reader=null){
    if(key==='from'||key==='to'){if(!item.inspection?.pdfReconciliation)item[key]=e.value;}
    if(key==='scope')item.bankOptions.scope=e.value;
    if(key==='direct')item.directIncluded[e.dataset.month]=e.value==='included';
-   if(key==='duplicate')item.decisions[e.dataset.row]=e.value;
+   if(key==='duplicate'){if(e.value)item.decisions[e.dataset.row]=e.value;else delete item.decisions[e.dataset.row];}
    if(key==='label'){const a=ui.newAccounts.find(a=>a.id===item.target),c=ui.newCards.find(c=>c.id===item.target);if(a)a.label=e.value.trim();if(c)c.name=e.value.trim();}
    if(key==='kind'){if(e.value==='card'){const total=item.records.reduce((n,r)=>n-r.amountCents,0)/100;if(item.records.some(r=>!r.valid||r.currency!=='ILS')||total<0)throw Error('לא זוהה סיכום חיובי כרטיס ברור. בחרו דוח כרטיס נתמך.');item.report={amount:total,dueDate:''};}item.kind=e.value;item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}
    if(key==='sheet'){const {inspectIntake}=reader;Object.assign(item,inspectIntake([item.sheets[Number(e.value)]]));item.identityKey=item.identity?await inboxHash(item.identity):'';item.target=inboxTarget(inboxBase(ui),item);item.payer=inboxPayer(inboxBase(ui),item.target);}

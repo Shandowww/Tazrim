@@ -1,6 +1,8 @@
 import {monthlyDataCoverage,monthAt,creditCards,cashAccountList} from './budget.js';
 
-// Facts are derived from their owning subsystem. Reading/snoozing never resolves them.
+// Facts are derived from their owning subsystem. Notification preferences never resolve them.
+export const ACTION_DISMISSED=-1;
+export function actionIssueDismissed(issue,preferences){const p=preferences?.[issue.key];return p?.evidence===issue.evidence&&p.until===ACTION_DISMISSED;}
 export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,locked=false,saveError='',reports=[],expectations=[],gmail=null,notices=[],statementNotices=[],incomingReports=null,day=asOf+'-01'}={}){
  const issues=[],add=(code,id,title,effect,action,target,evidence,severity='required')=>issues.push({key:scope+':'+code+':'+id,code,title,effect,action,target,evidence:JSON.stringify(evidence),severity});
  if(saveError)add('save.failed','device','השינויים במכשיר טרם נשמרו',saveError,'חזרה לשמירה',{screen:'save'},saveError);
@@ -42,9 +44,9 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
  return issues;
 }
 
-export function actionIssueVisible(issue,preferences,now){const p=preferences?.[issue.key];return !p||p.evidence!==issue.evidence||!(p.until>now);}
+export function actionIssueVisible(issue,preferences,now){const p=preferences?.[issue.key];return !p||p.evidence!==issue.evidence||p.until!==ACTION_DISMISSED&&!(p.until>now);}
 
 export function validActionTarget(t){return !!t&&typeof t==='object'&&['save','backup','report','unlock','upload','gmail','notice','statement-notice','incoming'].includes(t.screen)&&Object.keys(t).every(k=>['screen','month','kind','target','reportId','noticeId'].includes(k))&&(!t.month||/^20\d{2}-(0[1-9]|1[0-2])$/.test(t.month))&&['target','reportId','noticeId'].every(k=>t[k]===undefined||typeof t[k]==='string'&&/^[\w:-]{1,100}$/.test(t[k]));}
 
 export function nextActionAnnouncement(active,preferences,announced){return active.find(i=>i.severity==='required'&&!announced.has(i.key+i.evidence)&&preferences[i.key]?.evidence!==i.evidence);}
-export function actionPreferencePayload(issue,preferences,until,action,accountId,compare=false){const prior=Object.hasOwn(preferences,issue.key)?preferences[issue.key]:null;return{...(action==='read'?{action:'read'}:{}),key:issue.key,evidence:issue.evidence,until,accountId,...(compare?{previous:prior?{evidence:prior.evidence,until:prior.until}:null}:{})};}
+export function actionPreferencePayload(issue,preferences,until,action,accountId,compare=false){const prior=Object.hasOwn(preferences,issue.key)?preferences[issue.key]:null;return{...(['read','dismiss'].includes(action)?{action}:{}),key:issue.key,evidence:issue.evidence,until,accountId,...(compare?{previous:prior?{evidence:prior.evidence,until:prior.until}:null}:{})};}

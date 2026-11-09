@@ -1,0 +1,7 @@
+# Manual cheque planning — 2026-11-09
+
+Application `2607be3` is verified live. Release evidence: [release-manual-cheques-2026-11-09.json](evidence/release-manual-cheques-2026-11-09.json).
+
+New manual cheques use the existing included-detail model: they retain amount, due date, category, number and status without adding an account or aggregate cash-flow deduction. The cheque register retains their dated totals for planning/analysis; no new chart or automatic report matching is claimed. Actual bank reports supply the charge. New cheque forms in both interfaces hide the payment-method and accounting controls. Native generic manual-detail creation has its own action. Existing additional cheques retain their stored treatment with explicit editing available; no migration or real-record writes were performed.
+
+Validation: build/typecheck, 1,293 tests in `test/*.test.mjs`, and 15 core checks pass. The new accounting regression checks two account projections, aggregate projection, cheque-register evidence, a later monthly charge and clearing without a second deduction. Existing standalone cheque and payer contracts explicitly retain the legacy accounting case. No browser or physical-device acceptance performed. Fresh verified backup, isolated financial/access/startup/rollback/restore gates, 85 candidate contracts and runtime/public verification passed. All 50 authoritative tables were preserved.
