@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "5d86c8b",
+  "previousApplicationCommit": "86f4857",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:1126b574cee3faaed9aa3c8c00a8c0520da7b2705d5d52b5f9a7ad1b08a74cf5",
+  "changes": [
+    "Keep vertical page position when choosing another card and disable scroll anchoring within the changing accounts view",
+    "Remove the advertising slogan from the transparent Isracard issuer mark",
+    "Show the existing transparent Cal mark without a white tile and give bank and issuer marks the same sized placement on both cards"
+  ],
+  "validation": {
+    "buildTypecheck": "passed",
+    "regressions": 1276,
+    "coreChecks": 15,
+    "localMobileBrowser": "390px Chrome: selected-card and page positions unchanged across card changes; bank and issuer marks have matching 104x38 boxes",
+    "freshVerifiedSQLiteBackup": true,
+    "candidateFinancialPreservation": "passed against isolated backup",
+    "candidateAccessAndHttp": "passed against isolated backup with synthetic identities",
+    "priorLiveImageMatched": true,
+    "priorLiveChangedFilesMatched": true,
+    "runtimeImageAndHealth": "matched and healthy",
+    "publicHealth": 200,
+    "unauthenticatedPlan": 401,
+    "unauthenticatedAccountsRoute": 200,
+    "databaseIntegrity": "ok",
+    "adjacentParkingProxy": "running",
+    "rollbackImage": "budgit-rollback:card-5d86c8b",
+    "physicalIPhoneRetest": false
+  },
+  "financialRecordsChangedByRelease": false,
+  "sitesChanged": false
+}

@@ -28,8 +28,13 @@ function WalletDots({cards,selectedId,select,step}:{cards:Array<{id:string;displ
  return <div ref={ref} role="group" aria-label="בחירת כרטיס">{cards.map(card=><button type="button" key={card.id} onClick={()=>select(card.id)} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}}} aria-label={'הצגת '+card.displayName+' '+(card.cardLastFour??'')} aria-pressed={selectedId===card.id}><span/></button>)}</div>
 }
 function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
- const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null)
+ const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pendingScroll=useRef<number|null>(null)
  useEffect(()=>()=>{if(swipeTimer.current)clearTimeout(swipeTimer.current)},[scope,period.year,period.month])
+ useLayoutEffect(()=>{
+  if(pendingScroll.current===null)return
+  window.scrollTo({top:pendingScroll.current,behavior:'instant'})
+  pendingScroll.current=null
+ },[query.get('walletCard')])
  let view:ReturnType<typeof householdAccounts>
  try{view=householdAccounts(plan,period)}catch{return <section className="surface household-empty" role="alert">לא ניתן להציג את נתוני החשבונות. <Link href={withViewQuery('/upload',location.search,import.meta.env.DEV)}>בדיקת הדוחות</Link></section>}
  const selected=selectedWalletCard(view.cards,query.get('walletCard'),remembered.get(scope))
@@ -47,6 +52,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   if(!view.cards.some(c=>c.id===id))return
   if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}
   resetSwipe(true)
+  pendingScroll.current=window.scrollY
   remembered.set(scope,id)
   if(remembered.size>30)remembered.delete(remembered.keys().next().value!)
   const next=new URLSearchParams(location.search)

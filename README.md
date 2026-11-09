@@ -1,5 +1,15 @@
 # Monthly Flow
 
+## Clear report classification published — 2026-11-09
+
+Application `f96c277` is verified live at https://budgit.duckdns.org/next/incoming. Report review now shows every transaction and its current classification/status, retains automatic and selected bank rows for original-command editing, explains pending checks with exact decision navigation, and replaces generic completion radios with explicit optional-category actions. Matching/conflicting/imported records retain their original guards. Failed recalculation keeps the last usable rows read-only and can retry the intended unsaved choice.
+
+A scoped read-only backup diagnostic confirmed that the reported `file.pdf` contained seven matching conflicts and no new-classification groups; the report was not imported or completed by the agent. Build/typecheck,1,358 regressions,15 core checks,29 synthetic interface checks and32 candidate contracts pass. All474 prior-source files and167 candidate/live runtime files matched; fresh verified backup, financial/access/21-source decryption/startup/rollback/intake/automation restore and68 retained-asset gates passed. Activation preserved all50 authoritative tables, configuration keys and adjacent services. Concurrent card-layout work is retained; Sites and paid resources are unchanged. Evidence: `docs/ui-redesign/evidence/release-classification-review-2026-11-09.json`; details: `docs/ui-redesign/CLASSIFICATION-REVIEW-2026-11-09.md`. Use guarded app refresh. No new physical iPhone acceptance. Continue in `work/budgit-household-ui`, branch `codex/budgit-household-ui`.
+
+## Card carousel and issuer marks published — 2026-11-09
+
+Application `5d86c8b` is verified live at https://budgit.duckdns.org/next/accounts. Switching cards preserves the vertical page position; the Isracard issuer mark no longer carries advertising copy; transparent Cal and the bank/issuer marks use aligned boxes. Build/typecheck, 1,276 regressions, 15 core checks, local 390px browser and isolated backup financial/access/HTTP gates pass. Live image, health, unauthenticated route behavior and database integrity were verified. No financial edit or Sites change. Physical iPhone retest remains. Evidence: `docs/ui-redesign/evidence/release-card-carousel-marks-2026-11-09.json`.
+
 ## Issuer notices, card positions and partial wording published — 2026-11-09
 
 Application `86f4857` is verified live at https://budgit.duckdns.org/next. Transfer actor/payroll rows no longer become promotional notices. Credit-limit, interest, points and club-benefit messages have explicit labels; original source text/pages remain. Older encrypted discoveries are filtered/reclassified at read time without rewriting them. An isolated actual-backup check confirms the reported payroll false positive is filtered. Household cards now place the paying bank above the processing issuer, retain network marks below, and preserve separate ONE ZERO program/issuer evidence. **נקלט חלקית** replaces **עוכל חלקית** across the Sync Center and guided-review wording; internal lifecycle/approval/retention behavior is unchanged.
