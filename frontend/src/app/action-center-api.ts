@@ -1,4 +1,4 @@
-import {actionIssues,actionIssueVisible,actionPreferencePayload,validActionTarget} from '../../../src/action-center-model.js'
+import {ACTION_DISMISSED,actionIssues,actionIssueVisible,actionPreferencePayload,validActionTarget} from '../../../src/action-center-model.js'
 import {validatePlan} from '../../../src/budget.js'
 import {loadExpectations,type ExpectationsSnapshot,type ActionIntegrations} from './report-expectations-api.ts'
 import {AccessError,loadBudgetSnapshot} from './budget-api.ts'
@@ -6,7 +6,7 @@ import {SaveConflict,SaveUncertain} from './plan-save.ts'
 import {withViewQuery} from './navigation-query.js'
 export interface ActionClock{asOf:string;day:string;now:number}
 export type ActionIssue=ReturnType<typeof actionIssues>[number]
-export interface PreferenceAttempt{issue:ActionIssue;action:'read'|'snooze';until:number}
+export interface PreferenceAttempt{issue:ActionIssue;action:'read'|'snooze'|'dismiss';until:number}
 export function actionClock():ActionClock{const p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),day=p.find(r=>r.type==='year')!.value+'-'+p.find(r=>r.type==='month')!.value+'-'+p.find(r=>r.type==='day')!.value;return{day,asOf:day.slice(0,7),now:Date.now()}}
 export function reportActionFacts(snapshot:ExpectationsSnapshot,clock:ActionClock){
  const plan=snapshot.budget.value.plan,locked=plan?.format==='monthly-flow-encrypted-v1'
@@ -38,7 +38,8 @@ export async function saveActionPreference(input:{budgetId:string;base:Expectati
  const {budgetId,base,attempt,clock}=input,signal=new AbortController().signal,fresh=await (base.integrations?loadActionSnapshot:loadExpectations)(budgetId,base.budget.value,signal,fetcher)
  if(fresh.actions.actionPreferenceCAS!==true)throw Error('השרת עדיין לא תומך בעדכון מוגן של תזכורות. אפשר לרענן ולנסות שוב; אם ההודעה נמשכת נדרש עדכון השרת.')
  const issue=reportActionFacts(fresh,clock).facts.find(i=>i.key===attempt.issue.key&&i.evidence===attempt.issue.evidence)
- if(!issue||!['read','snooze'].includes(attempt.action)||!Number.isSafeInteger(attempt.until)||attempt.action==='read'&&attempt.until!==0)throw new SaveConflict('הפעולה השתנתה או כבר טופלה. יש לרענן את הרשימה.')
+ if(!issue||!['read','snooze','dismiss'].includes(attempt.action)||!Number.isSafeInteger(attempt.until)||attempt.action==='read'&&attempt.until!==0)throw new SaveConflict('הפעולה השתנתה או כבר טופלה. יש לרענן את הרשימה.')
+ if(attempt.action==='dismiss'&&(fresh.actions.actionDismiss!==true||!['report','incoming'].includes(issue.target.screen)||attempt.until!==ACTION_DISMISSED))throw Error('הסרת התראה זמינה רק לדוח שממתין לטיפול ובשרת מעודכן. אפשר לרענן ולנסות שוב.')
  const intended={evidence:issue.evidence,until:attempt.until},current=preference(fresh,issue.key)
  if(equal(current,intended))return{...fresh,recovered:true}
  if(!equal(current,preference(base,issue.key)))throw new SaveConflict('התזכורת השתנתה במכשיר אחר. השינוי הקיים נשמר; יש לרענן לפני ניסיון נוסף.')

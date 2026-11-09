@@ -1,19 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "3ba7208b41b1d33afcfe3a51fffc785d6fae441a",
+  "sourceCommit": "bae2597cf6249596d83c5597a312d2bcb92cf27e",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published bank wallet activity destination repair; original signed bank movements remain separate from purchase-detail analytics. All financial/source records preserved.",
+  "status": "Pending report bell-notification dismissal implemented and tested; publication pending server SSH access. Reports, review progress and budget data are retained. See docs/ui-redesign/REPORT-NOTIFICATION-DISMISSAL-2026-11-09.md.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1289,
+    "regressionTests": 1368,
     "coreChecks": 15,
     "candidateRuntimeContracts": 47,
     "browser": "No new browser or physical iPhone acceptance.",
-    "release": "docs/ui-redesign/evidence/release-bank-activity-2026-11-09.json"
+    "release": "Not deployed; configured SSH key rejected."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
   "productionApplicationCommit": "a56f2b3eb809090ed49aabe5787d664036050159",

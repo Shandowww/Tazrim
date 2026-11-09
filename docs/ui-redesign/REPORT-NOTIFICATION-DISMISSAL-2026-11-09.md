@@ -1,0 +1,11 @@
+# Dismiss pending-report bell notifications — 2026-11-09
+
+Tal clarified that report removal already exists in the inbox; the requested change is dismissal of its bell notification. Imported reports remain outside this action. Dismissal retains report files, review progress and budget data.
+
+Both interfaces now offer **הסרת התראה** for pending stored reports and the private incoming-report inbox summary. It updates only the calling user's existing action preference. **הצגת נדחות ומוסתרות → החזרת התראה** restores the notification. Dismissal persists through reloads without a time limit, while a changed source revision/state or private-inbox count/latest witness makes a new notification visible. Other users' notifications are independent, including shared viewers.
+
+The existing action-preference service and compare-and-set protocol remain authoritative. The new dismiss action requires an actor, previous preference and exact current pending-report evidence inside the write transaction. An advertised capability keeps older services from receiving unsupported actions. No schema, financial model, source deletion or import action was added. Existing read/snooze callers remain compatible.
+
+Validation: build/typecheck, 1,368 regressions (`node --test test/*.test.mjs tools/bank-csv/*.test.mjs`) and 15 core checks pass. Three additional isolated-service tests cover persistence, restoration, lost-response recovery without a second POST, changed source/inbox evidence, shared-viewer privacy, stale/concurrent/actor/older-service refusal and unchanged source bytes/financial records. The runtime packaging contract also passes. No new browser or physical iPhone acceptance is claimed.
+
+Implemented on current `work/budgit-household-ui`, branch `codex/budgit-household-ui`, preserving the Nov9 report/matching/bank changes. The older frontend checkout was returned to its original clean state after transferring only this patch. Publication is pending: a read-only SSH probe with the configured parking-server key was refused (`Permission denied (publickey,password)`). No server, production report, budget, Sites or adjacent service was changed. Fresh live reconciliation, verified backup and the existing release gates remain required before publishing.
