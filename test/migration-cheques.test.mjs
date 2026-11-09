@@ -19,7 +19,7 @@ test('Manual cheques preserve exact identity, accounting, status and full dated 
  for(const [id,after]of [['a',r.targetAfter],['b',r.sourceAfter]])assert.deepEqual(cashAccountForecast(after,id,[],15).map(({net,balance})=>({net,balance})),cashAccountForecast(p,id,[],15).map(({net,balance})=>({net,balance})));
 });
 test('Account forecasts cover complete cheque and loan horizons without an explicit caller horizon',()=>{
- const p=fixture();p.loans=[{id:'long-loan',name:'הלוואה',monthly:1.23,from:'2026-01',months:26,cashAccountId:'a'}];const r=prepareManualAccountMigration(p,base(),opts);assert.equal(r.eligible,true);assert.equal(cashAccountForecast(p,'a').length,26);assert.equal(cashAccountForecast(r.targetAfter,'a').length,26);assert.equal(cashAccountForecast(p,'a')[14].planned,46.90);assert.equal(cashAccountForecast(p,'a')[25].spending,1.23);
+ const p=fixture();p.loans=[{id:'long-loan',name:'הלוואה',monthly:1.23,from:'2026-01',months:26,cashAccountId:'a'}];const r=prepareManualAccountMigration(p,base(),opts);assert.equal(r.eligible,true);assert.equal(cashAccountForecast(p,'a').length,26);assert.equal(cashAccountForecast(r.targetAfter,'a').length,26);assert.equal(cashAccountForecast(p,'a')[14].planned,46.90);assert.equal(cashAccountForecast(p,'a')[25].spending,0);
 });
 test('Unassigned, imported, linked, card or unreviewed detail metadata and populated target details are refused',()=>{
  for(const change of [p=>delete p.details[0].cashAccountId,p=>p.details[0].method='variable',p=>p.details[0].statement={key:'private'},p=>p.details[0].cardId='card1',p=>p.details[0].source='bank',p=>p.details[0].note='private']){const p=fixture();change(p);assert.equal(prepareManualAccountMigration(p,base(),opts).eligible,false);}

@@ -1,0 +1,9 @@
+# Loan tracking and planning — 2026-11-09
+
+Implemented locally; not published. Application `2607be3` remains live.
+
+Loan schedules no longer feed `monthlyValues` or per-account projections, and loan create/edit/remove no longer rewrite estimated monthly repayment amounts. Existing report/default/monthly figures remain authoritative and retain their existing forecast inheritance rules. No data migration or monthly-record rewrite is performed, including figures previously saved under the old workflow. Existing loans receive the same tracking-only computation without a new storage flag. Calendar schedule totals and months remaining remain in the loan tracker; identified repayments still use the existing bank report/link/undo commands. Unassigned tracking loans no longer create a cash-planning payer warning. Optional account association retains its report-matching purpose and rejects foreign IDs.
+
+Both interfaces explain the tracking role and unchanged bank-report accounting. Native loan entry and removal retain guarded saves, revision checks, backups and lost-result recovery. No new chart, inferred payment completion or automatic reclassification is added.
+
+Validation: clean build/typecheck, 1,294 tests in `test/*.test.mjs` and 15 core checks pass. The new regression verifies create/edit/remove without a payer against both account projections and aggregate balances across 120 months, unchanged stored financial figures and a single reported charge. It also verifies dated remaining-month totals and that elapsed months do not create payment evidence. Existing actual CSV import/atomic lost-response recovery, refund/link/undo, actor/viewer refusal, migration and calendar/evidence tests pass. Old tests expecting schedule deductions now assert tracking-only behavior while retaining their other financial invariants. No browser/physical-device acceptance or production record access/write performed for this increment.

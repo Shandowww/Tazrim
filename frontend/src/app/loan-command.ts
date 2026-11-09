@@ -9,7 +9,7 @@ export function prepareLoan(plan:any,id:string,draft:LoanDraft,create=false){
  const keys=['name','monthly','months','from','cashAccountId']
  if(typeof id!=='string'||!id||id.length>100||!draft||Object.keys(draft).length!==keys.length||Object.entries(draft).some(([k,v])=>!keys.includes(k)||typeof v!=='string'||v.length>100)||!/^\d{1,3}$/.test(draft.months.trim()))throw Error('יש לבדוק את פרטי ההלוואה.')
  if(create&&(plan.loans??[]).some((l:any)=>l.id===id))throw Error('מזהה ההלוואה כבר קיים. אין לדרוס אותו.')
- const accounts=cashAccountList(plan);if(accounts.length&&!accounts.some((a:any)=>a.id===draft.cashAccountId)||!accounts.length&&draft.cashAccountId)throw Error('יש לבחור חשבון משלם שקיים במרחב הזה.')
+ const accounts=cashAccountList(plan);if(draft.cashAccountId&&!accounts.some((a:any)=>a.id===draft.cashAccountId))throw Error('יש לבחור חשבון משלם שקיים במרחב הזה.')
  const old=(plan.loans??[]).find((l:any)=>l.id===id),loan={...clone(old??{}),id,name:draft.name.trim(),monthly:moneyInputCents(draft.monthly)/100,months:Number(draft.months),from:draft.from}
  delete loan.cashAccountId;if(draft.cashAccountId)loan.cashAccountId=draft.cashAccountId
  return setLoan(plan,loan)

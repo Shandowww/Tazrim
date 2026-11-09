@@ -9,7 +9,7 @@ export const budgetFields=p=>[...fields.map(f=>f[0].startsWith('card')?[f[0],cre
 // Initial navigation follows the current month without changing the budget period.
 export const defaultBudgetMonth=(p,asOf)=>asOf<p.startMonth?p.startMonth:asOf;
 // Transfers are needs-based: inherit only an explicit recurring estimate, never a prior report.
-export function monthlyValues(p,m){const prior=Object.keys(p.months).filter(k=>k<m&&(p.months[k].actual||p.months[k].bankCoverage?.complete!==false)).sort().at(-1),v=clone(p.months[m]?.values??(prior?p.months[prior].values:p.defaults));if(!p.months[m]){const schedule=(p.savingSchedules??[]).filter(r=>r.from<=m).sort((a,b)=>a.from.localeCompare(b.from)).at(-1);if(schedule){v.personalSaving=schedule.personalSaving;v.sharedSaving=schedule.sharedSaving;}}for(const k of ['incomingTransfers','outgoingTransfers'])v[k]=p.months[m]?v[k]??0:p.defaults[k]??0;v.loanRepayment??=0;if(!p.months[m]&&p.loans!==undefined)v.loanRepayment=scheduledLoans(p,m);for(const c of creditCards(p)){v[c.id]??=p.defaults[c.id]??0;if(!p.months[m]&&c.removedFrom&&m>=c.removedFrom)v[c.id]=0;}return v;}
+export function monthlyValues(p,m){const prior=Object.keys(p.months).filter(k=>k<m&&(p.months[k].actual||p.months[k].bankCoverage?.complete!==false)).sort().at(-1),v=clone(p.months[m]?.values??(prior?p.months[prior].values:p.defaults));if(!p.months[m]){const schedule=(p.savingSchedules??[]).filter(r=>r.from<=m).sort((a,b)=>a.from.localeCompare(b.from)).at(-1);if(schedule){v.personalSaving=schedule.personalSaving;v.sharedSaving=schedule.sharedSaving;}}for(const k of ['incomingTransfers','outgoingTransfers'])v[k]=p.months[m]?v[k]??0:p.defaults[k]??0;v.loanRepayment??=0;for(const c of creditCards(p)){v[c.id]??=p.defaults[c.id]??0;if(!p.months[m]&&c.removedFrom&&m>=c.removedFrom)v[c.id]=0;}return v;}
 export function saveMonthReport(p,m,actual,asOf,salaryChanged=false){if(actual&&m>asOf)throw Error('חודש עתידי ניתן לשמור כהערכה בלבד.');const next=clone(p),values=monthlyValues(p,m);next.months[m]={values,actual,includesPlannedCard:p.months[m]?.includesPlannedCard??false,...(p.months[m]?.includesPlannedDirect!==undefined?{includesPlannedDirect:p.months[m].includesPlannedDirect}:{}),...(p.months[m]?.bankCoverage?{bankCoverage:p.months[m].bankCoverage}:{}),...(p.months[m]?.otherIncomeNote!==undefined?{otherIncomeNote:p.months[m].otherIncomeNote}:{}),...(actual&&p.months[m]?.cashReport?{cashReport:{balance:p.months[m].cashReport.balance,net:p.months[m].cashReport.pending?forecast(p,undefined,Math.max(p.horizon,indexMonth(m)-indexMonth(p.startMonth)+1)).find(r=>r.month===m).net+pendingSavingCents(p,m)/100:p.months[m].cashReport.net}}:{})};if(salaryChanged)for(const [month,r] of Object.entries(next.months))if(month>m&&!r.actual)r.values.salary=values.salary;if(next.savingsGoals&&m>=next.savingsGoals.snapshotMonth&&m<=asOf)return confirmMonthlySavings(next,m,asOf,!actual);return next;}
 export function stopCardForecast(p,id,from){const next=clone(p);next.creditCards=clone(creditCards(p));const card=next.creditCards.find(c=>c.id===id);if(!card||!monthOk(from))throw Error('יש לבחור כרטיס וחודש תקינים.');card.removedFrom=from;for(const [m,r] of Object.entries(next.months))if(m>=from&&!r.actual)r.values[id]=0;next.defaults[id]=0;if(!validatePlan(next))throw Error('לא ניתן להפסיק את הערכות הכרטיס.');return next;}
 export function cardsValid(p){if(p.creditCards===undefined)return true;if(!Array.isArray(p.creditCards)||p.creditCards.length>30)return false;const ids=new Set(),aliases=new Set();return p.creditCards.every(c=>{if(!c||!/^card(?:[12]|_[a-zA-Z0-9-]{1,70})$/.test(c.id)||ids.has(c.id)||typeof c.name!=='string'||!c.name.trim()||c.name.length>60||typeof c.alias!=='string'||c.alias.length>80||/^\d{13,19}$/.test(c.alias.replace(/[ -]/g,''))||c.billingDay!==undefined&&(!Number.isInteger(c.billingDay)||c.billingDay<1||c.billingDay>31)||c.removedFrom!==undefined&&!monthOk(c.removedFrom)||c.alias&&aliases.has(c.alias))return false;ids.add(c.id);if(c.alias)aliases.add(c.alias);return true;});}
@@ -35,6 +35,7 @@ export function bankMovementAudit(p,month){
 export function setOffCardTotal(v,total){if(!Number.isFinite(total)||total<0||total>200000000)throw Error('יש להזין סכום הוצאות תקין.');v.variable=Math.min(total,100000000);v.transfers=(cents(total)-cents(v.variable))/100;return v;}
 export const formBudgetFields=p=>budgetFields(p).filter(([k])=>k!=='transfers').map(f=>f[0]==='variable'?['offCard','הוצאות שלא שולמו בכרטיס',f[2]]:f);
 export const zero=()=>Object.fromEntries(fields.map(([k])=>[k,0]));
+// Loan schedules are tracking evidence only; monthly reports/defaults own cash-flow charges.
 export function scheduledLoans(p,month){return (p.loans??[]).filter(l=>month>=l.from&&indexMonth(month)<indexMonth(l.from)+l.months).reduce((n,l)=>n+cents(l.monthly),0)/100;}
 // Payment evidence stays attached to its loan; a source undo removes its contribution by lookup.
 export const loanMatchText=value=>String(value??'').normalize('NFKC').replace(/[״׳"']/g,'').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
@@ -66,14 +67,11 @@ export function loanPaymentEvidence(p,id){
 }
 export function setLoan(p,loan){
  const previous=p.loans?.find(l=>l.id===loan.id);if(previous?.repayments&&loan.repayments===undefined)loan={...loan,repayments:clone(previous.repayments)};
- if(cashAccountList(p).length>1&&!cashAssignedItem(p,loan))throw Error('בחר את החשבון שממנו נגבית ההלוואה.');
  const next=clone(p);next.loans=[...(p.loans??[]).filter(l=>l.id!==loan.id),loan];
  if(!loansValid(next))throw Error('יש להזין שם, החזר חודשי ומספר חודשים תקינים בתוך תקופת התכנון.');
- for(const [m,r] of Object.entries(next.months))if(!r.actual)r.values.loanRepayment=scheduledLoans(next,m);
  if(!validatePlan(next))throw Error('לא ניתן לעדכן את ההלוואה.');return next;
 }
-export function removeLoan(p,id){const loan=(p.loans??[]).find(row=>row.id===id);if(loan&&cashAccountList(p).length>1&&!cashAssignedItem(p,loan))throw Error('בחר את החשבון שממנו נגבית ההלוואה.');
- const next=clone(p);next.loans=(p.loans??[]).filter(l=>l.id!==id);for(const [m,r] of Object.entries(next.months))if(!r.actual)r.values.loanRepayment=scheduledLoans(next,m);return next;}
+export function removeLoan(p,id){const next=clone(p);next.loans=(p.loans??[]).filter(l=>l.id!==id);return next;}
 export function savingTransfersValid(p){return p.savingTransfers===undefined||Array.isArray(p.savingTransfers)&&p.savingTransfers.length<=120&&new Set(p.savingTransfers.map(t=>t?.id)).size===p.savingTransfers.length&&p.savingTransfers.every(t=>t&&typeof t.id==='string'&&t.id.length>0&&t.id.length<=100&&monthOk(t.month)&&t.month>=p.startMonth&&moneyOk(t.personal)&&moneyOk(t.shared)&&cents(t.personal)/100===t.personal&&cents(t.shared)/100===t.shared&&cents(t.personal)+cents(t.shared)>0&&['pending','completed','cancelled'].includes(t.status));}
 export function pendingSavingCents(p,month){return (p.savingTransfers??[]).filter(t=>t.status==='pending'&&t.month===month).reduce((n,t)=>n+cents(t.personal)+cents(t.shared),0);}
 export function planSavingTransfer(p,id,month,personal,shared,asOf){
@@ -1342,7 +1340,7 @@ export function cashAccountValues(p,id,month,sourceRecords=null){
  const values=clone(record?.values??(prior?records[prior].values:a?.defaults??zero()));
  for(const k of ['incomingTransfers','outgoingTransfers'])values[k]=record?values[k]??0:a?.defaults?.[k]??0;
  for(const c of creditCards(p))values[c.id]??=0;
- if(!record&&p.loans!==undefined)values.loanRepayment=(p.loans??[]).filter(l=>cashAssignedItem(p,l)===id&&month>=l.from&&indexMonth(month)<indexMonth(l.from)+l.months).reduce((n,l)=>n+cents(l.monthly),0)/100;
+
  return {values,record};
 }
 export function cashUnassigned(p,month){
@@ -1367,7 +1365,7 @@ export function cashAccountForecast(p,id,additionalIds=[],minHorizon=0){
  for(const t of p.cashPlanning?.transfers??[])if(t.month===month&&t.status==='planned')transferNet+=(t.to===id?cents(t.amount):0)-(t.from===id?cents(t.amount):0);transferDelta+=transferNet;
  const issues=[];if(!anchorState[i])issues.push('חסרה יתרת עו״ש לחשבון');
  if(Object.keys(cashUnassigned(p,month)).length)issues.push('יש סכומים חודשיים ללא שיוך או שאינם תואמים לסיכום');
- if(p.expenses.some(e=>!cashAssignedItem(p,e)&&paymentFor(e,month)>0)||(p.loans??[]).some(l=>!cashAssignedItem(p,l)&&month>=l.from&&indexMonth(month)<indexMonth(l.from)+l.months)||(p.details??[]).some(e=>additionalCheque(e)&&e.month===month&&!cashAssignedItem(p,e))||(p.savingTransfers??[]).some(t=>t.month===month&&t.status==='pending'&&!cashAssignedItem(p,t)))issues.push('יש התחייבויות ללא חשבון משלם');
+ if(p.expenses.some(e=>!cashAssignedItem(p,e)&&paymentFor(e,month)>0)||(p.details??[]).some(e=>additionalCheque(e)&&e.month===month&&!cashAssignedItem(p,e))||(p.savingTransfers??[]).some(t=>t.month===month&&t.status==='pending'&&!cashAssignedItem(p,t)))issues.push('יש התחייבויות ללא חשבון משלם');
  if(creditCards(p).some(c=>cents(proxy.months[month].values[c.id]??0)>0&&p.cashPlanning?.cardAccounts[c.id]&&p.cashPlanning.cardAccounts[c.id]!==id))issues.push('יש חיוב כרטיס המשויך לחשבון אחר');
  const latestRecord=records[month]??records[Object.keys(records).filter(m=>m<month).sort().at(-1)];if(latestRecord?.fromBank&&!latestRecord.actual)issues.push('דוח הבנק לחודש זה חלקי');
  return {...row,net:(cents(row.net)+transferNet-cents(billingAdjustment))/100,internalTransfer:transferNet/100,balance:anchorState[i]?(cents(row.balance)+transferDelta+billingDelta)/100:null,accountId:id,label:a.label,buffer:a.buffer??0,issues};});

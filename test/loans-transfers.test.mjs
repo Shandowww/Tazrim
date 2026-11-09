@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import {zero,clone,validatePlan,setLoan,removeLoan,monthlyValues,forecast,saveMonthReport,setReportedCashBalance,planSavingTransfer,completeSavingTransfer,savingsBalances} from '../src/budget.js';
 const base=()=>({startMonth:'2026-10',opening:50000,buffer:5000,horizon:12,defaults:zero(),months:{},expenses:[],demo:false,savingsGoals:{balance:1000,snapshotMonth:'2026-10',items:[],deposits:{}}});
 function reported(){return saveMonthReport(setReportedCashBalance(base(),'2026-10',50000),'2026-10',true,'2026-10');}
-test('Loans stop after remaining months, preserve actual reports and remain valid in old backups',()=>{
+test('Loan schedules do not add cash-flow charges and preserve actual reports and old backups',()=>{
  const p=base();delete p.defaults.loanRepayment;assert.equal(validatePlan(p),true);
  const next=setLoan(p,{id:'loan',name:'הלוואה לבדיקה',monthly:1000.25,from:'2026-10',months:3});
- assert.deepEqual(forecast(next).slice(0,4).map(r=>r.spending),[1000.25,1000.25,1000.25,0]);
+ assert.deepEqual(forecast(next).slice(0,4).map(r=>r.spending),[0,0,0,0]);
  next.months['2026-10']={values:{...zero(),loanRepayment:800},actual:true,includesPlannedCard:false};
  const edited=setLoan(next,{...next.loans[0],monthly:1200});assert.equal(monthlyValues(edited,'2026-10').loanRepayment,800);
- assert.equal(monthlyValues(removeLoan(edited,'loan'),'2026-11').loanRepayment,0);
+ assert.equal(monthlyValues(removeLoan(edited,'loan'),'2026-11').loanRepayment,monthlyValues(edited,'2026-11').loanRepayment);
  for(const monthly of [0,-1,1.001,NaN])assert.throws(()=>setLoan(p,{id:'bad',name:'bad',monthly,from:'2026-10',months:3}));
 });
 test('Planning reserves cash without posting savings; bank completion posts exactly once',()=>{

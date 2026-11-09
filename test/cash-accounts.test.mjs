@@ -24,10 +24,10 @@ test('An explicit inter-bank transfer changes both accounts once and leaves aggr
  assert.equal(cashScenarioSafe(previewScenario(p,[purchase]).plan,['new'],month),true);p.cashPlanning.transfers[0].status='included';assert.equal(cashAccountForecast(p,'a')[0].balance,1100);
  assert.equal(validatePlan({...p,cashPlanning:{...p.cashPlanning,transfers:[{...p.cashPlanning.transfers[0],to:'b'}]}}),false);
 });
-test('Account reports retain their own planned inclusion flags and finite loan payments',()=>{
+test('Account reports retain planned inclusion flags without extra tracked-loan charges',()=>{
  const p=fixture();p.months[month]=record({salary:2000,card1:500});p.cashPlanning.months[month]={a:{...record({salary:1000,card1:500}),includesPlannedCard:true},b:record({salary:1000})};p.expenses=[{...purchase,amount:500}];
  assert.equal(cashAccountForecast(p,'a')[0].balance,600);assert.equal(cashAccountForecast(p,'b')[0].balance,10000);assert.equal(forecast(p)[0].planned,0);
- p.loans=[{id:'loan',name:'הלוואה',monthly:100,from:month,months:2,cashAccountId:'a'}];assert.equal(cashAccountForecast(p,'a')[1].spending,600);assert.equal(cashAccountForecast(p,'a')[2].spending,500);assert.equal(cashAccountForecast(p,'b')[1].spending,0);
+ p.loans=[{id:'loan',name:'הלוואה',monthly:100,from:month,months:2,cashAccountId:'a'}];assert.equal(cashAccountForecast(p,'a')[1].spending,500);assert.equal(cashAccountForecast(p,'a')[2].spending,500);assert.equal(cashAccountForecast(p,'b')[1].spending,0);
 });
 test('Assigning legacy monthly amounts preserves aggregate records and all money, then per-account edits update only their delta',()=>{
  const p=fixture();p.months[month]=record({salary:2000,variable:300});p.cashPlanning.months[month]={a:record({salary:1000}),b:record({salary:1000})};

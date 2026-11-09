@@ -26,7 +26,7 @@ test('Full extended horizon conserves exact cents, installment remainder, loan s
  const p=fixture(),r=prepareManualAccountMigration(p,base(),opts),before=forecast(p),length=before.length;assert.equal(length,26);assert.equal(r.manifest.comparisons.length,26);
  const from=forecast(r.sourceAfter,undefined,length),to=forecast(r.targetAfter,undefined,length);
  for(let i=0;i<length;i++)for(const key of ['income','spending','saving','planned','net','balance','incomingTransfers','outgoingTransfers'])assert.equal(Math.round((from[i][key]+to[i][key])*100),Math.round(before[i][key]*100),`${i}:${key}`);
- assert.equal(to[0].planned,0);assert.equal(to[1].planned,33.34);assert.equal(to[2].planned,-86.7);assert.equal(to[12].spending,55.56);assert.equal(forecast(r.targetAfter,undefined,27)[26].spending,33.35);assert.equal(Math.round((to[25].spending-forecast(r.targetAfter,undefined,27)[26].spending)*100),2221);
+ assert.equal(to[0].planned,0);assert.equal(to[1].planned,33.34);assert.equal(to[2].planned,-86.7);assert.equal(to[12].spending,55.56);assert.equal(forecast(r.targetAfter,undefined,27)[26].spending,55.56);assert.equal(Math.round((to[25].spending-forecast(r.targetAfter,undefined,27)[26].spending)*100),0);
  for(const [id,after]of [['a',r.targetAfter],['b',r.sourceAfter]])assert.deepEqual(cashAccountForecast(after,id,[],length).map(({net,balance})=>({net,balance})),cashAccountForecast(p,id,[],length).map(({net,balance})=>({net,balance})));
  for(const row of r.manifest.comparisons)assert.equal(row.flows.find(f=>f.field==='planned').beforeCents,row.flows.find(f=>f.field==='planned').sourceAfterCents+row.flows.find(f=>f.field==='planned').targetAfterCents);
 });

@@ -1,17 +1,18 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
-import {zero,clone,setLoan,forecast,scheduledLoans,validatePlan} from '../src/budget.js'
+import {zero,clone,setLoan,forecast,cashAccountForecast,scheduledLoans,validatePlan,cashUnassigned} from '../src/budget.js'
 import {initialLoanDraft,prepareLoan,prepareLoanRemoval,loanDraftFingerprint} from '../frontend/src/app/loan-command.ts'
+import {loanScheduleSummaries} from '../frontend/src/app/commitment-summary.js'
 import {openDatabase} from '../server/database.mjs'
 import {createApp} from '../server/app.mjs'
 import {loadBudgetSnapshot} from '../frontend/src/app/budget-api.ts'
 import {savePreparedPlan,SaveUncertain} from '../frontend/src/app/plan-save.ts'
 function base(){return{startMonth:'2026-01',opening:1000,buffer:0,horizon:24,defaults:zero(),months:{'2026-09':{values:{...zero(),loanRepayment:50},actual:true,includesPlannedCard:false},'2026-10':{values:zero(),actual:false,includesPlannedCard:false},'2027-01':{values:zero(),actual:false,includesPlannedCard:false}},expenses:[],demo:false,cashPlanning:{accounts:[{id:'a',label:'A',buffer:0,opening:1000,openingMonth:'2026-01'},{id:'b',label:'B',buffer:0,opening:1000,openingMonth:'2026-01'}],months:{},cardAccounts:{},transfers:[]}}}
 const draft=p=>({...initialLoanDraft(p,'','2026-10'),name:'הלוואה',monthly:'12.34',months:'3',cashAccountId:'a'})
-test('Loan command reuses setLoan; estimates stop after the final month and actual reports remain fixed',()=>{
+test('Loan command reuses setLoan; schedules stop after the final month without changing saved monthly amounts',()=>{
  const p=base(),before=JSON.stringify(p),next=prepareLoan(p,'loan',draft(p),true)
- assert.deepEqual(next,setLoan(p,{id:'loan',name:'הלוואה',monthly:12.34,months:3,from:'2026-10',cashAccountId:'a'}));assert.equal(scheduledLoans(next,'2026-12'),12.34);assert.equal(scheduledLoans(next,'2027-01'),0);assert.equal(next.months['2026-10'].values.loanRepayment,12.34);assert.equal(next.months['2027-01'].values.loanRepayment,0);assert.deepEqual(next.months['2026-09'],p.months['2026-09']);assert.equal(JSON.stringify(p),before);assert.ok(validatePlan(next))
+ assert.deepEqual(next,setLoan(p,{id:'loan',name:'הלוואה',monthly:12.34,months:3,from:'2026-10',cashAccountId:'a'}));assert.equal(scheduledLoans(next,'2026-12'),12.34);assert.equal(scheduledLoans(next,'2027-01'),0);assert.equal(next.months['2026-10'].values.loanRepayment,0);assert.equal(next.months['2027-01'].values.loanRepayment,0);assert.deepEqual(next.months['2026-09'],p.months['2026-09']);assert.equal(JSON.stringify(p),before);assert.ok(validatePlan(next))
 })
 test('Editing retains metadata and other loans; normalized input does not invent dirty state',()=>{
  const p=prepareLoan(base(),'one',draft(base()),true);p.loans[0].note={retain:true};const other={id:'two',name:'שנייה',monthly:20,months:2,from:'2026-11',cashAccountId:'b'};p.loans.push(other)
@@ -20,10 +21,10 @@ test('Editing retains metadata and other loans; normalized input does not invent
 })
 test('Invalid periods, amounts, names, payer identities, collisions and malformed loan fields are refused',()=>{
  const p=base(),d=draft(p),before=JSON.stringify(p)
- for(const bad of [{...d,monthly:'0'},{...d,monthly:'-1'},{...d,monthly:'1.001'},{...d,months:'121'},{...d,months:'1.5'},{...d,from:'1999-12'},{...d,from:'2035-12',months:'3'},{...d,name:''},{...d,cashAccountId:'foreign'},{...d,cashAccountId:''},{...d,extra:'x'}])assert.throws(()=>prepareLoan(p,'id',bad,true))
+ for(const bad of [{...d,monthly:'0'},{...d,monthly:'-1'},{...d,monthly:'1.001'},{...d,months:'121'},{...d,months:'1.5'},{...d,from:'1999-12'},{...d,from:'2035-12',months:'3'},{...d,name:''},{...d,cashAccountId:'foreign'},{...d,extra:'x'}])assert.throws(()=>prepareLoan(p,'id',bad,true))
  const next=prepareLoan(p,'id',d,true);assert.throws(()=>prepareLoan(next,'id',d,true));assert.throws(()=>prepareLoan(p,'missing',d));assert.equal(JSON.stringify(p),before)
 })
-test('Loan removal updates only estimates while retaining actuals and other financial records',()=>{
+test('Loan removal preserves estimates, actuals and other financial records',()=>{
  const p=prepareLoan(base(),'one',draft(base()),true),actual=clone(p.months['2026-09']),next=prepareLoanRemoval(p,'one')
  assert.deepEqual(next.loans,[]);assert.deepEqual(next.months['2026-09'],actual);assert.equal(next.months['2026-10'].values.loanRepayment,0);assert.deepEqual(next.cashPlanning,p.cashPlanning);assert.deepEqual(next.expenses,p.expenses);assert.throws(()=>prepareLoanRemoval(p,'missing'));assert.equal(p.loans.length,1)
 })
@@ -43,8 +44,25 @@ test('First repayment before the budget start retains the full term and projects
  const p=base(),before=JSON.stringify(p),next=prepareLoan(p,'historical',{...draft(p),from:'2025-03',months:'24',monthly:'1000'},true)
  assert.ok(validatePlan(next));assert.equal(next.loans[0].from,'2025-03');assert.equal(next.loans[0].months,24)
  assert.equal(scheduledLoans(next,'2025-02'),0);assert.equal(scheduledLoans(next,'2025-03'),1000);assert.equal(scheduledLoans(next,'2027-02'),1000);assert.equal(scheduledLoans(next,'2027-03'),0)
- assert.equal(forecast(next).find(r=>r.month==='2027-02').spending,1000);assert.equal(forecast(next).find(r=>r.month==='2027-03').spending,0)
+ assert.equal(forecast(next).find(r=>r.month==='2027-02').spending,forecast(p).find(r=>r.month==='2027-02').spending);assert.equal(forecast(next).find(r=>r.month==='2027-03').spending,forecast(p).find(r=>r.month==='2027-03').spending)
  assert.deepEqual(next.months['2026-09'],p.months['2026-09']);assert.equal(JSON.stringify(p),before)
  const d=initialLoanDraft(next,'historical','2026-11');assert.equal(d.from,'2025-03');assert.equal(d.months,'24');assert.deepEqual(prepareLoan(next,'historical',d),next)
  const finished=prepareLoan(p,'finished',{...draft(p),from:'2024-01',months:'12'},true);assert.ok(validatePlan(finished));assert.equal(scheduledLoans(finished,'2026-01'),0)
+})
+
+test('Unassigned loan tracking, edits and removal preserve both account balances, saved figures and report charges',()=>{
+ const p=base();p.months['2026-10'].values.loanRepayment=123.45
+ p.cashPlanning.months['2026-10']={a:{values:{...zero(),loanRepayment:123.45},actual:true,includesPlannedCard:false,includesPlannedDirect:false}}
+ const before=clone(p),d={...draft(p),cashAccountId:'',monthly:'250',months:'5'}
+ const saved=prepareLoan(p,'tracker',d,true),edited=prepareLoan(saved,'tracker',{...initialLoanDraft(saved,'tracker','2026-10'),monthly:'400',months:'8'})
+ for(const plan of [saved,edited,prepareLoanRemoval(edited,'tracker')]){
+  assert.deepEqual(plan.months,p.months);assert.deepEqual(plan.defaults,p.defaults);assert.deepEqual(plan.cashPlanning,p.cashPlanning)
+  assert.deepEqual(forecast(plan,undefined,120),forecast(p,undefined,120))
+  for(const id of ['a','b'])assert.deepEqual(cashAccountForecast(plan,id,[],120),cashAccountForecast(p,id,[],120))
+  assert.deepEqual(cashUnassigned(plan,'2026-11'),cashUnassigned(p,'2026-11'))
+ }
+ assert.equal(forecast(saved).find(r=>r.month==='2026-10').spending,123.45)
+ assert.equal(cashAccountForecast(saved,'a').find(r=>r.month==='2026-10').spending,123.45)
+ const summary=loanScheduleSummaries(saved,'2026-12')[0];assert.equal(summary.remainingMonths,3);assert.equal(summary.scheduledRemainingCents,75000);assert.equal(summary.evidence.paidCents,0)
+ assert.equal(loanScheduleSummaries(saved,'2027-03')[0].remainingMonths,0);assert.deepEqual(p,before)
 })

@@ -1,3 +1,7 @@
+## Loan tracker workflow — 2026-11-09
+
+Tal clarified that the loan tracker, like manual cheques, is a tracking/planning layer. Loan terms and calendar months remaining help plan future large expenses; they must not populate repayment totals or independently deduct account/aggregate balances. Actual repayments come from monthly bank reports. Creating, editing and removing tracked loans preserves all saved monthly amounts/defaults, source records and payment evidence. Account association is optional and useful for matching report payments. A passed month is not proof of payment. Implementation is tested locally; application `2607be3` remains live until a separate release.
+
 ## Manual cheque planning published — 2026-11-09
 
 Application `2607be3` is verified live at https://budgit.duckdns.org/next/checks. New manual cheques use a fixed cheque method and retain dated planning/analysis details without additional account deductions; actual charges come from bank reports. Both cheque forms hide redundant method/accounting choices. Existing standalone cheques retain their stored accounting unless explicitly edited; generic native manual-detail creation remains separate.
