@@ -1,3 +1,9 @@
+## Loan-payment search period published — 2026-11-09
+
+Application `a1dc026` is verified live. Loan-payment search follows the header's selected month or whole year, within the original associated-account and loan-term eligibility. Selected/loan ranges and out-of-term guidance are explicit; the identified-payment list is labeled as covering the whole loan. No accounting, matcher or stored-record changes.
+
+Clean build/typecheck,1,297 regressions,15 core checks,three new period contracts and112 candidate contracts pass. Static actual-page month/year/viewer/term rendering passed with zero writes. All509 prior-source and168 runtime files matched. Fresh verified SQLite backup, isolated financial/access/source-decryption/startup/rollback/intake/automation restore and69 retained-asset checks passed. Activation preserved all50 authoritative tables, keys/configuration and adjacent services; public health/auth/deep routes/root/manifest/installer pass. No real-record edits, Sites/resource changes or new browser/physical-iPhone acceptance. Use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-loan-payment-period-2026-11-09.json`. Continue in `work/budgit-household-ui`.
+
 ## Loan tracking and empty-entry form published — 2026-11-09
 
 Application `b32637c` is verified live at https://budgit.duckdns.org/next/loans. Loan schedules retain months remaining and planning amounts without additional account deductions; actual repayments come from bank reports. Loan create/edit/remove preserve saved monthly figures and source/payment evidence. Account association is optional. An empty editable register now displays the original loan-entry form directly at full content width, retaining draft/access/save guards.
