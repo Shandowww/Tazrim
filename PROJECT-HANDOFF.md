@@ -1,3 +1,9 @@
+## Loan tracking and empty-entry form published — 2026-11-09
+
+Application `b32637c` is verified live at https://budgit.duckdns.org/next/loans. Loan schedules retain months remaining and planning amounts without additional account deductions; actual repayments come from bank reports. Loan create/edit/remove preserve saved monthly figures and source/payment evidence. Account association is optional. An empty editable register now displays the original loan-entry form directly at full content width, retaining draft/access/save guards.
+
+Clean build/typecheck,1,294 regressions,15 core checks and109 candidate contracts pass. All509 prior-source and168 runtime files matched. Fresh verified SQLite backup, isolated financial/access/source-decryption/startup/rollback/intake/automation restore and69 retained-asset checks passed. Activation preserved all50 authoritative tables, keys/configuration and adjacent services; public health/auth/deep routes/root/manifest/installer pass. No financial-record migration, Sites/resource changes or new browser/physical-iPhone acceptance. Save drafts and use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-loan-tracking-2026-11-09.json`. Continue in `work/budgit-household-ui`.
+
 ## Manual cheque planning published — 2026-11-09
 
 Application `2607be3` is verified live at https://budgit.duckdns.org/next/checks. New manual cheques use a fixed cheque method and retain dated planning/analysis details without additional account deductions; actual charges come from bank reports. Both cheque forms hide redundant method/accounting choices. Existing standalone cheques retain their stored accounting unless explicitly edited; generic native manual-detail creation remains separate.

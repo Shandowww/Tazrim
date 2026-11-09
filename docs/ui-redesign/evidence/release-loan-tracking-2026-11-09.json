@@ -1,0 +1,152 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "b32637c7f3bca3fb3daad326df515ccc2f9f43b1",
+  "previousApplicationCommit": "2607be36ffa8012f6949c07a4a24a5ea394dfc01",
+  "entry": "https://budgit.duckdns.org/next/loans",
+  "runtimeImage": "sha256:fc612ac174932483cb46cc242f16a89a8fba36662ee1777b5d3a0dc536eb3a18",
+  "sourceArchiveSha256": "63c9c892bb8f9f124fda7eb53370559ed1b60ca2889de0f780fdaf5d27571f34",
+  "changes": [
+    "Loan tracker schedules no longer populate monthly repayment values or deduct account/aggregate balances",
+    "Loan create/edit/remove retain saved monthly amounts, bank sources and payment evidence; account association is optional",
+    "The empty editable loan register displays the existing loan-entry form directly with full content width and existing draft/access/save guards"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed",
+    "regressions": 1294,
+    "coreChecks": 15,
+    "staticFormRender": "passed; editable-empty/viewer/service-binding/populated boundaries; SSR-only draft registry snapshot supplied for markup, no browser effects or writes",
+    "previousSource": {
+      "files": 509,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 168,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 109,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "9dd341eaca34b19472b67cb64eef6ae79943177037e0652e108dabadfd89ce4c",
+          "reactHTMLSha256": "bf91b3f7efada4262202d6e25ec352a132782ad9dc19e6a59aab54f239815add"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "0e305847353566d53a99996c1b5d5eb402633aec5f1c71f71183bdd390f10b09",
+          "reactHTMLSha256": "8f32ecb05240b63352998596658e2de9076f02bc548ce3821661eba4bb180f1c"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "2607be3"
+          ],
+          "originalAssetsVerified": 69,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 168,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T19:17:03.401Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone acceptance",
+    "Saved monthly figures are retained, including any previously saved under the old schedule workflow; no financial-record migration",
+    "Already-open pages need guarded refresh",
+    "No new chart or inferred payment completion; passed months are calendar information only"
+  ]
+}

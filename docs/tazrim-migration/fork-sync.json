@@ -1,11 +1,11 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "beb85f5f6ee0975930803a6192f1fb0e851e0d50",
+  "sourceCommit": "3761d94a6718811dfa97b1e7aeb5288ef7cb60f4",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Loan tracker-only accounting implemented and tested; not published",
+  "status": "Published loan tracking without additional balance deductions and empty-register entry form",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
@@ -13,16 +13,16 @@
     "coreChecks": 15,
     "nativeShortcutSchemaActions": 419,
     "receiptGraph": "passed; format/whitespace guards, actionable catalog errors and explicit nested repeats",
-    "browser": "No new browser/physical-device acceptance; loan account/aggregate invariance and original report/payment/migration contracts pass.",
+    "browser": "No new browser/device acceptance; static form rendering and 109 built-candidate contracts pass.",
     "physicalDevice": "Native Mac two-file cleanup/refusal/retry/empty-folder accepted with exact retained bytes and zero financial commits. Prior iPhone 0a5ab68 acceptance retained; revised bindings not newly claimed tested on iPhone. Scheduling/locked-device unverified.",
-    "release": "docs/ui-redesign/evidence/release-manual-cheques-2026-11-09.json",
+    "release": "docs/ui-redesign/evidence/release-loan-tracking-2026-11-09.json",
     "productionEvidence": "docs/ui-redesign/evidence/release-mac-shortcut-2026-11-08.json",
     "checkpoint": "docs/ui-redesign/LOAN-TRACKING-2026-11-09.md"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "2607be36ffa8012f6949c07a4a24a5ea394dfc01",
-  "productionImage": "sha256:0c339dfd8ffb463268917d7c14648d3b2ca367fec309ae4393d3e3ca26b70ff0",
+  "productionApplicationCommit": "b32637c7f3bca3fb3daad326df515ccc2f9f43b1",
+  "productionImage": "sha256:fc612ac174932483cb46cc242f16a89a8fba36662ee1777b5d3a0dc536eb3a18",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "beb85f5f6ee0975930803a6192f1fb0e851e0d50"
+  "applicationCommit": "b32637c7f3bca3fb3daad326df515ccc2f9f43b1"
 }

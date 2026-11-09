@@ -1,6 +1,12 @@
+## Loan tracking and empty-entry form published — 2026-11-09
+
+Application `b32637c` is verified live at https://budgit.duckdns.org/next/loans. Loan schedules retain months remaining and planning amounts without additional account deductions; actual repayments come from bank reports. Loan create/edit/remove preserve saved monthly figures and source/payment evidence. Account association is optional. An empty editable register now displays the original loan-entry form directly at full content width, retaining draft/access/save guards.
+
+Clean build/typecheck,1,294 regressions,15 core checks and109 candidate contracts pass. All509 prior-source and168 runtime files matched. Fresh verified SQLite backup, isolated financial/access/source-decryption/startup/rollback/intake/automation restore and69 retained-asset checks passed. Activation preserved all50 authoritative tables, keys/configuration and adjacent services; public health/auth/deep routes/root/manifest/installer pass. No financial-record migration, Sites/resource changes or new browser/physical-iPhone acceptance. Save drafts and use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-loan-tracking-2026-11-09.json`. Continue in `work/budgit-household-ui`.
+
 ## Loan tracker workflow — 2026-11-09
 
-Tal clarified that the loan tracker, like manual cheques, is a tracking/planning layer. Loan terms and calendar months remaining help plan future large expenses; they must not populate repayment totals or independently deduct account/aggregate balances. Actual repayments come from monthly bank reports. Creating, editing and removing tracked loans preserves all saved monthly amounts/defaults, source records and payment evidence. Account association is optional and useful for matching report payments. A passed month is not proof of payment. Implementation is tested locally; application `2607be3` remains live until a separate release.
+Tal clarified that the loan tracker, like manual cheques, is a tracking/planning layer. Loan terms and calendar months remaining help plan future large expenses; they must not populate repayment totals or independently deduct account/aggregate balances. Actual repayments come from monthly bank reports. Creating, editing and removing tracked loans preserves all saved monthly amounts/defaults, source records and payment evidence. Account association is optional and useful for matching report payments. A passed month is not proof of payment. This workflow is published as application `b32637c`; see its release evidence above.
 
 ## Manual cheque planning published — 2026-11-09
 
