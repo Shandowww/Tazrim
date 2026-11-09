@@ -13,9 +13,9 @@ test('Selected month/year changes loan candidates across actual saved bank repor
  assert.deepEqual(loanPaymentCandidates(p,'loan','?year=2027').entries,[])
  assert.equal(JSON.stringify(p),before)
 })
-test('Search applies within the selected period and keeps original linked-payment/account/loan-term exclusions',async()=>{
+test('Search applies within the selected period and keeps account/loan-term boundaries and labels for previous loan assignments',async()=>{
  const p=await history(),linked=linkLoanPayment(p,'loan',p.bankImport.entries[0].key,false),before=JSON.stringify(linked)
- assert.equal(loanPaymentCandidates(linked,'loan','?year=2026&month=1').entries.length,0)
+ assert.equal(loanPaymentCandidates(linked,'loan','?year=2026&month=1').entries[0].assignedLoan.id,'loan')
  assert.equal(loanPaymentCandidates(linked,'loan','?year=2026&month=2','2026-01').entries.length,0)
  for(const text of ['הוראת קבע','מוטב בדיקה','2026-02'])assert.equal(loanPaymentCandidates(linked,'loan','?year=2026&month=02',text).entries.length,1)
  assert.equal(loanPaymentEvidence(linked,'loan').paidCents,100000)
@@ -26,7 +26,7 @@ test('Search applies within the selected period and keeps original linked-paymen
  const other=clone(p.bankImport.entries[1]);other.accountId='other';other.key='f'.repeat(64);scoped.bankImport.entries.push(other)
  assert.equal(loanPaymentCandidates(scoped,'loan','?year=2026&month=2').entries.length,1)
  scoped.loans.push({id:'other',repayments:{keys:[{key:p.bankImport.entries[1].key}]}})
- assert.equal(loanPaymentCandidates(scoped,'loan','?year=2026&month=2').entries.length,0)
+ assert.equal(loanPaymentCandidates(scoped,'loan','?year=2026&month=2').entries[0].assignedLoan.id,'other')
 })
 test('Search can find older matches beyond the display cap and period switching never leaks another year',async()=>{
  const {p}=await fixture(),original=p.bankImport.entries[0]

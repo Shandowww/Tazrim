@@ -1,4 +1,4 @@
-import {clone,fields,creditCards,monthlyValues,forecast,confirmMonthlySavings,validatePlan,cents,paymentFor,monthAt,cashAccountList,cashAccountValues,cashAssignedItem,loanBankMatch,loanMatchText,indexMonth} from './budget.js';
+import {clone,fields,creditCards,monthlyValues,forecast,confirmMonthlySavings,validatePlan,cents,paymentFor,monthAt,cashAccountList,cashAccountValues,cashAssignedItem,loanBankMatch,loanMatchText,loanRulesTextOverlap,indexMonth} from './budget.js';
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function bankMonthSources(p,month){
  const sources=new Map();for(const batch of p.bankImport?.batches??[])for(const h of batch.months??[])if(h.month===month){const c=h.after?.bankCoverage;if(c?.accountId!==batch.accountId)continue;const explicit=Object.hasOwn(c,'sourceBalanceCents');sources.set(batch.accountId,{complete:c.accountComplete??c.complete,balance:explicit?c.sourceBalanceCents:h.after.cashReport?cents(h.after.cashReport.balance):null,date:c.date});}return sources;
@@ -134,8 +134,8 @@ export function undoBankImport(p,id){
 
 
 // A manual category correction moves an already reported expense; it never posts another debit.
-export function linkLoanPayment(p,loanId,key,remember=false){
- if(!validatePlan(p)||typeof remember!=='boolean')throw Error('לא ניתן לאמת את פרטי השיוך.');
+export function linkLoanPayment(p,loanId,key,remember=false,matchMode='strict'){
+ if(!['strict','name-amount'].includes(matchMode)||!validatePlan(p)||typeof remember!=='boolean')throw Error('לא ניתן לאמת את פרטי השיוך.');
  const loan=p.loans?.find(l=>l.id===loanId),entry=p.bankImport?.entries.find(e=>e.key===key);
  if(!loan||!entry?.source||entry.source.date.slice(0,7)!==entry.month||!entry.cents||cashAssignedItem(p,loan)!==entry.accountId)throw Error('יש לבחור תנועה מהחשבון שמשלם את ההלוואה.');
  if(entry.month<loan.from||indexMonth(entry.month)>=indexMonth(loan.from)+loan.months)throw Error('התנועה מחוץ לתקופת ההחזר של ההלוואה.');
@@ -155,9 +155,9 @@ export function linkLoanPayment(p,loanId,key,remember=false){
  target.repayments??={version:1,keys:[]};if(!target.repayments.keys.some(r=>r.key===key))target.repayments.keys.push({key:row.key,fingerprint:row.fingerprint,accountId:row.accountId});
  if(target.repayments.ignored)target.repayments.ignored=target.repayments.ignored.filter(r=>r.key!==key);
  if(remember){
-  const rule={accountId:row.accountId,action:loanMatchText(row.source.description),beneficiary:loanMatchText(row.source.beneficiary),amountCents:-row.cents};
+  const rule={accountId:row.accountId,action:loanMatchText(row.source.description),beneficiary:loanMatchText(row.source.beneficiary),amountCents:-row.cents,...(matchMode==='name-amount'?{match:'name-amount'}:{})};
   if(!(rule.action||rule.beneficiary))throw Error('אין בתנועה תיאור או מוטב לזיהוי תשלומים עתידיים.');
-  const conflict=next.loans.some(other=>{const r=other.repayments?.rule;return other.id!==loanId&&r&&r.accountId===rule.accountId&&loanMatchText(r.action)===rule.action&&loanMatchText(r.beneficiary)===rule.beneficiary&&r.amountCents===rule.amountCents&&Math.max(indexMonth(other.from),indexMonth(target.from))<Math.min(indexMonth(other.from)+other.months,indexMonth(target.from)+target.months)});
+  const conflict=next.loans.some(other=>{const r=other.repayments?.rule;return other.id!==loanId&&r&&r.accountId===rule.accountId&&loanRulesTextOverlap(r,rule)&&r.amountCents===rule.amountCents&&Math.max(indexMonth(other.from),indexMonth(target.from))<Math.min(indexMonth(other.from)+other.months,indexMonth(target.from)+target.months)});
   if(conflict)throw Error('כלל זה מתאים להלוואה נוספת באותה תקופה. אפשר לשייך את התנועה ידנית ללא זיהוי עתידי.');target.repayments.rule=rule;
  }
  if(!validatePlan(next))throw Error('השיוך מתנגש עם פירוט או התאמות קיימים. יש לסקור את דוח המקור לפני שינוי הסיווג.');return next;

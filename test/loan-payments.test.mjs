@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {zero,clone,validatePlan,setLoan,loanPaymentEvidence,loanBankMatch,forecast} from '../src/budget.js'
 import {bankIdentity,bankPreview,applyBankImport,linkLoanPayment,unlinkLoanPayment,stopLoanPaymentRule,undoBankImport} from '../src/bank-import-model.js'
+import {prepareLoanPaymentLink} from '../frontend/src/app/loan-payment-reassignment.ts'
 import {base,rows,options,fixture} from './helpers/loan-payment-fixture.mjs'
 test('Linking an existing debit moves its expense once, preserves bank cash and original evidence, and deducts only identified payments from the planned total',async()=>{
  const {r,p}=await fixture(),before=JSON.stringify(p),next=linkLoanPayment(p,'loan',r[0].key,true)
@@ -50,12 +51,18 @@ test('Real guarded saves recover a lost loan-link response once and refuse a sha
  try{
   for(const u of ['alice','bob']){db.prepare('INSERT INTO auth_users VALUES(?,?,?,?)').run(u,u,u+'@example.test',Date.now());db.prepare('INSERT INTO auth_sessions VALUES(?,?,?)').run(createHash('sha256').update(u).digest('hex'),u,Date.now()+3600000)}
   const app=createApp({db,DB,origin,allowedEmails:['alice@example.test','bob@example.test']}),req=(user,path,method='GET',body)=>app(new Request(origin+path,{method,headers:{origin,cookie:'__Host-mf_session='+user,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})})),{p,r}=await fixture()
+  p.loans.push({id:'second',name:'הלוואה שנייה',monthly:1000,from:'2026-01',months:3,cashAccountId:'a'})
   for(const u of ['alice','bob'])assert.equal((await req(u,'/api/plan','PUT',{plan:p,revision:0})).status,200)
   let puts=0,lost=true;const fetcher=async(url,init={})=>{const path=new URL(url,origin).pathname+new URL(url,origin).search,method=init.method??'GET';const response=await req('alice',path,method,init.body?JSON.parse(init.body):undefined);if(method==='PUT'){puts++;if(lost){lost=false;return new Response('{}',{status:503,headers:{'Content-Type':'application/json'}})}}return response}
   const snapshot=await loadBudgetSnapshot('personal',undefined,fetcher),next=linkLoanPayment(snapshot.value.plan,'loan',r[0].key,true)
   await assert.rejects(savePreparedPlan({budgetId:'personal',base:snapshot.value,plan:next},fetcher),SaveUncertain)
   const recovered=await savePreparedPlan({budgetId:'personal',base:snapshot.value,plan:next},fetcher);assert.equal(recovered.recovered,true);assert.equal(puts,1);assert.equal(loanPaymentEvidence(recovered.value.plan,'loan').paidCents,100000)
   assert.equal(db.prepare('SELECT revision FROM plans WHERE user_id=?').get('alice').revision,2);assert.equal(db.prepare('SELECT revision FROM plans WHERE user_id=?').get('bob').revision,1)
+  lost=true;const transfer={budgetId:'personal',base:recovered.value,plan:prepareLoanPaymentLink(recovered.value.plan,'second',r[0].key,'loan',true)}
+  await assert.rejects(savePreparedPlan(transfer,fetcher),SaveUncertain);const moved=await savePreparedPlan(transfer,fetcher)
+  assert.equal(moved.recovered,true);assert.equal(puts,2);assert.equal(loanPaymentEvidence(moved.value.plan,'loan').paidCents,0);assert.equal(loanPaymentEvidence(moved.value.plan,'second').paidCents,100000)
+  assert.equal(moved.value.plan.loans.find(l=>l.id==='second').repayments.rule.match,'name-amount');assert.deepEqual(moved.value.plan.months,recovered.value.plan.months);assert.deepEqual(moved.value.plan.bankImport,recovered.value.plan.bankImport)
+  assert.equal(db.prepare('SELECT revision FROM plans WHERE user_id=?').get('alice').revision,3);assert.equal(db.prepare('SELECT revision FROM plans WHERE user_id=?').get('bob').revision,1)
   const house=(await(await req('alice','/api/budgets','POST',{name:'בית בדיקה'})).json()).id;assert.equal((await req('alice','/api/plan?budget='+house,'PUT',{plan:p,revision:0})).status,200)
   const invite=await(await req('alice','/api/budgets/'+house+'/invites','POST',{email:'bob@example.test',role:'viewer'})).json();await req('bob','/api/budgets/accept','POST',{token:invite.token})
   assert.equal((await req('bob','/api/plan?budget='+house,'PUT',{plan:next,revision:1,accountId:'bob',budgetId:house})).status,403);assert.equal(db.prepare('SELECT revision FROM budgets WHERE id=?').get(house).revision,1)

@@ -1,3 +1,9 @@
+## Loan reassignment and future name/amount matching published — 2026-11-09
+
+Application `bafe416` is verified live. Prior loan assignments stay searchable and show their current loan. Explicit transfer replaces the previous link in one guarded save, counting the payment once. An unchecked future-report opt-in recognizes the shown name and exact amount in the same account/loan term. Legacy strict rules retain their behavior. Explicit consent can move a matching previous-owner rule together with the payment; unrelated/third rules are guarded.
+
+Clean build/typecheck,1,302 regressions,15 core checks,five new reassignment contracts and117 candidate contracts pass. Static candidate route/action/viewer rendering and real-service one-write lost-response transfer/rule recovery pass. All510 prior-source and168 runtime files matched. Fresh verified SQLite backup, isolated financial/access/source-decryption/startup/rollback/intake/automation restore and69 retained-asset checks passed. Activation preserved all50 authoritative tables, keys/configuration and adjacent services; public health/auth/deep routes/root/manifest/installer pass. No real financial/link/rule edits, Sites/resource changes or new browser/physical-iPhone acceptance. Use guarded refresh. Evidence: `docs/ui-redesign/evidence/release-loan-reassignment-2026-11-09.json`. After users save the new rule mode, rollback must retain its compatible model/validator; see `docs/ui-redesign/LOAN-REASSIGNMENT-2026-11-09.md`. Continue in `work/budgit-household-ui`.
+
 ## Loan-payment search period published — 2026-11-09
 
 Application `a1dc026` is verified live. Loan-payment search follows the header's selected month or whole year, within the original associated-account and loan-term eligibility. Selected/loan ranges and out-of-term guidance are explicit; the identified-payment list is labeled as covering the whole loan. No accounting, matcher or stored-record changes.

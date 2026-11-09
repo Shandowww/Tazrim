@@ -1,0 +1,154 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "bafe41637f17ec3552c455526ff029f87ff7fd35",
+  "previousApplicationCommit": "a1dc0268712336b4d69a93ce1652bdba07f64d47",
+  "entry": "https://budgit.duckdns.org/next/loans",
+  "runtimeImage": "sha256:8224514ac119602715ef2f0f29a0cd2960245af8a243a496af56f84eab4447a5",
+  "sourceArchiveSha256": "d0d8d7c99dd5a31e4c756f281c197bd8a56fffa15424a96a8363d46ece3f3c44",
+  "changes": [
+    "Previously assigned movements stay searchable with current-loan labels and explicit same-loan update/other-loan transfer actions",
+    "Atomic prepared original unlink/stop/link composition validates the expected previous owner and counts one payment once",
+    "Unchecked future-report opt-in uses shown normalized name and exact cents within account/loan term; legacy strict rules retain behavior",
+    "With explicit consent a conflicting matching previous-owner future rule moves with the payment; unrelated/third rules are not silently removed"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed",
+    "regressions": 1302,
+    "coreChecks": 15,
+    "newReassignmentContracts": 5,
+    "staticCandidateRoutes": "passed on actual rendered month/year route content, own/other-loan action labels and viewer boundaries; SSR-only registry snapshot, no browser effects or writes",
+    "previousSource": {
+      "files": 510,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 168,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 117,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "3bea419ff33e41172ce0e1acc7f00e890f7e4a0d25a7269d03d9c16a0282748d",
+          "reactHTMLSha256": "2d758483e8b71187eb3ab969052c15589eac4076158e8a799135e9f32df05515"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "683925097b83a4a2442deb48e6fcd5617b399e87a987864b58e828349f3399ab",
+          "reactHTMLSha256": "2781af6f0f4b54fe45a00a68df5cc7b2944b7196df8668907d315d5a5bda8c68"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "a1dc026"
+          ],
+          "originalAssetsVerified": 69,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 168,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-09T19:54:24.875Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone acceptance",
+    "Future matching runs within original report intake; no direct bank access or automatic financial application added",
+    "After adoption of match:name-amount, use a compatible model/validator on rollback or roll forward; prior runtime does not accept the new rule field",
+    "No production financial edits, report links or rules set by the agent; already-open pages need guarded refresh"
+  ]
+}
