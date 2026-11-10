@@ -9,7 +9,7 @@ import {savePreparedPlan,SaveConflict} from './plan-save'
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
 import {useFinancialDraft,useDraftGuard} from './draft-guard'
-import {useCreatedEditorRoute} from './use-created-editor-route'
+import {useSavedReturn} from './use-saved-return'
 import Link from './link'
 import {groupAmountText,groupedAmountChange} from './amount-format'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
@@ -33,12 +33,12 @@ function LoanRemoval({budget,base,id,onSaved}:{budget:BudgetState;base:BudgetRes
 export function LoansPage({mode,fixture,budget}:{mode:'list'|'new'|'edit'|'remove';fixture:boolean;budget:BudgetState}){
  const emptyEntry=mode==='list'&&!fixture&&budget.status==='ready'&&!budget.value.plan?.format&&!(budget.value.plan?.loans as any[]|undefined)?.length&&budget.spaces.find(s=>s.id===budget.budgetId)?.role!=='viewer'
  const {id:routeId}=useParams(),{state}=useLocation(),href=usePeriodHref(),[newId]=useState(()=>crypto.randomUUID()),[done,setDone]=useState<string|null>(null),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'?state.setupSavedMessage:''),id=mode==='new'||emptyEntry?(done??newId):(routeId??''),create=(mode==='new'||emptyEntry)&&!done,asOf=currentMonth()
- useCreatedEditorRoute((mode==='new'||mode==='list')&&done?href('/loans/'+encodeURIComponent(done)+'/edit'):mode==='remove'&&done?href('/loans'):null,message)
+ const returnAfterSave=useSavedReturn(budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:'','/loans')
  if(fixture)return <div className="household-page"><PageHeading>הלוואות</PageHeading><HouseholdLoanList plan={demoHouseholdPlan} asOf={asOf} viewer/></div>
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען הלוואות…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>
  const plan=budget.value.plan
  if(!plan||plan.format)return <section className="surface rounded-xl p-6">{plan?'התקציב מוצפן.':'אין תקציב שמור.'} </section>
  const reason=mode==='list'&&!emptyEntry?null:budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת אינה זמינה בשרת הזה.':mode==='remove'&&done?null:loanEligibility(plan,id,create)
- return <div className="household-page w-full"><PageHeading className="text-2xl font-semibold">{mode==='list'?'החזר הלוואות':mode==='remove'?'הסרה מתכנון ההלוואות':create?'הוספת הלוואה לתכנון':'עריכת תכנון הלוואה'}</PageHeading>{mode==='edit'&&<Link href={href('/loans/'+encodeURIComponent(id)+'/payments')} className="inline-flex min-h-11 items-center text-primary underline">שיוך תשלומים ומעקב החזרים</Link>}{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{mode==='list'&&!emptyEntry?<HouseholdLoanList plan={plan} asOf={asOf} viewer={budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'}/>:reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:mode==='remove'?done?<p role="status">{message}</p>:<LoanRemoval key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} onSaved={s=>{setMessage(s);setDone(id)}}/>:<LoanEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} create={create} month={asOf} onSaved={s=>{setMessage(s);if(s&&create)setDone(id)}}/>}</div>
+ return <div className="household-page w-full"><PageHeading className="text-2xl font-semibold">{mode==='list'?'החזר הלוואות':mode==='remove'?'הסרה מתכנון ההלוואות':create?'הוספת הלוואה לתכנון':'עריכת תכנון הלוואה'}</PageHeading>{mode==='edit'&&<Link href={href('/loans/'+encodeURIComponent(id)+'/payments')} className="inline-flex min-h-11 items-center text-primary underline">שיוך תשלומים ומעקב החזרים</Link>}{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{mode==='list'&&!emptyEntry?<HouseholdLoanList plan={plan} asOf={asOf} viewer={budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'}/>:reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:mode==='remove'?done?<p role="status">{message}</p>:<LoanRemoval key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} onSaved={s=>{setMessage(s);returnAfterSave(s);setDone(id)}}/>:<LoanEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} create={create} month={asOf} onSaved={s=>{setMessage(s);returnAfterSave(s);if(s&&create)setDone(id)}}/>}</div>
 }

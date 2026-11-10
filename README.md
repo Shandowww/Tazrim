@@ -1,3 +1,9 @@
+## Menu cleanup and completed-form returns published — 2026-11-10
+
+Application `73fa5aa` is verified live. More no longer repeats the primary Accounts destination. Selected-card editing is directly visible; existing card/account metadata editors are available in Basic mode with original viewer/identity/revision guards retained. Bank, card, cheque/manual-detail, loan, planned-item and savings-goal forms return to their actual previous page only after confirmed saving and clean/idle drafts. Explicit Save and Continue, scoped period/filter/wallet context and private success receipts remain. Current carousel flash/scroll fixes and financial commands are preserved.
+
+Clean archive build/typecheck,1,332 regressions,15 core checks,33 focused contracts and148 built-candidate contracts pass. All982 prior-source and169 candidate/live runtime files matched. Fresh verified SQLite backup, isolated financial/access/source-decryption/startup/rollback/intake/automation restore and retained-asset gates passed. All50 authoritative tables, configuration/keys and adjacent services were preserved. No production financial edits, Sites/resource changes or new browser/physical-iPhone acceptance. Save drafts and use guarded refresh in browser/PWA. Evidence: `docs/ui-redesign/evidence/release-menu-form-return-2026-11-10.json`. Continue in `work/budgit-household-ui`.
+
 ## Carousel transition flash and scroll jump fixed — 2026-11-10
 
 Application `f7bf3ba` is verified live at `https://budgit.duckdns.org/next/accounts`. Following the supplied iPhone recording, the incoming card now remains in position until the query selection renders; the disabled-transition reset is flushed before motion resumes. Pending selection commits refuse overlap. Card switches share the accounts-page scroll-restoration identity without mixing users, budgets, periods or account filters. Existing continuous carousel, RTL/touch/keyboard/reduced-motion and financial semantics remain.

@@ -1,6 +1,6 @@
 import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
-import {useCreatedEditorRoute} from './use-created-editor-route'
+import {useSavedReturn} from './use-saved-return'
 import {useLocation,useParams} from 'react-router-dom'
 import {creditCards,cashAccountList} from '../../../src/budget.js'
 import {cardConfigEligibility,initialCardDraft,cardDraftFingerprint,prepareCardConfig,type CardDraft} from './card-command'
@@ -35,7 +35,7 @@ function CardEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:Bud
 }
 export function CardPage({mode,fixture,budget}:{mode:'list'|'new'|'edit';fixture:boolean;budget:BudgetState}){
  const {id:routeId}=useParams(),{state}=useLocation(),[newId]=useState(()=>'card_'+crypto.randomUUID()),[completed,setCompleted]=useState<string|null>(null),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'&&!state.setupSavedScope?state.setupSavedMessage:''),href=usePeriodHref(),id=mode==='new'?(completed??newId):(routeId??''),create=mode==='new'&&!completed
- useCreatedEditorRoute(mode==='new'&&completed?href('/card-setup/'+encodeURIComponent(completed)):null,message)
+ const returnAfterSave=useSavedReturn(budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:'')
  if(fixture)return <section className="surface rounded-xl p-6">נתוני הדוגמה אינם נשמרים. יש לפתוח תקציב שמור להגדרת כרטיסים.</section>
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען כרטיסים…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>
@@ -43,6 +43,6 @@ export function CardPage({mode,fixture,budget}:{mode:'list'|'new'|'edit';fixture
  if(!plan||plan.format==='monthly-flow-encrypted-v1')return <section className="surface rounded-xl p-6">{plan?'התקציב מוצפן.':'אין תקציב שמור.'} </section>
  const reason=mode==='list'?null:budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת עדיין אינה זמינה בשרת הזה.':cardConfigEligibility(plan,id,create)
  return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">{mode==='list'?'הגדרת כרטיסים':create?'הוספת כרטיס':'עריכת פרטי כרטיס'}</PageHeading><p className="text-sm text-muted-foreground"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{(message||(state?.setupSavedScope===budget.value.accountId+'/'+budget.budgetId&&state?.setupSavedMessage))&&<p role="status" className="surface rounded-xl p-4 text-sm">{message||(state?.setupSavedScope===budget.value.accountId+'/'+budget.budgetId?state?.setupSavedMessage:'')}</p>}{mode==='edit'&&<Link href={href('/cards/'+encodeURIComponent(id)+'/stop')} className="inline-flex min-h-11 items-center text-sm text-primary underline">הפסקת הערכות לכרטיס</Link>}
- {mode==='list'?<><Link href={href('/card-setup/new')} className="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm">הוספת כרטיס</Link><section className="surface rounded-xl p-4"><ul className="divide-y">{creditCards(plan).map((c:any)=><li key={c.id}><Link className="flex min-h-11 min-w-0 flex-wrap items-center justify-between gap-3 py-3 text-sm [overflow-wrap:anywhere]" href={href('/card-setup/'+encodeURIComponent(c.id))}><bdi>{c.name}</bdi><span>{c.removedFrom?'הופסק החל מ־'+c.removedFrom:'עריכת פרטים'} · <bdi>{c.alias||'ללא כינוי'}</bdi></span></Link></li>)}</ul></section></>:reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:<CardEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} id={id} create={create} budget={budget} base={budget.value} onSaved={text=>{setMessage(text);if(text&&create)setCompleted(id)}} />}
+ {mode==='list'?<><Link href={href('/card-setup/new')} className="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm">הוספת כרטיס</Link><section className="surface rounded-xl p-4"><ul className="divide-y">{creditCards(plan).map((c:any)=><li key={c.id}><Link className="flex min-h-11 min-w-0 flex-wrap items-center justify-between gap-3 py-3 text-sm [overflow-wrap:anywhere]" href={href('/card-setup/'+encodeURIComponent(c.id))}><bdi>{c.name}</bdi><span>{c.removedFrom?'הופסק החל מ־'+c.removedFrom:'עריכת פרטים'} · <bdi>{c.alias||'ללא כינוי'}</bdi></span></Link></li>)}</ul></section></>:reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:<CardEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} id={id} create={create} budget={budget} base={budget.value} onSaved={text=>{setMessage(text);returnAfterSave(text);if(text&&create)setCompleted(id)}} />}
  </div>
 }

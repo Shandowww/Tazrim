@@ -1,5 +1,6 @@
 import {cashAccountList,cashSourceRecords,monthAt} from '../../../src/budget.js'
 import {tazrimDisplaySnapshot} from '../../../src/tazrim-display-model.js'
+import {withViewQuery} from './navigation-query.js'
 export const mainPages=['/','/accounts','/savings','/more']
 /** Space changes keep the period, never another space's record/filter/action. */
 export function householdSpaceHref(path,search,id){
@@ -55,6 +56,12 @@ export function householdReplaceState(location,href,explicit){
  const trail=householdTrail(location.state,location.search),path=href.split('?')[0]
  const ancestor=trail.findIndex(value=>value.split('?')[0]===path)
  return {...explicit,householdTrail:ancestor<0?trail:trail.slice(0,ancestor)}
+}
+
+export function householdSaveDestination(location,fallback=householdFallback(location.pathname,location.search)){
+ const trail=householdTrail(location.state,location.search)
+ const previous=trail.filter(value=>value.split('?')[0]!==location.pathname).at(-1)
+ return withViewQuery(returnDestination(previous??withViewQuery(fallback,location.search),location.search),location.search)
 }
 
 /** Useful parent for a deep link opened without an in-app trail. */

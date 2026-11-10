@@ -1,0 +1,160 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "73fa5aa6ab7306750a732e92196dca9ab76da4f7",
+  "previousApplicationCommit": "f7bf3ba9fb1b3b5d0488d4a4757a07c6bf4a351d",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:ce2f0481a5b3d052c735bf2d30376a03f280b5c7b536d5486df3b2cd9204411d",
+  "sourceArchiveSha256": "8f1a1b6ab7863d93237ac6f631e286a62be8b8d030d38ed79407234b53d4ce35",
+  "changes": [
+    "Remove the duplicate More to Accounts shortcut while retaining primary navigation and distinct tools",
+    "Expose selected-card editing directly and allow existing card/account metadata editors in Basic mode without changing permissions",
+    "Return saved bank, card, cheque/manual-detail, loan, planned-item and savings-goal forms to their actual previous page",
+    "Wait for clean idle drafts and confirmed saves; explicit Save and Continue takes priority",
+    "Preserve scope, period, wallet selection and filters, with actor/budget-bound success receipts",
+    "Retain the current carousel flash/scroll repair and original financial commands"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on an extraction of the committed source archive",
+    "regressions": 1332,
+    "coreChecks": 15,
+    "focusedContracts": 33,
+    "previousSource": {
+      "files": 982,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 169,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 148,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "b1e178646b6de999c08e8163132d10d99a08938ae2484ad43fedb8701aea4d8d",
+          "reactHTMLSha256": "965d437d54c9fecb80ce02c0b166cd5a6aa02ca91645581e024b8dddeb1a03e7"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "62dea5378d030ba20d57501e85196a9da992292ea9d83a36d74e4c68125aeef5",
+          "reactHTMLSha256": "48b9dd14dc1e0a8e20e26361c68bae3bfb0d9eef8df716861610f8184353c2c6"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "f7bf3ba"
+          ],
+          "originalAssetsVerified": 70,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 169,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T09:24:15.978Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/accounts/new",
+        "/next/accounts/synthetic/edit",
+        "/next/card-setup",
+        "/next/card-setup/new",
+        "/next/card-setup/synthetic",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone acceptance; focused rendering and deterministic navigation/draft contracts passed",
+    "Save unsaved edits and use guarded application refresh in browser and PWA",
+    "Multistep report, security and settings workflows retain their existing completion behavior",
+    "No production financial edits, Sites publication or hosting-resource upgrade"
+  ]
+}

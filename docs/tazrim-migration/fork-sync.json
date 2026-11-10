@@ -1,25 +1,25 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "1527c25cd823c6973dbcf520612cee04a44faaf0",
+  "sourceCommit": "c72f5aba96a32325f841f743565447daa271fbe5",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Carousel end-of-transition flash and vertical scroll jump fixed and verified live; existing charge display, continuous wrapping and original financial behavior retained.",
+  "status": "Menu cleanup, confirmed-save previous-page returns and visible card editing verified live; current carousel flash/scroll repair retained.",
   "validation": {
     "build": "passed on committed clean source archive",
     "typecheck": "passed",
-    "regressionTests": 1320,
+    "regressionTests": 1332,
     "coreChecks": 15,
-    "focusedContracts": 23,
-    "candidateRuntimeContracts": 135,
-    "browser": "Synthetic demo at 402x874: eight two-card light transitions (221 frames) and four dark transitions; no prior-card flash, scrollY=150 retained, no overflow. No new physical-iPhone acceptance.",
-    "release": "docs/ui-redesign/evidence/release-card-carousel-jump-2026-11-10.json"
+    "focusedContracts": 33,
+    "candidateRuntimeContracts": 148,
+    "browser": "No new browser or physical-iPhone acceptance; rendering/hook contracts and live runtime/public/preservation verification passed.",
+    "release": "docs/ui-redesign/evidence/release-menu-form-return-2026-11-10.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "f7bf3ba9fb1b3b5d0488d4a4757a07c6bf4a351d",
-  "productionImage": "sha256:6c69240dfe51c2a092c762bfde03927252c544180cd873d16f7272c93eab2c22",
+  "productionApplicationCommit": "73fa5aa6ab7306750a732e92196dca9ab76da4f7",
+  "productionImage": "sha256:ce2f0481a5b3d052c735bf2d30376a03f280b5c7b536d5486df3b2cd9204411d",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "f7bf3ba9fb1b3b5d0488d4a4757a07c6bf4a351d"
+  "applicationCommit": "73fa5aa6ab7306750a732e92196dca9ab76da4f7"
 }

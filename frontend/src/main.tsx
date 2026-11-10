@@ -1,4 +1,5 @@
 import {PageHeading} from './app/page-heading'
+import {SavedReturnNotice} from './app/use-saved-return'
 import {ChequesPage} from './app/cheques-page'
 import {IncomePlanningPage} from './app/income-planning-page'
 import {HouseholdAccountsPage} from './app/household-accounts'
@@ -186,7 +187,7 @@ function App() {
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}
-            {!accountChanged&&<HouseholdBack/>}<div className="household-screen"><PageLoadBoundary resetKey={routeScopeKey+pathname+search}><Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
+            {!accountChanged&&<><SavedReturnNotice scope={!fixture&&budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:''}/><HouseholdBack/></>}<div className="household-screen"><PageLoadBoundary resetKey={routeScopeKey+pathname+search}><Suspense fallback={<section className="surface rounded-xl p-6" role="status">טוען מסך…</section>}>
             {accountChanged ? <section className="household-page" role="status">מעדכנים את החשבון…</section> : !fixture && budget.status==='error' ? (
               <section className="household-page">
                 <PageHeading>התקציב לא זמין</PageHeading>

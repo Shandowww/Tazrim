@@ -13,6 +13,14 @@ function load(router,overrides={}){
  return module.exports.HouseholdAccountsPage
 }
 function fixture(){const plan=clone(demoPlan);plan.startMonth='2026-01';plan.expenses=[];plan.defaults=zero();plan.months={'2026-10':{actual:true,includesPlannedCard:true,values:{...zero(),card1:123.45,card2:0}}};plan.details=[{id:'food',name:'אוכל',category:'מזון',amount:23.45,method:'card1',month:'2026-10',date:'2026-10-10',status:'cleared',accounting:'included'}];return plan}
+test('Selected card has an immediately visible, scoped edit action, while viewers retain read-only actions',()=>{
+ const Page=load({useLocation:()=>({search:'?budget=family&year=2026&month=10&walletCard=card1'}),useNavigate:()=>()=>{}}),plan=fixture()
+ const render=role=>renderToStaticMarkup(React.createElement(Page,{fixture:false,budget:{...budget(plan),budgetId:'family',spaces:[{id:'family',role}]}}))
+ const editor=render('editor')
+ assert.match(editor,/<h2><bdi>[^<]+<\/bdi>(?:[^]*?)<\/h2><a class="household-update" href="\/card-setup\/card1\?year=2026&amp;month=10&amp;budget=family">עריכת פרטי הכרטיס<\/a>/)
+ assert.doesNotMatch(render('viewer'),/עריכת פרטי הכרטיס|הוספת כרטיס|ניהול פרטי הכרטיסים/)
+ assert.match(render('viewer'),/עסקאות ופירוט שמור/)
+})
 const budget=plan=>({status:'ready',value:{plan,accountId:'synthetic'},budgetId:'personal',spaces:[]})
 function walk(node,predicate){if(!node||typeof node!=='object')return [];return [...(predicate(node)?[node]:[]),...[node.props?.children].flat(Infinity).flatMap(child=>walk(child,predicate))]}
 function harness({reduced=false,deferred=false}={}){
