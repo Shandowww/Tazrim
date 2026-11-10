@@ -1,6 +1,5 @@
 import {PageHeading} from './page-heading'
 import {useEffect,useLayoutEffect,useRef} from 'react'
-import {flushSync} from 'react-dom'
 import {useLocation,useNavigate} from 'react-router-dom'
 import {ChevronLeft,ChevronRight,ShoppingBasket,Pill,Fuel,ShoppingBag,House,Landmark,Tag} from 'lucide-react'
 import {networkLabel,providerKey} from '../tazrim/lib/accounts/brands'
@@ -29,12 +28,13 @@ function WalletDots({cards,selectedId,select,step}:{cards:Array<{id:string;displ
 }
 function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
  const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pendingScroll=useRef<number|null>(null)
- useEffect(()=>()=>{if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}pointer.current=null;resetSwipe(true)},[scope,location.search,plan])
+ useEffect(()=>()=>{if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}pointer.current=null},[scope,location.search,plan])
  useLayoutEffect(()=>{
+  resetSwipe(true)
   if(pendingScroll.current===null)return
   window.scrollTo({top:pendingScroll.current,behavior:'instant'})
   pendingScroll.current=null
- },[query.get('walletCard')])
+ },[scope,location.search,plan])
  let view:ReturnType<typeof householdAccounts>
  try{view=householdAccounts(plan,period)}catch{return <section className="surface household-empty" role="alert">לא ניתן להציג את נתוני החשבונות. <Link href={withViewQuery('/upload',location.search,import.meta.env.DEV)}>בדיקת הדוחות</Link></section>}
  const selected=selectedWalletCard(view.cards,query.get('walletCard'),remembered.get(scope))
@@ -47,12 +47,11 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   delete stage.dataset.direction
   if(!immediate)void stage.offsetWidth
   stage.style.setProperty('--wallet-drag-x','0px')
-  if(immediate)requestAnimationFrame(()=>{if(stage.isConnected)stage.dataset.dragging='false'})
+  if(immediate){void stage.offsetWidth;requestAnimationFrame(()=>{if(stage.isConnected)stage.dataset.dragging='false'})}
  }
  function commitSelection(id:string){
   if(!view.cards.some(c=>c.id===id))return
   if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}
-  resetSwipe(true)
   pendingScroll.current=window.scrollY
   remembered.set(scope,id)
   if(remembered.size>30)remembered.delete(remembered.keys().next().value!)
@@ -61,7 +60,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   navigate('/accounts?'+next,{replace:true,state:location.state,preventScrollReset:true})
  }
  function select(id:string,delta?:number){
-  if(id===selected?.id||swipeTimer.current||!view.cards.some(c=>c.id===id))return
+  if(id===selected?.id||swipeTimer.current||pendingScroll.current!==null||!view.cards.some(c=>c.id===id))return
   const stage=stageRef.current
   if(!stage||window.matchMedia('(prefers-reduced-motion: reduce)').matches){commitSelection(id);return}
   const targetIndex=view.cards.findIndex(c=>c.id===id)
@@ -76,7 +75,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   stage.style.setProperty('--wallet-drag-x',`${(direction>0?1:-1)*width*1.06}px`)
   swipeTimer.current=setTimeout(()=>{
    swipeTimer.current=null
-   flushSync(()=>commitSelection(id))
+   commitSelection(id)
   },260)
  }
  function step(delta:number){const id=nextWalletCard(view.cards,selected?.id,delta);if(id)select(id,delta)}
@@ -104,7 +103,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
    <div ref={stageRef} className="household-wallet-stage"
     onPointerDown={e=>{
      pointer.current=null
-     if(!e.isPrimary||e.button!==0||view.cards.length<2||swipeTimer.current||(e.target as Element).closest('button,a,input,select'))return
+     if(!e.isPrimary||e.button!==0||view.cards.length<2||swipeTimer.current||pendingScroll.current!==null||(e.target as Element).closest('button,a,input,select'))return
      pointer.current={x:e.clientX,y:e.clientY,id:e.pointerId,dragging:false}
      e.currentTarget.setPointerCapture(e.pointerId)
     }}

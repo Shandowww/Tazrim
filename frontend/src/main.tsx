@@ -25,7 +25,7 @@ import { AppearanceContext } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoHouseholdPlan } from './app/demo-fixture'
 import { budgetNavigation } from './app/budget-adapter'
-import { withViewQuery } from './app/navigation-query'
+import { withViewQuery, scrollRouteSearch } from './app/navigation-query'
 import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
 import { installPullRefresh } from './app/pull-refresh'
 import { RefreshIndicator } from './app/refresh-indicator'
@@ -155,9 +155,7 @@ function App() {
   const scrollActor = fixture ? 'demo' : budget.status === 'ready' ? budget.value.accountId : undefined
   const getScrollKey = useCallback((location: Location) => {
     if (!scrollActor) return location.key
-    const query = new URLSearchParams(location.search)
-    query.sort()
-    const route = JSON.stringify([scrollActor, location.pathname, query.toString()])
+    const route = JSON.stringify([scrollActor, location.pathname, scrollRouteSearch(location.pathname,location.search)])
     const key = scrollKeys.current.get(route)
     if (key) return key
     // Keep account identifiers and route filters out of React Router's session storage.

@@ -1,0 +1,163 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "f7bf3ba9fb1b3b5d0488d4a4757a07c6bf4a351d",
+  "previousApplicationCommit": "3af797bb11bc762e0a4ea4097518634cf6ec1d37",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:6c69240dfe51c2a092c762bfde03927252c544180cd873d16f7272c93eab2c22",
+  "sourceArchiveSha256": "8a33c067491e8f94b8c872dc806a5c291cf893cbb43fdb7c8da5b49b0fa1bf38",
+  "changes": [
+    "Keep the incoming card translated until the query-based selection renders; no previous-card flash",
+    "Flush the zero position with transitions disabled before re-enabling motion",
+    "Refuse overlapping selections while the route commit is pending",
+    "Share scroll restoration only across walletCard selections on the accounts route; keep actor/budget/period/filter isolation",
+    "Retain continuous wrapping, RTL/touch/keyboard/reduced-motion handling and original financial semantics"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on an extraction of the committed source archive",
+    "regressions": 1320,
+    "coreChecks": 15,
+    "focusedContracts": 23,
+    "browser": {
+      "data": "Built-in synthetic demo only; two-card list narrowed in browser memory; no production writes",
+      "viewport": "402x874",
+      "light": "Eight bidirectional transitions, 221 sampled frames; one identity change per transition; no old-card reappearance",
+      "dark": "Four transitions; no old-card reappearance",
+      "scroll": "All final light/dark transitions retain scrollY=150 with no horizontal overflow",
+      "threeCards": "Earlier eight-transition probe also retained a single identity change per transition",
+      "physicalIPhone": "Not retested; user-supplied recording examined"
+    },
+    "previousSource": {
+      "files": 980,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 169,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 135,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "62dea5378d030ba20d57501e85196a9da992292ea9d83a36d74e4c68125aeef5",
+          "reactHTMLSha256": "48b9dd14dc1e0a8e20e26361c68bae3bfb0d9eef8df716861610f8184353c2c6"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "59cf4092e617c100bea99bcb01d31b3b385eff61fc12cc2950aeba9b50c896e2",
+          "reactHTMLSha256": "a5a0f22d6a04113eb8a1909a97c2348ac0154471085fd2fc297fb02c85d292a3"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "3af797b"
+          ],
+          "originalAssetsVerified": 70,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 169,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T08:49:48.032Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new physical-iPhone touch acceptance",
+    "Save unsaved edits and use guarded app refresh in browser and PWA",
+    "No production financial edits, Sites publication or hosting-resource upgrade",
+    "User recording and extracted private frames stay outside Git"
+  ]
+}

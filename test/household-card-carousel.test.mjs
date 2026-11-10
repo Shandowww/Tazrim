@@ -15,16 +15,35 @@ function load(router,overrides={}){
 function fixture(){const plan=clone(demoPlan);plan.startMonth='2026-01';plan.expenses=[];plan.defaults=zero();plan.months={'2026-10':{actual:true,includesPlannedCard:true,values:{...zero(),card1:123.45,card2:0}}};plan.details=[{id:'food',name:'אוכל',category:'מזון',amount:23.45,method:'card1',month:'2026-10',date:'2026-10-10',status:'cleared',accounting:'included'}];return plan}
 const budget=plan=>({status:'ready',value:{plan,accountId:'synthetic'},budgetId:'personal',spaces:[]})
 function walk(node,predicate){if(!node||typeof node!=='object')return [];return [...(predicate(node)?[node]:[]),...[node.props?.children].flat(Infinity).flatMap(child=>walk(child,predicate))]}
-function harness({reduced=false}={}){
- const refs=[],timers=new Map(),frames=[],effects=[],navigations=[]
- let cursor=0,serial=0,tree,location={search:'?year=2026&month=10&walletCard=card1',state:{kept:true}},plan=fixture()
- const style=new Map(),stage={dataset:{},style:{setProperty:(key,value)=>style.set(key,value)},offsetWidth:400,isConnected:true,clientWidth:400,querySelector:()=>({getBoundingClientRect:()=>({width:100})})}
+function harness({reduced=false,deferred=false}={}){
+ const refs=[],timers=new Map(),frames=[],effects=[],navigations=[],flushes=[],scrolls=[]
+ let cursor=0,serial=0,tree,pendingLocation=null,location={search:'?year=2026&month=10&walletCard=card1',state:{kept:true}},plan=fixture()
+ const style=new Map(),stage={dataset:{},style:{setProperty:(key,value)=>style.set(key,value)},get offsetWidth(){flushes.push({dragging:stage.dataset.dragging,offset:style.get('--wallet-drag-x')});return 400},isConnected:true,clientWidth:400,querySelector:()=>({getBoundingClientRect:()=>({width:100})})}
  const jsx=(type,props,key)=>({type,props,key})
- const Page=load({useLocation:()=>location,useNavigate:()=>((href,options)=>{navigations.push({href,options});location={...location,search:href.slice(href.indexOf('?'))}})},{react:{...React,useRef:value=>refs[cursor++]??(refs[cursor-1]={current:value}),useEffect:callback=>effects.push(callback),useLayoutEffect:callback=>effects.push(callback)},'react/jsx-runtime':{jsx,jsxs:jsx,Fragment:'fragment'},'react-dom':{flushSync:callback=>callback()},window:{matchMedia:()=>({matches:reduced}),scrollY:432,scrollTo:()=>{}},setTimeout:callback=>{timers.set(++serial,callback);return serial},clearTimeout:id=>timers.delete(id),requestAnimationFrame:callback=>frames.push(callback)})
- function render(){cursor=0;const page=Page({budget:budget(plan),fixture:false});tree=page.type(page.props);refs[1].current=stage;return tree}
+ const Page=load({useLocation:()=>location,useNavigate:()=>((href,options)=>{navigations.push({href,options});const next={...location,search:href.slice(href.indexOf('?'))};if(deferred)pendingLocation=next;else location=next})},{react:{...React,useRef:value=>refs[cursor++]??(refs[cursor-1]={current:value}),useEffect:callback=>effects.push(callback),useLayoutEffect:callback=>effects.push(callback)},'react/jsx-runtime':{jsx,jsxs:jsx,Fragment:'fragment'},'react-dom':{flushSync:callback=>callback()},window:{matchMedia:()=>({matches:reduced}),scrollY:432,scrollTo:options=>scrolls.push(options)},setTimeout:callback=>{timers.set(++serial,callback);return serial},clearTimeout:id=>timers.delete(id),requestAnimationFrame:callback=>frames.push(callback)})
+ function render(){cursor=0;const effectStart=effects.length,page=Page({budget:budget(plan),fixture:false});tree=page.type(page.props);refs[1].current=stage;effects.slice(effectStart+1).forEach(callback=>callback());return tree}
+ function advance(){for(const [id,callback]of timers){timers.delete(id);callback()}}
+ function paint(){while(frames.length)frames.shift()()}
  render()
- return {stage,style,timers,frames,effects,navigations,render,get tree(){return tree},step:delta=>walk(tree,node=>node.type?.name==='WalletDots')[0].props.step(delta),select:id=>walk(tree,node=>node.type?.name==='WalletDots')[0].props.select(id),settle(){for(const [id,callback]of timers){timers.delete(id);callback()}render();while(frames.length)frames.shift()()},setPlan:value=>{plan=value}}
+ paint()
+ return {stage,style,timers,frames,effects,navigations,flushes,scrolls,render,advance,paint,get tree(){return tree},step:delta=>walk(tree,node=>node.type?.name==='WalletDots')[0].props.step(delta),select:id=>walk(tree,node=>node.type?.name==='WalletDots')[0].props.select(id),settle(){advance();render();paint()},commitRoute(){location=pendingLocation;pendingLocation=null;render()},setPlan:value=>{plan=value}}
 }
+test('Deferred router commits keep the incoming card in place until the new face is rendered, then reset without a reverse transition',()=>{
+ const ui=harness({deferred:true})
+ for(const direction of [1,-1,1]){
+  const before=ui.navigations.length
+  ui.step(direction);ui.advance()
+  assert.equal(ui.navigations.length,before+1)
+  assert.equal(ui.style.get('--wallet-drag-x'),`${direction*106}px`)
+  ui.step(-direction);assert.equal(ui.navigations.length,before+1);assert.equal(ui.timers.size,0)
+  ui.commitRoute()
+  assert.equal(ui.style.get('--wallet-drag-x'),'0px')
+  assert.deepEqual(ui.flushes.at(-1),{dragging:'true',offset:'0px'})
+  assert.equal(ui.stage.dataset.direction,undefined)
+  assert.deepEqual(ui.scrolls.at(-1),{top:432,behavior:'instant'})
+  ui.paint();assert.equal(ui.stage.dataset.dragging,'false');assert.equal(ui.style.get('--wallet-drag-x'),'0px')
+ }
+})
 test('Actual card page renders signed/zero charges, two side copies and categories without the duplicate heading amount',()=>{
  const plan=fixture(),before=JSON.stringify(plan)
  const Page=load({useLocation:()=>({search:'?year=2026&month=10&walletCard=card1'}),useNavigate:()=>()=>{}})

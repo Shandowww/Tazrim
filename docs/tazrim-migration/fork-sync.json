@@ -1,25 +1,25 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "a4467f2e6f0cef4c29036f0e494d099deb8ac73c",
+  "sourceCommit": "1527c25cd823c6973dbcf520612cee04a44faaf0",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Card charge display and continuous two-way carousel verified live; Cal moved to lower left and duplicate category heading total removed. Existing category and loan releases retained.",
+  "status": "Carousel end-of-transition flash and vertical scroll jump fixed and verified live; existing charge display, continuous wrapping and original financial behavior retained.",
   "validation": {
     "build": "passed on committed clean source archive",
     "typecheck": "passed",
-    "regressionTests": 1318,
+    "regressionTests": 1320,
     "coreChecks": 15,
-    "focusedContracts": 12,
+    "focusedContracts": 23,
     "candidateRuntimeContracts": 135,
-    "browser": "No new browser or physical-iPhone acceptance; static rendering, deterministic event harness and live runtime/public verification passed.",
-    "release": "docs/ui-redesign/evidence/release-card-carousel-2026-11-10.json"
+    "browser": "Synthetic demo at 402x874: eight two-card light transitions (221 frames) and four dark transitions; no prior-card flash, scrollY=150 retained, no overflow. No new physical-iPhone acceptance.",
+    "release": "docs/ui-redesign/evidence/release-card-carousel-jump-2026-11-10.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "3af797bb11bc762e0a4ea4097518634cf6ec1d37",
-  "productionImage": "sha256:6f742d3d12cf9a9cf5a2cb2de5de2e91daf33e500d8a3eb9e4fb04b427e9e578",
+  "productionApplicationCommit": "f7bf3ba9fb1b3b5d0488d4a4757a07c6bf4a351d",
+  "productionImage": "sha256:6c69240dfe51c2a092c762bfde03927252c544180cd873d16f7272c93eab2c22",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "3af797bb11bc762e0a4ea4097518634cf6ec1d37"
+  "applicationCommit": "f7bf3ba9fb1b3b5d0488d4a4757a07c6bf4a351d"
 }

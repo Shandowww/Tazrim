@@ -2,7 +2,13 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { clone, demoPlan, zero, validatePlan } from '../src/budget.js'
 import { budgetAccountOverview, budgetDashboard, budgetNavigation, summarizeBankBalances } from '../frontend/src/app/budget-adapter.js'
-import { withViewQuery, legacyBudgetHref } from '../frontend/src/app/navigation-query.js'
+import { withViewQuery, legacyBudgetHref, scrollRouteSearch } from '../frontend/src/app/navigation-query.js'
+test('Wallet card switches share the account-page scroll position, never another period, space, filter or route',()=>{
+ const selected='?walletCard=card1&year=2026&month=10&budget=family'
+ assert.equal(scrollRouteSearch('/accounts',selected),scrollRouteSearch('/accounts','?budget=family&month=10&year=2026&walletCard=card2'))
+ for(const query of ['?budget=other&year=2026&month=10','?budget=family&year=2026&month=11','?budget=family&year=2025&month=10','?budget=family&year=2026&month=10&account=other'])assert.notEqual(scrollRouteSearch('/accounts',selected),scrollRouteSearch('/accounts',query))
+ assert.match(scrollRouteSearch('/categories',selected),/walletCard=card1/)
+})
 
 test('React summary keeps consumption, card breakdown and full net distinct', () => {
   const plan = clone(demoPlan)

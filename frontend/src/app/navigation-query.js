@@ -1,4 +1,5 @@
 import {legacyInterfaceHref} from '../../../src/interface-destination.js'
+export function scrollRouteSearch(pathname,search){const query=new URLSearchParams(search);if(pathname==='/accounts')query.delete('walletCard');query.sort();return query.toString()}
 /** Keep the selected budget space and display period across internal routes. */
 export function withViewQuery(href, search, development = false) {
   const current = new URLSearchParams(search)
