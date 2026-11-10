@@ -1,3 +1,5 @@
+import {CardFeeFlip} from './card-fee-flip'
+import {CardClubMark} from '../tazrim/components/accounts/card-club-mark'
 import {PageHeading} from './page-heading'
 import {useEffect,useLayoutEffect,useRef} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
@@ -27,7 +29,7 @@ function WalletDots({cards,selectedId,select,step}:{cards:Array<{id:string;displ
  return <div ref={ref} role="group" aria-label="בחירת כרטיס">{cards.map(card=><button type="button" key={card.id} onClick={()=>select(card.id)} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}}} aria-label={'הצגת '+card.displayName+' '+(card.cardLastFour??'')} aria-pressed={selectedId===card.id}><span/></button>)}</div>
 }
 function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
- const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pendingScroll=useRef<number|null>(null)
+ const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pendingScroll=useRef<number|null>(null),suppressFlip=useRef(false)
  useEffect(()=>()=>{if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}pointer.current=null},[scope,location.search,plan])
  useLayoutEffect(()=>{
   resetSwipe(true)
@@ -85,13 +87,14 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   if(!next||next===selected?.id){resetSwipe();return}
   select(next,delta)
  }
- const face=(card:typeof selected)=>card&&<div className="household-card-face" data-bank={card.payer?.provider}>
+ const face=(card:typeof selected)=>card&&<div className="household-card-face" data-bank={card.payer?.provider} data-issuer={providerKey(card.issuer)} data-club={card.club??undefined}>
   <div className="household-card-top">
    {card.payer&&hasProviderLogo(card.payer.provider)?<ProviderLogo provider={card.payer.provider}/>:<span><bdi>{card.payer?.name||'כרטיס אשראי'}</bdi></span>}
    {card.cardLastFour&&<bdi dir="ltr">•••• {card.cardLastFour}</bdi>}
   </div>
+  {card.club&&<CardClubMark club={card.club}/>}
   <span className="household-card-charge" data-missing={card.total===null}><bdi dir={card.total===null?'auto':'ltr'}>{walletCardCharge(card,period)}</bdi></span>
-  <div className="household-card-bottom"><div className="household-card-marks">{providerKey(card.issuer)==='cal'&&<ProviderLogo provider={card.issuer}/>} {card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}</div><div className="household-payer">{card.payer?<span>מחויב מ־<bdi>{card.payer.name}</bdi></span>:<span>אין שיוך לחשבון משלם</span>}{providerKey(card.issuer)!=='cal'&&hasProviderLogo(card.issuer)&&<ProviderLogo provider={card.issuer}/>} </div></div>
+  <div className="household-card-bottom"><div className="household-card-marks">{card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}</div><div className="household-card-issuer">{hasProviderLogo(card.issuer)?<ProviderLogo provider={card.issuer}/>:card.issuer==='bank'?<span>כרטיס בנקאי</span>:null}</div><div className="household-payer">{card.payer?<span>מחויב מ־<bdi>{card.payer.name}</bdi></span>:<span>אין שיוך לחשבון משלם</span>}</div></div>
  </div>
  const peeks=walletNeighbors(view.cards,selected?.id)
  const coverage=selected?cardDetailCoverage(selected):null
@@ -103,9 +106,9 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
    <div ref={stageRef} className="household-wallet-stage"
     onPointerDown={e=>{
      pointer.current=null
-     if(!e.isPrimary||e.button!==0||view.cards.length<2||swipeTimer.current||pendingScroll.current!==null||(e.target as Element).closest('button,a,input,select'))return
+     if(!e.isPrimary||e.button!==0||view.cards.length<2||swipeTimer.current||pendingScroll.current!==null||(e.target as Element).closest('button:not([data-card-flip]),a,input,select'))return
      pointer.current={x:e.clientX,y:e.clientY,id:e.pointerId,dragging:false}
-     e.currentTarget.setPointerCapture(e.pointerId)
+     suppressFlip.current=false
     }}
     onPointerMove={e=>{
      const start=pointer.current
@@ -113,6 +116,8 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
      const dx=e.clientX-start.x,dy=e.clientY-start.y
      if(!start.dragging&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)*1.2)start.dragging=true
      if(start.dragging){
+      e.currentTarget.setPointerCapture(e.pointerId)
+      suppressFlip.current=true
       e.currentTarget.dataset.dragging='true'
       const width=e.currentTarget.querySelector('.household-wallet-selected')?.getBoundingClientRect().width??e.currentTarget.clientWidth*.78
       e.currentTarget.style.setProperty('--wallet-drag-x',`${Math.max(-width,Math.min(width,dx))}px`)
@@ -126,12 +131,12 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
      finishSwipe(start,{x:e.clientX,y:e.clientY})
      if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId)
     }}
-    onPointerCancel={()=>{pointer.current=null;resetSwipe()}}
+    onPointerCancel={()=>{suppressFlip.current=true;pointer.current=null;resetSwipe()}}
     onLostPointerCapture={e=>{if(pointer.current?.id===e.pointerId){pointer.current=null;resetSwipe()}}}
-    onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}}}>
+    onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')suppressFlip.current=false;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}}}>
     {peeks.map(peek=><div className={'household-wallet-peek far-'+peek.side} key={'far-'+peek.side} aria-hidden="true">{face(view.cards.find(card=>card.id===nextWalletCard(view.cards,selected.id,peek.delta*2))!)}</div>)}
     {peeks.map(peek=>{const card=view.cards.find(c=>c.id===peek.id)!;return <button type="button" className={'household-wallet-peek '+peek.side} key={peek.side} onClick={()=>select(card.id,peek.delta)} aria-label={(peek.delta>0?'הכרטיס הבא: ':'הכרטיס הקודם: ')+card.displayName+' '+(card.cardLastFour??'')}><div aria-hidden="true">{face(card)}</div></button>})}
-    <div className="household-wallet-selected" role="group" tabIndex={0} aria-live="polite" aria-label={selected.displayName+' '+(selected.cardLastFour??'')}>{face(selected)}</div>
+    <div className="household-wallet-selected" role="group" tabIndex={0} aria-live="polite" aria-label={selected.displayName+' '+(selected.cardLastFour??'')}><CardFeeFlip key={scope+'/'+selected.id+'/'+location.search} card={selected} canFlip={()=>!suppressFlip.current&&!swipeTimer.current&&pendingScroll.current===null}>{face(selected)}</CardFeeFlip></div>
    </div>
    <div className="household-wallet-controls"><button type="button" onClick={()=>step(1)} disabled={view.cards.length<2} aria-label="הכרטיס הבא"><ChevronRight size={20}/></button><WalletDots cards={view.cards} selectedId={selected.id} select={select} step={step}/><button type="button" onClick={()=>step(-1)} disabled={view.cards.length<2} aria-label="הכרטיס הקודם"><ChevronLeft size={20}/></button></div>
    <p className="household-wallet-total">{view.cards.every(c=>c.total!==null)?<>סה״כ בכרטיסים בתקופה: <bdi>{money(view.cards.reduce((s,c)=>s+(c.total??0),0))}</bdi></>:'חסר דיווח בחלק מהכרטיסים'}</p>

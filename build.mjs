@@ -11,7 +11,7 @@ const buildId=createHash('sha256').update(readdirSync('src').sort().map(name=>na
 execFileSync('npm',['run','build'],{cwd:'frontend',stdio:'inherit'});
 let html=readFileSync('src/index.html','utf8').replace('/*STYLE*/',readFileSync('src/style.css','utf8')+'\n'+readFileSync('src/details.css','utf8')+'\n'+readFileSync('src/spaces.css','utf8')+'\n'+readFileSync('src/savings.css','utf8')+'\n'+readFileSync('src/savings-art.css','utf8')+'\n'+readFileSync('src/design.css','utf8')+'\n'+readFileSync('src/wallet-design.css','utf8')+'\n'+readFileSync('src/action-center.css','utf8')+'\n'+readFileSync('src/tazrim-theme.css','utf8'));
 html=html.replace('/*THEME*/',()=>readFileSync('src/theme.js','utf8'));
-const model=readFileSync('src/reconciliation-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/card-billing-model.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/budget.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/investment-model.js','utf8').replaceAll(/^export /gm,'');
+const model=readFileSync('src/card-metadata.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/reconciliation-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/card-billing-model.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/budget.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/investment-model.js','utf8').replaceAll(/^export /gm,'');
 const growth=readFileSync('src/savings-growth.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'');
 const vault=readFileSync('src/vault.js','utf8').replaceAll(/^export /gm,'');
 const bankModel=readFileSync('src/bank-import-model.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'');
@@ -51,6 +51,7 @@ copyFileSync('src/spaces-worker.js','dist/server/spaces-worker.js');
 copyFileSync('src/space-model.js','dist/server/space-model.js');
 copyFileSync('src/space-migration-model.js','dist/server/space-migration-model.js');
 copyFileSync('src/wallet-text-model.js','dist/server/wallet-text-model.js');
+copyFileSync('src/card-metadata.js','dist/server/card-metadata.js');
 copyFileSync('src/gmail-filter-model.js','dist/server/gmail-filter-model.js');
 copyFileSync('src/space-savings-model.js','dist/server/space-savings-model.js');
 copyFileSync('src/space-savings-migration.js','dist/server/space-savings-migration.js');

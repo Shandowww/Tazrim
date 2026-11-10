@@ -1,0 +1,12 @@
+# Card club identification artwork
+
+Retrieved on 2026-11-10. Trademarks remain the property of their respective owners. Local transparent assets identify the user's chosen club; the app makes no affiliation claim and loads no third-party resources at runtime.
+
+- **Hitechzone**: https://www.htzone.co.il/ and https://www.htzone.co.il/כרטיס_אשראי ; official header mark https://media.htzone.co.il/design/header/logo_htz2.png?v=2 . The published compact HTZ mark is cropped and its dark backing removed to produce `public/tazrim/club-hitechzone.png`; navy/turquoise card colors take their cue from the official program. No PRO tier is inferred.
+- **HOT**: https://www.isracard.co.il/credit-cards/moadonhot ; official card image https://www.isracard.co.il/_media/e46636_01df91d0be854e90844759f536df92c0~mv2.png . Club mark cropped at (449,9)-(614,121) from the 650×395 card, white stock removed with alpha. White/turquoise/violet background is an app-native adaptation.
+- **LifeStyle**: https://www.isracard.co.il/credit-cards/lifestyle ; official image https://www.isracard.co.il/_media/e46636_2d1a4f1e890848c9b5673310711420c4~mv2.png . Wordmark cropped at (31,19)-(267,90), white stock removed with alpha. White/blue background follows the published card.
+- **W**: https://www.isracard.co.il/credit-cards/w ; official reference https://www.isracard.co.il/_media/e46636_ad5bceedcdcc4b71b636a023409372c7~mv2.png . Its embossed mark overlaps the chip and is unsuitable for a clean isolated crop. `club-w.svg` is an original transparent silver rounded-W interpretation, not an official logo file. The silver field is app-native CSS.
+- **Shufersal**: https://www.shufersal.co.il/ ; https://www.shufersal.co.il/online/medias/sys_master/root/h18/hc4/11095082172446/logo-online.png . Hebrew wordmark cropped at x=79 from the 176×32 transparent header image, excluding the Online label. White/red field is app-native CSS rather than a claim to match every card edition.
+- **Issuers**: existing local Cal, Max and Isracard marks are reused. Online references consulted: https://www.cal-online.co.il/ (fetch blocked), https://www.max.co.il/ , https://www.isracard.co.il/ . Bank-issued cards retain the existing paying-bank identity. Existing network marks and their notices are retained unchanged.
+
+No full card image, printed account/card number, security code, photograph or source webpage is included in the app assets. Raster club marks have alpha transparency and are displayed in bounded boxes sized for the app card.

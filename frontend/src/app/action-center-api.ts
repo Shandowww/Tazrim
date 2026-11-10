@@ -16,6 +16,7 @@ export function reportActionFacts(snapshot:ExpectationsSnapshot,clock:ActionCloc
 }
 export function reportActionDestination(search:string,issue:ActionIssue){
  if(!validActionTarget(issue.target))throw Error('יעד הפעולה אינו זמין.')
+ if(issue.target.screen==='card')return{href:withViewQuery('/card-setup/'+encodeURIComponent(issue.target.target!),search),native:true}
  if(issue.target.screen==='incoming')return{href:withViewQuery('/incoming',search),native:true}
  if(issue.target.screen==='statement-notice'&&issue.target.noticeId)return{href:withViewQuery('/notices/'+encodeURIComponent(issue.target.noticeId),search),native:true}
  if(issue.target.screen==='gmail')return{href:withViewQuery('/settings/gmail',search),native:true}

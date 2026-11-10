@@ -93,7 +93,7 @@ test('Pointer swipe shares the animated cycle; vertical, cancelled and short ges
  for(const [horizontal,vertical]of [[5,100],[30,0]]){stage().onPointerDown(event(0,0));stage().onPointerMove(event(horizontal,vertical));stage().onPointerUp(event(horizontal,vertical));assert.equal(ui.timers.size,0)}
  stage().onPointerDown(event(0,0));stage().onPointerMove(event(-80,0));stage().onPointerCancel();assert.equal(ui.timers.size,0);assert.equal(ui.navigations.length,1)
 })
-test('Card CSS keeps both sides upright, matched spacing, Cal on the left and reduced motion without transitions',()=>{
+test('Card CSS keeps both sides upright, matched spacing, issuer/network slots and reduced motion without transitions',()=>{
  const css=readFileSync('frontend/src/app.css','utf8')
  for(const side of ['right','left']){const rule=css.match(new RegExp('\\.household-wallet-peek\\.'+side+'\\{([^}]+)\\}'))[1];assert.doesNotMatch(rule,/rotate|scale/)}
  for(const [side,offset]of [['right',162],['left',-262]])assert.ok(css.includes(`.household-wallet-peek.far-${side}{transform:translateX(calc(${offset}% + var(--wallet-drag-x,0px)))`))
@@ -101,11 +101,11 @@ test('Card CSS keeps both sides upright, matched spacing, Cal on the left and re
  assert.match(css,/household-card-marks[^}]*direction:ltr/)
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{\.household-wallet-stage[^}]*transition:none/)
 })
-test('Cal occupies the left mark slot once per face; missing, empty and single-card views retain their actual evidence',()=>{
+test('Cal occupies the centered issuer slot once per face; missing, empty and single-card views retain their actual evidence',()=>{
  const plan=fixture();plan.creditCards=[{id:'card1',name:'כרטיס כאל',provider:'cal',alias:''}]
  const render=search=>{const Page=load({useLocation:()=>({search}),useNavigate:()=>()=>{}});return renderToStaticMarkup(React.createElement(Page,{budget:budget(plan),fixture:false}))}
  const html=render('?year=2026&month=10'),selected=html.split('class="household-wallet-selected"')[1].split('household-wallet-controls')[0]
- assert.match(selected,/household-card-marks"><span class="wallet-provider-logo" data-provider="cal"/)
+ assert.match(selected,/household-card-issuer"><span class="wallet-provider-logo" data-provider="cal"/)
  assert.doesNotMatch(selected.split('household-payer')[1],/data-provider="cal"/)
  assert.doesNotMatch(html,/household-wallet-peek /)
  assert.match(html,/disabled="" aria-label="הכרטיס הבא"/)

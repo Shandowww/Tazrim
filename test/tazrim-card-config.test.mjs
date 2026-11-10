@@ -1,3 +1,4 @@
+import {CARD_METADATA_FIELDS,applyCardMetadata} from '../src/card-metadata.js'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import vm from 'node:vm'
@@ -7,7 +8,7 @@ import {cardDraftFingerprint,initialCardDraft,prepareCardConfig} from '../fronte
 const base=()=>({startMonth:'2026-01',opening:1000,buffer:100,horizon:24,defaults:{...zero(),salary:1000,card1:100},months:{},expenses:[],demo:false,setupCompleted:true})
 const id='card_qa-new'
 function originalSubmit(plan,cardId,draft){
- const source=readFileSync('src/cards.js','utf8'),a=source.indexOf('form.onsubmit='),b=source.indexOf('\n}',a),snippet=source.slice(a,b),context={form:{},plan:clone(plan),clone,creditCards,cardsValid,FormData:class{get(key){return {id:cardId,name:draft.name,alias:draft.alias,billingDay:draft.billingDay}[key]}},crypto:{randomUUID:()=> 'qa-new'},report:message=>{throw Error(message)},close(){},openCardManager(){},mutate:next=>context.next=next};vm.runInNewContext(snippet,context);context.form.onsubmit({preventDefault(){}});return JSON.parse(JSON.stringify(context.next))
+ const source=readFileSync('src/cards.js','utf8'),a=source.indexOf('form.onsubmit='),b=source.indexOf('\n}',a),snippet=source.slice(a,b),context={CARD_METADATA_FIELDS,applyCardMetadata,form:{},plan:clone(plan),clone,creditCards,cardsValid,FormData:class{get(key){return {id:cardId,...draft}[key]}},crypto:{randomUUID:()=> 'qa-new'},report:message=>{throw Error(message)},close(){},openCardManager(){},mutate:next=>context.next=next};vm.runInNewContext(snippet,context);context.form.onsubmit({preventDefault(){}});return JSON.parse(JSON.stringify(context.next))
 }
 test('Card create/edit metadata exactly matches the existing card manager while retaining original state and financial forecasts',()=>{
  const p=base(),draft={name:' כרטיס חדש ',alias:' 1234 ',billingDay:'05',payer:''},before=JSON.stringify(p),next=prepareCardConfig(p,id,draft,true)

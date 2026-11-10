@@ -11,7 +11,7 @@ export function budgetNavigation(plan) {
   const cards = creditCards(plan).filter(card => !card.removedFrom).map(card => ({
     id: card.id, kind: 'CREDIT_CARD', displayName: card.name,
     cardLastFour: /^\d{4}$/.test(card.lastFour || '') ? card.lastFour : /^\d{4}$/.test(card.alias || '') ? card.alias : null, provider: savedCardProvider(plan,card),
-    cardNetwork: savedCardNetwork(plan,card), color: card.color || null,
+    cardNetwork: savedCardNetwork(plan,card), club:card.club??null, discountEndsOn:card.discountEndsOn??null, feeAfterDiscount:card.feeAfterDiscount??null, issuerPhone:card.issuerPhone??null, color: card.color || null,
   }))
   return [...banks, ...cards]
 }
@@ -65,6 +65,7 @@ export function summarizeBankBalances(banks) {
 
 /** Decorative issuer/program evidence only; never infers or changes a paying account. */
 export function savedCardProvider(plan,card){
+ if(card.issuer)return card.issuer
  if(card.provider)return card.provider
  const name=String(card.name??'').toLowerCase()
  const payer=cashAccountList(plan).find(account=>account.id===plan.cashPlanning?.cardAccounts?.[card.id])
@@ -75,6 +76,7 @@ export function savedCardProvider(plan,card){
 
 /** The processing issuer remains distinct from a bank-branded card program. */
 export function savedCardIssuer(plan,card){
+ if(card.issuer)return card.issuer
  const explicit=String(card.provider??'').trim()
  if(explicit&&!/^(?:one[ -]?zero|(?:בנק\s+)?ו?ואן\s*זירו)$/i.test(explicit))return explicit
  const name=String(card.name??'').toLowerCase()

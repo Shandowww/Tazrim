@@ -116,6 +116,7 @@ export const PROVIDER_LABELS: Record<string, string> = {
   hapoalim: 'הפועלים',
   discount: 'דיסקונט',
   mizrahi: 'מזרחי טפחות',
+  bank: 'כרטיס בנקאי',
   max: 'מקס',
   cal: 'כאל',
   isracard: 'ישראכרט',

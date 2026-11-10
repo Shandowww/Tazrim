@@ -1,4 +1,5 @@
 import {monthlyDataCoverage,monthAt,creditCards,cashAccountList} from './budget.js';
+import {cardDateValid,cardDiscountReminderOn} from './card-metadata.js';
 
 // Facts are derived from their owning subsystem. Notification preferences never resolve them.
 export const ACTION_DISMISSED=-1;
@@ -25,6 +26,12 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
  const noticeText=text=>String(text??'').normalize('NFKC').replace(/\s+/g,' ').trim();
  for(const notice of notices.filter(n=>n.state==='review'&&!statementNotices.some(statement=>statement.issuer!=='unknown'&&statement.issuer===n.issuer&&statement.accountReference&&statement.accountReference===n.accountReference&&noticeText(statement.text)===noticeText(n.text))))add('bank.notice',notice.id,'עדכון מהבנק ממתין לבדיקה',notice.subject,'בדיקת ההודעה',{screen:'notice',noticeId:notice.id},notice.revision,'incomplete');
  if(!p||!asOf)return issues;
+ if(cardDateValid(day))for(const card of creditCards(p)){
+  const reminder=cardDiscountReminderOn(card.discountEndsOn);
+  if(!reminder||day<reminder||card.removedFrom&&card.removedFrom<=day.slice(0,7))continue;
+  const ended=day>card.discountEndsOn,date=card.discountEndsOn.split('-').reverse().join('.'),fee=card.feeAfterDiscount===undefined?'':' · עלות לאחר ההנחה: '+new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(card.feeAfterDiscount);
+  add('card.discount-ending',card.id,ended?'ההנחה בדמי הכרטיס הסתיימה':'ההנחה בדמי הכרטיס מסתיימת בקרוב',card.name+(card.alias?' · '+card.alias:'')+' · '+date+fee,'פרטי הכרטיס וחידוש ההנחה',{screen:'card',target:card.id},[card.discountEndsOn,card.feeAfterDiscount??null,card.issuerPhone??null],'incomplete');
+ }
  for(const rule of expectations){
   if(!rule.enabled||!['bank','card'].includes(rule.kind)||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(rule.startMonth)||!Number.isInteger(rule.dueDay)||rule.dueDay<1||rule.dueDay>31||!Number.isInteger(rule.graceDays)||rule.graceDays<0||rule.graceDays>31)continue;
   const entity=(rule.kind==='card'?creditCards(p):cashAccountList(p)).find(e=>e.id===rule.target);if(!entity)continue;
@@ -46,7 +53,7 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
 
 export function actionIssueVisible(issue,preferences,now){const p=preferences?.[issue.key];return !p||p.evidence!==issue.evidence||p.until!==ACTION_DISMISSED&&!(p.until>now);}
 
-export function validActionTarget(t){return !!t&&typeof t==='object'&&['save','backup','report','unlock','upload','gmail','notice','statement-notice','incoming'].includes(t.screen)&&Object.keys(t).every(k=>['screen','month','kind','target','reportId','noticeId'].includes(k))&&(!t.month||/^20\d{2}-(0[1-9]|1[0-2])$/.test(t.month))&&['target','reportId','noticeId'].every(k=>t[k]===undefined||typeof t[k]==='string'&&/^[\w:-]{1,100}$/.test(t[k]));}
+export function validActionTarget(t){return !!t&&typeof t==='object'&&['save','backup','report','unlock','upload','gmail','notice','statement-notice','incoming','card'].includes(t.screen)&&Object.keys(t).every(k=>['screen','month','kind','target','reportId','noticeId'].includes(k))&&(!t.month||/^20\d{2}-(0[1-9]|1[0-2])$/.test(t.month))&&['target','reportId','noticeId'].every(k=>t[k]===undefined||typeof t[k]==='string'&&/^[\w:-]{1,100}$/.test(t[k]))&&(t.screen!=='card'||/^card(?:[12]|_[a-zA-Z0-9-]{1,70})$/.test(t.target??''));}
 
 export function nextActionAnnouncement(active,preferences,announced){return active.find(i=>i.severity==='required'&&!announced.has(i.key+i.evidence)&&preferences[i.key]?.evidence!==i.evidence);}
 export function actionPreferencePayload(issue,preferences,until,action,accountId,compare=false){const prior=Object.hasOwn(preferences,issue.key)?preferences[issue.key]:null;return{...(['read','dismiss'].includes(action)?{action}:{}),key:issue.key,evidence:issue.evidence,until,accountId,...(compare?{previous:prior?{evidence:prior.evidence,until:prior.until}:null}:{})};}

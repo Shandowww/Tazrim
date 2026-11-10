@@ -1,0 +1,200 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "c3bcde5383682bad077dea40c2ab40d94e00323d",
+  "previousApplicationCommit": "73fa5aa6ab7306750a732e92196dca9ab76da4f7",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:8a94d127eabba4fb7b1a96e87d6e4d90b3421b02b463d81c08113a3f4fcd9d0e",
+  "sourceArchiveSha256": "b007ab0428a0b8ff7e1a52657547e43281bc5cc27fd02680909423c0c4de9126",
+  "changes": [
+    "Optional issuer, independent network and five card clubs in original and native metadata editors",
+    "Locally stored transparent club marks with official reference provenance and issuer/club backgrounds",
+    "Paying-bank icon retains its upper slot, network lower left and issuer lower center",
+    "Accessible reversible card face with optional discount date, post-discount fee including zero and renewal phone",
+    "Scoped existing notification-center reminder one calendar month before expiry",
+    "Exact user-confirmed card 0394 corrected to Cal / Mastercard through original revision-guarded save and encrypted history"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on an extraction of the committed source archive",
+    "regressions": 1413,
+    "regressionScope": "test/*.test.mjs and tools/bank-csv/*.test.mjs, including reader tests",
+    "coreChecks": 15,
+    "focusedContracts": 26,
+    "previousSource": {
+      "files": 987,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 172,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 153,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "053d2dc6de1ed930a9a856e415afac499c1f6bf5e684e2999e4745e8038fe9ee",
+          "reactHTMLSha256": "16eeed3d8d8f1b5b35e6e58b71f66d5ab163a27446f8b8d73030731f15f0d6e5"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "b1e178646b6de999c08e8163132d10d99a08938ae2484ad43fedb8701aea4d8d",
+          "reactHTMLSha256": "965d437d54c9fecb80ce02c0b166cd5a6aa02ca91645581e024b8dddeb1a03e7"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "73fa5aa"
+          ],
+          "originalAssetsVerified": 70,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 172,
+      "extra": [],
+      "mismatched": []
+    },
+    "releasePreservationBeforeMetadataCorrection": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T10:44:13.914Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/accounts/new",
+        "/next/accounts/synthetic/edit",
+        "/next/card-setup",
+        "/next/card-setup/new",
+        "/next/card-setup/synthetic",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true,
+    "browserEvidence": "docs/ui-redesign/evidence/card-metadata-browser-2026-11-10.json",
+    "syntheticBrowserChecks": 92,
+    "card0394": {
+      "isolatedDryRun": {
+        "cardSuffix": "0394",
+        "issuer": "cal",
+        "network": "mastercard",
+        "corrected": true,
+        "originalWorkerAndEncryptedHistory": true,
+        "revisionAdvancedOnce": true,
+        "onlyCardMetadataChanged": true,
+        "allOtherActorsAndStoredTablesPreserved": true,
+        "transactionsAndMonthlyAmountsPreserved": true,
+        "oneCardProjectionAndAudit": true,
+        "foreignKeys": true,
+        "at": "2026-11-10T10:38:05.045Z"
+      },
+      "staleRefusal": {
+        "staleWitnessRefused": true,
+        "databaseByteIdentical": true,
+        "secondWriteAbsent": true
+      },
+      "live": {
+        "cardSuffix": "0394",
+        "issuer": "cal",
+        "network": "mastercard",
+        "corrected": true,
+        "originalWorkerAndEncryptedHistory": true,
+        "revisionAdvancedOnce": true,
+        "onlyCardMetadataChanged": true,
+        "allOtherActorsAndStoredTablesPreserved": true,
+        "transactionsAndMonthlyAmountsPreserved": true,
+        "oneCardProjectionAndAudit": true,
+        "foreignKeys": true,
+        "at": "2026-11-10T10:44:01.988Z"
+      },
+      "privateIdentityAndHashWitness": "retained privately on server; not included in source backup"
+    }
+  },
+  "limitations": [
+    "No new physical-iPhone acceptance; synthetic Chrome light/dark and 320/390/430/1440px checks passed",
+    "Reminder is inside the existing notification center; no push or scheduler was added",
+    "Card fee metadata creates no budget charges or forecasts",
+    "Save drafts and use guarded refresh in browser/PWA",
+    "No Sites publication, hosting-resource upgrade or changes to financial amounts"
+  ]
+}

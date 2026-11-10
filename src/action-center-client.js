@@ -35,6 +35,7 @@ async function actionGo(key){
  if(!canSwitchBudget()||typeof reportInbox!=='undefined'&&reportInbox){actionCenterState.pendingNavigation={key,scope:actionScope()};notify('יש לסיים ולשמור את העריכה. הפעולה שבחרתם תישאר זמינה להמשך במרכז ההתראות.');return;}actionCenterState.pendingNavigation=null;
  document.getElementById('action-center-dialog')?.close();const t=issue.target;let text='',dialog='';
  if(t.screen==='incoming'){window.location.assign('/next/incoming?budget='+encodeURIComponent(activeBudget));return;}
+ if(t.screen==='card'){window.location.assign('/next/card-setup/'+encodeURIComponent(t.target)+'?budget='+encodeURIComponent(activeBudget));return;}
  if(t.screen==='statement-notice'){window.location.assign('/next/notices/'+encodeURIComponent(t.noticeId)+'?budget='+encodeURIComponent(activeBudget));return;}
  if(t.screen==='notice'){if(typeof openBankNotice==='function')await openBankNotice(t.noticeId);return;}
  if(t.screen==='gmail'){tab='settings';settingsSection='gmail';text='בדקו את החיבור, הסינון ומצב Gmail API. לאחר חיבור מחדש יש לבדוק שהמשיכה הושלמה. אין אישור כיסוי כאשר הבדיקה נכשלה.';}

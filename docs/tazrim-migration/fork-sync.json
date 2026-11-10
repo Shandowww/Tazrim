@@ -1,25 +1,28 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "c72f5aba96a32325f841f743565447daa271fbe5",
+  "sourceCommit": "a9a17439de4e447a21229520ff1cc4780137f5d6",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Menu cleanup, confirmed-save previous-page returns and visible card editing verified live; current carousel flash/scroll repair retained.",
+  "status": "Published card clubs, issuer identity, optional fee details and calendar-month reminders; exact 0394 Cal/Mastercard correction verified",
   "validation": {
     "build": "passed on committed clean source archive",
     "typecheck": "passed",
-    "regressionTests": 1332,
+    "regressionTests": 1413,
     "coreChecks": 15,
     "focusedContracts": 33,
     "candidateRuntimeContracts": 148,
-    "browser": "No new browser or physical-iPhone acceptance; rendering/hook contracts and live runtime/public/preservation verification passed.",
-    "release": "docs/ui-redesign/evidence/release-menu-form-return-2026-11-10.json"
+    "browser": "Synthetic Chrome all five clubs in light/dark; 320/390/430/1440px no overflow; flip/focus/keyboard/reduced motion/swipe; one-write lost-response retry, scoped reminders and finance/other-actor preservation passed. No new physical-iPhone acceptance.",
+    "release": "docs/ui-redesign/evidence/release-card-metadata-2026-11-10.json",
+    "productionEvidence": "docs/ui-redesign/evidence/release-card-metadata-2026-11-10.json",
+    "checkpoint": "docs/ui-redesign/CARD-METADATA-2026-11-10.md",
+    "physicalDevice": "No new physical-iPhone acceptance for this release. Prior native Shortcut acceptance is retained for its unchanged scope."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "73fa5aa6ab7306750a732e92196dca9ab76da4f7",
-  "productionImage": "sha256:ce2f0481a5b3d052c735bf2d30376a03f280b5c7b536d5486df3b2cd9204411d",
+  "productionApplicationCommit": "c3bcde5383682bad077dea40c2ab40d94e00323d",
+  "productionImage": "sha256:8a94d127eabba4fb7b1a96e87d6e4d90b3421b02b463d81c08113a3f4fcd9d0e",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "73fa5aa6ab7306750a732e92196dca9ab76da4f7"
+  "applicationCommit": "c3bcde5383682bad077dea40c2ab40d94e00323d"
 }
