@@ -1,3 +1,9 @@
+## Full app refresh published — 2026-11-10
+
+Application `a556d9c` is verified live. Header refresh and top pull now load the latest interface code and saved data, rather than only re-fetching the budget. The existing draft guard runs before the connection check and again before navigation. Offline, timeout, login and invalid responses preserve the current page with retry; overlapping refreshes and stale routes are refused. Budget/period/filter context and editor-local data refresh commands remain.
+
+Clean archive build/typecheck,1,421 regressions (including readers),15 core checks,34 focused refresh checks and187 built-candidate contracts pass. All1002 previous-source and172 candidate/live runtime files match. Fresh verified backup, isolated release/rollback gates and live checks preserve all50 authoritative tables, keys/configuration and adjacent services. No production record/Sites/resource change or new browser/physical-iPhone/PWA acceptance. An already-open old app needs one browser reload or PWA reopen to receive this fix. Later in-app refreshes load app updates. Evidence: `docs/ui-redesign/evidence/release-app-refresh-2026-11-10.json`. Continue in `work/budgit-household-ui`.
+
 ## Touch carousel and card-back tap repair published — 2026-11-10
 
 Application `123b773` is verified live. Touch swipes retain their gesture when implicit capture moves from card content to the carousel stage; only capture loss by the stage cancels it. Tapping noninteractive card-back content or blank surface now returns to the front. Telephone links, the accessible return button/focus, vertical scrolling, short/cancelled gestures, two-way continuous wrapping, period/scope and scroll position are retained. Prior issuer/club/fee/reminder behavior and saved 0394 Cal/Mastercard metadata remain.

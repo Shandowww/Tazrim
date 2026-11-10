@@ -30,6 +30,7 @@ import { withViewQuery, scrollRouteSearch } from './app/navigation-query'
 import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
 import { installPullRefresh } from './app/pull-refresh'
 import { RefreshIndicator } from './app/refresh-indicator'
+import { createAppRefresh } from './app/refresh-app'
 import {InterfaceModeProvider,InterfaceModeSelector,InterfaceModeBoundary} from './app/interface-mode'
 import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
@@ -90,10 +91,9 @@ function useFixtureMode() {
   return import.meta.env.DEV && new URLSearchParams(search).get('demo') === '1'
 }
 
-function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
+function Header({ budget,refreshApp,refreshPending }: { budget: ReturnType<typeof useBudget>;refreshApp:()=>void;refreshPending:boolean }) {
   const { pathname, search } = useLocation()
   const navigate = useNavigate()
-  const guard = useDraftGuard()
   function selectBudget(id: string) {
     if(budget.status!=='ready'||id===budget.budgetId||!budget.spaces.some(space=>space.id===id))return
     navigate(householdSpaceHref(pathname,search,id))
@@ -104,7 +104,7 @@ function Header({ budget }: { budget: ReturnType<typeof useBudget> }) {
       {budget.status==='ready'&&(budget.spaces.length===2?<div className="household-space-switch" role="group" aria-label="מרחב תקציב">{budget.spaces.map(space=><button type="button" key={space.id} aria-pressed={budget.budgetId===space.id} aria-label={space.name+(space.role==='viewer'?' · צפייה בלבד':'')} title={space.name} onClick={()=>selectBudget(space.id)}><span><span className="household-space-short">{space.id==='personal'?'אישי':'משותף'}</span><span className="household-space-full">{space.name}</span></span>{space.role==='viewer'&&<small>צפייה בלבד</small>}</button>)}</div>:budget.spaces.length>2?<label className="household-space-select"><span className="sr-only">מרחב תקציב</span><select value={budget.budgetId} onChange={event=>selectBudget(event.target.value)}>{budget.spaces.map(space=><option key={space.id} value={space.id}>{space.name}{space.role==='viewer'?' · צפייה בלבד':''}</option>)}</select></label>:<div className="household-space-name">{budget.spaces[0]?.name}{budget.spaces[0]?.role==='viewer'&&' · צפייה בלבד'}</div>)}
         {budget.status!=='ready'&&<div className="household-space-name" role="status">{budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
         <div className="household-header-actions"><GlobalActionCenter budget={budget}/>
-          <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון נתונים" disabled={budget.refreshPending || budget.status === 'loading'} onClick={()=>guard.run(budget.refresh)}><RefreshCw className="h-5 w-5" /></button>
+          <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון האפליקציה והנתונים" disabled={refreshPending || budget.refreshPending || budget.status === 'loading'} onClick={refreshApp}><RefreshCw className="h-5 w-5" /></button>
         </div>
       </div>
     </header>
@@ -143,6 +143,9 @@ function App() {
   const { pathname, search } = useLocation()
   const budgetId = new URLSearchParams(search).get('budget') || 'personal'
   const budget = useBudget(budgetId, !fixture)
+  const [appRefreshState,setAppRefreshState]=useState<{pending:boolean;error:string|null}>({pending:false,error:null})
+  const [reloadApp]=useState(()=>createAppRefresh({location:window.location,fetch:(...args:Parameters<typeof fetch>)=>fetch(...args),guard:guard.run,onState:setAppRefreshState}))
+  const refreshApp=useCallback(()=>{document.activeElement instanceof HTMLElement&&document.activeElement.blur();guard.run(()=>{void reloadApp()})},[guard,reloadApp])
   const currentAccountId = !fixture && budget.status === 'ready' ? budget.value.accountId : null
   const lastAccountId = useRef<string | null>(null)
   const accountChanged = !!currentAccountId && !!lastAccountId.current && currentAccountId !== lastAccountId.current
@@ -175,7 +178,7 @@ function App() {
   }, [])
   const dark = theme === 'dark' || (theme === 'system' && systemDark)
   useEffect(() => { document.documentElement.classList.toggle('dark', dark) }, [dark])
-  useEffect(()=>installPullRefresh({document,window,refresh:()=>guard.run(budget.refresh),isBusy:()=>budget.refreshPending||budget.status==='loading'||guard.registry.getSnapshot().busy,onHint:setPullHint,onProgress:setPullProgress}),[guard,budget.refresh,budget.refreshPending,budget.status])
+  useEffect(()=>installPullRefresh({document,window,refresh:refreshApp,isBusy:()=>appRefreshState.pending||budget.refreshPending||budget.status==='loading'||guard.navigationPending||guard.registry.getSnapshot().busy,onHint:setPullHint,onProgress:setPullProgress}),[guard,refreshApp,appRefreshState.pending,budget.refreshPending,budget.status])
   const actualPlan: BudgetResponse['plan'] = budget.status === 'ready' ? budget.value.plan : null
   const sections = buildNavSections(fixture ? demoAccounts : actualPlan && actualPlan.format !== 'monthly-flow-encrypted-v1' ? budgetNavigation(actualPlan) : [])
   return (
@@ -183,7 +186,7 @@ function App() {
       <div className="household-shell flex min-h-screen font-sans">
         <Sidebar initialCollapsed={false} initialClosed={[]} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header budget={budget} />
+          <Header budget={budget} refreshApp={refreshApp} refreshPending={appRefreshState.pending||guard.navigationPending}/>
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}
@@ -305,7 +308,8 @@ function App() {
         </div>
       </div>
       <HouseholdNavigation />
-      <RefreshIndicator progress={pullProgress} pending={budget.refreshPending} hint={pullHint}/>
+      <RefreshIndicator progress={pullProgress} pending={appRefreshState.pending||budget.refreshPending} hint={pullHint}/>
+      {appRefreshState.error&&createPortal(<div role="alert" className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[100] mx-auto flex max-w-lg items-center gap-3 rounded-xl bg-foreground p-4 text-background shadow-2xl"><span className="min-w-0 flex-1">{appRefreshState.error} הנתונים והטיוטות נשארו פתוחים.</span><button type="button" className="shrink-0 rounded-lg border border-background/40 px-2 py-1" onClick={refreshApp}>ניסיון חוזר</button><button type="button" className="shrink-0 rounded-lg px-2 py-1" aria-label="סגירת הודעה" onClick={()=>setAppRefreshState({pending:false,error:null})}>סגירה</button></div>,document.body)}
       {budget.status === 'ready' && budget.refreshError && createPortal(
         <div role="alert" className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[100] mx-auto flex max-w-lg items-center gap-3 rounded-xl bg-foreground p-4 text-background shadow-2xl">
           <span className="min-w-0 flex-1">{budget.refreshError} הנתונים האחרונים נשארו מוצגים.</span>

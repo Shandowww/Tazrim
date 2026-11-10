@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "a556d9c90736a77c6e3d1551e62ca7e4e632d66f",
+  "previousApplicationCommit": "123b7735be02761ea52bd4af731fe76d5c1d0091",
+  "entry": "https://budgit.duckdns.org/next",
+  "runtimeImage": "sha256:3982d45e544936115adfcaee9a8c245514e90ad24d06c59d3b04725ca98acbd9",
+  "sourceArchiveSha256": "aa59ce3eaa037555ad19691af3cf98f19b96aa6ca21bb511a8c90df5f6954c24",
+  "changes": [
+    "Header refresh and top pull now reload the running app code and saved data through the existing draft guard",
+    "Check the current route HTML without caching and preserve the usable page on timeout, offline, login or invalid responses",
+    "Recheck edits or active saves immediately before navigation; retain explicit save/discard/stay choices",
+    "Preserve route, budget, period and filters; refuse overlapping refreshes and stale-route navigation",
+    "Retain editor-local data refresh commands and original interface behavior"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on committed source archive",
+    "regressions": 1421,
+    "regressionScope": "test/*.test.mjs and tools/bank-csv/*.test.mjs",
+    "coreChecks": 15,
+    "focusedRefreshChecks": 34,
+    "builtInterface": {
+      "currentScopedHTMLNoStore": true,
+      "contentHashedEntryServed": true,
+      "refreshFixInBuiltBundle": true
+    },
+    "previousSource": {
+      "files": 1002,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 172,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 187,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "4cfc326f66ddffbe816a5ac9b4d89f34790b3b9d8a6c52e0d427f0913d6e530d",
+          "reactHTMLSha256": "4a425cf0d59e598ff8872012f3b3a52ab4ba6762ecfaa00a4ae816cb16969cf0"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "8cb506a721ff993360c153426f0ac5df1db0cfce5b5b9ec56e2b34bf3fc6b6c1",
+          "reactHTMLSha256": "50ba85c69275349a571fd837fc143e53d456125e3aa86a5683ce70071b62311b"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "123b773"
+          ],
+          "originalAssetsVerified": 72,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 172,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T12:49:35.280Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/accounts/new",
+        "/next/accounts/synthetic/edit",
+        "/next/card-setup",
+        "/next/card-setup/new",
+        "/next/card-setup/synthetic",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone/PWA acceptance",
+    "An already-open old app needs one browser reload or PWA reopen to receive this fix",
+    "No production record edits, Sites publication or hosting-resource changes"
+  ]
+}
