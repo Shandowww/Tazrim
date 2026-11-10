@@ -93,6 +93,18 @@ test('Pointer swipe shares the animated cycle; vertical, cancelled and short ges
  for(const [horizontal,vertical]of [[5,100],[30,0]]){stage().onPointerDown(event(0,0));stage().onPointerMove(event(horizontal,vertical));stage().onPointerUp(event(horizontal,vertical));assert.equal(ui.timers.size,0)}
  stage().onPointerDown(event(0,0));stage().onPointerMove(event(-80,0));stage().onPointerCancel();assert.equal(ui.timers.size,0);assert.equal(ui.navigations.length,1)
 })
+test('Touch capture handed from card content to the stage keeps the drag; actual stage capture loss cancels it',()=>{
+ const ui=harness(),stage=()=>walk(ui.tree,node=>node.props?.className==='household-wallet-stage')[0].props
+ const target={closest:()=>null},currentTarget={...ui.stage,setPointerCapture:()=>{},hasPointerCapture:()=>true,releasePointerCapture:()=>{}}
+ const event=(x,y)=>({isPrimary:true,button:0,pointerId:1,clientX:x,clientY:y,target,currentTarget,preventDefault:()=>{}})
+ stage().onPointerDown(event(0,0));stage().onPointerMove(event(15,1))
+ stage().onLostPointerCapture(event(15,1)) // Touch implicit capture leaves a descendant and bubbles.
+ assert.equal(ui.style.get('--wallet-drag-x'),'15px');assert.equal(ui.stage.dataset.dragging,'true')
+ stage().onPointerMove(event(85,2));stage().onPointerUp(event(85,2));assert.equal(ui.timers.size,1);ui.settle();assert.equal(ui.navigations.length,1)
+ stage().onPointerDown(event(0,0));stage().onPointerMove(event(-80,2))
+ stage().onLostPointerCapture({...event(-80,2),target:currentTarget})
+ stage().onPointerUp(event(-80,2));assert.equal(ui.timers.size,0);assert.equal(ui.style.get('--wallet-drag-x'),'0px')
+})
 test('Card CSS keeps both sides upright, matched spacing, issuer/network slots and reduced motion without transitions',()=>{
  const css=readFileSync('frontend/src/app.css','utf8')
  for(const side of ['right','left']){const rule=css.match(new RegExp('\\.household-wallet-peek\\.'+side+'\\{([^}]+)\\}'))[1];assert.doesNotMatch(rule,/rotate|scale/)}

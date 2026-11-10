@@ -1,28 +1,28 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "a9a17439de4e447a21229520ff1cc4780137f5d6",
+  "sourceCommit": "bbc13170be95eb734cd212b921b1163adb23764c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published card clubs, issuer identity, optional fee details and calendar-month reminders; exact 0394 Cal/Mastercard correction verified",
+  "status": "Touch carousel implicit-capture handoff and tap-to-return card back verified live",
   "validation": {
     "build": "passed on committed clean source archive",
     "typecheck": "passed",
-    "regressionTests": 1413,
+    "regressionTests": 1414,
     "coreChecks": 15,
-    "focusedContracts": 26,
+    "focusedContracts": 9,
     "candidateRuntimeContracts": 153,
-    "browser": "Synthetic Chrome all five clubs in light/dark; 320/390/430/1440px no overflow; flip/focus/keyboard/reduced motion/swipe; one-write lost-response retry, scoped reminders and finance/other-actor preservation passed. No new physical-iPhone acceptance.",
-    "release": "docs/ui-redesign/evidence/release-card-metadata-2026-11-10.json",
-    "productionEvidence": "docs/ui-redesign/evidence/release-card-metadata-2026-11-10.json",
-    "checkpoint": "docs/ui-redesign/CARD-METADATA-2026-11-10.md",
-    "physicalDevice": "No new physical-iPhone acceptance for this release. Prior native Shortcut acceptance is retained for its unchanged scope."
+    "browser": "Prior touch failure reproduced with implicit capture; 34 synthetic Chrome touchscreen checks pass: two/five-card two-way wrapping, both card faces, back content/surface taps, telephone exclusion, keyboard focus, vertical/short/cancelled gestures, light/dark and reduced motion. No new physical-iPhone acceptance.",
+    "release": "docs/ui-redesign/evidence/release-card-touch-2026-11-10.json",
+    "productionEvidence": "docs/ui-redesign/evidence/release-card-touch-2026-11-10.json",
+    "checkpoint": "docs/ui-redesign/CARD-TOUCH-2026-11-10.md",
+    "physicalDevice": "Synthetic Chrome touchscreen input passed; no new physical-iPhone acceptance for this repair."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "c3bcde5383682bad077dea40c2ab40d94e00323d",
-  "productionImage": "sha256:8a94d127eabba4fb7b1a96e87d6e4d90b3421b02b463d81c08113a3f4fcd9d0e",
+  "productionApplicationCommit": "123b7735be02761ea52bd4af731fe76d5c1d0091",
+  "productionImage": "sha256:cde65b163f5ffa28d9430c92d06f90baf92b4a5a2c279a91c0d1f278a2e56ae0",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "c3bcde5383682bad077dea40c2ab40d94e00323d"
+  "applicationCommit": "123b7735be02761ea52bd4af731fe76d5c1d0091"
 }

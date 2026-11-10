@@ -7,7 +7,7 @@ export function CardFeeFlip({card,children,canFlip}:{card:{displayName:string;di
  const toggle=()=>{if(canFlip())setFlipped(value=>!value)}
  return <div className="household-card-flipper" data-flipped={flipped}>
   <button ref={front} type="button" data-card-flip className="household-card-front" aria-label={'הצגת גב הכרטיס '+card.displayName} aria-expanded={flipped} inert={flipped} onClick={toggle}>{children}<span className="household-card-flip-hint">פרטי ההנחה בגב הכרטיס ↶</span></button>
-  <div className="household-card-back" inert={!flipped} aria-hidden={!flipped}>
+  <div className="household-card-back" inert={!flipped} aria-hidden={!flipped} onClick={e=>{if(!(e.target as Element).closest('a,button'))toggle()}}>
    <div className="household-card-back-heading"><span>הנחה ודמי כרטיס</span><button ref={back} type="button" data-card-flip onClick={toggle} aria-label="חזרה לחזית הכרטיס">↶</button></div>
    <dl>
     {card.discountEndsOn&&<div><dt>בחינם/הנחה עד</dt><dd><bdi dir="ltr">{card.discountEndsOn.split('-').reverse().join('.')}</bdi></dd></div>}

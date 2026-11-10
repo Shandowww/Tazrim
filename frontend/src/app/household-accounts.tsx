@@ -132,7 +132,10 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
      if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId)
     }}
     onPointerCancel={()=>{suppressFlip.current=true;pointer.current=null;resetSwipe()}}
-    onLostPointerCapture={e=>{if(pointer.current?.id===e.pointerId){pointer.current=null;resetSwipe()}}}
+    onLostPointerCapture={e=>{
+     // Touch content yields implicit capture to this stage when horizontal dragging starts.
+     if(e.target===e.currentTarget&&pointer.current?.id===e.pointerId){pointer.current=null;resetSwipe()}
+    }}
     onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')suppressFlip.current=false;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}}}>
     {peeks.map(peek=><div className={'household-wallet-peek far-'+peek.side} key={'far-'+peek.side} aria-hidden="true">{face(view.cards.find(card=>card.id===nextWalletCard(view.cards,selected.id,peek.delta*2))!)}</div>)}
     {peeks.map(peek=>{const card=view.cards.find(c=>c.id===peek.id)!;return <button type="button" className={'household-wallet-peek '+peek.side} key={peek.side} onClick={()=>select(card.id,peek.delta)} aria-label={(peek.delta>0?'הכרטיס הבא: ':'הכרטיס הקודם: ')+card.displayName+' '+(card.cardLastFour??'')}><div aria-hidden="true">{face(card)}</div></button>})}

@@ -1,0 +1,165 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "123b7735be02761ea52bd4af731fe76d5c1d0091",
+  "previousApplicationCommit": "c3bcde5383682bad077dea40c2ab40d94e00323d",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:cde65b163f5ffa28d9430c92d06f90baf92b4a5a2c279a91c0d1f278a2e56ae0",
+  "sourceArchiveSha256": "879ee36a1d84ab5c584cf7923ddbcf19c256368573d959ca9cefd01b6891ce10",
+  "changes": [
+    "Keep touchscreen drag active when implicit capture transfers from card content to the carousel stage",
+    "Only actual stage capture loss cancels its active gesture",
+    "Tap noninteractive card back content or surface to return to the front",
+    "Retain telephone action, explicit keyboard return, focus and swipe suppression"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on an extraction of the committed source archive",
+    "regressions": 1414,
+    "regressionScope": "test/*.test.mjs and tools/bank-csv/*.test.mjs, including reader tests",
+    "coreChecks": 15,
+    "focusedCarouselContracts": 9,
+    "priorTouchReproduction": {
+      "selectedCardChanged": false,
+      "syntheticTouchEvents": true,
+      "cause": "Descendant implicit lostpointercapture bubbled during handoff and incorrectly reset the stage gesture"
+    },
+    "syntheticTouchChecks": 34,
+    "browserEvidence": "docs/ui-redesign/evidence/card-touch-browser-2026-11-10.json",
+    "previousSource": {
+      "files": 999,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 172,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 153,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "8cb506a721ff993360c153426f0ac5df1db0cfce5b5b9ec56e2b34bf3fc6b6c1",
+          "reactHTMLSha256": "50ba85c69275349a571fd837fc143e53d456125e3aa86a5683ce70071b62311b"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "053d2dc6de1ed930a9a856e415afac499c1f6bf5e684e2999e4745e8038fe9ee",
+          "reactHTMLSha256": "16eeed3d8d8f1b5b35e6e58b71f66d5ab163a27446f8b8d73030731f15f0d6e5"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "c3bcde5"
+          ],
+          "originalAssetsVerified": 72,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 172,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T12:09:23.073Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/accounts/new",
+        "/next/accounts/synthetic/edit",
+        "/next/card-setup",
+        "/next/card-setup/new",
+        "/next/card-setup/synthetic",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "Synthetic Chrome touchscreen input and taps passed; no new physical-iPhone acceptance",
+    "No production record changes, Sites publication or hosting-resource upgrade",
+    "Save drafts and use guarded refresh in browser/PWA"
+  ]
+}
