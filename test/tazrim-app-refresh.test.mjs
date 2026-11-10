@@ -36,6 +36,6 @@ test('A route/scope change during the connection check or draft prompt cancels t
 })
 test('The header and top-pull share guarded app refresh while editor data-only refresh remains available',()=>{
  const source=fs.readFileSync(new URL('../frontend/src/main.tsx',import.meta.url),'utf8')
- assert.match(source,/onClick=\{refreshApp\}/);assert.match(source,/installPullRefresh\(\{document,window,refresh:refreshApp/);assert.match(source,/guard\.run\(\(\)=>\{void reloadApp\(\)\}\)/)
+ assert.match(source,/onClick=\{refreshApp\}/);assert.match(source,/installPullRefresh\(\{document,window,refresh:refreshApp/);assert.match(source,/guard\.run\(\(\)=>\{void reloadApp\(\)\},'refresh'\)/)
  assert.match(source,/guard\.run\(budget\.refresh\)/)
 })

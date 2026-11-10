@@ -1,0 +1,477 @@
+{
+  "status": "39 raw-form adapters and 19 explicit guard exceptions; local verification and live publication passed",
+  "rows": [
+    {
+      "file": "account-page.tsx",
+      "line": 20,
+      "disposition": "raw device draft",
+      "kind": "account",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'account',record:create?'new':id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "action-center-page.tsx",
+      "line": 21,
+      "disposition": "guard exception",
+      "reason": "Unresolved preference mutation only; original same-operation retry retained."
+    },
+    {
+      "file": "admin-access-page.tsx",
+      "line": 17,
+      "disposition": "raw device draft",
+      "kind": "access-email",
+      "raw": "email",
+      "scope": ",dirty:!!email||!!command||!!attempt,busy,saveError:(command||attempt)&&error?error:undefined,discard:clear,save:command&&!blocked?saveRaw:undefined},{budgetId,base:actor,kind:'access-email'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "analysis-mutations.tsx",
+      "line": 15,
+      "disposition": "raw device draft",
+      "kind": "analysis-view",
+      "raw": "name",
+      "scope": ",dirty:!!name||!!candidate||attempted,busy,discard:clear,save:confirmed&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'analysis-view'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "bank-report-review.tsx",
+      "line": 22,
+      "disposition": "raw device draft",
+      "kind": "bank-review",
+      "raw": "selection",
+      "scope": ",dirty,busy,saveError:attempt&&error?error:undefined,discard:()=>{setSelection(JSON.parse(baseline));setAttempt(null);setConfirmed(false);setError('')},save:attempt==='commit'||confirmed?saveRaw:saveProgressRaw},{budgetId:budget.budgetId,base,kind:'bank-review',record:source.id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "billing-page.tsx",
+      "line": 19,
+      "disposition": "raw device draft",
+      "kind": "card-billing",
+      "raw": "{...draft,confirmed:false}",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'card-billing',record:id,period:dueDate,context:noActivity?'no-activity':'total'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "card-activity-review.tsx",
+      "line": 10,
+      "disposition": "raw device draft",
+      "kind": "activity-cycle",
+      "raw": "{cycle,total}",
+      "scope": ",dirty,busy:false,discard:()=>{setCycle('');setTotal('');setConfirmed(false);setError('')}},{budgetId:budget.budgetId,base,kind:'activity-cycle',record:source.id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "card-page.tsx",
+      "line": 25,
+      "disposition": "raw device draft",
+      "kind": "card",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'card',record:create?'new':id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "card-payer-page.tsx",
+      "line": 19,
+      "disposition": "raw device draft",
+      "kind": "card-payer",
+      "raw": "payer",
+      "scope": ",dirty,busy,discard:()=>{setPayer(baseline);setConfirmed(false);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'card-payer',record:id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "card-report-page.tsx",
+      "line": 34,
+      "disposition": "raw device draft",
+      "kind": "card-review",
+      "raw": "selection",
+      "scope": ",dirty,busy,saveError:attempt&&error?error:undefined,discard:()=>{setAttempt(null);setSelection(JSON.parse(baseline));setConfirmed(false);setError('')},save:attempt==='commit'||confirmed?saveRaw:saveProgressRaw},{budgetId:budget.budgetId,base,kind:'card-review',record:source.id,period:parsed.activityCycle??''",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "card-stop-page.tsx",
+      "line": 17,
+      "disposition": "guard exception",
+      "reason": "Destructive estimate-removal approval; saved reports and original financial command retained."
+    },
+    {
+      "file": "cash-assignments-page.tsx",
+      "line": 16,
+      "disposition": "raw device draft",
+      "kind": "cash-assignments",
+      "raw": "{...draft,confirmed:false}",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'cash-assignments'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "cash-flow-page.tsx",
+      "line": 21,
+      "disposition": "raw device draft",
+      "kind": "cash-transfer",
+      "raw": "{...draft,confirmed:false}",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'cash-transfer',record:mode==='new'?'new':id||'new',period:month,context:mode",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "cash-monthly-page.tsx",
+      "line": 19,
+      "disposition": "raw device draft",
+      "kind": "account-month",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setConfirmed(!sourceAware);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'account-month',record:id,period:month,context:sourceAware?'correction':'manual'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "category-limit-page.tsx",
+      "line": 18,
+      "disposition": "raw device draft",
+      "kind": "category-limit",
+      "raw": "{...draft,confirmed:false}",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'category-limit'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "category-management-page.tsx",
+      "line": 20,
+      "disposition": "raw device draft",
+      "kind": "category-management",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard,save:candidate&&confirmed&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'category-management'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "comparison-goals-page.tsx",
+      "line": 19,
+      "disposition": "raw device draft",
+      "kind": "comparison-goals",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard,save:writable&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'comparison-goals'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "consumption-mutations.tsx",
+      "line": 23,
+      "disposition": "raw device draft",
+      "kind": "source-allocation",
+      "raw": "{editor,from,to,query,applied,replaceFilter,amounts}",
+      "scope": ",dirty,busy,discard:clear,save:confirmed&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'source-allocation',period:month",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "detail-annotation-page.tsx",
+      "line": 17,
+      "disposition": "raw device draft",
+      "kind": "detail-annotation",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{prepared.current=null;setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'detail-annotation',record:id,context:JSON.stringify([options.year,options.month??'',options.account??''])",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "detail-management-page.tsx",
+      "line": 23,
+      "disposition": "raw device draft",
+      "kind": "detail",
+      "raw": "{draft,payer}",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setPayer('');setConfirmed(false);setAttempted(false);setBlocked(false);prepared.current=null;setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'detail',record:mode==='new'?'new':id,period:month,context:mode+':'+newMethod",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "device-draft-page.tsx",
+      "line": 20,
+      "disposition": "guard exception",
+      "reason": "Legacy complete-plan recovery approval and unknown save result; existing draft format and recovery command remain unchanged."
+    },
+    {
+      "file": "drive-backup-page.tsx",
+      "line": 17,
+      "disposition": "raw device draft",
+      "kind": "drive-schedule",
+      "raw": "mode",
+      "scope": ",dirty:!!confirm||!!pending||!!value&&mode!==value.scheduleMode,busy,saveError:pending&&error?error:undefined,discard:()=>{setConfirm('');setPending(null);if(value)setMode(value.scheduleMode)}},{budgetId,base:actor,kind:'drive-schedule'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "forecast-settings-page.tsx",
+      "line": 17,
+      "disposition": "raw device draft",
+      "kind": "forecast-settings",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard,save:writable&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'forecast-settings'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "gmail-page.tsx",
+      "line": 21,
+      "disposition": "guard exception",
+      "reason": "An attempted notification-state mutation only; same-operation retry remains guarded."
+    },
+    {
+      "file": "gmail-settings-editor.tsx",
+      "line": 16,
+      "disposition": "raw device draft",
+      "kind": "gmail-filters",
+      "raw": "draft",
+      "scope": ",dirty,busy,saveError:attempt&&error?error:undefined,discard:()=>{setDraft(initial);setPreview(null);setConfirmed(false);setAttempt(null);setConfirmation(null);setBlocked(false);setError('')},save:attempt&&!blocked?()=>saveRaw(attempt.action):undefined},{budgetId,base:actor,kind:'gmail-filters'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "history-page.tsx",
+      "line": 12,
+      "disposition": "guard exception",
+      "reason": "Active export only; no ordinary editable values."
+    },
+    {
+      "file": "history-review.tsx",
+      "line": 11,
+      "disposition": "guard exception",
+      "reason": "Undo confirmation for a historical financial snapshot; requires a fresh review and approval."
+    },
+    {
+      "file": "incoming-reports-page.tsx",
+      "line": 46,
+      "disposition": "guard exception",
+      "reason": "File reselection, server-read consent, routing review with source proof, connection secrets and deletion confirmation. Existing source/progress machinery retained."
+    },
+    {
+      "file": "insight-controls.tsx",
+      "line": 13,
+      "disposition": "raw device draft",
+      "kind": "insight-scenario",
+      "raw": "draft",
+      "scope": ",dirty:dirty&&!disabled,busy:false,discard:clear},{budgetId:budget.budgetId,base,kind:'insight-scenario',period:asOf",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "investment-page.tsx",
+      "line": 25,
+      "disposition": "raw device draft",
+      "kind": "investment",
+      "raw": "{draft,monthlyTouched,goalSelected}",
+      "scope": ",dirty,busy,discard,save:goalSelected&&confirmed&&writable&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'investment',period:asOf",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "loan-payments-page.tsx",
+      "line": 25,
+      "disposition": "guard exception",
+      "reason": "Movement reassignment/future-rule confirmation or original-file metadata recovery proof. Prepared plans/proofs are not serialized; query-only browsing has no guard."
+    },
+    {
+      "file": "loans-page.tsx",
+      "line": 24,
+      "disposition": "raw device draft",
+      "kind": "loan",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'loan',record:create?'new':id,period:create?month:''",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "loans-page.tsx",
+      "line": 32,
+      "disposition": "guard exception",
+      "reason": "Removal confirmation (second editor); the loan create/edit editor uses scoped raw drafts."
+    },
+    {
+      "file": "migration-page.tsx",
+      "line": 25,
+      "disposition": "guard exception",
+      "reason": "Multi-space migration depends on temporary vault keys, freshly loaded source/target proofs and prepared atomic operations. Existing recovery/uncertainty guard retained."
+    },
+    {
+      "file": "monthly-page.tsx",
+      "line": 38,
+      "disposition": "raw device draft",
+      "kind": "monthly",
+      "raw": "draft",
+      "scope": ",dirty,busy:busy||recoveryBusy,discard,save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'monthly',period:month",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "onboarding-page.tsx",
+      "line": 19,
+      "disposition": "raw device draft",
+      "kind": "onboarding",
+      "raw": "{v,step}",
+      "scope": ",dirty:eligible&&writable&&!done,busy,discard:()=>{setV(onboardingInitialValues(today()));setStep(0);setAttempted(false);setBlocked(false)},save:step===4&&writable&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'onboarding'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "periodic-controls.tsx",
+      "line": 12,
+      "disposition": "raw device draft",
+      "kind": "periodic-cost",
+      "raw": "{edit,link}",
+      "scope": ",dirty:dirty&&!disabled,busy:false,discard:clear},{budgetId:budget.budgetId,base,kind:'periodic-cost',period:asOf",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "planned-items-page.tsx",
+      "line": 24,
+      "disposition": "raw device draft",
+      "kind": "planned-item",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'planned-item',record:create?'new':id,period:create?month:''",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "planned-items-page.tsx",
+      "line": 33,
+      "disposition": "guard exception",
+      "reason": "Removal confirmation (second editor); planned-item create/edit uses scoped raw drafts."
+    },
+    {
+      "file": "profile-page.tsx",
+      "line": 17,
+      "disposition": "raw device draft",
+      "kind": "profile",
+      "raw": "name",
+      "scope": ",dirty,busy,discard,save:writable&&!blocked?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'profile'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "recurring-page.tsx",
+      "line": 16,
+      "disposition": "raw device draft",
+      "kind": "recurring",
+      "raw": "choices",
+      "scope": ",dirty,busy,discard:()=>{setChoices([]);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'recurring',period:asOf",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "report-automation-panel.tsx",
+      "line": 18,
+      "disposition": "guard exception",
+      "reason": "Automation activation/server-read consent or rejection approval; fresh confirmation required."
+    },
+    {
+      "file": "report-expectations-page.tsx",
+      "line": 17,
+      "disposition": "raw device draft",
+      "kind": "report-expectations",
+      "raw": "draft",
+      "scope": ",dirty,busy,saveError:attempted&&error?error:undefined,discard:()=>{setDraft(baseline);setConfirmed(false);setAttempted(false);setBlocked(false);setError('')},save:confirmed&&!blocked&&!viewer?saveRaw:undefined},{budgetId:budget.budgetId,base:base.budget.value,kind:'report-expectations'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "report-group-page.tsx",
+      "line": 198,
+      "disposition": "raw device draft",
+      "kind": "report-group-page",
+      "raw": "See typed adapter",
+      "scope": "actor / budget / kind",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "report-history-page.tsx",
+      "line": 18,
+      "disposition": "guard exception",
+      "reason": "Import undo approval with source/revision evidence; must be reviewed again."
+    },
+    {
+      "file": "report-library-page.tsx",
+      "line": 26,
+      "disposition": "guard exception",
+      "reason": "Selected File bytes are not persisted. Reselect the file after leaving; explicit upload consent remains fresh."
+    },
+    {
+      "file": "report-state-page.tsx",
+      "line": 15,
+      "disposition": "raw device draft",
+      "kind": "report-state",
+      "raw": "reason",
+      "scope": ",dirty,busy,saveError:attempted&&error?error:undefined,discard:()=>{setReason('');setConfirmed(false);setAttempted(false);setError('')},save:saveRaw},{budgetId:budget.budgetId,base,kind:'report-state',record:source.id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "report-storage-consent.tsx",
+      "line": 9,
+      "disposition": "guard exception",
+      "reason": "Consent to server-readable source storage; never reusable authorization."
+    },
+    {
+      "file": "savings-balance-page.tsx",
+      "line": 23,
+      "disposition": "raw device draft",
+      "kind": "savings-balance",
+      "raw": "{accounts,allocation,date,modes,deposit}",
+      "scope": ",dirty,busy,discard:()=>{const old=JSON.parse(initial);setAccounts(old.accounts);setAllocation(old.allocation);setDate(old.date);setModes(old.modes);setDeposit(old.deposit);setConfirmed(false);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'savings-balance',record:id||'new',period:asOf,context:mode",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "savings-goals-page.tsx",
+      "line": 25,
+      "disposition": "raw device draft",
+      "kind": "savings-goal",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'savings-goal',record:create?'new':id",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "savings-schedule-page.tsx",
+      "line": 16,
+      "disposition": "raw device draft",
+      "kind": "savings-schedule",
+      "raw": "draft",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'savings-schedule',period:asOf",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "savings-transfer-page.tsx",
+      "line": 20,
+      "disposition": "raw device draft",
+      "kind": "savings-transfer",
+      "raw": "{...draft,confirmed:false}",
+      "scope": ",dirty,busy,discard:()=>{setDraft(baseline);setAttempted(false);setBlocked(false);setError('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'savings-transfer',record:['complete','cancel'].includes(mode)?id:'new',period:asOf,context:mode",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "scenario-page.tsx",
+      "line": 26,
+      "disposition": "raw device draft",
+      "kind": "scenario",
+      "raw": "rows",
+      "scope": ",dirty,busy,discard:()=>{setRows([]);setError(null);setBlocked(false);setHint('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'scenario',period:asOf",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "security-page.tsx",
+      "line": 23,
+      "disposition": "guard exception",
+      "reason": "Passwords, recovery secrets, vault setup keys and selected encrypted files; never automatically persisted."
+    },
+    {
+      "file": "spaces-page.tsx",
+      "line": 18,
+      "disposition": "raw device draft",
+      "kind": "space-fields",
+      "raw": "{createName,rename,inviteEmail,inviteRole}",
+      "scope": ",dirty,busy,discard:reset,save:confirmed&&!uncertain?saveRaw:undefined},{budgetId:budget.budgetId,base,kind:'space-fields'",
+      "reason": "Original explicit command retained. Busy/unknown mutations, incompatible revisions/keys and storage failures remain guarded. Raw approval fields reset on restore."
+    },
+    {
+      "file": "statement-notices-page.tsx",
+      "line": 16,
+      "disposition": "guard exception",
+      "reason": "Active notice fetch/update only; no ordinary draft."
+    },
+    {
+      "file": "transfer-matches-page.tsx",
+      "line": 18,
+      "disposition": "guard exception",
+      "reason": "Temporary source-vault secrets and private transfer proof/approval; cannot restore without reopening and revalidating sources."
+    },
+    {
+      "file": "wallet-page.tsx",
+      "line": 26,
+      "disposition": "guard exception",
+      "reason": "Retired Apple Pay scope includes connection secrets, imported files and pending mutation envelopes; retains its original guard."
+    }
+  ],
+  "validation": {
+    "regressions": 1437,
+    "coreChecks": 15,
+    "browserChecks": 69,
+    "focusedNewBehaviorContracts": 16,
+    "physicalDevice": false
+  }
+}

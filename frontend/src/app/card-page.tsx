@@ -1,3 +1,4 @@
+import {useFormDraft} from './use-form-draft'
 import {CARD_ISSUERS,CARD_CLUBS} from '../../../src/card-metadata.js'
 import {CARD_NETWORKS} from '../tazrim/lib/accounts/brands'
 import {CardClubMark} from '../tazrim/components/accounts/card-club-mark'
@@ -11,7 +12,7 @@ import {cardConfigEligibility,initialCardDraft,cardDraftFingerprint,prepareCardC
 import {savePreparedPlan,SaveConflict} from './plan-save'
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
-import {useFinancialDraft,useDraftGuard} from './draft-guard'
+import {useDraftGuard} from './draft-guard'
 import Link from './link'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
 import {PaymentCard} from '../tazrim/components/accounts/account-element'
@@ -20,9 +21,10 @@ function CardEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:Bud
  const href=usePeriodHref()
  const [baseline]=useState(()=>initialCardDraft(base.plan,create?'':id)),[draft,setDraft]=useState<CardDraft>(baseline),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[blocked,setBlocked]=useState(false),flight=useRef(false),guard=useDraftGuard(),dirty=cardDraftFingerprint(draft)!==cardDraftFingerprint(baseline),accounts=cashAccountList(base.plan),existing=creditCards(base.plan).find((c:any)=>c.id===id)
  const update=(key:keyof CardDraft,value:string)=>{setDraft({...draft,[key]:value});setError(null);onSaved('')}
- const save=async()=>{if(flight.current||!dirty||blocked)return false;flight.current=true;setBusy(true);setError(null);try{const plan=prepareCardConfig(base.plan,id,draft,create),result=await savePreparedPlan({budgetId:budget.budgetId,base,plan});budget.accept(result);onSaved(result.recovered?'שמירת הכרטיס אושרה מול הנתונים השמורים.':'פרטי הכרטיס נשמרו.');return true}catch(e){const message=e instanceof Error?e.message:'הכרטיס לא נשמר.';if(e instanceof AccessError){budget.invalidate(message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(message);return false}finally{flight.current=false;setBusy(false)}}
- useFinancialDraft({kind:'card',dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:save})
+ const saveRaw=async()=>{if(flight.current||!dirty||blocked)return false;flight.current=true;setBusy(true);setError(null);try{const plan=prepareCardConfig(base.plan,id,draft,create),result=await savePreparedPlan({budgetId:budget.budgetId,base,plan});budget.accept(result);onSaved(result.recovered?'שמירת הכרטיס אושרה מול הנתונים השמורים.':'פרטי הכרטיס נשמרו.');return true}catch(e){const message=e instanceof Error?e.message:'הכרטיס לא נשמר.';if(e instanceof AccessError){budget.invalidate(message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(message);return false}finally{flight.current=false;setBusy(false)}}
+ const formDraft=useFormDraft({kind:'card',dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'card',record:create?'new':id,values:draft,baseline:baseline,restore:value=>{setDraft(value)},mutationPending:blocked,enabled:true}),save=formDraft.save
  const backup=()=>{try{const plan=prepareCardConfig(base.plan,id,draft,create),url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-card-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){setError(e instanceof Error?e.message:'יש לתקן את הפרטים לפני הכנת גיבוי.')}}
+ if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
  return <form className="space-y-5" onSubmit={event=>{event.preventDefault();void save()}}>
   <div className="max-w-sm card-config-preview" data-club={draft.club||undefined}><PaymentCard provider={draft.issuer||savedCardIssuer(base.plan,existing??{})} name={draft.name||'הכרטיס שלי'} lastFour={/^\d{4}$/.test(draft.alias)?draft.alias:null} network={draft.network||savedCardNetwork(base.plan,existing??{})} colorChoice={existing?.color??null} />{draft.club&&<CardClubMark club={draft.club}/>}</div>
   <fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">פרטי הכרטיס</h2>

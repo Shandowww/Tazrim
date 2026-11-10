@@ -1,3 +1,9 @@
+## Form drafts across navigation published — 2026-11-10
+
+Application `70a302a` is verified live. Ordinary recoverable forms retain exact unfinished input in encrypted actor/budget/editor-scoped device drafts before navigation. Financial Save stays explicit. Settings offers draft discovery, editor return, export and deliberate discard; legacy complete-plan recovery is retained. All 39 raw-form adapters and 19 justified guard exceptions are documented in `docs/ui-redesign/FORM-DRAFT-NAVIGATION-IMPLEMENTATION-2026-11-10.md`.
+
+Clean archive build/typecheck, 1,437 regressions, 15 core checks, 69 synthetic browser checks and 208 built-candidate contracts pass. All 1007 prior-source and 172 candidate/live runtime files match. Fresh verified backup, isolated preflight/rollback and live checks preserve all 50 authoritative tables, configuration/keys and adjacent services. No production record/Sites/resource change, offline guarantee or new physical-iPhone/PWA acceptance. Use guarded refresh to receive the update. Evidence: `docs/ui-redesign/evidence/release-form-drafts-2026-11-10.json`. Continue in `work/budgit-household-ui`.
+
 ## Full app refresh published — 2026-11-10
 
 Application `a556d9c` is verified live. Header refresh and top pull now load the latest interface code and saved data, rather than only re-fetching the budget. The existing draft guard runs before the connection check and again before navigation. Offline, timeout, login and invalid responses preserve the current page with retry; overlapping refreshes and stale routes are refused. Budget/period/filter context and editor-local data refresh commands remain.

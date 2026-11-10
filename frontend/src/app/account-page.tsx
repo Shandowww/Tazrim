@@ -1,3 +1,4 @@
+import {useFormDraft} from './use-form-draft'
 import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useSavedReturn} from './use-saved-return'
@@ -6,7 +7,7 @@ import {accountColors,cashAccountList} from '../../../src/budget.js'
 import {accountDraftFingerprint,initialAccountDraft,manualAccountEligibility,prepareManualAccount,type AccountDraft} from './account-command'
 import {savePreparedPlan,SaveConflict} from './plan-save'
 import {AccessError,type BudgetResponse} from './budget-api'
-import {useFinancialDraft,useDraftGuard} from './draft-guard'
+import {useDraftGuard} from './draft-guard'
 import type {BudgetState} from './use-budget'
 
 import {BankElement} from '../tazrim/components/accounts/account-element'
@@ -15,9 +16,10 @@ function todayMonth(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asi
 function AccountEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:BudgetResponse;id:string;create:boolean;onSaved:(message:string)=>void}){
  const asOf=todayMonth(),[baseline]=useState(()=>initialAccountDraft(base.plan,create?'':id,asOf)),[draft,setDraft]=useState<AccountDraft>(baseline),[busy,setBusy]=useState(false),[blocked,setBlocked]=useState(false),[error,setError]=useState<string|null>(null),inFlight=useRef(false),guard=useDraftGuard(),dirty=accountDraftFingerprint(draft)!==accountDraftFingerprint(baseline)
  const update=(key:keyof AccountDraft,value:string)=>{setDraft({...draft,[key]:value});setError(null);onSaved('')}
- const save=async()=>{if(inFlight.current||!dirty||blocked)return false;inFlight.current=true;setBusy(true);setError(null);try{const plan=prepareManualAccount(base.plan,id,draft,{create,asOf}),result=await savePreparedPlan({budgetId:budget.budgetId,base,plan});budget.accept(result);onSaved(result.recovered?'שמירת החשבון אושרה מול הנתונים השמורים.':'פרטי החשבון נשמרו.');return true}catch(e){const message=e instanceof Error?e.message:'החשבון לא נשמר.';if(e instanceof AccessError){budget.invalidate(message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(message);return false}finally{inFlight.current=false;setBusy(false)}}
- useFinancialDraft({kind:'cash',dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:save})
+ const saveRaw=async()=>{if(inFlight.current||!dirty||blocked)return false;inFlight.current=true;setBusy(true);setError(null);try{const plan=prepareManualAccount(base.plan,id,draft,{create,asOf}),result=await savePreparedPlan({budgetId:budget.budgetId,base,plan});budget.accept(result);onSaved(result.recovered?'שמירת החשבון אושרה מול הנתונים השמורים.':'פרטי החשבון נשמרו.');return true}catch(e){const message=e instanceof Error?e.message:'החשבון לא נשמר.';if(e instanceof AccessError){budget.invalidate(message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(message);return false}finally{inFlight.current=false;setBusy(false)}}
+ const formDraft=useFormDraft({kind:'cash',dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'account',record:create?'new':id,values:draft,baseline:baseline,restore:value=>{setDraft(value)},mutationPending:blocked,enabled:true}),save=formDraft.save
  const backup=()=>{try{const plan=prepareManualAccount(base.plan,id,draft,{create,asOf}),url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-account-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){setError(e instanceof Error?e.message:'יש לתקן את השדות לפני הכנת גיבוי.')}}
+ if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
  return <form className="space-y-5" onSubmit={event=>{event.preventDefault();void save()}}>
   <div className="max-w-md"><BankElement provider={cashAccountList(base.plan).find(a=>a.id===id)?.bankName??''} name={draft.label} colorChoice={draft.color||null} emptyText="תצוגת שם וצבע בלבד · ללא יתרה מדווחת" /></div>
   <fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">פרטי חשבון הבנק</h2>

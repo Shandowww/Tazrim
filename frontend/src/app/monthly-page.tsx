@@ -1,7 +1,7 @@
 import {PageHeading} from './page-heading'
-import {monthlyDeviceWriter} from './monthly-device-persistence'
+import {useFormDraft} from './use-form-draft'
 import {loadDeviceDraft} from './device-draft-api'
-import {useEffect,useRef,useState} from 'react'
+import {useRef,useState} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
 import Link from './link'
 import {withViewQuery} from './navigation-query'
@@ -10,7 +10,7 @@ import {initialMonthlyDraft,manualMonthEligibility,monthlyDraftFingerprint,saveM
 import {createMonthlyRecovery,readMonthlyRecovery,originalMonthlyFields} from './monthly-recovery'
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
-import {useDraftGuard,useFinancialDraft} from './draft-guard'
+import {useDraftGuard} from './draft-guard'
 function todayMonth(){const p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).formatToParts(new Date());return p.find(v=>v.type==='year')!.value+'-'+p.find(v=>v.type==='month')!.value}
 async function exportDraft(base:BudgetResponse,budgetId:string,month:string,draft:MonthlyDraft,asOf:string){
  const payload=await createMonthlyRecovery(base,budgetId,month,draft,asOf)
@@ -19,11 +19,9 @@ async function exportDraft(base:BudgetResponse,budgetId:string,month:string,draf
 function MonthlyEditor({base,budget,month,asOf,onSaved}:{base:BudgetResponse;budget:BudgetState;month:string;asOf:string;onSaved:(message:string)=>void}){
  const [baseline]=useState(()=>initialMonthlyDraft(base.plan,month)),[draft,setDraft]=useState<MonthlyDraft>(baseline),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[blocked,setBlocked]=useState(false),flight=useRef(false),fileRef=useRef<HTMLInputElement>(null),[recoveryBusy,setRecoveryBusy]=useState(false),guard=useDraftGuard()
  const dirty=monthlyDraftFingerprint(draft)!==monthlyDraftFingerprint(baseline)
- const [deviceStatus,setDeviceStatus]=useState(''),writer=useRef<ReturnType<typeof monthlyDeviceWriter>|null>(null)
- useEffect(()=>{const instance=monthlyDeviceWriter(budget.budgetId,base,month,asOf);writer.current=instance;return()=>{instance.stop();writer.current=null}},[])
- useEffect(()=>{if(!dirty||busy||recoveryBusy)return;let active=true;setDeviceStatus('שומר טיוטה במכשיר…');const timer=setTimeout(()=>{void writer.current?.write(draft).then(()=>{if(active)setDeviceStatus('טיוטה מוצפנת שמורה במכשיר · טרם נשמרה בתקציב')}).catch(e=>{if(active)setDeviceStatus((e instanceof Error?e.message:'לא ניתן לשמור טיוטה במכשיר.')+' אפשר להוריד גיבוי לטיוטה לקובץ.')})},250);return()=>{active=false;clearTimeout(timer)}},[draft,dirty,busy,recoveryBusy])
+
  const discard=()=>{setDraft(baseline);setError(null);setBlocked(false)}
- const save=async()=>{
+ const saveRaw=async()=>{
   if(flight.current||recoveryBusy||!dirty||blocked)return false
   flight.current=true;setBusy(true);setError(null)
   try{const result=await saveMonthlyReport({budgetId:budget.budgetId,base,month,draft,asOf});budget.accept(result);onSaved(result.recovered?'השמירה אושרה מול התקציב השמור.':'הדיווח נשמר בתקציב.');return true}
@@ -37,7 +35,8 @@ function MonthlyEditor({base,budget,month,asOf,onSaved}:{base:BudgetResponse;bud
   try{const recovered=await readMonthlyRecovery(await file.text(),base,budget.budgetId,month);setDraft(recovered);onSaved('הטיוטה נטענה במכשיר בלבד. יש לבדוק ולשמור במפורש כדי לעדכן את התקציב.')}catch(e){setError(e instanceof Error?e.message:'לא ניתן לטעון את הטיוטה.')}finally{flight.current=false;setRecoveryBusy(false)}
  }
  const restoreDevice=async()=>{if(flight.current||busy||recoveryBusy||dirty)return;flight.current=true;setRecoveryBusy(true);setError(null);try{const local=await loadDeviceDraft(budget.budgetId,base);if(!local)throw Error('לא נמצאה טיוטה לחשבון ולמרחב האלה.');setDraft(originalMonthlyFields(local,base,budget.budgetId,month));onSaved('שדות הטיוטה נטענו במכשיר בלבד. טקסט חלקי נשמר כפי שהוזן; יש לבדוק ולשמור במפורש.')}catch(e){if(e instanceof AccessError)budget.invalidate(e.message);else setError(e instanceof Error?e.message:'הטיוטה לא נטענה.')}finally{flight.current=false;setRecoveryBusy(false)}}
- useFinancialDraft({kind:'monthly',dirty,busy:busy||recoveryBusy,discard,save:blocked?undefined:save})
+ const formDraft=useFormDraft({kind:'monthly',dirty,busy:busy||recoveryBusy,discard,save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'monthly',period:month,values:draft,baseline,restore:setDraft,mutationPending:blocked}),save=formDraft.save,deviceStatus=formDraft.status
+ if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
  return <form className="space-y-5" onChange={()=>onSaved('')} onSubmit={event=>{event.preventDefault();void save()}}>
   <fieldset disabled={busy||recoveryBusy} className="space-y-5">
    <section className="surface rounded-xl p-4 sm:p-6"><h2 className="font-semibold">סכומי החודש · ₪</h2><p className="mt-1 text-sm text-muted-foreground">דיווח ידני לכל התקציב, ללא חשבונות בנק מוגדרים. שדה סכום ריק יישמר כאפס. עריכת שדות אינה שומרת אוטומטית. שינוי שכר יעדכן גם דיווחי הערכה עתידיים שמורים.</p>

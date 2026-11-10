@@ -144,8 +144,8 @@ function App() {
   const budgetId = new URLSearchParams(search).get('budget') || 'personal'
   const budget = useBudget(budgetId, !fixture)
   const [appRefreshState,setAppRefreshState]=useState<{pending:boolean;error:string|null}>({pending:false,error:null})
-  const [reloadApp]=useState(()=>createAppRefresh({location:window.location,fetch:(...args:Parameters<typeof fetch>)=>fetch(...args),guard:guard.run,onState:setAppRefreshState}))
-  const refreshApp=useCallback(()=>{document.activeElement instanceof HTMLElement&&document.activeElement.blur();guard.run(()=>{void reloadApp()})},[guard,reloadApp])
+  const [reloadApp]=useState(()=>createAppRefresh({location:window.location,fetch:(...args:Parameters<typeof fetch>)=>fetch(...args),guard:(action:()=>void)=>guard.run(action,'refresh'),onState:setAppRefreshState}))
+  const refreshApp=useCallback(()=>{document.activeElement instanceof HTMLElement&&document.activeElement.blur();guard.run(()=>{void reloadApp()},'refresh')},[guard,reloadApp])
   const currentAccountId = !fixture && budget.status === 'ready' ? budget.value.accountId : null
   const lastAccountId = useRef<string | null>(null)
   const accountChanged = !!currentAccountId && !!lastAccountId.current && currentAccountId !== lastAccountId.current

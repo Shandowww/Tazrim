@@ -19,7 +19,7 @@ export function PageLoadBoundary({children,resetKey}:{children:ReactNode;resetKe
   try{
    const response=await fetch('/api/health',{cache:'no-store',signal:AbortSignal.timeout(10000)})
    if(!response.ok||!(await response.json()).ok)throw Error('unavailable')
-   guard.run(()=>window.location.reload())
+   guard.run(()=>window.location.reload(),'refresh')
   }catch{setError('לא הצלחנו להתחבר. בדקו את החיבור ונסו שוב. אפשר לעבור למסך אחר דרך התפריט.')}
   finally{setBusy(false)}
  }

@@ -1,0 +1,161 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496",
+  "previousApplicationCommit": "a556d9c90736a77c6e3d1551e62ca7e4e632d66f",
+  "entry": "https://budgit.duckdns.org/next",
+  "runtimeImage": "sha256:7656f38cf5f1fb826131ec75d1ab066a74116c920046bbc49bbd4b0f94052ce5",
+  "sourceArchiveSha256": "b8bd323e5947d345d9aa9cf4db4ad321b3716e69f0de2c0143dd75b93d4cf267",
+  "changes": [
+    "Ordinary recoverable forms persist exact partial input in encrypted scoped device drafts before navigation, with no financial write",
+    "39 raw form adapters and 19 documented guard exceptions; explicit Save and original commands retained",
+    "Settings provides editor return, partial-form export and deliberate discard; legacy recovery copies retained",
+    "Conditional cleanup and transactional concurrent-write checks protect newer edits and competing tabs"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on committed source archive",
+    "regressions": 1437,
+    "regressionScope": "test/*.test.mjs and tools/bank-csv/*.test.mjs",
+    "coreChecks": 15,
+    "syntheticBrowserChecks": 69,
+    "browserEvidence": "docs/ui-redesign/evidence/form-draft-browser-2026-11-10.json",
+    "inventory": "docs/ui-redesign/evidence/form-draft-inventory-2026-11-10.json",
+    "previousSource": {
+      "files": 1007,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 172,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 208,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "3e353361ee7decb1db125cb694976d6080e9fd356bc736cc147a8d6df9441bac",
+          "reactHTMLSha256": "cae18d48a2c59680329b349adcd59e1a4b71ac9256c3712ce2a1aa1d643a18d4"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "4cfc326f66ddffbe816a5ac9b4d89f34790b3b9d8a6c52e0d427f0913d6e530d",
+          "reactHTMLSha256": "4a425cf0d59e598ff8872012f3b3a52ab4ba6762ecfaa00a4ae816cb16969cf0"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "a556d9c"
+          ],
+          "originalAssetsVerified": 72,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 172,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T19:41:53.162Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/accounts/new",
+        "/next/accounts/synthetic/edit",
+        "/next/card-setup",
+        "/next/card-setup/new",
+        "/next/card-setup/synthetic",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "Synthetic browser coverage is bounded; no physical-iPhone/PWA/Face ID acceptance",
+    "Device draft persistence does not establish offline support or guarantee newest keystrokes after OS termination",
+    "Secrets, original files, destructive approvals and uncertain financial mutations retain documented guards",
+    "No production record edits, Sites publication or hosting-resource changes"
+  ]
+}

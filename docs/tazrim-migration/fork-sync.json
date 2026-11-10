@@ -1,28 +1,26 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "40ad89258b480d6df5b60f579aa5a1c74ff95caa",
+  "sourceCommit": "42f23a797e67b00ada1432f5bea5a1fccd05751b",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Application a556d9c verified live: guarded full app reload from header and top pull, latest interface and saved data, draft/race/offline/timeout protection; no production record edits.",
+  "status": "Scoped encrypted device form drafts verified live: 39 raw adapters, 19 documented guard exceptions, explicit financial Save retained.",
   "validation": {
     "build": "passed on committed clean source archive",
     "typecheck": "passed",
-    "regressionTests": 1421,
+    "regressionTests": 1437,
     "coreChecks": 15,
-    "focusedContracts": 9,
-    "candidateRuntimeContracts": 153,
-    "browser": "34 focused refresh checks, build/typecheck, 1421 regressions, 15 core checks, 187 built-candidate contracts and 172 matching runtime files pass. No new browser or physical-iPhone/PWA acceptance.",
-    "release": "docs/ui-redesign/evidence/release-app-refresh-2026-11-10.json",
-    "productionEvidence": "docs/ui-redesign/evidence/release-card-touch-2026-11-10.json",
-    "checkpoint": "docs/ui-redesign/CARD-TOUCH-2026-11-10.md",
-    "physicalDevice": "Synthetic Chrome touchscreen input passed; no new physical-iPhone acceptance for this repair."
+    "syntheticBrowserChecks": 69,
+    "candidateRuntimeContracts": 208,
+    "runtimeFilesMatched": 172,
+    "release": "docs/ui-redesign/evidence/release-form-drafts-2026-11-10.json",
+    "browser": "Bounded synthetic phone/desktop navigation, storage failure, competing tabs, isolation and explicit lost-response save checks; no physical-iPhone/PWA/Face ID acceptance."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "a556d9c90736a77c6e3d1551e62ca7e4e632d66f",
-  "productionImage": "sha256:cde65b163f5ffa28d9430c92d06f90baf92b4a5a2c279a91c0d1f278a2e56ae0",
+  "productionApplicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496",
+  "productionImage": "sha256:7656f38cf5f1fb826131ec75d1ab066a74116c920046bbc49bbd4b0f94052ce5",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "123b7735be02761ea52bd4af731fe76d5c1d0091"
+  "applicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496"
 }

@@ -6,7 +6,7 @@ test('Draft registration is inert until actual changes and removing a scoped for
  const r=new DraftRegistry();let notified=0;const off=r.subscribe(()=>notified++)
  r.set('personal:monthly',entry());assert.equal(r.getSnapshot().dirty,false);assert.equal(notified,0)
  r.set('personal:monthly',entry({dirty:true}));assert.equal(r.getSnapshot().dirty,true);assert.equal(r.getSnapshot().canSave,false)
- r.remove('personal:monthly');assert.deepEqual(r.getSnapshot(),{dirty:false,busy:false,canSave:false,count:0,errors:[]});off()
+ r.remove('personal:monthly');assert.deepEqual(r.getSnapshot(),{dirty:false,busy:false,canSave:false,count:0,errors:[],durable:true,localStatuses:[]});off()
 })
 test('One explicit save runs once, blocks discard while pending and clears only after a real success',async()=>{
  const r=new DraftRegistry();let resolve,calls=0,discarded=0
