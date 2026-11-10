@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {clone,demoPlan,zero,withRegisteredCategory,renameRegisteredCategory,moveRegisteredCategory,mergeRegisteredCategories,categoryRegistryEntry} from '../src/budget.js'
 import {budgetAccountOverview} from '../frontend/src/app/budget-adapter.js'
-import {householdAccounts,selectedWalletCard,nextWalletCard,walletSwipe,cardDetailCoverage} from '../frontend/src/app/household-accounts-model.js'
+import {householdAccounts,selectedWalletCard,nextWalletCard,walletNeighbors,walletCardCharge,walletSwipe,cardDetailCoverage} from '../frontend/src/app/household-accounts-model.js'
 import {householdCategory} from '../frontend/src/app/household-categories.js'
 const period={year:'2026',month:'10',asOf:'2026-10'}
 function plan(){const p=clone(demoPlan);p.startMonth='2026-01';p.expenses=[];p.defaults=zero();p.months={'2026-10':{actual:true,includesPlannedCard:true,values:{...zero(),salary:1000,card1:100,card2:50}}};p.cashPlanning={accounts:[{id:'a',label:'המשלם א',bankName:'hapoalim',buffer:0},{id:'b',label:'המשלם ב',bankName:'one-zero',buffer:0}],months:{'2026-10':{a:{actual:true,values:{...zero(),salary:1000,card1:100},balance:-25.01,date:'2026-10-31'},b:{actual:false,values:zero(),balance:9999,date:'2026-10-31'}}},cardAccounts:{card1:'a',card2:'b'},transfers:[]};p.details=[['food',80,'מזון'],['shop',40,'קניות'],['refund',-20,'קניות']].map(([id,amount,category])=>({id,name:id,amount,category,method:'card1',status:'cleared',accounting:'included',month:'2026-10',date:'2026-10-10',number:''}));return p}
@@ -28,9 +28,25 @@ test('Card selection validates ids in the current scope, wraps 1/2/many cards an
 })
 test('Category tones are semantic, stable across rename/move/merge and respect saved custom colours without modifying source',()=>{
  let p=plan();const before=JSON.stringify(p)
- assert.match(householdCategory('מזון',p).color,/green/);assert.match(householdCategory('בריאות / פארם',p).color,/purple/);assert.match(householdCategory('תחבורה / דלק וטעינה',p).color,/orange/);assert.match(householdCategory('קניות',p).color,/blue/);assert.equal(JSON.stringify(p),before)
+ assert.match(householdCategory('מזון',p).color,/green/);assert.match(householdCategory('בריאות',p).color,/purple/);assert.match(householdCategory('תחבורה',p).color,/orange/);assert.match(householdCategory('קניות',p).color,/blue/);assert.notEqual(householdCategory('בריאות / פארם',p).color,householdCategory('בריאות',p).color);assert.equal(JSON.stringify(p),before)
  p=clone(demoPlan);p.expenses=[];p=withRegisteredCategory(p,'מזון');const original=householdCategory('מזון',p);p=renameRegisteredCategory(p,'מזון','אוכל');assert.deepEqual(householdCategory('אוכל',p),original)
  p=withRegisteredCategory(p,'קניות / כללי');const custom=householdCategory('קניות / כללי',p);p=moveRegisteredCategory(p,'קניות / כללי','אוכל');assert.deepEqual(householdCategory('אוכל / כללי',p),custom)
  p=mergeRegisteredCategories(p,'אוכל / כללי','אוכל');assert.deepEqual(householdCategory('קניות / כללי',p),householdCategory('אוכל',p))
  categoryRegistryEntry(p,'אוכל').color='#123456';assert.equal(householdCategory('אוכל',p).color,'#123456')
+})
+test('Two-card neighbors occupy both physical sides and repeated steps cycle indefinitely in either direction',()=>{
+ const cards=[{id:'a'},{id:'b'}]
+ assert.deepEqual(walletNeighbors(cards,'a'),[{id:'b',side:'right',delta:-1},{id:'b',side:'left',delta:1}])
+ for(const direction of [-1,1]){let selected='a';for(let turn=0;turn<101;turn++){selected=nextWalletCard(cards,selected,direction);assert.equal(selected,turn%2?'a':'b');assert.ok(walletNeighbors(cards,selected).every(row=>row.id!==selected))}}
+ assert.deepEqual(walletNeighbors([],null),[]);assert.deepEqual(walletNeighbors(cards.slice(0,1),'a'),[])
+ assert.deepEqual(walletNeighbors([...cards,{id:'c'}],'a').map(row=>row.id),['c','b'])
+})
+test('Charge text distinguishes a reported zero, signed refunds and missing month/year evidence without changing totals',()=>{
+ const source=plan(),before=JSON.stringify(source),card=householdAccounts(source,period).cards[0]
+ assert.equal(walletCardCharge(card,period),new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:2}).format(card.total))
+ assert.match(walletCardCharge({total:0},period),/0/)
+ assert.match(walletCardCharge({total:-12.34},period),/-12\.34/)
+ assert.equal(walletCardCharge({total:null},period),'טרם נקלט חיוב לחודש זה')
+ assert.equal(walletCardCharge({total:null},{...period,month:''}),'טרם נקלט חיוב לשנה זו')
+ assert.equal(JSON.stringify(source),before)
 })

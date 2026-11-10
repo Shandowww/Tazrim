@@ -1,0 +1,154 @@
+{
+  "date": "2026-11-10",
+  "applicationCommit": "3af797bb11bc762e0a4ea4097518634cf6ec1d37",
+  "previousApplicationCommit": "3946e922944b0cfacb80c3efa25982ac665ab81a",
+  "entry": "https://budgit.duckdns.org/next/accounts",
+  "runtimeImage": "sha256:6f742d3d12cf9a9cf5a2cb2de5de2e91daf33e500d8a3eb9e4fb04b427e9e578",
+  "sourceArchiveSha256": "5d317cb2c233a6021116785dc6852606def64aa63d73c98a368cc871bc877daf",
+  "changes": [
+    "Cal occupies the lower-left mark group; saved network marks remain visible",
+    "Card faces show the original selected-period charge, reported zero or explicit missing-evidence wording",
+    "Only the duplicate selected-card category-header total is removed; category amounts and all-card totals remain",
+    "Upright side cards, unified adjacent-card transition and continuous bidirectional wrapping with two cards",
+    "Reduced motion, keyboard controls, query scope and vertical-position preservation remain"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on an extraction of the committed source archive",
+    "regressions": 1318,
+    "coreChecks": 15,
+    "focusedContracts": 12,
+    "previousSource": {
+      "files": 976,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 169,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 135,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "59cf4092e617c100bea99bcb01d31b3b385eff61fc12cc2950aeba9b50c896e2",
+          "reactHTMLSha256": "a5a0f22d6a04113eb8a1909a97c2348ac0154471085fd2fc297fb02c85d292a3"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "2453a96de204eac8d657e5f0441c0ef287c02aa437e6c04c659838b4533267a2",
+          "reactHTMLSha256": "091cc0cde125cbd2f52b56c2e4630ebc88d1e1d2c36d9404bdaf69e346855af2"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "3946e92"
+          ],
+          "originalAssetsVerified": 70,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 169,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851,
+      "checkedAt": "2026-11-10T07:10:46.777Z",
+      "origin": "https://budgit.duckdns.org",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "anonymousAndForgedAPIRefused": true,
+      "anonymousDeepRoutesShowLogin": [
+        "/next/more",
+        "/next/settings",
+        "/next/notices",
+        "/next/actions",
+        "/next",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/savings",
+        "/next/plans/scenario",
+        "/next/details/new",
+        "/next/settings/security",
+        "/next/upload/group",
+        "/next/analysis",
+        "/next/categories/manage",
+        "/next/incoming"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      }
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone visual/touch acceptance",
+    "Save unsaved edits and use the guarded application refresh in browser and PWA",
+    "Direct nonadjacent dot selection remains immediate",
+    "No production financial edits, Sites publication or hosting-resource upgrade"
+  ]
+}

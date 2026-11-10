@@ -13,6 +13,8 @@ export function householdAccounts(plan,period){
 }
 export function selectedWalletCard(cards,requested,remembered){return cards.find(c=>c.id===requested)??cards.find(c=>c.id===remembered)??cards[0]??null}
 export function nextWalletCard(cards,current,delta){if(!cards.length)return null;const i=Math.max(0,cards.findIndex(c=>c.id===current));return cards[(i+delta%cards.length+cards.length)%cards.length].id}
+export function walletNeighbors(cards,current){return cards.length<2?[]:[{id:nextWalletCard(cards,current,-1),side:'right',delta:-1},{id:nextWalletCard(cards,current,1),side:'left',delta:1}]}
+export function walletCardCharge(card,period){return card.total===null?(period.month?'טרם נקלט חיוב לחודש זה':'טרם נקלט חיוב לשנה זו'):new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:2}).format(card.total)}
 export function walletSwipe(start,end){const dx=end.x-start.x,dy=end.y-start.y;return Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4?(dx>0?1:-1):0}
 export function cardDetailCoverage(card){
  const detailed=card.details.valueCents===null?null:card.details.valueCents/100

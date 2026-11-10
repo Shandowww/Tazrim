@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-09",
+  "applicationCommit": "3946e922944b0cfacb80c3efa25982ac665ab81a",
+  "previousApplicationCommit": "9f4125f03d8888e02034f083c82a77e17893f8d2",
+  "entry": "https://budgit.duckdns.org/next/categories",
+  "runtimeImage": "sha256:c0da7c1d84bd7f3a58bfe015f4d4fa0245e1343a4e220516d86b0dc0157b256d",
+  "sourceArchiveSha256": "ffe9ef4cd59132016b34e5cb0db71de453f97ce857ecf24abd44bfc18d19db86",
+  "changes": [
+    "Automatic colours use the full category identity, so built-in subcategories and the 16 pictured categories no longer repeat their parent colour",
+    "Additional root tones and three theme-specific lightness levels widen the light/dark palette",
+    "Colour is independent of amounts, ranking and filtering; original registry aliases preserve it across rename/move/merge and saved custom colours win",
+    "Presentation-only change; original financial models, source labels, saved categories and amounts are not rewritten"
+  ],
+  "validation": {
+    "cleanBuildTypecheck": "passed on a fresh source-archive extraction; no stale generated chunks",
+    "regressions": 1310,
+    "coreChecks": 15,
+    "newColourContracts": 4,
+    "previousSource": {
+      "files": 512,
+      "mismatched": []
+    },
+    "candidateRuntime": {
+      "files": 169,
+      "mismatched": [],
+      "extra": []
+    },
+    "isolatedReleaseGates": {
+      "allReleaseGatesPassed": true,
+      "candidateBackendContracts": 133,
+      "backupVerified": true,
+      "sourceArchiveVerified": true,
+      "receipts": {
+        "access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "2453a96de204eac8d657e5f0441c0ef287c02aa437e6c04c659838b4533267a2",
+          "reactHTMLSha256": "091cc0cde125cbd2f52b56c2e4630ebc88d1e1d2c36d9404bdaf69e346855af2"
+        },
+        "rollback-access": {
+          "startupPreservesAllExistingRecords": true,
+          "anonymousAndForgedAPIsDenied": true,
+          "anonymousDeepRoutesShowLogin": true,
+          "authenticatedDeepRoutes": true,
+          "privateImmutableAssetsAndMime": true,
+          "framingProtection": true,
+          "freshActorBoundAndEmpty": true,
+          "nonadministratorDenied": true,
+          "existingSpacesPrivate": true,
+          "apiNotSwallowedBySPA": true,
+          "allExistingRecordsPreservedAfterReadChecks": true,
+          "storedSourcesDecrypted": 19,
+          "defaultAndPreferredRootLaunch": true,
+          "originalHTMLSha256": "8843037649a1ac43989a7df833a38aa932a920406a978e3f56e0974e9a577eec",
+          "reactHTMLSha256": "0b402ae70122a2d3a23d7b77b3413463bc1bd1be4c153116b68501069b1e898d"
+        },
+        "retained-assets": {
+          "priorReleases": [
+            "9f4125f"
+          ],
+          "originalAssetsVerified": 70,
+          "currentAndPriorBytesMatch": true
+        },
+        "intake-restore": {
+          "intakeFiveTablesRestored": true,
+          "encryptedOriginalDecrypted": true,
+          "restoredConnectionReceipt": true,
+          "productionDatabaseUntouched": true
+        },
+        "automation": {
+          "startupAndRepeatedStartupPreserveExistingRecords": true,
+          "newTables": 2,
+          "activationPolicies": 0,
+          "syntheticBankAndCalPDFProposals": 2,
+          "calNoticesSeparate": true,
+          "noAutomaticFinancialWrites": true,
+          "rejectionAndPause": true,
+          "encryptedBackupRoundTripAndProposalDecryption": true
+        }
+      }
+    },
+    "liveRuntime": {
+      "runtimeFilesMatched": 169,
+      "extra": [],
+      "mismatched": []
+    },
+    "preservation": {
+      "authoritativeTablesPreserved": 50,
+      "integrity": true,
+      "foreignKeys": true,
+      "referenceInterestCacheExcluded": true,
+      "backupAttemptTimestampExcluded": true
+    },
+    "configurationAndKeysPreserved": true,
+    "adjacentServicesPreserved": true,
+    "public": {
+      "checkedAt": "2026-11-09T20:33:26.101Z",
+      "health": {
+        "ok": true,
+        "loginConfigured": true
+      },
+      "privateAPIsDenied": [
+        "/api/plan",
+        "/api/reports",
+        "/api/actions",
+        "/api/data/transactions",
+        "/api/report-lifecycle",
+        "/api/report-automation"
+      ],
+      "anonymousDeepRoutesShowLogin": [
+        "/next",
+        "/next/categories",
+        "/next/categories/manage",
+        "/next/accounts",
+        "/next/checks",
+        "/next/loans",
+        "/next/incoming",
+        "/next/settings/security"
+      ],
+      "htmlNoStore": true,
+      "framingProtection": true,
+      "defaultGetHeadRootLaunch": true,
+      "preferredOriginalRootLaunch": true,
+      "manifest": {
+        "id": "/",
+        "scope": "/",
+        "start_url": "/next"
+      },
+      "installerSha256": "a8a09143575d1af698e72d34d409896f7e4efd6c041d211dade3a076f4f497e8",
+      "installerBytes": 68851
+    },
+    "rollbackPrepared": true
+  },
+  "limitations": [
+    "No new browser or physical-iPhone visual acceptance",
+    "Use guarded refresh after saving unsaved edits to load the published UI",
+    "Saved user-selected colours are intentionally retained, including any duplicates chosen by the user",
+    "Existing name-amount loan-rule compatibility must be retained when considering versions older than bafe416"
+  ]
+}

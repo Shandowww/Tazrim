@@ -3,10 +3,10 @@ import {useEffect,useLayoutEffect,useRef} from 'react'
 import {flushSync} from 'react-dom'
 import {useLocation,useNavigate} from 'react-router-dom'
 import {ChevronLeft,ChevronRight,ShoppingBasket,Pill,Fuel,ShoppingBag,House,Landmark,Tag} from 'lucide-react'
-import {networkLabel} from '../tazrim/lib/accounts/brands'
+import {networkLabel,providerKey} from '../tazrim/lib/accounts/brands'
 import {NetworkMark} from '../tazrim/components/accounts/network-mark'
 import {ProviderLogo,hasProviderLogo} from '../tazrim/components/accounts/provider-logo'
-import {householdAccounts,selectedWalletCard,nextWalletCard,walletSwipe,cardDetailCoverage} from './household-accounts-model'
+import {householdAccounts,selectedWalletCard,nextWalletCard,walletNeighbors,walletCardCharge,walletSwipe,cardDetailCoverage} from './household-accounts-model'
 import {householdCategory} from './household-categories'
 import {accountWorkflows} from './account-workflows'
 import {periodFor} from './detail-period'
@@ -29,7 +29,7 @@ function WalletDots({cards,selectedId,select,step}:{cards:Array<{id:string;displ
 }
 function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
  const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pendingScroll=useRef<number|null>(null)
- useEffect(()=>()=>{if(swipeTimer.current)clearTimeout(swipeTimer.current)},[scope,period.year,period.month])
+ useEffect(()=>()=>{if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}pointer.current=null;resetSwipe(true)},[scope,location.search,plan])
  useLayoutEffect(()=>{
   if(pendingScroll.current===null)return
   window.scrollTo({top:pendingScroll.current,behavior:'instant'})
@@ -44,11 +44,12 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   const stage=stageRef.current
   if(!stage)return
   stage.dataset.dragging=immediate?'true':'false'
+  delete stage.dataset.direction
   if(!immediate)void stage.offsetWidth
   stage.style.setProperty('--wallet-drag-x','0px')
   if(immediate)requestAnimationFrame(()=>{if(stage.isConnected)stage.dataset.dragging='false'})
  }
- function select(id:string){
+ function commitSelection(id:string){
   if(!view.cards.some(c=>c.id===id))return
   if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}
   resetSwipe(true)
@@ -59,33 +60,41 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
   next.set('walletCard',id)
   navigate('/accounts?'+next,{replace:true,state:location.state,preventScrollReset:true})
  }
- function step(delta:number){const id=nextWalletCard(view.cards,selected?.id,delta);if(id)select(id)}
- function finishSwipe(start:{x:number;y:number;id:number;dragging:boolean},end:{x:number;y:number},stage:HTMLDivElement){
+ function select(id:string,delta?:number){
+  if(id===selected?.id||swipeTimer.current||!view.cards.some(c=>c.id===id))return
+  const stage=stageRef.current
+  if(!stage||window.matchMedia('(prefers-reduced-motion: reduce)').matches){commitSelection(id);return}
+  const targetIndex=view.cards.findIndex(c=>c.id===id)
+  const forward=(targetIndex-index+view.cards.length)%view.cards.length
+  const direction=delta??(forward<=view.cards.length/2?1:-1)
+  const neighbor=nextWalletCard(view.cards,selected?.id,direction)
+  if(neighbor!==id){commitSelection(id);return}
+  const width=stage.querySelector('.household-wallet-selected')?.getBoundingClientRect().width??stage.clientWidth*.78
+  stage.dataset.dragging='false'
+  stage.dataset.direction=direction>0?'right':'left'
+  void stage.offsetWidth
+  stage.style.setProperty('--wallet-drag-x',`${(direction>0?1:-1)*width*1.06}px`)
+  swipeTimer.current=setTimeout(()=>{
+   swipeTimer.current=null
+   flushSync(()=>commitSelection(id))
+  },260)
+ }
+ function step(delta:number){const id=nextWalletCard(view.cards,selected?.id,delta);if(id)select(id,delta)}
+ function finishSwipe(start:{x:number;y:number;id:number;dragging:boolean},end:{x:number;y:number}){
   if(!start.dragging)return
   const delta=walletSwipe(start,end),next=delta&&nextWalletCard(view.cards,selected?.id,delta)
   if(!next||next===selected?.id){resetSwipe();return}
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){select(next);return}
-  const width=stage.querySelector('.household-wallet-selected')?.getBoundingClientRect().width??stage.clientWidth*.78
-  stage.dataset.dragging='false'
-  void stage.offsetWidth
-  stage.style.setProperty('--wallet-drag-x',`${(delta>0?1:-1)*width*1.01}px`)
-  swipeTimer.current=setTimeout(()=>{
-   swipeTimer.current=null
-   stage.dataset.dragging='true'
-   stage.style.setProperty('--wallet-drag-x','0px')
-   flushSync(()=>select(next))
-   requestAnimationFrame(()=>{if(stage.isConnected)stage.dataset.dragging='false'})
-  },220)
+  select(next,delta)
  }
  const face=(card:typeof selected)=>card&&<div className="household-card-face" data-bank={card.payer?.provider}>
   <div className="household-card-top">
    {card.payer&&hasProviderLogo(card.payer.provider)?<ProviderLogo provider={card.payer.provider}/>:<span><bdi>{card.payer?.name||'כרטיס אשראי'}</bdi></span>}
    {card.cardLastFour&&<bdi dir="ltr">•••• {card.cardLastFour}</bdi>}
   </div>
-  <span className="household-card-name"><bdi dir="auto">{card.displayName}</bdi></span>
-  <div className="household-card-bottom">{card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}<div className="household-payer">{card.payer?<span>מחויב מ־<bdi>{card.payer.name}</bdi></span>:<span>אין שיוך לחשבון משלם</span>}{hasProviderLogo(card.issuer)&&<ProviderLogo provider={card.issuer}/>} </div></div>
+  <span className="household-card-charge" data-missing={card.total===null}><bdi dir={card.total===null?'auto':'ltr'}>{walletCardCharge(card,period)}</bdi></span>
+  <div className="household-card-bottom"><div className="household-card-marks">{providerKey(card.issuer)==='cal'&&<ProviderLogo provider={card.issuer}/>} {card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}</div><div className="household-payer">{card.payer?<span>מחויב מ־<bdi>{card.payer.name}</bdi></span>:<span>אין שיוך לחשבון משלם</span>}{providerKey(card.issuer)!=='cal'&&hasProviderLogo(card.issuer)&&<ProviderLogo provider={card.issuer}/>} </div></div>
  </div>
- const peeks=selected&&view.cards.length>1?[{id:nextWalletCard(view.cards,selected.id,-1),side:'right'},...(view.cards.length>2?[{id:nextWalletCard(view.cards,selected.id,1),side:'left'}]:[])]:[]
+ const peeks=walletNeighbors(view.cards,selected?.id)
  const coverage=selected?cardDetailCoverage(selected):null
  return <div className="household-page household-accounts"><div className="household-title"><PageHeading>החשבונות והכרטיסים</PageHeading>{!viewer&&<Link className="household-update" href={href('/accounts/new')}>הוספת חשבון</Link>}</div>
  <section className="household-bank-list" aria-label="חשבונות בנק">{view.banks.map(bank=><article className="surface household-bank" key={bank.id}><div className="household-bank-heading"><ProviderLogo provider={bank.provider}/><div><h2><bdi>{bank.displayName}</bdi></h2>{!hasProviderLogo(bank.provider)&&bank.provider&&<p><bdi>{bank.provider}</bdi></p>}</div></div><div className="household-bank-balance"><span>{bank.balance?<>יתרה ל־<bdi dir="ltr">{bank.balance.date.split('-').reverse().join('.')}</bdi></>:'יתרה לא דווחה בתקופה'}</span><strong><bdi>{money(bank.balance?.value??null)}</bdi></strong></div><details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('banks',bank.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></article>)}{!view.banks.length&&<p className="surface household-empty">עדיין אין חשבונות בנק במרחב.</p>}</section>
@@ -95,7 +104,7 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
    <div ref={stageRef} className="household-wallet-stage"
     onPointerDown={e=>{
      pointer.current=null
-     if(!e.isPrimary||e.button!==0||view.cards.length<2||(e.target as Element).closest('button,a,input,select'))return
+     if(!e.isPrimary||e.button!==0||view.cards.length<2||swipeTimer.current||(e.target as Element).closest('button,a,input,select'))return
      pointer.current={x:e.clientX,y:e.clientY,id:e.pointerId,dragging:false}
      e.currentTarget.setPointerCapture(e.pointerId)
     }}
@@ -115,20 +124,22 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
      pointer.current=null
      if(!start||start.id!==e.pointerId)return
      if(start.dragging)e.preventDefault()
-     finishSwipe(start,{x:e.clientX,y:e.clientY},e.currentTarget)
+     finishSwipe(start,{x:e.clientX,y:e.clientY})
+     if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId)
     }}
     onPointerCancel={()=>{pointer.current=null;resetSwipe()}}
     onLostPointerCapture={e=>{if(pointer.current?.id===e.pointerId){pointer.current=null;resetSwipe()}}}
     onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}}}>
-    {peeks.map(peek=>{const card=view.cards.find(c=>c.id===peek.id)!;return <button type="button" className={'household-wallet-peek '+peek.side} key={card.id} onClick={()=>select(card.id)} aria-label={'הצגת '+card.displayName+' '+(card.cardLastFour??'')}>{face(card)}</button>})}
-    <div className="household-wallet-selected" role="group" aria-label={selected.displayName+' '+(selected.cardLastFour??'')}>{face(selected)}</div>
+    {peeks.map(peek=><div className={'household-wallet-peek far-'+peek.side} key={'far-'+peek.side} aria-hidden="true">{face(view.cards.find(card=>card.id===nextWalletCard(view.cards,selected.id,peek.delta*2))!)}</div>)}
+    {peeks.map(peek=>{const card=view.cards.find(c=>c.id===peek.id)!;return <button type="button" className={'household-wallet-peek '+peek.side} key={peek.side} onClick={()=>select(card.id,peek.delta)} aria-label={(peek.delta>0?'הכרטיס הבא: ':'הכרטיס הקודם: ')+card.displayName+' '+(card.cardLastFour??'')}><div aria-hidden="true">{face(card)}</div></button>})}
+    <div className="household-wallet-selected" role="group" tabIndex={0} aria-live="polite" aria-label={selected.displayName+' '+(selected.cardLastFour??'')}>{face(selected)}</div>
    </div>
    <div className="household-wallet-controls"><button type="button" onClick={()=>step(1)} disabled={view.cards.length<2} aria-label="הכרטיס הבא"><ChevronRight size={20}/></button><WalletDots cards={view.cards} selectedId={selected.id} select={select} step={step}/><button type="button" onClick={()=>step(-1)} disabled={view.cards.length<2} aria-label="הכרטיס הקודם"><ChevronLeft size={20}/></button></div>
    <p className="household-wallet-total">{view.cards.every(c=>c.total!==null)?<>סה״כ בכרטיסים בתקופה: <bdi>{money(view.cards.reduce((s,c)=>s+(c.total??0),0))}</bdi></>:'חסר דיווח בחלק מהכרטיסים'}</p>
   </>}
   {!viewer&&<Link className="household-back" href={href('/card-setup/new')}>הוספת כרטיס</Link>}
  </section>
- {selected&&<section className="surface household-card-detail" aria-live="polite"><div className="household-title"><h2><bdi>{selected.displayName}</bdi>{selected.cardLastFour&&<> · <bdi>{selected.cardLastFour}</bdi></>}</h2><strong><bdi>{money(selected.total)}</bdi></strong></div><p className="household-detail-period">{period.month?period.year+'-'+period.month:'שנת '+period.year}</p>{selected.details.categories.map((row:{category:string;cents:number})=>{const category=householdCategory(row.category,plan),Icon=icons[category.kind as keyof typeof icons];return <Link className="household-category-row" key={row.category} href={href('/categories?card='+encodeURIComponent(selected.id)+'&category='+encodeURIComponent(row.category))}><span style={{color:category.color,background:`color-mix(in srgb, ${category.color} 14%, transparent)`}}><Icon size={19}/></span><span>{row.category}</span><bdi>{money(row.cents/100)}</bdi></Link>})}{coverage?.remainder!=null&&coverage.remainder!==0&&<p className="household-detail-note">{coverage.remainder>=0?'ללא פירוט: ':'הפירוט חורג מסך החיוב ב־'}<bdi>{money(Math.abs(coverage.remainder))}</bdi></p>}{coverage?.detailed===null&&<p className="household-detail-note">אין פירוט שנפרע לתקופה זו.</p>}<details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('cards',selected.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></section>}
+ {selected&&<section className="surface household-card-detail" aria-live="polite"><div className="household-title"><h2><bdi>{selected.displayName}</bdi>{selected.cardLastFour&&<> · <bdi>{selected.cardLastFour}</bdi></>}</h2></div><p className="household-detail-period">{period.month?period.year+'-'+period.month:'שנת '+period.year}</p>{selected.details.categories.map((row:{category:string;cents:number})=>{const category=householdCategory(row.category,plan),Icon=icons[category.kind as keyof typeof icons];return <Link className="household-category-row" key={row.category} href={href('/categories?card='+encodeURIComponent(selected.id)+'&category='+encodeURIComponent(row.category))}><span style={{color:category.color,background:`color-mix(in srgb, ${category.color} 14%, transparent)`}}><Icon size={19}/></span><span>{row.category}</span><bdi>{money(row.cents/100)}</bdi></Link>})}{coverage?.remainder!=null&&coverage.remainder!==0&&<p className="household-detail-note">{coverage.remainder>=0?'ללא פירוט: ':'הפירוט חורג מסך החיוב ב־'}<bdi>{money(Math.abs(coverage.remainder))}</bdi></p>}{coverage?.detailed===null&&<p className="household-detail-note">אין פירוט שנפרע לתקופה זו.</p>}<details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('cards',selected.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></section>}
  <details className="surface household-bank"><summary>ניהול חשבונות ודוחות</summary><nav className="household-account-actions">{accountWorkflows('banks','',viewer).concat(accountWorkflows('cards','',viewer)).filter((a,i,all)=>all.findIndex(b=>b.href===a.href)===i).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></div>
 }
 export function HouseholdAccountsPage({budget,fixture}:{budget:BudgetState;fixture:boolean}){

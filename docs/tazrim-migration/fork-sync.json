@@ -1,28 +1,25 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "532d36f210e3b783b3d42501206fd78b7c4f4555",
+  "sourceCommit": "a4467f2e6f0cef4c29036f0e494d099deb8ac73c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Published legacy loan source explanation and exact metadata-only recovery from original reports",
+  "status": "Card charge display and continuous two-way carousel verified live; Cal moved to lower left and duplicate category heading total removed. Existing category and loan releases retained.",
   "validation": {
-    "build": "passed",
+    "build": "passed on committed clean source archive",
     "typecheck": "passed",
-    "regressionTests": 1306,
+    "regressionTests": 1318,
     "coreChecks": 15,
-    "nativeShortcutSchemaActions": 419,
-    "receiptGraph": "passed; format/whitespace guards, actionable catalog errors and explicit nested repeats",
-    "browser": "No new browser/device acceptance; static legacy warning/file/period/viewer rendering and 121 built-candidate contracts pass.",
-    "physicalDevice": "Native Mac two-file cleanup/refusal/retry/empty-folder accepted with exact retained bytes and zero financial commits. Prior iPhone 0a5ab68 acceptance retained; revised bindings not newly claimed tested on iPhone. Scheduling/locked-device unverified.",
-    "release": "docs/ui-redesign/evidence/release-loan-source-recovery-2026-11-09.json",
-    "productionEvidence": "docs/ui-redesign/evidence/release-mac-shortcut-2026-11-08.json",
-    "checkpoint": "docs/ui-redesign/LOAN-SOURCE-RECOVERY-2026-11-09.md"
+    "focusedContracts": 12,
+    "candidateRuntimeContracts": 135,
+    "browser": "No new browser or physical-iPhone acceptance; static rendering, deterministic event harness and live runtime/public verification passed.",
+    "release": "docs/ui-redesign/evidence/release-card-carousel-2026-11-10.json"
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "9f4125f03d8888e02034f083c82a77e17893f8d2",
-  "productionImage": "sha256:0b3f222609ee662ed55e910ec175ade1dbe205bc61d502c1afa20f274abb5ccb",
+  "productionApplicationCommit": "3af797bb11bc762e0a4ea4097518634cf6ec1d37",
+  "productionImage": "sha256:6f742d3d12cf9a9cf5a2cb2de5de2e91daf33e500d8a3eb9e4fb04b427e9e578",
   "phase2ProductionEnabled": true,
   "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "9f4125f03d8888e02034f083c82a77e17893f8d2"
+  "applicationCommit": "3af797bb11bc762e0a4ea4097518634cf6ec1d37"
 }
