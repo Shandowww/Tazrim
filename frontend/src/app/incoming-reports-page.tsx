@@ -99,7 +99,7 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  const nextLabel=(report:IncomingReport)=>{const job=jobs.find(job=>job.id===report.id);return report.lifecycle==='digested'?'הטיפול הושלם':report.lifecycle==='partial'?'נשאר טיפול להשלמה':syncWaiting(report,job)?'בהכנה אוטומטית':job?.manualOnly?'נדרשת בדיקת היסטוריית הקליטה':job?.status==='attention'?'דורש טיפול':report.route?'מוכן להמשך בדיקה':report.verificationState==='verified'?'נדרש זיהוי ושיוך':'נדרש אישור פענוח'}
  const step=Math.min(3,Math.max(1,Number(query.get('syncStep'))||1)),connectionsPage=Math.max(1,Number(query.get('connectionPage'))||1),connectionsPages=Math.max(1,Math.ceil((snapshot?.connections.length??0)/6)),connectionPage=Math.min(connectionsPage,connectionsPages)
  return <div className={"mx-auto min-w-0 space-y-4 [overflow-wrap:anywhere] "+(view==='missing'?'sync-coverage-workspace':'max-w-3xl')}>
-  <PageHeading>סנכרון דוחות</PageHeading>
+  <PageHeading mobilePeriod={view!=='missing'}>סנכרון דוחות</PageHeading>
   <p className="text-xs text-muted-foreground">תיבה פרטית לכל התקציבים שלך · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>
   <nav aria-label="תצוגות בתוך מרכז הסנכרון" className="grid grid-cols-4 gap-1 rounded-xl bg-muted p-1">
    {tabs.map(tab=><Link key={tab.id} href={center(tab.id,{syncWaiting:null,syncPage:null})} aria-current={currentTab===tab.id?'page':undefined} className={'flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-xs font-medium '+(currentTab===tab.id?'bg-card text-foreground shadow-sm':'text-muted-foreground')}><tab.icon size={18} aria-hidden="true"/><span>{tab.label}{tab.id==='attention'&&snapshot&&attentionCount>0&&<> <bdi>({attentionCount})</bdi></>}</span></Link>)}

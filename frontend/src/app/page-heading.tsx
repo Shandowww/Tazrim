@@ -2,12 +2,14 @@ import type {ComponentProps} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
 import {PeriodPicker} from '../tazrim/components/layout/period-picker'
 import type {Period} from '../tazrim/lib/period'
+import {MobileMonthPicker, availableMonths} from './mobile-month-picker'
+import {periodFor} from './detail-period'
 
-export function PageHeading({children,...props}:ComponentProps<'h1'>){
- const {pathname,search,state}=useLocation(),navigate=useNavigate(),params=new URLSearchParams(search)
- const current=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric'}).format(new Date())
- const year=/^20\d{2}$/.test(params.get('year')||'')?Number(params.get('year')):Number(current)
- const month=/^(?:[1-9]|1[0-2]|0[1-9])$/.test(params.get('month')||'')?Number(params.get('month')):undefined
+export function PageHeading({children,mobilePeriod=true,...props}:ComponentProps<'h1'> & {mobilePeriod?: boolean}){
+ const {pathname,search,state}=useLocation(),navigate=useNavigate()
+ const requested=periodFor(search)
+ const year=Number(requested.year),month=Number(requested.month)||undefined
+ const current=Number(requested.asOf.slice(0,4)),currentMonth=Number(requested.asOf.slice(5))
  const selectPeriod=(next:Period)=>{
   if(next.year<1900||next.year>2999)return
   const query=new URLSearchParams(search)
@@ -15,5 +17,14 @@ export function PageHeading({children,...props}:ComponentProps<'h1'>){
   if(next.month)query.set('month',String(next.month));else query.delete('month')
   navigate(pathname+'?'+query,{state,preventScrollReset:true})
  }
- return <div className="household-page-heading"><h1 {...props}>{children}</h1>{pathname!=='/'&&<div className="household-period"><PeriodPicker period={{year,month}} onChange={selectPeriod}/></div>}</div>
+ const monthKey=(part:number)=>`${year}-${String(part).padStart(2,'0')}`
+ const anchor=monthKey(month??(year===current?currentMonth:6))
+ return <div className="household-page-heading">
+  <h1 {...props}>{children}</h1>
+  {pathname!=='/'&&<>
+   <div className="household-period"><PeriodPicker period={{year,month}} onChange={selectPeriod}/></div>
+   {mobilePeriod&&<MobileMonthPicker months={availableMonths(anchor)} selected={month?anchor:undefined} anchor={anchor} label="חודש לתצוגה"
+    onChange={key=>selectPeriod({year:Number(key.slice(0,4)),month:Number(key.slice(5))})} onYearChange={year=>selectPeriod({year})}/>}
+  </>}
+ </div>
 }

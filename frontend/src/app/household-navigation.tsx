@@ -49,7 +49,7 @@ export function HouseholdNavigation(){
 function DesktopMore(){
  const location=useLocation(),{mode}=useInterfaceMode()
  const sections=visibleNavigation(mode).filter(section=>!['overview','accounts','savings'].includes(section.key))
- return <div className="household-page household-more"><PageHeading>עוד</PageHeading><div className="household-task-menu">{sections.map(section=><Link key={section.key} href={withViewQuery(section.items[0][0],location.search,import.meta.env.DEV)} state={{householdFrom:location.pathname+location.search}}><span><strong>{section.label}</strong><small>{section.description}</small></span><span aria-hidden>←</span></Link>)}</div></div>
+ return <div className="household-page household-more"><PageHeading mobilePeriod={false}>עוד</PageHeading><div className="household-task-menu">{sections.map(section=><Link key={section.key} href={withViewQuery(section.items[0][0],location.search,import.meta.env.DEV)} state={{householdFrom:location.pathname+location.search}}><span><strong>{section.label}</strong><small>{section.description}</small></span><span aria-hidden>←</span></Link>)}</div></div>
 }
 
 /** One searchable home for the actions that do not need a permanent tab. */

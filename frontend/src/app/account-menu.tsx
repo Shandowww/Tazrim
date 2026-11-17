@@ -1,20 +1,24 @@
 import {useEffect, useState} from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import {useLocation} from 'react-router-dom'
-import {ChevronLeft, FolderOpen, RefreshCw, Settings, Upload, UserRound, X} from 'lucide-react'
+import {Check, ChevronLeft, FolderOpen, RefreshCw, Settings, Upload, UserRound, X} from 'lucide-react'
 import Link from './link'
 import {withViewQuery} from './navigation-query'
 import {SignOutForm} from './session-controls'
+import type {BudgetSpace} from './use-budget'
 
 /** Secondary destinations live with the account, leaving the phone bar for pages. */
 type AccountMenuProps = {
+  spaces: BudgetSpace[]
+  budgetId: string
+  selectBudget: (id: string) => void
   email?: string
   demo?: boolean
   refreshApp: () => void
   refreshPending: boolean
 }
 
-export function AccountMenu({email,demo=false,refreshApp,refreshPending}: AccountMenuProps) {
+export function AccountMenu({spaces,budgetId,selectBudget,email,demo=false,refreshApp,refreshPending}: AccountMenuProps) {
   const [open,setOpen]=useState(false)
   const {pathname,search}=useLocation()
   useEffect(()=>setOpen(false),[pathname,search])
@@ -41,6 +45,17 @@ export function AccountMenu({email,demo=false,refreshApp,refreshPending}: Accoun
           <div className="min-w-0 flex-1"><Dialog.Title>החשבון שלי</Dialog.Title><p className="truncate text-sm text-muted-foreground">{email?<bdi dir="ltr">{email}</bdi>:demo?'מצב הדגמה':'חשבון מחובר'}</p></div>
           <Dialog.Close className="household-account-close" aria-label="סגירת תפריט חשבון"><X size={18}/></Dialog.Close>
         </div>
+        {spaces.length>0&&<section className="household-account-spaces" aria-label="מרחב תקציב">
+          <p>מרחב תקציב</p>
+          {spaces.map(space=>{
+            const current=space.id===budgetId
+            const name=space.id==='personal'?'אישי':space.name
+            const content=<><span><bdi>{name}</bdi>{space.role==='viewer'&&<small>צפייה בלבד</small>}</span>{current&&<Check size={18} aria-hidden/>}</>
+            return spaces.length===1
+              ? <div key={space.id} className="household-account-space" data-current={current}>{content}</div>
+              : <button key={space.id} type="button" className="household-account-space" data-current={current} aria-pressed={current} onClick={()=>{setOpen(false);selectBudget(space.id)}}>{content}</button>
+          })}
+        </section>}
         <nav aria-label="כלים והגדרות">
           {links.map(([href,label,Icon])=><Link key={href} href={withViewQuery(href,search,import.meta.env.DEV)} onClick={()=>setOpen(false)} className="household-account-link"><Icon size={19} aria-hidden/><span>{label}</span><ChevronLeft size={17} aria-hidden/></Link>)}
         </nav>

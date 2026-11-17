@@ -1,19 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/platform-adaptive-ui",
-  "sourceCommit": "d1ed8242ffbfd3d4e207259974e9b2330fc9de6c",
+  "sourceCommit": "0671188577e93c6463ccea72e6074bf487a3860d",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "upstreamMain": "ab9b47948b39ab34e926fdc4a715e101b86d7248",
-  "status": "Reviewed Planning interface and calculator prototype. Local build and browser checks completed.",
+  "status": "Approved compact mobile month picker, profile budget switcher and Overview interface.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
     "regressionTests": 1458,
     "coreChecks": 15,
-    "browser": "Synthetic phone and desktop checks cover the Planning layout, calculator, draft recovery, and row actions."
+    "browser": "Synthetic light and dark checks at 320, 375, 402, 767, 768 and 1440 CSS pixels cover RTL, focus, dismissal, year navigation, annual mode and top-bar placement.",
+    "production": "Active on Budgit. Candidate and rollback preflights, 222 container contracts, live runtime inventory, authoritative record preservation, health and public access checks passed."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "ae73b6391dbf018e372fe7fa294282540df90e10"
+  "productionApplicationCommit": "0671188577e93c6463ccea72e6074bf487a3860d"
 }

@@ -3,7 +3,7 @@ export function installPullRefresh({document,window,refresh,isBusy,onHint,onProg
  let start=null,x=null,distance=0
  const reset=()=>{start=null;x=null;distance=0;onHint('');onProgress(null)}
  const begin=event=>{reset();if(event.touches.length!==1||isBusy()||(document.scrollingElement?.scrollTop??0)>2||document.querySelector('dialog[open],[role="dialog"][data-state="open"]'))return
-  if(event.target.closest?.('input,select,textarea,button,a,summary,[role=button],[role=slider],[contenteditable]'))return
+  if(event.target.closest?.('input,select,textarea,button,a,summary,[role=button],[role=slider],[contenteditable],[data-pull-refresh-ignore]'))return
   // Only a pull begun near the top of the viewport may refresh. Starting on
   // the page body must leave ordinary scrolling under the browser's control.
   const touch=event.touches[0];if(touch.clientY<0||touch.clientY>Math.min(180,window.innerHeight/4))return
