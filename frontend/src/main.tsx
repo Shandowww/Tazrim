@@ -1,4 +1,4 @@
-import {PageHeading} from './app/page-heading'
+import {PageHeading,SidebarPeriodPicker} from './app/page-heading'
 import {SavedReturnNotice} from './app/use-saved-return'
 import {ChequesPage} from './app/cheques-page'
 import {IncomePlanningPage} from './app/income-planning-page'
@@ -18,11 +18,11 @@ import {ForecastSettingsPage} from './app/forecast-settings-page'
 import {OnboardingPage} from './app/onboarding-page'
 import {ProfilePage} from './app/profile-page'
 import {ExistingWorkflowLinks} from './app/existing-workflow-links'
-import { StrictMode, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import { StrictMode, Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate, ScrollRestoration, type Location } from 'react-router-dom'
-import { RefreshCw } from 'lucide-react'
+import {ChevronDown} from 'lucide-react'
 import { DesktopNavigation } from './app/desktop-navigation'
 import {WorkspaceActions} from './app/workspace-actions'
 import {WorkspaceNavigation} from './app/workspace-navigation'
@@ -98,30 +98,58 @@ function useFixtureMode() {
   return import.meta.env.DEV && new URLSearchParams(search).get('demo') === '1'
 }
 
-function Header({ budget,refreshApp,refreshPending }: { budget: ReturnType<typeof useBudget>;refreshApp:()=>void;refreshPending:boolean }) {
-  const { pathname, search } = useLocation()
-  const navigate = useNavigate(),fixture=useFixtureMode()
-  const plan=fixture?demoHouseholdPlan:budget.status==='ready'&&budget.value.plan?.format!=='monthly-flow-encrypted-v1'?budget.value.plan:null
-  function selectBudget(id: string) {
-    if(budget.status!=='ready'||id===budget.budgetId||!budget.spaces.some(space=>space.id===id))return
-    navigate(householdSpaceHref(pathname,search,id))
-  }
-  return (
-    <header className="household-header sticky top-0 z-30 border-b">
-      <div className="household-topbar"><div className="household-header-leading"><HouseholdBack/><div className="household-budget-control">
-      <div className="household-budget-desktop">{budget.status==='ready'&&(budget.spaces.length===2?<div className="household-space-switch" role="group" aria-label="מרחב תקציב">{budget.spaces.map(space=><button type="button" key={space.id} aria-pressed={budget.budgetId===space.id} aria-label={space.name+(space.role==='viewer'?' · צפייה בלבד':'')} title={space.name} onClick={()=>selectBudget(space.id)}><span><span className="household-space-short">{space.id==='personal'?'אישי':'משותף'}</span><span className="household-space-full">{space.name}</span></span>{space.role==='viewer'&&<small>צפייה בלבד</small>}</button>)}</div>:budget.spaces.length>2?<label className="household-space-select"><span className="sr-only">מרחב תקציב</span><select value={budget.budgetId} onChange={event=>selectBudget(event.target.value)}>{budget.spaces.map(space=><option key={space.id} value={space.id}>{space.name}{space.role==='viewer'?' · צפייה בלבד':''}</option>)}</select></label>:<div className="household-space-name">{budget.spaces[0]?.name}{budget.spaces[0]?.role==='viewer'&&' · צפייה בלבד'}</div>)}
-        {budget.status==='ready'&&budget.spaces.length>1&&<Link href={withViewQuery('/overview',search,import.meta.env.DEV)} className="household-spaces-overview">כל המרחבים</Link>}
-      </div>
-        {budget.status!=='ready'&&<div className="household-space-name" role="status">{fixture?'מצב הדגמה':budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
-        </div>
-        <div id="mobile-month-slot" className="household-header-month">{pathname==='/'&&plan&&<HomeMonthPicker plan={plan} asOf={jerusalemMonth()} compact/>}</div>
-        </div><div className="household-header-actions"><GlobalActionCenter budget={budget} fixture={fixture}/>
-          <button type="button" className="household-desktop-refresh text-muted-foreground disabled:opacity-50" aria-label="רענון האפליקציה והנתונים" disabled={refreshPending || budget.refreshPending || budget.status === 'loading'} onClick={refreshApp}><RefreshCw className="h-5 w-5" /></button>
-          <div className="md:hidden"><AccountMenu spaces={budget.status==='ready'?budget.spaces:[]} budgetId={budget.budgetId} selectBudget={selectBudget} refreshApp={refreshApp} refreshPending={refreshPending || budget.refreshPending || budget.status === 'loading'} email={budget.status==='ready'?budget.value.accountEmail:undefined} demo={fixture}/></div>
-        </div>
-      </div>
-    </header>
-  )
+const desktopMedia=window.matchMedia('(min-width: 768px)')
+function subscribeDesktop(listener:()=>void){
+ desktopMedia.addEventListener('change',listener)
+ return ()=>desktopMedia.removeEventListener('change',listener)
+}
+
+function useSelectBudget(budget:ReturnType<typeof useBudget>){
+ const {pathname,search}=useLocation(),navigate=useNavigate()
+ return (id:string)=>{
+  if(budget.status!=='ready'||id===budget.budgetId||!budget.spaces.some(space=>space.id===id))return
+  navigate(householdSpaceHref(pathname,search,id))
+ }
+}
+
+function Header({budget,refreshApp,refreshPending,fixture,showNotifications}:{
+ budget:ReturnType<typeof useBudget>;refreshApp:()=>void;refreshPending:boolean;fixture:boolean;showNotifications:boolean
+}){
+ const {pathname}=useLocation(),selectBudget=useSelectBudget(budget)
+ const plan=fixture?demoHouseholdPlan:budget.status==='ready'&&budget.value.plan?.format!=='monthly-flow-encrypted-v1'?budget.value.plan:null
+ return <header className="household-header sticky top-0 z-30 border-b md:hidden">
+  <div className="household-topbar">
+   <div className="household-header-leading"><HouseholdBack/>
+    {budget.status!=='ready'&&<div className="household-space-name" role="status">{fixture?'מצב הדגמה':budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
+    <div id="mobile-month-slot" className="household-header-month">{pathname==='/'&&plan&&<HomeMonthPicker plan={plan} asOf={jerusalemMonth()} compact/>}</div>
+   </div>
+   <div className="household-header-actions">
+    {showNotifications&&<GlobalActionCenter budget={budget} fixture={fixture}/>}
+    <div><AccountMenu spaces={budget.status==='ready'?budget.spaces:[]} budgetId={budget.budgetId} selectBudget={selectBudget} refreshApp={refreshApp} refreshPending={refreshPending||budget.refreshPending||budget.status==='loading'} email={budget.status==='ready'?budget.value.accountEmail:undefined} demo={fixture}/></div>
+   </div>
+  </div>
+ </header>
+}
+
+function DesktopControls({budget,fixture,plan}:{budget:ReturnType<typeof useBudget>;fixture:boolean;plan:BudgetResponse['plan']}){
+ const {pathname}=useLocation(),selectBudget=useSelectBudget(budget)
+ return <>
+  {pathname==='/'?(plan&&plan.format!=='monthly-flow-encrypted-v1'&&<HomeMonthPicker plan={plan} asOf={jerusalemMonth()}/>):<SidebarPeriodPicker/>}
+  {budget.status==='ready'?<>
+   {budget.spaces.length===2?<div className="household-space-switch" role="group" aria-label="מרחב תקציב">
+    {budget.spaces.map(space=><button type="button" key={space.id} aria-pressed={budget.budgetId===space.id}
+      aria-label={space.name+(space.role==='viewer'?' · צפייה בלבד':'')} title={space.name} onClick={()=>selectBudget(space.id)}>
+     <span><bdi className="household-space-full">{space.name}</bdi></span>
+     {space.role==='viewer'&&<small>צפייה בלבד</small>}
+    </button>)}
+   </div>:budget.spaces.length>2?<label className="desktop-select-field"><span className="sr-only">מרחב תקציב</span>
+    <select value={budget.budgetId} onChange={event=>selectBudget(event.target.value)}>
+     {budget.spaces.map(space=><option key={space.id} value={space.id}>{space.name}{space.role==='viewer'?' · צפייה בלבד':''}</option>)}
+    </select>
+    <ChevronDown size={16} aria-hidden/>
+   </label>:<div className="household-space-name"><bdi>{budget.spaces[0]?.name}</bdi>{budget.spaces[0]?.role==='viewer'&&' · צפייה בלבד'}</div>}
+  </>:<div className="household-space-name" role="status">{fixture?'מצב הדגמה':budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
+ </>
 }
 
 function jerusalemMonth() {
@@ -149,6 +177,7 @@ function PendingPage({ title }: { title: string }) {
 }
 
 function App() {
+  const desktop=useSyncExternalStore(subscribeDesktop,()=>desktopMedia.matches)
   const guard = useDraftGuard()
   const navigate = useNavigate()
   const [pullHint, setPullHint] = useState('')
@@ -204,9 +233,11 @@ function App() {
     <InterfaceModeProvider key={scrollActor??'pending'} accountId={scrollActor??'pending'} hasPlan={fixture||!!actualPlan}><AppearanceContext.Provider value={dark}><NavSectionsProvider sections={sections}>
       <div className="household-shell flex min-h-screen font-sans">
         <a href="#main-content" className="skip-to-content" onClick={event=>{event.preventDefault();document.getElementById('main-content')?.focus()}}>דילוג לתוכן</a>
-        <DesktopNavigation />
+        <DesktopNavigation notifications={desktop&&<GlobalActionCenter budget={budget} fixture={fixture}/>}
+          controls={desktop&&<DesktopControls budget={budget} fixture={fixture} plan={fixture?demoHouseholdPlan:actualPlan}/>}/>
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header budget={budget} refreshApp={refreshApp} refreshPending={appRefreshState.pending||guard.navigationPending}/>
+          <Header budget={budget} refreshApp={refreshApp} refreshPending={appRefreshState.pending||guard.navigationPending}
+            fixture={fixture} showNotifications={!desktop}/>
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main id="main-content" tabIndex={-1} className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}

@@ -10,6 +10,42 @@ test('Reported six-month window crosses years, preserves gaps and signed cents, 
  assert.equal(h.rows[3].income,null);assert.equal(h.rows[5].income,0);assert.equal(h.rows[4].income,200.01);assert.equal(h.rows[4].incomingTransfers,30.02);assert.equal(h.rows[4].spending,14.99);assert.equal(h.rows[4].cardTotal,20)
  assert.equal(JSON.stringify(p),before)
 })
+test('Overview can select older reports and calendar gaps while keeping a six-month chart',()=>{
+ const p=clone(demoPlan);p.startMonth='2025-12';p.expenses=[];p.cashPlanning=undefined
+ p.months={
+  '2025-12':{actual:true,values:{...zero(),salary:1250}},
+  '2026-10':{actual:true,values:{...zero(),salary:3000}},
+  '2026-11':{actual:false,values:{...zero(),salary:9999}},
+ }
+ const older=householdHistory(p,'2026-11','2025-12')
+ assert.equal(older.months[0],'2025-12')
+ assert.equal(older.months.at(-1),'2026-10')
+ assert.equal(older.selected.income,1250)
+ assert.equal(older.rows[0].month,'2025-12')
+ assert.equal(older.rows.length,6)
+ const gap=householdHistory(p,'2026-11','2026-01')
+ assert.equal(gap.selected.month,'2026-01')
+ assert.equal(gap.selected.income,null)
+ assert.equal(householdHistory(p,'2026-11','2026-11').selected.month,'2026-10')
+})
+test('Overview history includes detail-only and partial bank months without fabricating totals',()=>{
+ const p=clone(demoPlan);p.startMonth='2024-01';p.expenses=[]
+ p.months={'2026-10':{actual:true,values:{...zero(),salary:3000}},'2024-02':{actual:false,values:{...zero(),salary:9999}}}
+ const detail={id:'old-purchase',name:'דוגמה',category:'אחר',amount:20,method:'card1',month:'2024-07',date:'2024-07-01',number:'',status:'cleared',accounting:'included'}
+ p.details=[detail,{...detail,id:'cancelled',month:'2024-01',status:'cancelled'},{...detail,id:'future',month:'2026-12'}]
+ p.bankImport={entries:[{accountId:'bank',month:'2024-04',field:'salary',cents:100}],accounts:[{id:'bank',label:'בנק'}]}
+ const history=householdHistory(p,'2026-11','2024-07')
+ assert.equal(history.months[0],'2024-04')
+ assert.equal(history.months.at(-1),'2026-10')
+ assert.equal(history.selected.hasSavedData,true)
+ assert.equal(history.selected.cardTotal,null)
+ assert.equal(history.selected.spending,null)
+ const earlier=householdHistory(p,'2026-11','2024-04').selected
+ assert.equal(earlier.hasSavedData,true)
+ assert.equal(earlier.income,null)
+ const other=clone(p);other.bankImport=undefined
+ assert.equal(householdHistory(other,'2026-11').months[0],'2024-07')
+})
 test('No actuals remains six missing months; counts use scoped pending cheques and active loan terms',()=>{
  const p=clone(demoPlan);p.months={};p.details=[{method:'checks',status:'pending'},{method:'checks',status:'cancelled'},{method:'card1',status:'pending'}];p.details=p.details.map((r,i)=>({id:'detail-'+i,name:'דוגמה',category:'אחר',amount:1,date:'2026-02-10',month:'2026-02',accounting:'included',...r}));p.loans=[{from:'2026-01',months:2},{from:'2026-03',months:12},{from:'2025-12',months:2}]
  const h=householdHistory(p,'2026-02');assert.equal(h.latest,null);assert.ok(h.rows.every(r=>r.income===null));assert.equal(h.checks,1);assert.equal(h.loans,1)

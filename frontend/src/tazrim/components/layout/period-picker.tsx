@@ -18,15 +18,11 @@ const IDLE = 'border border-foreground/[0.06] bg-foreground/[0.04] hover:bg-fore
 // Months that haven't happened yet: still pickable, drawn as empty slots
 const LATER = 'border border-dashed border-foreground/[0.12] text-muted-foreground/70 hover:bg-foreground/[0.04]'
 
-/**
- * The header's period: one month back / forward on the arrows (crossing years;
- * a whole year when all months are shown), and the month grid on the middle
- * button: a panel under it on md+, a sheet from the bottom on phones.
- */
+/** Desktop sidebar periods step across years and open a month grid beside the controls. */
 export function PeriodPicker({ period, onChange }: { period: Period; onChange: (next: Period) => void }) {
   const [open, setOpen] = useState(false)
   const [viewYear, setViewYear] = useState(period.year)
-  const [anchor, setAnchor] = useState({ top: 0, center: 0 })
+  const [anchor, setAnchor] = useState({ edge: 0, left: 0, above: true })
   const trigger = useRef<HTMLButtonElement>(null)
 
   const today = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: 'numeric' }).formatToParts(new Date())
@@ -38,7 +34,15 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
     if (next) {
       setViewYear(period.year)
       const r = trigger.current?.getBoundingClientRect()
-      if (r) setAnchor({ top: r.bottom + 8, center: r.left + r.width / 2 })
+      if (r) {
+        const below = window.innerHeight - r.bottom
+        const above = r.top >= below
+        setAnchor({
+          edge: above ? window.innerHeight - r.top + 8 : r.bottom + 8,
+          left: r.left + r.width / 2,
+          above,
+        })
+      }
     }
     setOpen(next)
   }
@@ -66,7 +70,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
           {label}
         </Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay className="sheet-scrim fixed inset-0 z-40 bg-black/45 md:bg-transparent" />
+          <Dialog.Overlay className="sheet-scrim fixed inset-0 z-40" />
           <Dialog.Content
             dir="rtl"
             aria-describedby={undefined}
@@ -77,20 +81,15 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
               e.preventDefault()
               picked.focus()
             }}
-            style={{ '--pp-top': `${anchor.top}px`, '--pp-left': `${anchor.center}px` } as React.CSSProperties}
-            className={cn(
-              'sheet fixed z-50 flex flex-col gap-3 rounded-3xl p-4 surface-overlay text-card-foreground focus:outline-none',
-              // Phones: a sheet above the bottom bar
-              'inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))]',
-              // md+: centred under the button
-              'md:inset-x-auto md:bottom-auto md:left-[calc(var(--pp-left)-9.25rem)] md:top-[var(--pp-top)] md:w-[18.5rem] md:rounded-2xl md:p-3.5 md:origin-top'
-            )}
+            style={{
+              left: `clamp(12px, calc(${anchor.left}px - 9.25rem), calc(100vw - 19.25rem))`,
+              [anchor.above ? 'bottom' : 'top']: anchor.edge,
+              maxHeight: `calc(100dvh - ${anchor.edge}px - 12px)`,
+            }}
+            className="sheet surface-overlay fixed z-50 flex w-[18.5rem] flex-col gap-3 overflow-y-auto rounded-2xl p-3.5 text-card-foreground focus:outline-none"
           >
             <Dialog.Title className="sr-only">בחירת תקופה</Dialog.Title>
-            <div aria-hidden className="flex justify-center md:hidden">
-              <span className="h-1 w-9 rounded-full bg-border" />
-            </div>
-            <div className="flex items-center justify-between">
+            <div className="flex shrink-0 items-center justify-between">
               <button type="button" aria-label="השנה הקודמת" onClick={() => setViewYear(y => y - 1)} className={ARROW}>
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </button>
@@ -99,7 +98,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
                 <ChevronLeft className="h-4 w-4" aria-hidden />
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid shrink-0 grid-cols-4 gap-1.5">
               {MONTHS.map(m => {
                 const picked = period.year === viewYear && period.month === m.value
                 const later = viewYear > nowYear || (viewYear === nowYear && m.value > nowMonth)
@@ -121,7 +120,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
               aria-pressed={period.year === viewYear && !period.month}
               onClick={() => pick({ year: viewYear })}
               className={cn(
-                CELL,
+                CELL, 'shrink-0',
                 period.year === viewYear && !period.month ? PICKED : 'border border-foreground/10 hover:bg-foreground/[0.06]'
               )}
             >

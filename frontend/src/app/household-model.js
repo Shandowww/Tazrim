@@ -1,4 +1,4 @@
-import {cashAccountList,cashSourceRecords,monthAt} from '../../../src/budget.js'
+import {cashAccountList,cashSourceRecords,indexMonth,monthAt} from '../../../src/budget.js'
 import {tazrimDisplaySnapshot} from '../../../src/tazrim-display-model.js'
 import {withViewQuery} from './navigation-query.js'
 export const mainPages=['/','/accounts','/savings','/more']
@@ -25,14 +25,32 @@ export function returnDestination(value,search=''){
  return url.pathname+url.search
 }
 /** Reuse authoritative actual-only snapshots; retain calendar gaps across years. */
-export function householdHistory(plan,asOf){
- const sources=cashAccountList(plan).map(a=>cashSourceRecords(plan,a.id))
- const keys=[...Object.keys(plan.months??{}),...sources.flatMap(s=>Object.keys(s)),...(plan.cardBilling?.reports??[]).map(r=>r.dueDate?.slice(0,7))].filter(k=>/^20\d{2}-(0[1-9]|1[0-2])$/.test(k??'')&&k<=asOf)
- const years=[...new Set([asOf.slice(0,4),...keys.map(k=>k.slice(0,4))])]
- const rows=years.flatMap(year=>tazrimDisplaySnapshot(plan,{year,asOf}).series).filter(r=>r.month<=asOf)
- const latest=rows.filter(r=>r.reported||r.cardTotal!==null).map(r=>r.month).sort().at(-1)??null
+export function householdHistory(plan,asOf,requested){
+ const accounts=cashAccountList(plan)
+ const sources=accounts.map(account=>cashSourceRecords(plan,account.id))
+ const validMonth=month=>/^20\d{2}-(0[1-9]|1[0-2])$/.test(month??'')&&month<=asOf
+ const evidenceMonths=new Set()
+ const addEvidence=month=>{if(validMonth(month))evidenceMonths.add(month)}
+ for(const [month,row] of Object.entries(plan.months??{}))if(row.bankCoverage)addEvidence(month)
+ for(const source of sources)for(const [month,row] of Object.entries(source))if(row.fromBank)addEvidence(month)
+ for(const entry of plan.bankImport?.entries??[])if(entry.field!=='exclude')addEvidence(entry.month)
+ for(const detail of plan.details??[])if(detail.status==='cleared')addEvidence(detail.month)
+ const keys=[...Object.keys(plan.months??{}),...sources.flatMap(Object.keys),...(plan.cardBilling?.reports??[]).map(report=>report.dueDate?.slice(0,7))]
+ const years=[...new Set([asOf.slice(0,4),...keys.filter(validMonth).map(month=>month.slice(0,4))])]
+ const rows=years.flatMap(year=>tazrimDisplaySnapshot(plan,{year,asOf}).series).filter(row=>row.month<=asOf)
+ const reportedMonths=rows.filter(row=>row.reported||row.cardTotal!==null).map(row=>row.month)
+ const savedMonths=[...new Set([...reportedMonths,...evidenceMonths])].sort()
+ const latest=reportedMonths.sort().at(-1)??savedMonths.at(-1)??null
+ const last=savedMonths.at(-1)??asOf
+ const recentStart=monthAt(last,-5)
+ const earliest=savedMonths[0]??recentStart
+ const first=earliest<recentStart?earliest:recentStart
+ const selected=/^\d{4}-(?:0[1-9]|1[0-2])$/.test(requested??'')&&requested>=first&&requested<=last?requested:latest??last
+ const chartEnd=selected<recentStart?monthAt(selected,5):last
  const byMonth=new Map(rows.map(r=>[r.month,r]))
- return {latest,rows:Array.from({length:6},(_,i)=>{const month=monthAt(latest??asOf,i-5);return byMonth.get(month)??{month,reported:false,partial:false,income:null,spending:null,incomingTransfers:null,cardTotal:null}}),
+ const rowFor=month=>byMonth.get(month)??{month,reported:false,partial:false,income:null,spending:null,incomingTransfers:null,cardTotal:null}
+ return {latest,selected:{...rowFor(selected),hasSavedData:evidenceMonths.has(selected)},months:Array.from({length:indexMonth(last)-indexMonth(first)+1},(_,i)=>monthAt(first,i)),
+  rows:Array.from({length:6},(_,i)=>rowFor(monthAt(chartEnd,i-5))),
   checks:(plan.details??[]).filter(r=>r.method==='checks'&&r.status==='pending').length,
   loans:(plan.loans??[]).filter(l=>l.from<=asOf&&monthAt(l.from,l.months-1)>=asOf).length}
 }

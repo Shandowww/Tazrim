@@ -16,7 +16,7 @@ db.prepare('INSERT INTO auth_sessions VALUES(?,?,?)').run(createHash('sha256').u
 const app=createApp({db,DB,origin,allowedEmails:[email],reportOptions:{key:randomBytes(32)}})
 const headersFor=()=>new Headers({origin,cookie:'__Host-mf_session='+session,'x-budget-account-id':actor})
 const plan=structuredClone(demoHouseholdPlan)
-plan.demo=false;plan.setupCompleted=true;plan.profileName='תקציב לדוגמה'
+plan.demo=false;plan.setupCompleted=true;plan.profileName='תקציב לדוגמה';plan.startMonth='2025-07'
 const sampleIncomes=[13900,14500,15000,15800,15100,15000],sampleExpenses=[2100,2800,2400,3100,2200,2500]
 Object.keys(plan.months).sort().forEach((month,index)=>{
  const values=plan.months[month].values,bankRows=plan.cashPlanning.months[month]
@@ -24,6 +24,13 @@ Object.keys(plan.months).sort().forEach((month,index)=>{
  bankRows['sample-bank-1'].values.salary=Math.round(sampleIncomes[index]*2/3);bankRows['sample-bank-2'].values.salary=sampleIncomes[index]-bankRows['sample-bank-1'].values.salary
  bankRows['sample-bank-1'].values.variable=sampleExpenses[index]-500
 })
+// Include older samples so the Overview picker can be swiped past its first page.
+for(const month of ['2026-02','2026-03','2026-04']){
+ plan.months[month]=structuredClone(plan.months['2026-05'])
+ plan.cashPlanning.months[month]=structuredClone(plan.cashPlanning.months['2026-05'])
+ for(const row of Object.values(plan.cashPlanning.months[month]))row.date=month+'-28'
+}
+plan.details.push({id:'preview-historical-detail',name:'קנייה ישנה לדוגמה',amount:58.5,category:'קניות',method:'card1',month:'2025-07',date:'2025-07-08',number:'',status:'cleared',accounting:'included'})
 plan.details[0].amount=43.21;plan.details[0].statement.originalCents=4321
 for(const [id,name,category,amount] of [['transport','תחבורה לדוגמה','תחבורה',25.3],['health','בית מרקחת לדוגמה','בריאות',18.5],['shopping','קנייה לדוגמה','קניות',14]])plan.details.push({id:'preview-'+id,name,category,amount,method:'card1',month:'2026-10',date:'2026-10-08',number:'',status:'cleared',accounting:'included'})
 // Outlook prototype: explicit per-account estimates, matched to the aggregate budget.
@@ -38,6 +45,14 @@ plan.details.push({id:'preview-next-cheque',name:'תשלום לוועד הבית
 plan.cardBilling={version:1,reports:[{cardId:'card1',accountId:'sample-bank-1',dueDate:'2026-11-20',updatedOn:'2026-11-10',amount:2200,status:'pending',source:'manual'}]}
 const initial=await app(new Request(origin+'/api/plan',{method:'PUT',headers:{...Object.fromEntries(headersFor()),'Content-Type':'application/json'},body:JSON.stringify({plan,revision:0})}))
 if(!initial.ok)throw Error('Synthetic seed refused: '+await initial.text())
+const shared=await app(new Request(origin+'/api/budgets',{method:'POST',headers:{...Object.fromEntries(headersFor()),'Content-Type':'application/json'},body:JSON.stringify({name:'מרחב משותף לדוגמה'})}))
+if(!shared.ok)throw Error('Synthetic space refused: '+await shared.text())
+const {id:sharedId}=await shared.json()
+const sharedPlan=structuredClone(plan)
+sharedPlan.profileName='מרחב משותף לדוגמה'
+sharedPlan.details=sharedPlan.details.filter(row=>row.id!=='preview-historical-detail')
+const sharedSeed=await app(new Request(origin+'/api/plan?budget='+encodeURIComponent(sharedId),{method:'PUT',headers:{...Object.fromEntries(headersFor()),'Content-Type':'application/json'},body:JSON.stringify({plan:sharedPlan,revision:0})}))
+if(!sharedSeed.ok)throw Error('Synthetic shared seed refused: '+await sharedSeed.text())
 const port=Number(process.env.PLATFORM_PREVIEW_PORT??5178),host=process.env.PLATFORM_PREVIEW_HOST??'127.0.0.1'
 if(!Number.isInteger(port)||port<1024||port>65535||!['127.0.0.1','0.0.0.0'].includes(host))throw Error('Invalid preview bind')
 const banner='<aside class="platform-preview-banner" dir="rtl" aria-label="תצוגה מקדימה">תצוגה מקדימה · נתוני דוגמה בלבד</aside>'

@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react'
+import {useEffect,useState,type ReactNode} from 'react'
 import {useLocation} from 'react-router-dom'
 import {House,Landmark,Target,PanelRightClose,PanelRightOpen,Files,ChartNoAxesCombined,CalendarDays,Settings,CircleHelp,ChevronDown} from 'lucide-react'
 import Link from './link'
@@ -6,7 +6,7 @@ import {useInterfaceMode} from './interface-mode'
 import {withViewQuery} from './navigation-query'
 import {visibleNavigation,navigationSection,currentNavigationItem} from './navigation-sections'
 const icons={overview:House,accounts:Landmark,reports:Files,spending:ChartNoAxesCombined,planning:CalendarDays,savings:Target,settings:Settings,help:CircleHelp}
-export function DesktopNavigation(){
+export function DesktopNavigation({notifications,controls}:{notifications?:ReactNode;controls:ReactNode}){
  const {pathname,search}=useLocation(),{mode}=useInterfaceMode(),current=navigationSection(pathname)
  const [collapsed,setCollapsed]=useState(()=>{try{return localStorage.getItem('budgit-desktop-navigation')==='collapsed'}catch{return false}})
  const [expanded,setExpanded]=useState<string|null>(current)
@@ -21,5 +21,14 @@ export function DesktopNavigation(){
    {hasChildren&&open&&<div id={'desktop-tools-'+section.key} className="desktop-navigation-subnav">{secondary.map(([path,label])=><Link key={path} href={href(path)} aria-current={selected===path?'page':undefined}>{label}</Link>)}{section.tools.length>0&&<details open={section.tools.some(([path])=>selected===path)||undefined}><summary>ניהול וכלים נוספים</summary>{section.tools.map(([path,label])=><Link key={path} href={href(path)} aria-current={selected===path?'page':undefined}>{label}</Link>)}</details>}</div>}
   </div>
  }
- return <aside className="desktop-navigation" data-collapsed={collapsed}><div className="desktop-navigation-heading"><button type="button" onClick={toggle} aria-expanded={!collapsed} aria-label={collapsed?'הרחבת תפריט':'צמצום תפריט'}>{collapsed?<PanelRightOpen size={21}/>:<PanelRightClose size={21}/>}</button>{!collapsed&&<Link href={href('/')}>Budgit</Link>}</div><nav aria-label="ניווט ראשי במחשב">{sections.filter(section=>!['settings','help'].includes(section.key)).map(renderSection)}</nav><nav className="desktop-navigation-footer" aria-label="הגדרות ועזרה">{sections.filter(section=>['settings','help'].includes(section.key)).map(renderSection)}</nav></aside>
+ return <aside className="desktop-navigation" data-collapsed={collapsed}>
+  <div className="desktop-navigation-heading">
+   {!collapsed&&<Link className="desktop-navigation-brand" href={href('/')}>Budgit</Link>}
+   {notifications}
+   <button type="button" className="desktop-navigation-collapse" onClick={toggle} aria-expanded={!collapsed} aria-label={collapsed?'הרחבת תפריט':'צמצום תפריט'}>{collapsed?<PanelRightOpen size={21} aria-hidden/>:<PanelRightClose size={21} aria-hidden/>}</button>
+  </div>
+  <nav aria-label="ניווט ראשי במחשב">{sections.filter(section=>!['settings','help'].includes(section.key)).map(renderSection)}</nav>
+  {!collapsed&&<div className="desktop-navigation-controls">{controls}</div>}
+  <nav className="desktop-navigation-footer" aria-label="הגדרות ועזרה">{sections.filter(section=>['settings','help'].includes(section.key)).map(renderSection)}</nav>
+ </aside>
 }
