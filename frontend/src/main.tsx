@@ -6,16 +6,14 @@ import {HouseholdAccountsPage} from './app/household-accounts'
 import {HouseholdHome} from './app/household-home'
 import {householdSpaceHref} from './app/household-model'
 import {HouseholdNavigation,HouseholdBack,HouseholdMore} from './app/household-navigation'
-import {InterfaceLayoutSetting} from './app/interface-layout-setting'
 import {openingViewSearch} from './app/navigation-query'
-import {SessionControls} from './app/session-controls'
 import {GlobalActionCenter} from './app/global-action-center'
 import {AccountMenu} from './app/account-menu'
 import {ComparisonGoalsPage} from './app/comparison-goals-page'
 import {ForecastSettingsPage} from './app/forecast-settings-page'
 import {OnboardingPage} from './app/onboarding-page'
 import {ProfilePage} from './app/profile-page'
-import {ExistingWorkflowLinks} from './app/existing-workflow-links'
+import {SettingsHome} from './app/settings-home'
 import { StrictMode, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
@@ -32,7 +30,7 @@ import { DraftGuardProvider, useDraftGuard } from './app/draft-guard'
 import { installPullRefresh } from './app/pull-refresh'
 import { RefreshIndicator } from './app/refresh-indicator'
 import { createAppRefresh } from './app/refresh-app'
-import {InterfaceModeProvider,InterfaceModeSelector,InterfaceModeBoundary} from './app/interface-mode'
+import {InterfaceModeProvider,InterfaceModeBoundary} from './app/interface-mode'
 import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
 import './app.css'
@@ -92,7 +90,7 @@ function useFixtureMode() {
   return import.meta.env.DEV && new URLSearchParams(search).get('demo') === '1'
 }
 
-function Header({ budget,refreshApp,refreshPending }: { budget: ReturnType<typeof useBudget>;refreshApp:()=>void;refreshPending:boolean }) {
+function Header({ budget,refreshApp,refreshPending,fixture }: { budget: ReturnType<typeof useBudget>;refreshApp:()=>void;refreshPending:boolean;fixture:boolean }) {
   const { pathname, search } = useLocation()
   const navigate = useNavigate()
   function selectBudget(id: string) {
@@ -106,7 +104,7 @@ function Header({ budget,refreshApp,refreshPending }: { budget: ReturnType<typeo
         {budget.status!=='ready'&&<div className="household-space-name" role="status">{budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
         <div className="household-header-actions"><GlobalActionCenter budget={budget}/>
           <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון האפליקציה והנתונים" disabled={refreshPending || budget.refreshPending || budget.status === 'loading'} onClick={refreshApp}><RefreshCw className="h-5 w-5" /></button>
-          <AccountMenu email={budget.status==='ready'?budget.value.accountEmail:undefined}/>
+          <AccountMenu email={budget.status==='ready'?budget.value.accountEmail:undefined} demo={fixture}/>
         </div>
       </div>
     </header>
@@ -188,7 +186,7 @@ function App() {
       <div className="household-shell flex min-h-screen font-sans">
         <Sidebar initialCollapsed={false} initialClosed={[]} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header budget={budget} refreshApp={refreshApp} refreshPending={appRefreshState.pending||guard.navigationPending}/>
+          <Header budget={budget} refreshApp={refreshApp} refreshPending={appRefreshState.pending||guard.navigationPending} fixture={fixture}/>
           {!fixture&&budget.status==='ready'&&budget.value.vault&&<div className="border-b px-4 py-2 text-sm"><Link href={withViewQuery('/settings/security',search)} className="inline-flex min-h-11 items-center text-primary underline">מוצפן · פתוח במכשיר · נעילה ופרטיות</Link></div>}
           <main className="flex-1 p-4 pb-[calc(5.75rem+max(0.75rem,env(safe-area-inset-bottom)))] md:p-6">
             {!fixture&&budget.status==='ready'&&budget.value.vault&&pathname.startsWith('/upload')&&<p className="mb-4 rounded-xl border p-4 text-sm">הצפנת התקציב אינה מכסה את תיבת הדוחות: קובצי המקור והתקדמות הבדיקה נגישים לשרת לאחר אישור נפרד של בעל המרחב.</p>}
@@ -300,7 +298,7 @@ function App() {
               <Route path="/goals" element={<ComparisonGoalsPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/start" element={<OnboardingPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings/profile" element={<ProfilePage key={budgetId} fixture={fixture} budget={budget}/>} />
-              <Route path="/settings" element={<div className="household-page"><PageHeading className="text-2xl font-semibold">הגדרות אפליקציה</PageHeading>{!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}<InterfaceModeSelector/><InterfaceLayoutSetting/><ExistingWorkflowLinks/><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><Link href={"/settings/history" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">יומן שינויים וגיבוי</Link><Link href={"/settings/spaces" + search} className="surface flex min-h-14 items-center rounded-xl p-4 text-primary underline">המרחבים שלי ושיתוף</Link></div>} />
+              <Route path="/settings" element={<SettingsHome theme={theme} email={budget.status==='ready'?budget.value.accountEmail:undefined} onThemeChange={value=>{setTheme(value);try{localStorage.setItem('budgit-react-appearance',value)}catch{/* The current selection still applies. */}}}/>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
             </Routes></InterfaceModeBoundary>}

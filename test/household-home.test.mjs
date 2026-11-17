@@ -44,6 +44,7 @@ test('Period changes keep the origin, main navigation resets it, foreign space a
  const location={pathname:'/loans',search:'?budget=family&year=2026&month=10',state:{householdTrail:['/more?budget=family']}}
  assert.deepEqual(householdLinkState(location,'/loans?budget=family&month=9').householdTrail,['/more?budget=family'])
  assert.deepEqual(householdLinkState(location,'/accounts?budget=family').householdTrail,[])
+ assert.deepEqual(householdLinkState(location,'/plans?budget=family').householdTrail,[])
  assert.deepEqual(householdLinkState(location,'/analysis?budget=family').householdTrail,[])
  assert.deepEqual(householdLinkState(location,'/categories?budget=family').householdTrail,[])
  assert.deepEqual(householdTrail({householdTrail:['/loans?budget=other&token=private']},location.search),['/'])

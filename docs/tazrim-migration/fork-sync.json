@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "8b4f660",
+  "sourceCommit": "7ffff52",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "upstreamMain": "ab9b47948b39ab34e926fdc4a715e101b86d7248",
-  "status": "Source checkpoint: Budgit adapts upstream pages-only phone navigation, account menu, and rolling amount motion. This is not a production release.",
+  "status": "Source checkpoint: five-page navigation, compact account card, Settings tiles and a searchable catalog retaining all prior routes. Not a production release.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1361,
+    "regressionTests": 1362,
     "coreChecks": 15,
-    "navigationChecks": 11,
+    "focusedNavigationChecks": 14,
     "browser": "No new browser or physical-iPhone acceptance claimed."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",

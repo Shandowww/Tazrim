@@ -4,9 +4,9 @@ Source: `JordanYefet/Tazrim` `main` at `ab9b479`, compared with the original for
 
 ## Adapted in this checkpoint
 
-- The phone navigation follows upstream's pages-only pattern. Its five Budgit destinations are Home, Accounts, Goals, Analysis, and Categories. The `…` tab is removed.
-- An account card in the header identifies the current account and opens report intake, upload, the complete Budgit tool catalog, Settings, and Help. The catalog route remains available for existing deep links and every planning/report workflow.
-- The desktop sidebar exposes Analysis and Categories directly and moves the tool catalog to its footer.
+- The phone navigation follows upstream's pages-only pattern. Budgit's five destinations are Home, Accounts, Planning, Goals, and Categories; Basic mode shows the four permitted pages. The `…` tab is removed.
+- An account card in the header identifies the current account and offers report intake, upload, Settings, and guarded sign out. The card closes on outside interaction and Escape without a full-screen scrim.
+- The desktop sidebar shows the same primary pages. Settings uses compact section tiles, with Help and a single searchable tool catalog. The catalog preserves all 27 previously linked advanced/native workflows and the former More-page destinations without duplicate routes.
 - Rolling amounts follow the newer, slower digit cascade with brief motion blur. Reduced-motion preferences disable the blur and transform transition.
 
 ## Upstream changes requiring separate Budgit decisions

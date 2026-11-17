@@ -17,7 +17,7 @@ import {
   toggleSection,
   type NavSectionKey,
 } from '@/lib/nav/state'
-import { ABOUT_NAV, MAIN_NAV, SETTINGS_NAV, TOOLS_NAV, useNavSections, type NavLinkItem, type NavSectionItem } from './nav-context'
+import { MAIN_NAV, useNavSections, type NavLinkItem, type NavSectionItem } from './nav-context'
 import { RailFlyout } from './rail-flyout'
 import { usePeriodHref } from './period-context'
 
@@ -269,7 +269,7 @@ export function Sidebar({
           </Link>
         </div>
 
-        <nav aria-label="ניווט ראשי" className={cn('flex flex-1 flex-col gap-0.5 p-3', collapsed ? 'overflow-visible' : 'overflow-y-auto')}>
+        <nav aria-label="ניווט ראשי" className={cn('flex min-h-0 flex-1 flex-col gap-0.5 p-3', collapsed ? 'overflow-visible' : 'overflow-y-auto')}>
           {MAIN_NAV.map(item =>
             item.type === 'section' ? (
               <SectionItem
@@ -286,11 +286,6 @@ export function Sidebar({
           )}
         </nav>
 
-        <div className="flex shrink-0 flex-col gap-0.5 border-t p-3">
-          <PlainItem item={TOOLS_NAV} pathname={pathname} collapsed={collapsed} />
-          <PlainItem item={SETTINGS_NAV} pathname={pathname} collapsed={collapsed} />
-          <PlainItem item={ABOUT_NAV} pathname={pathname} collapsed={collapsed} />
-        </div>
       </aside>
     </Tooltip.Provider>
   )

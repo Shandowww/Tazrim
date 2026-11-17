@@ -15,7 +15,11 @@ test('More no longer repeats main-navigation destinations, while the primary Acc
  for(const mode of ['basic','advanced','expert']){
   const markup=render(mode,'HouseholdMore')
   assert.doesNotMatch(markup,/href="\/(?:accounts|savings|more)?\?/,mode)
-  assert.match(render(mode,'HouseholdNavigation'),/href="\/accounts\?year=2026&amp;month=10&amp;budget=family"/,mode)
+  const tabs=render(mode,'HouseholdNavigation')
+  assert.match(tabs,/href="\/accounts\?year=2026&amp;month=10&amp;budget=family"/,mode)
+  assert.doesNotMatch(tabs,/href="\/more\?/,mode)
+  if(mode==='basic')assert.doesNotMatch(tabs,/href="\/plans\?/,mode)
+  else assert.match(tabs,/href="\/plans\?/,mode)
  }
 })
 test('Retained menu entries lead to existing distinct tools and keep selected space and period',()=>{
@@ -25,5 +29,9 @@ test('Retained menu entries lead to existing distinct tools and keep selected sp
   assert.ok(routes.includes(url.pathname),url.pathname)
   assert.equal(url.searchParams.get('budget'),'family');assert.equal(url.searchParams.get('year'),'2026');assert.equal(url.searchParams.get('month'),'10')
  }
- for(const route of ['/checks','/loans','/incoming','/upload','/upload/history','/analysis','/overview','/settings','/about'])assert.ok(markup.includes('href="'+route+'?'),route)
+ for(const route of ['/checks','/loans','/incoming','/upload','/upload/history','/analysis','/overview'])assert.ok(markup.includes('href="'+route+'?'),route)
+ const profile=readFileSync('frontend/src/app/account-menu.tsx','utf8'),settings=readFileSync('frontend/src/app/settings-home.tsx','utf8')
+ assert.match(profile,/\['\/settings','הגדרות'/)
+ assert.match(settings,/href:'\/more'/)
+ assert.match(settings,/href:'\/about'/)
 })
