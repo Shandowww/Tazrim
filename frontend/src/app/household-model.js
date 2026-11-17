@@ -1,7 +1,7 @@
 import {cashAccountList,cashSourceRecords,monthAt} from '../../../src/budget.js'
 import {tazrimDisplaySnapshot} from '../../../src/tazrim-display-model.js'
 import {withViewQuery} from './navigation-query.js'
-export const mainPages=['/','/accounts','/savings','/more']
+export const mainPages=['/','/accounts','/savings','/analysis','/categories','/more']
 /** Space changes keep the period, never another space's record/filter/action. */
 export function householdSpaceHref(path,search,id){
  const query=new URLSearchParams(search),next=new URLSearchParams()

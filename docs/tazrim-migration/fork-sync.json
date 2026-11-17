@@ -1,26 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "42f23a797e67b00ada1432f5bea5a1fccd05751b",
+  "sourceCommit": "8b4f660",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
-  "upstreamCommit": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "status": "Scoped encrypted device form drafts verified live: 39 raw adapters, 19 documented guard exceptions, explicit financial Save retained.",
+  "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
+  "upstreamMain": "ab9b47948b39ab34e926fdc4a715e101b86d7248",
+  "status": "Source checkpoint: Budgit adapts upstream pages-only phone navigation, account menu, and rolling amount motion. This is not a production release.",
   "validation": {
-    "build": "passed on committed clean source archive",
+    "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1437,
+    "regressionTests": 1361,
     "coreChecks": 15,
-    "syntheticBrowserChecks": 69,
-    "candidateRuntimeContracts": 208,
-    "runtimeFilesMatched": 172,
-    "release": "docs/ui-redesign/evidence/release-form-drafts-2026-11-10.json",
-    "browser": "Bounded synthetic phone/desktop navigation, storage failure, competing tabs, isolation and explicit lost-response save checks; no physical-iPhone/PWA/Face ID acceptance."
+    "navigationChecks": 11,
+    "browser": "No new browser or physical-iPhone acceptance claimed."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496",
-  "productionImage": "sha256:7656f38cf5f1fb826131ec75d1ab066a74116c920046bbc49bbd4b0f94052ce5",
-  "phase2ProductionEnabled": true,
-  "productionApplicationBranch": "codex/budgit-household-ui",
-  "applicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496"
+  "productionApplicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496"
 }

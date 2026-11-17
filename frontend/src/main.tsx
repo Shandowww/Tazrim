@@ -10,6 +10,7 @@ import {InterfaceLayoutSetting} from './app/interface-layout-setting'
 import {openingViewSearch} from './app/navigation-query'
 import {SessionControls} from './app/session-controls'
 import {GlobalActionCenter} from './app/global-action-center'
+import {AccountMenu} from './app/account-menu'
 import {ComparisonGoalsPage} from './app/comparison-goals-page'
 import {ForecastSettingsPage} from './app/forecast-settings-page'
 import {OnboardingPage} from './app/onboarding-page'
@@ -105,6 +106,7 @@ function Header({ budget,refreshApp,refreshPending }: { budget: ReturnType<typeo
         {budget.status!=='ready'&&<div className="household-space-name" role="status">{budget.status==='loading'?'טוען תקציב…':'תקציב'}</div>}
         <div className="household-header-actions"><GlobalActionCenter budget={budget}/>
           <button type="button" className="text-muted-foreground disabled:opacity-50" aria-label="רענון האפליקציה והנתונים" disabled={refreshPending || budget.refreshPending || budget.status === 'loading'} onClick={refreshApp}><RefreshCw className="h-5 w-5" /></button>
+          <AccountMenu email={budget.status==='ready'?budget.value.accountEmail:undefined}/>
         </div>
       </div>
     </header>

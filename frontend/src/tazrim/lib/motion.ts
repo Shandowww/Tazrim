@@ -40,5 +40,5 @@ export const CHART_ANIMATION = {
   animationEasing: 'ease-out',
 } as const
 
-/** Rolling digits: they start together (lowest first by a hair) and all land on the page beat. */
-export const ROLL = { duration: MOTION.page, stagger: 12 } as const
+/** A readable top-to-bottom digit cascade, with a sharp landing. */
+export const ROLL = { duration: 950, stagger: 70, minDuration: 560, blur: '0.07em' } as const

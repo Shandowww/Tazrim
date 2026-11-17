@@ -37,22 +37,40 @@ const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 const LINE_HEIGHT = 'round(1.15em, 1px)'
 // Strong ease-out: fast start, long settle, reads as "rolling into place" (motion tokens, ENG-67)
 const EASE = MOTION_EASE.ui
-// Lower digits start a hair earlier, odometer-style, but every digit lands on the same beat
-const STAGGER_MS = ROLL.stagger
 // Soft top/bottom edges so passing digits fade instead of being cut off
 const EDGE_MASK = 'linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%)'
+function cascade(index: number, count: number, total: number) {
+  return { delay: index * ROLL.stagger, duration: Math.max(ROLL.minDuration, total - (count - 1) * ROLL.stagger) }
+}
 // Sign, digits and separators: the part that is laid out character by character
 const NUMERIC_CORE = /[-−]?\d(?:[\d.,]*\d)?/
 
 /** One rolling digit; also used for the card digits as they are typed (ENG-56). */
 export function DigitStrip({ digit, duration, delay }: { digit: number; duration: number; delay: number }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const shown = useRef(digit)
+  useLayoutEffect(() => {
+    if (shown.current === digit) return
+    shown.current = digit
+    const strip = ref.current
+    if (!strip || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    for(const animation of strip.getAnimations())if(animation.id==='budgit-digit-blur')animation.cancel()
+    const animation=strip.animate([
+      {filter:'blur(0)'},
+      {filter:`blur(${ROLL.blur})`,offset:.12},
+      {filter:'blur(0)',offset:.7},
+      {filter:'blur(0)'},
+    ],{duration,delay,easing:'linear'})
+    animation.id='budgit-digit-blur'
+  }, [digit,duration,delay])
   return (
     <span
       className="relative block overflow-hidden"
       style={{ height: LINE_HEIGHT, maskImage: EDGE_MASK, WebkitMaskImage: EDGE_MASK }}
     >
       <span
-        className="flex flex-col transition-transform will-change-transform motion-reduce:transition-none"
+        ref={ref}
+        className="flex flex-col transition-transform motion-reduce:transition-none"
         style={{
           transform: `translateY(${-digit * 10}%)`,
           transitionDuration: `${duration}ms`,
@@ -78,18 +96,16 @@ interface RollingNumberProps {
   className?: string
 }
 
-export function RollingNumber({ value, duration = ROLL.duration, format: kind = 'currency', className }: RollingNumberProps) {
-  // The server render and the first client render show zeros. Before the
-  // browser paints, the zeros' styles are resolved (a forced layout read) and
-  // the real digits are set, so the roll starts on the very first frame, in
-  // step with the rest of the page (no frame-waiting delay, ENG-67).
-  const ref = useRef<HTMLSpanElement>(null)
-  const [rolled, setRolled] = useState(false)
-  useLayoutEffect(() => {
-    ref.current?.getBoundingClientRect()
-    setRolled(true)
-  }, [])
+/** Newly appearing leading digits start at zero as well. */
+function RollingDigit({digit,duration,delay}:{digit:number;duration:number;delay:number}) {
+  const ref=useRef<HTMLSpanElement>(null)
+  const [mounted,setMounted]=useState(false)
+  useLayoutEffect(()=>{ref.current?.getBoundingClientRect();setMounted(true)},[])
+  return <span ref={ref} className="contents"><DigitStrip digit={mounted?digit:0} duration={duration} delay={delay}/></span>
+}
 
+export function RollingNumber({ value, duration = ROLL.duration, format: kind = 'currency', className }: RollingNumberProps) {
+  // Each digit starts at zero before paint, including new leading digits.
   const text = format(value, kind)
   const match = text.match(NUMERIC_CORE)
   if (!match || match.index === undefined) return <span className={className}>{text}</span>
@@ -97,9 +113,11 @@ export function RollingNumber({ value, duration = ROLL.duration, format: kind = 
   const before = text.slice(0, match.index)
   const after = text.slice(match.index + match[0].length)
   const chars = [...match[0]]
+  const count=chars.filter(ch=>/\d/.test(ch)).length
+  let place=0
 
   return (
-    <span ref={ref} className={cn('tabular-nums', className)}>
+    <span className={cn('tabular-nums', className)}>
       <span className="sr-only">{text}</span>
       <span aria-hidden>
         {before}
@@ -111,12 +129,10 @@ export function RollingNumber({ value, duration = ROLL.duration, format: kind = 
             // number of digits changes; unchanged digits don't move
             const fromEnd = chars.length - 1 - i
             return /\d/.test(ch) ? (
-              <DigitStrip
+              <RollingDigit
                 key={`d${fromEnd}`}
-                digit={rolled ? Number(ch) : 0}
-                // Shorter by its delay, so all digits land together
-                duration={Math.max(duration / 2, duration - fromEnd * STAGGER_MS)}
-                delay={fromEnd * STAGGER_MS}
+                digit={Number(ch)}
+                {...cascade(place++,count,duration)}
               />
             ) : (
               <span key={`s${fromEnd}`}>{ch}</span>
