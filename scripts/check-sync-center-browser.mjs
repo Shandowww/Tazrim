@@ -41,7 +41,25 @@ try{
  check(true,'missing month has a direct upload action');
  await page.getByRole('link',{name:'חזרה למפת החודשים',exact:true}).click();
  await page.getByRole('combobox',{name:'חשבון או כרטיס'}).selectOption('card:card1');
- for(const width of [320,390,430,1440]){await page.setViewportSize({width,height:900});check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow at '+width)}
+ for(const width of [320,390,430,768,1024,1440,1920]){
+  await page.setViewportSize({width,height:900});
+  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow at '+width);
+  check(await page.locator('.sync-coverage-rows>article:visible').count()===(width>=1024?2:1),'appropriate visible account rows at '+width);
+  check(await page.locator('.sync-coverage-selector').isVisible()===(width<1024),'compact selector only at narrow widths '+width);
+ }
+ for(const theme of ['light','dark']){
+  await page.emulateMedia({colorScheme:theme});
+  check(await page.locator('.sync-coverage-rows>article:visible').count()===2,'all accounts shown together in '+theme);
+  const bankCells=page.locator('.sync-coverage-rows>article').first().locator('a'),cardCells=page.locator('.sync-coverage-rows>article').last().locator('a');
+  const bankBox=await bankCells.first().boundingBox(),cardBox=await cardCells.first().boundingBox();
+  check(Math.abs(bankBox.x-cardBox.x)<1,'months align across accounts in '+theme);
+ }
+ await page.locator('.sync-coverage-rows>article').last().locator('a').last().click();
+ await page.getByRole('link',{name:'לא היו עסקאות בחודש הזה?',exact:true}).waitFor();
+ check((await page.locator('h3[tabindex="-1"]').innerText()).includes('בדיקה'),'desktop card month opens the matching card detail');
+ await page.getByRole('link',{name:'חזרה למפת החודשים',exact:true}).click();
+ await page.locator('.sync-coverage-rows>article').first().waitFor();
+ check(await page.locator('.sync-coverage-rows>article:visible').count()===2,'return restores the complete desktop coverage map');
  await page.setViewportSize({width:390,height:844});
  await page.evaluate(()=>window.scrollTo(0,0));
  await page.waitForTimeout(250);
@@ -60,10 +78,8 @@ try{
  await page.goto(origin+'/next/incoming?sync=report&report='+initial.privateId+'&syncFrom=reports');
  await page.getByRole('link',{name:'פתיחת הדוח לבדיקה',exact:true}).click();
  await page.getByRole('link',{name:'חזרה למרכז הסנכרון'}).click();
- await page.getByRole('dialog',{name:'יש שינויים שעדיין לא נשמרו'}).waitFor();
- await page.getByRole('button',{name:'שמירה והמשך',exact:true}).click();
  await page.waitForURL(url=>url.searchParams.get('sync')==='reports');
- check(true,'original progress saves before returning to the report list');
+ check(await page.getByRole('dialog').count()===0,'untouched report review returns without a forced save');
  await page.goto(origin+'/next/incoming?sync=add');
  await page.getByLabel('קובץ לתיבת הסנכרון').setInputFiles({name:'synthetic-new-upload.csv',mimeType:'text/csv',buffer:Buffer.from('date,description,amount\n2026-10-01,synthetic,17\n')});
  await page.getByRole('button',{name:'שמירת המקור בתיבת הסנכרון',exact:true}).click();

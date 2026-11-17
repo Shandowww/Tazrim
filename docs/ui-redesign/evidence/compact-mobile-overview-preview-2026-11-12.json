@@ -1,0 +1,152 @@
+{
+  "date": "2026-11-12",
+  "application": "0414b15",
+  "preview": "https://adaptive.budgit.duckdns.org/next?year=2026&month=10",
+  "productionChanged": false,
+  "validation": {
+    "buildTypecheck": true,
+    "regressions": 1458,
+    "focused": 24,
+    "core": 15,
+    "responsive": [
+      {
+        "width": 320,
+        "theme": "",
+        "noOverflow": true,
+        "headerMonth": true,
+        "desktopMonth": false,
+        "scopeDropdown": true,
+        "refresh": false,
+        "heading": false,
+        "controlHeights": [
+          44,
+          44
+        ]
+      },
+      {
+        "width": 390,
+        "theme": "",
+        "noOverflow": true,
+        "headerMonth": true,
+        "desktopMonth": false,
+        "scopeDropdown": true,
+        "refresh": false,
+        "heading": false,
+        "controlHeights": [
+          44,
+          44
+        ]
+      },
+      {
+        "width": 768,
+        "theme": "",
+        "noOverflow": true,
+        "headerMonth": false,
+        "desktopMonth": true,
+        "scopeDropdown": false,
+        "refresh": true,
+        "heading": true,
+        "controlHeights": []
+      },
+      {
+        "width": 1440,
+        "theme": "",
+        "noOverflow": true,
+        "headerMonth": false,
+        "desktopMonth": true,
+        "scopeDropdown": false,
+        "refresh": true,
+        "heading": true,
+        "controlHeights": []
+      },
+      {
+        "width": 320,
+        "theme": "dark",
+        "noOverflow": true,
+        "headerMonth": true,
+        "desktopMonth": false,
+        "scopeDropdown": true,
+        "refresh": false,
+        "heading": false,
+        "controlHeights": [
+          44,
+          44
+        ]
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "noOverflow": true,
+        "headerMonth": true,
+        "desktopMonth": false,
+        "scopeDropdown": true,
+        "refresh": false,
+        "heading": false,
+        "controlHeights": [
+          44,
+          44
+        ]
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "noOverflow": true,
+        "headerMonth": false,
+        "desktopMonth": true,
+        "scopeDropdown": false,
+        "refresh": true,
+        "heading": true,
+        "controlHeights": []
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "noOverflow": true,
+        "headerMonth": false,
+        "desktopMonth": true,
+        "scopeDropdown": false,
+        "refresh": true,
+        "heading": true,
+        "controlHeights": []
+      }
+    ],
+    "fixtureAudit": {
+      "unchanged": true,
+      "counts": {
+        "writes": 2,
+        "financialWrites": 0
+      }
+    },
+    "sharedMonthScopePreserved": true,
+    "viewerLabelPreserved": true,
+    "reportMenuRouteVerified": true,
+    "refreshMenuRetainsScopeAndPeriod": true,
+    "hostedPhone": {
+      "width": 390,
+      "noOverflow": true,
+      "headingHidden": true,
+      "headerMonth": "2026-10",
+      "refreshHidden": true,
+      "uploadLinks": 0
+    },
+    "hostedSampleUnchanged": true,
+    "hostedRevision": 1,
+    "frontendSha256": "7156c69e77041aeba0188d701ee31e9b5cd0fe4a98e69451e3a229de537799ff"
+  },
+  "isolation": {
+    "container": "budgit-adaptive-preview-0414b15",
+    "readOnly": true,
+    "hostMounts": 0,
+    "memoryMiB": 256,
+    "cpus": 0.5,
+    "productionAdjacentIdentitiesUnchanged": true,
+    "productionFrontendUnchanged": true,
+    "productionHealthUnchanged": true,
+    "previousPreviewRetired": true,
+    "remoteEvidence": "/opt/budgit-previews/adaptive-0414b15"
+  },
+  "limitations": [
+    "No physical iPhone or installed-PWA acceptance",
+    "Pull gesture unchanged; existing refresh/pull contracts pass, no new physical gesture acceptance"
+  ]
+}

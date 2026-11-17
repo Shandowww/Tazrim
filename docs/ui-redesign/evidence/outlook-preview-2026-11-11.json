@@ -1,0 +1,156 @@
+{
+  "date": "2026-11-11",
+  "application": "54839f4",
+  "preview": "https://adaptive.budgit.duckdns.org/next?year=2026&month=10",
+  "productionChanged": false,
+  "syntheticOnly": true,
+  "validation": {
+    "buildTypecheck": true,
+    "regressions": 1458,
+    "core": 15,
+    "focused": 13,
+    "responsive": [
+      {
+        "width": 320,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "288px"
+      },
+      {
+        "width": 390,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "358px"
+      },
+      {
+        "width": 768,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "472px"
+      },
+      {
+        "width": 1024,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "714.562px"
+      },
+      {
+        "width": 1440,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "657.445px 424.164px"
+      },
+      {
+        "width": 1920,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "812.078px 523.922px"
+      },
+      {
+        "width": 320,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "288px"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "358px"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "472px"
+      },
+      {
+        "width": 1024,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "714.562px"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "657.445px 424.164px"
+      },
+      {
+        "width": 1920,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "forecast": "סוף נוב׳ · החשבון היומי\n₪\n9,350\n\nיתרות סוף חודש צפויות",
+        "accountButtons": true,
+        "columns": "812.078px 523.922px"
+      }
+    ],
+    "localSampleUnchanged": true,
+    "hostedSampleUnchanged": true,
+    "hostedRevision": 1,
+    "hostedAccount": "platform-preview",
+    "hostedMainValues": [
+      9350,
+      7400,
+      9050
+    ],
+    "hostedSecondFirstMonth": 4800,
+    "hostedFirstAccountReminders": 5,
+    "hostedSecondAccountReminders": 0,
+    "basicMode": "Unavailable planned-item destination renders static content; planning footer link hidden.",
+    "navigation": "Phone compact card opens outlook, account switches after page load, minimal Back returns Overview; browser history return also checked locally.",
+    "frontendSha256": "fa19927d5c523b21ad7e0a013ba610540795627ff3c986603f4779cf6912cc79"
+  },
+  "isolation": {
+    "container": "budgit-adaptive-preview-54839f4",
+    "readOnly": true,
+    "hostMounts": 0,
+    "memoryMiB": 256,
+    "cpus": 0.5,
+    "productionAdjacentIdentitiesUnchanged": true,
+    "productionFrontendUnchanged": true,
+    "productionHealthUnchanged": true,
+    "previousPreviewRetired": true,
+    "remoteEvidence": "/opt/budgit-previews/adaptive-54839f4"
+  },
+  "limitations": [
+    "No physical iPhone or installed PWA acceptance",
+    "No native operating-system Back gesture acceptance",
+    "No new reduced-motion emulation run; no new animations added",
+    "Forecast is month-end, not daily liquidity"
+  ]
+}

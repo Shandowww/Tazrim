@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-11",
+  "applicationSource": "128b3a5",
+  "url": "https://adaptive.budgit.duckdns.org/next/incoming?sync=missing&coverageEnd=2026-10&year=2026&month=10&review=128b3a5",
+  "scope": "Review preview only. Explicit approval required for production promotion.",
+  "change": {
+    "wideScreens": "All account/card coverage rows visible immediately, aligned month columns and no entity dropdown",
+    "wideBreakpointPx": 1024,
+    "narrowScreens": "Original entity selector with one visible selected row",
+    "financialAndCoverageModels": "unchanged"
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "focusedCoverageContracts": 7,
+    "coreChecks": 15,
+    "browserChecks": 44,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      320,
+      390,
+      430,
+      768,
+      1024,
+      1440,
+      1920
+    ],
+    "financialWrites": 0,
+    "syntheticFinancialRecordsUnchanged": true,
+    "browserRuntimeErrors": [],
+    "includes": [
+      "Aligned months across accounts",
+      "Exact card/month detail selection",
+      "Full desktop map restored on return",
+      "Narrow selected entity retained on resize",
+      "RTL and reduced motion",
+      "Private inbox isolation and selected shared-budget viewer coverage",
+      "Existing synthetic upload and confirmed private-copy deletion"
+    ]
+  },
+  "hosted": {
+    "frontendSha256": "11327169c8de6e454cd6b3e0f48dadd1bd24fd422fafcec57c1e31a262854201",
+    "matchesLocalBuild": true,
+    "desktop": {
+      "width": 1280,
+      "rows": [
+        {
+          "heading": "בנק · החשבון היומי",
+          "visible": true,
+          "cells": 6,
+          "firstCellX": 662.875
+        },
+        {
+          "heading": "בנק · החשבון הנוסף",
+          "visible": true,
+          "cells": 6,
+          "firstCellX": 662.875
+        },
+        {
+          "heading": "כרטיס · הכרטיס היומיומי · 4321",
+          "visible": true,
+          "cells": 6,
+          "firstCellX": 662.875
+        },
+        {
+          "heading": "כרטיס · קניות אונליין · 8046",
+          "visible": true,
+          "cells": 6,
+          "firstCellX": 662.875
+        },
+        {
+          "heading": "כרטיס · מנויים לבית · 1158",
+          "visible": true,
+          "cells": 6,
+          "firstCellX": 662.875
+        }
+      ],
+      "selectorVisible": false,
+      "workspaceWidth": 955.203125,
+      "overflow": false
+    },
+    "selectedDesktopDetail": {
+      "label": "מנויים לבית · אוק׳ 2026",
+      "entity": "card:card_home",
+      "month": "2026-10"
+    },
+    "phoneAfterReturnAndResize": {
+      "width": 390,
+      "visibleRows": [
+        "כרטיס · מנויים לבית · 1158מאי 26חסריוני 26חסריולי 26חסראוג׳ 26חסרספט׳ 26חסראוק׳ 26חסר"
+      ],
+      "selectorVisible": true,
+      "selected": "card:card_home",
+      "overflow": false,
+      "revision": 1
+    }
+  },
+  "isolation": {
+    "container": "budgit-adaptive-preview-128b3a5",
+    "database": "in-memory synthetic records",
+    "hostDataMounts": 0,
+    "readOnlyFilesystem": true,
+    "memoryMiB": 256,
+    "cpuLimit": 0.5,
+    "previousPreviewRetired": "budgit-adaptive-preview-e719b5c",
+    "serverReceiptDirectory": "/opt/budgit-previews/adaptive-128b3a5"
+  },
+  "preservation": {
+    "productionAndAdjacentContainerIdentitiesImagesStartedAt": "identical before/after/final",
+    "productionFrontendHashAndHealth": "identical before/after",
+    "productionRecordsTouched": false
+  },
+  "limits": [
+    "No physical iPhone acceptance",
+    "Production not promoted"
+  ]
+}

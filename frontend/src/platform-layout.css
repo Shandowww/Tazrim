@@ -1,0 +1,355 @@
+/* Platform layout uses the existing Budgit theme and the device's selected backdrop. */
+:root:has(.household-shell){--household-radius:18px;--household-gap:24px}
+body:has(.household-shell){font-optical-sizing:auto}
+.household-shell{min-height:100dvh;isolation:isolate}
+.household-shell main{padding:28px 20px 112px;min-width:0;outline:none}
+.household-screen{max-width:1360px;width:100%;margin-inline:auto}
+.household-page{width:100%;max-width:1360px;gap:24px}
+.household-screen h1,.household-page h1{font-size:clamp(1.5rem,2.2vw,1.9rem);line-height:1.18;letter-spacing:-.025em;font-weight:650}
+.household-screen h2{letter-spacing:-.015em}
+
+.household-header{padding:calc(8px + env(safe-area-inset-top)) 20px 8px;background:hsl(var(--background)/.86);backdrop-filter:blur(20px) saturate(150%);border-color:hsl(var(--border)/.65)}
+.household-topbar{max-width:1360px;min-height:44px;grid-template-columns:minmax(0,1fr) auto;gap:16px}
+.household-header-leading{display:flex;align-items:center;gap:10px;min-width:0}
+.household-budget-control{min-width:0;max-width:440px;flex:1}
+.household-header .household-back--icon{width:44px;min-width:44px;margin:0;border:0;background:transparent;box-shadow:none;color:hsl(var(--primary))}
+.household-header-actions{gap:2px}
+.household-header-actions>button{border-radius:50%}
+.household-header-actions>button:active{background:hsl(var(--muted))}
+.household-space-name{font-size:.875rem;font-weight:550;color:hsl(var(--foreground))}
+.household-space-switch{max-width:440px}
+.platform-preview-banner{min-height:26px;padding:4px 12px;text-align:center;font:500 11px/18px -apple-system,BlinkMacSystemFont,Arial,sans-serif;letter-spacing:.01em;color:hsl(var(--muted-foreground));background:hsl(var(--muted));border-bottom:1px solid hsl(var(--border))}
+.desktop-navigation{display:none}
+.skip-to-content{position:fixed;top:-100px;inset-inline-start:16px;z-index:100;padding:12px 20px;border-radius:12px;background:hsl(var(--card));color:hsl(var(--foreground));border:2px solid hsl(var(--ring))}
+.skip-to-content:focus{top:16px}
+.household-shell :is(a,button,summary){-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.household-shell :is(a,button):focus-visible{outline:2px solid hsl(var(--primary));outline-offset:3px}
+@media(hover:hover){.household-shell :is(button,a):not(:disabled){transition:background-color 120ms ease,color 120ms ease}.household-header .household-back:hover{background:hsl(var(--muted))}}
+
+/* Overview: one summary, one evidence workspace, one row of useful destinations. */
+.household-home{display:flex;flex-direction:column;gap:0}
+.home-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:26px}
+.home-eyebrow{font-size:.8125rem;color:hsl(var(--muted-foreground));margin-bottom:7px}
+.home-heading-actions{display:flex;align-items:center;gap:12px}
+.home-month-picker select{min-height:44px;max-width:100%;font-size:.875rem;padding:8px 12px 8px 34px;border:1px solid hsl(var(--border));border-radius:11px;background-color:hsl(var(--card));font-weight:500}
+.home-primary-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-radius:11px;font-size:.875rem;font-weight:550;white-space:nowrap}
+.home-primary-action:active{filter:brightness(.92)}
+.home-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:hsl(var(--card));border:1px solid hsl(var(--border)/.8);border-radius:18px;padding:24px 0}
+.home-metric{min-width:0;padding:0 28px}
+.home-metric+.home-metric{border-inline-start:1px solid hsl(var(--border))}
+.home-metric-label{display:flex;align-items:center;gap:8px;color:hsl(var(--muted-foreground));font-size:.875rem}
+.home-metric-label svg{color:hsl(var(--muted-foreground)/.7)}
+.home-metric strong{display:block;margin-top:12px;font-size:clamp(1.5rem,2.5vw,2.25rem);font-weight:600;letter-spacing:-.04em;line-height:1.15;font-variant-numeric:tabular-nums}
+.home-metric strong bdi{white-space:normal;overflow-wrap:anywhere}
+.home-metric strong[data-missing=true]{font-size:1.25rem;letter-spacing:0;color:hsl(var(--muted-foreground))}
+.home-metric[data-tone=income] strong{color:hsl(var(--income))}
+.home-metric-note{display:block;margin-top:9px;font-size:.75rem;color:hsl(var(--muted-foreground))}
+.home-data-note{min-height:18px;margin:10px 4px 26px;font-size:.75rem;color:hsl(var(--muted-foreground));line-height:1.5}
+.home-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+.home-panel{min-width:0;background:hsl(var(--card));border:1px solid hsl(var(--border)/.8);border-radius:18px;padding:24px}
+.home-panel-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.home-panel-heading h2,.home-planning h2{font-size:1rem;font-weight:600;line-height:1.4}
+.home-panel-heading p{font-size:.75rem;color:hsl(var(--muted-foreground));margin-top:4px}
+.home-chart-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.6875rem;color:hsl(var(--muted-foreground));padding-top:4px}
+.home-chart-legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.home-chart-legend i{width:6px;height:6px;border-radius:50%;flex:none}
+.home-chart-legend [data-tone=income],.home-chart-bars [data-tone=income]{background:hsl(var(--income))}
+.home-chart-legend [data-tone=expense],.home-chart-bars [data-tone=expense]{background:hsl(var(--expense))}
+.home-chart-legend [data-tone=cards],.home-chart-bars [data-tone=cards]{background:hsl(var(--cc))}
+.home-chart{display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;direction:ltr}
+.home-chart-axis{display:flex;flex-direction:column;justify-content:space-between;padding-bottom:30px;font-size:.625rem;color:hsl(var(--muted-foreground));text-align:right;font-variant-numeric:tabular-nums}
+.home-chart-months{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;direction:rtl;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(33.333% - 1px),hsl(var(--border)/.45) calc(33.333% - 1px),hsl(var(--border)/.45) 33.333%);background-size:100% calc(100% - 30px);background-repeat:no-repeat}
+.home-chart-month{display:grid;grid-template-rows:180px 30px;min-width:0;gap:0;text-align:center;border-radius:8px}
+.home-chart-bars{display:block;position:relative;margin-inline:8%;border-radius:6px}
+.home-chart-bars:after{content:"";position:absolute;inset-inline:0;bottom:var(--baseline);height:1px;background:hsl(var(--border))}
+.home-chart-bars>span[data-tone]{position:absolute;width:22%;border-radius:3px 3px 0 0;z-index:1}
+.home-chart-bars>span:nth-child(1){left:12%}.home-chart-bars>span:nth-child(2){left:39%}.home-chart-bars>span:nth-child(3){left:66%}
+.home-chart-missing{position:absolute;bottom:0;left:45%;color:hsl(var(--muted-foreground))}
+.home-chart-month-label{display:flex;justify-content:center;align-items:center;font-size:.75rem;color:hsl(var(--muted-foreground));position:relative}
+.home-chart-month[aria-current] .home-chart-month-label{color:hsl(var(--primary));font-weight:600}
+.home-chart-month[aria-current] .home-chart-month-label:after{content:"";position:absolute;bottom:-4px;width:4px;height:4px;border-radius:50%;background:hsl(var(--primary))}
+.home-chart-month:active{background:hsl(var(--muted)/.65)}
+.home-chart-caption{font-size:.6875rem;color:hsl(var(--muted-foreground));margin-top:20px;line-height:1.6}
+.home-category-list{display:grid;margin-top:-6px}
+.home-category-item{display:flex;align-items:center;gap:10px;min-height:55px;padding-block:8px;border-bottom:1px solid hsl(var(--border)/.55);font-size:.8125rem}
+.home-category-item:last-child{border-bottom:0}
+.home-category-dot{height:8px;width:8px;border-radius:50%;flex:none}
+.home-category-name{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:500}
+.home-category-name>span{display:block;font-weight:400;font-size:.6875rem;color:hsl(var(--muted-foreground));margin-top:2px}
+.home-category-item>bdi{font-size:.8125rem;font-variant-numeric:tabular-nums;flex:none}
+.home-category-item>svg{color:hsl(var(--muted-foreground)/.65);flex:none}
+.home-panel-link{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-top:12px;color:hsl(var(--primary));font-size:.8125rem;font-weight:500}
+.home-empty{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:164px;gap:8px;color:hsl(var(--muted-foreground));font-size:.8125rem;line-height:1.6}
+.home-empty>p{font-size:.9375rem;font-weight:500;color:hsl(var(--foreground))}
+.home-empty>a{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:hsl(var(--primary))}
+.home-planning{margin-top:28px}
+.home-planning h2{margin-bottom:14px}
+.home-planning-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.home-planning-links>a{display:flex;align-items:center;gap:12px;min-width:0;min-height:86px;padding:16px 18px;border:1px solid hsl(var(--border)/.8);background:hsl(var(--card));border-radius:15px}
+.home-planning-links>a>span:nth-child(2){flex:1;min-width:0}
+.home-planning-icon{display:grid;place-items:center;height:38px;width:38px;flex:none;background:hsl(var(--primary)/.07);color:hsl(var(--primary));border-radius:11px}
+.home-planning-links strong{display:block;font-size:.875rem;font-weight:550;line-height:1.4}
+.home-planning-links small{display:block;font-size:.75rem;color:hsl(var(--muted-foreground));margin-top:3px}
+.home-planning-links>a>svg{color:hsl(var(--muted-foreground)/.6);flex:none}
+
+/* Existing account models retain their controls and monetary meanings. */
+.household-bank-list{gap:16px}
+.household-bank-list .household-bank{padding:20px}
+.household-bank-heading h2{font-size:.9375rem}
+.household-bank-balance{margin:20px 0 12px;align-items:center}
+.household-bank-balance>strong{font-size:1.75rem;letter-spacing:-.03em;font-weight:600}
+.household-wallet{padding:20px;border-radius:18px;border:1px solid hsl(var(--border)/.8);background:hsl(var(--card))}
+.household-card-detail{padding:22px}
+.household-wallet-stage{margin-inline:-12px}
+.household-card-detail .household-title h2{font-size:1rem}
+.household-category-row{font-size:.875rem}
+.household-category-row>span:first-child{width:30px;height:30px;border-radius:9px}
+.household-account-actions a{font-size:.8125rem}
+.household-accounts>details{padding:8px 20px}
+.household-title>.household-update{font-size:.8125rem}
+.mobile-account-sections{display:none}
+
+/* Focused forms: stable section navigation and values stay mounted. */
+.adaptive-section-navigation,.adaptive-section-controls{display:none}
+.adaptive-section-panels{display:grid;gap:20px;align-items:start}
+.adaptive-section-panel{min-width:0;scroll-margin-top:160px;outline:none}
+.adaptive-section-panel[hidden]{display:none}
+.form-preview>summary{min-height:44px;cursor:pointer;padding:10px 0;font-size:.875rem;color:hsl(var(--primary))}
+.form-preview[open]>div{margin-top:12px}
+.adaptive-sections button:focus-visible,.mobile-account-sections button:focus-visible{outline:2px solid hsl(var(--primary));outline-offset:2px}
+
+@media(min-width:768px){
+ .household-shell main{padding:32px clamp(24px,3vw,48px) 40px}
+ .household-header{padding-inline:clamp(24px,3vw,48px)}
+ .desktop-navigation{display:flex;position:sticky;top:0;height:100dvh;width:248px;flex:none;flex-direction:column;border-inline-end:1px solid hsl(var(--border)/.7);background:hsl(var(--card)/.92);backdrop-filter:blur(16px);padding-top:env(safe-area-inset-top)}
+ .desktop-navigation[data-collapsed=true]{width:72px}
+ .desktop-navigation-heading{display:flex;align-items:center;gap:10px;padding:12px;font-size:1.125rem;font-weight:650;min-height:64px}
+ .desktop-navigation button{display:grid;place-items:center;min-width:44px;min-height:44px;border-radius:10px;color:hsl(var(--muted-foreground))}
+ .desktop-navigation nav{overflow-y:auto;padding:4px 12px 24px;min-height:0;overscroll-behavior:contain;scrollbar-width:thin}
+ .desktop-navigation nav>a{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 12px;border-radius:9px;font-size:.875rem;line-height:1.45}
+ .desktop-navigation nav a[aria-current]{background:hsl(var(--primary)/.1);color:hsl(var(--primary));font-weight:600}
+ .desktop-navigation nav section{margin-top:22px}
+ .desktop-navigation h2{font-size:.6875rem;font-weight:550;color:hsl(var(--muted-foreground));padding:0 12px 6px}
+ .desktop-navigation nav section a{display:flex;align-items:center;min-height:36px;padding:7px 12px;border-radius:8px;font-size:.8125rem;line-height:1.45}
+ .desktop-navigation a:hover,.desktop-navigation button:hover{background:hsl(var(--foreground)/.045)}
+ .desktop-navigation[data-collapsed=true] nav>a{justify-content:center;padding:10px}
+ .household-more{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+ .household-more>.household-page-heading{grid-column:1/-1}
+ .adaptive-editor{max-width:1120px}
+ .home-chart-month{grid-template-rows:205px 30px}
+}
+@media(min-width:1100px){
+ .home-workspace{grid-template-columns:minmax(0,1.8fr) minmax(290px,1fr)}
+ .household-accounts{grid-template-columns:minmax(300px,1fr) minmax(0,1.15fr);align-items:start}
+ .household-accounts>.household-title,.household-accounts>.household-bank-list,.household-accounts>details{grid-column:1/-1}
+ .household-wallet{position:sticky;top:85px}
+ .household-card-detail{grid-column:2;grid-row:3}
+ .adaptive-section-panels{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:1100px) and (min-width:768px){.home-panel-heading{flex-wrap:wrap}.home-planning-links{gap:12px}.home-planning-links>a{padding:14px 12px;gap:8px}.home-planning-icon{display:none}}
+@media(min-width:1500px){.household-more{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:767px){
+ .household-shell main{padding:24px 16px 112px}
+ .household-page{gap:20px}
+ .household-header{padding-inline:12px}
+ .household-topbar{gap:8px}
+ .household-budget-control{max-width:none}
+ .household-header-leading{gap:4px}
+ .household-header-actions>button{width:44px;min-width:44px}
+ .home-heading{align-items:flex-start;flex-direction:column;gap:18px;margin-bottom:20px}
+ .home-heading h1{font-size:1.75rem}
+ .home-heading-actions{justify-content:space-between;width:100%;gap:10px}
+ .home-month-picker{min-width:0;flex:1}
+ .home-month-picker select{width:100%}
+ .home-primary-action{padding-inline:12px;font-size:.8125rem}
+ .home-summary{padding:18px 0;border-radius:16px}
+ .home-metric{padding-inline:12px}
+ .home-metric-label{font-size:.6875rem;gap:4px;line-height:1.4;min-height:30px}
+ .home-metric-label svg{display:none}
+ .home-metric strong{font-size:clamp(1rem,4.5vw,1.35rem);letter-spacing:-.04em;margin-top:6px}
+ .home-metric strong[data-missing=true]{font-size:.8125rem;line-height:1.5}
+ .home-metric-note{font-size:.625rem;line-height:1.4;margin-top:8px}
+ .home-data-note{margin-bottom:20px;font-size:.6875rem}
+ .home-workspace{gap:20px}
+ .home-panel{padding:18px;border-radius:16px}
+ .home-panel-heading{gap:12px;flex-wrap:wrap;margin-bottom:22px}
+ .home-chart{grid-template-columns:46px minmax(0,1fr);gap:8px}
+ .home-chart-axis{font-size:.5625rem}
+ .home-chart-months{gap:4px}
+ .home-chart-bars{margin-inline:0}
+ .home-chart-month{grid-template-rows:150px 30px}
+ .home-chart-month-label{font-size:.6875rem}
+ .home-chart-caption{font-size:.625rem}
+ .home-planning{margin-top:24px}
+ .home-planning-links{grid-template-columns:1fr;gap:0;border:1px solid hsl(var(--border)/.8);border-radius:16px;background:hsl(var(--card));padding-inline:16px}
+ .home-planning-links>a{border:0;border-radius:0;background:none;padding:13px 0;min-height:74px}
+ .home-planning-links>a+a{border-top:1px solid hsl(var(--border)/.7)}
+ .mobile-account-sections{display:flex;padding:4px;background:hsl(var(--muted));border-radius:12px;gap:4px}
+ .mobile-account-sections button{flex:1;min-height:44px;padding:8px;border-radius:9px;font-size:.875rem}
+ .mobile-account-sections button[aria-pressed=true]{background:hsl(var(--card));color:hsl(var(--foreground));font-weight:550;box-shadow:0 1px 3px hsl(var(--foreground)/.07)}
+ .household-accounts[data-mobile-view=banks]>.household-wallet,.household-accounts[data-mobile-view=banks]>.household-card-detail,.household-accounts[data-mobile-view=cards]>.household-bank-list{display:none}
+ .household-wallet{padding:16px}
+ .household-card-detail{padding:18px}
+ .household-tabs{border-radius:22px;box-shadow:0 5px 25px hsl(var(--foreground)/.07);background:hsl(var(--card)/.94);backdrop-filter:blur(20px) saturate(150%)}
+ .household-tabs a{border-radius:16px}
+ .adaptive-section-navigation{display:flex;position:sticky;top:calc(64px + env(safe-area-inset-top));z-index:20;gap:4px;padding:4px;border-radius:12px;background:hsl(var(--muted));margin-bottom:16px}
+ .adaptive-section-navigation button{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;min-height:48px;padding:6px;border-radius:9px;font-size:.75rem}
+ .adaptive-section-navigation button[aria-pressed=true]{background:hsl(var(--card));color:hsl(var(--foreground));box-shadow:0 1px 3px hsl(var(--foreground)/.08)}
+ .adaptive-section-navigation button span{font-size:.625rem;color:hsl(var(--muted-foreground));font-variant-numeric:tabular-nums}
+ .adaptive-section-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;font-size:.8125rem}
+ .adaptive-section-controls button{min-height:44px;min-width:72px;border:1px solid hsl(var(--border));border-radius:11px;padding:8px 16px;background:hsl(var(--card))}
+ .adaptive-section-controls button:disabled{opacity:.4}
+ .adaptive-editor .household-period{display:none}
+ body:has(.adaptive-editor form) .household-tabs{display:none}
+ .adaptive-editor form>.surface:last-child{position:sticky;bottom:max(12px,env(safe-area-inset-bottom));z-index:25;box-shadow:0 4px 20px hsl(var(--foreground)/.08)}
+}
+@media(prefers-reduced-transparency:reduce){.household-header,.household-tabs{background:hsl(var(--card));backdrop-filter:none}}
+@media(prefers-contrast:more){.home-panel,.home-summary,.household-screen .surface{border-color:hsl(var(--foreground)/.6)}.household-header,.household-tabs{background:hsl(var(--card));backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){.household-shell :is(button,a){transition:none!important}}
+.home-planning-links>a:active,.home-category-item:active,.desktop-navigation nav a:active{background:hsl(var(--muted))}
+
+
+.screen-loading{min-height:180px;color:hsl(var(--muted-foreground));font-size:.875rem}
+.screen-loading>div{display:grid;gap:14px;margin-top:24px;max-width:620px}
+.screen-loading span{height:14px;border-radius:6px;background:hsl(var(--muted))}
+.screen-loading span:nth-child(2){width:82%}.screen-loading span:nth-child(3){width:58%}
+
+/* Currency is an isolated two-part value; inherited RTL cannot reorder it. */
+bdi.money-amount{display:inline-flex;align-items:baseline;direction:ltr;unicode-bidi:isolate;gap:.3em;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:normal;word-spacing:normal}
+.home-metric strong bdi.money-amount{letter-spacing:normal;word-spacing:normal;white-space:nowrap}
+.money-symbol{flex:none}.money-number{direction:ltr;unicode-bidi:isolate}
+/* Six task areas replace the flat tool inventory. Only one area's tools expand. */
+.desktop-navigation>nav:first-of-type{flex:1;min-height:0}
+.desktop-navigation nav.desktop-navigation-footer{flex:none;overflow:visible;border-top:1px solid hsl(var(--border));padding:8px 12px 12px}
+.desktop-navigation-row{display:flex;position:relative;align-items:center;border-radius:10px}
+.desktop-navigation-row>a{display:flex;align-items:center;gap:10px;flex:1;min-width:0;min-height:46px;padding:10px 12px;border-radius:10px;font-size:.875rem;line-height:1.4}
+.desktop-navigation-row>a>span{min-width:0;flex:1}
+.desktop-navigation-section[data-current=true]>.desktop-navigation-row{background:hsl(var(--primary)/.09);color:hsl(var(--primary));font-weight:550}
+.desktop-navigation-section[data-current=true]>.desktop-navigation-row>a[aria-current]{background:transparent}
+.desktop-navigation-row>.desktop-section-toggle{min-width:32px;width:32px;min-height:40px;height:40px;margin-inline-end:4px;color:inherit;flex:none}
+.desktop-section-toggle[aria-expanded=true] svg{transform:rotate(180deg)}
+.desktop-navigation-subnav{margin:4px 20px 12px 8px;padding-inline-start:12px;border-inline-start:1px solid hsl(var(--border))}
+.desktop-navigation-subnav>a,.desktop-navigation-subnav details>a{display:flex;align-items:center;min-height:38px;padding:8px 10px;border-radius:8px;font-size:.8125rem;line-height:1.45}
+.desktop-navigation-subnav summary{font-size:.75rem;color:hsl(var(--muted-foreground));padding:10px;min-height:38px;cursor:pointer}
+.desktop-navigation[data-collapsed=true] .desktop-navigation-row>a{justify-content:center;padding:10px}
+.household-task-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;grid-column:1/-1}
+.household-task-menu>a{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:100px;padding:22px;border-radius:var(--household-radius);background:hsl(var(--card));border:1px solid hsl(var(--border))}
+.household-task-menu strong{font-size:1rem;font-weight:600;display:block}.household-task-menu small{display:block;margin-top:6px;font-size:.8125rem;color:hsl(var(--muted-foreground));line-height:1.5}
+.household-task-menu>a>span:last-child{color:hsl(var(--primary))}
+.workspace-navigation{display:none}
+@media(max-width:767px){
+ .household-task-menu{grid-template-columns:1fr;gap:12px}
+ .household-task-menu>a{min-height:90px;padding:18px}
+ .workspace-navigation{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid hsl(var(--border))}
+ .workspace-navigation>a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 12px;font-size:.8125rem;border-radius:10px;color:hsl(var(--muted-foreground));background:hsl(var(--card)/.9);border:1px solid hsl(var(--border)/.7)}
+ .workspace-navigation a[aria-current]{color:hsl(var(--primary));background:hsl(var(--primary)/.09);border-color:hsl(var(--primary)/.2);font-weight:550}
+ .workspace-navigation[data-section=planning]{gap:8px}
+ .workspace-navigation[data-section=planning]>a{
+  display:grid; flex:1 1 0; min-inline-size:0; min-block-size:70px; grid-template-rows:auto 1fr; align-self:stretch;
+  justify-items:center; gap:5px; padding:8px 4px; border-radius:14px; text-align:center;
+  line-height:1.25; font-weight:600; color:hsl(var(--foreground)); background:hsl(var(--card)); border-color:hsl(var(--border));
+ }
+ .workspace-navigation[data-section=planning]>a>svg{color:hsl(var(--primary))}
+ .workspace-navigation[data-section=planning]>a>span{align-self:center; overflow-wrap:anywhere}
+ .workspace-navigation[data-section=planning]>a[aria-current=page]{
+  background:hsl(var(--primary)/.13); color:hsl(var(--foreground)); border-color:hsl(var(--primary));
+ }
+ .workspace-navigation[data-section=planning]>a:active{filter:brightness(.9)}
+ .workspace-navigation[data-section=planning]>a:focus-visible{outline:2px solid hsl(var(--primary)); outline-offset:2px}
+ .workspace-navigation>details{flex-basis:100%;font-size:.8125rem}.workspace-navigation summary{min-height:44px;padding:12px 4px;color:hsl(var(--primary));cursor:pointer}.workspace-navigation details>a{display:flex;align-items:center;min-height:44px;padding:10px 12px;background:hsl(var(--card));border-radius:10px;margin-top:4px}
+ .home-metric{padding-inline:10px}
+}
+@media(max-width:359px){.home-summary{grid-template-columns:1fr;padding:0 14px}.home-metric{padding:12px 0;display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 10px}.home-metric+.home-metric{border-inline-start:0;border-top:1px solid hsl(var(--border))}.home-metric-label{min-height:0}.home-metric strong{grid-column:2;grid-row:1/3;margin:0;font-size:1.25rem}.home-metric-note{grid-column:1;margin-top:3px}}
+@media(prefers-reduced-transparency:reduce){.desktop-navigation{background:hsl(var(--card));backdrop-filter:none}}
+@media(max-width:767px){.workspace-navigation>details{flex:0 1 auto}.workspace-navigation summary{padding:10px 12px;border-radius:10px;font-size:.8125rem;background:hsl(var(--card)/.9);border:1px solid hsl(var(--border)/.7)}.workspace-navigation>details[open]{flex-basis:100%}}
+
+/* A few workspace tabs and contextual actions replace the former tool inventory. */
+.workspace-actions{margin-top:24px}.workspace-actions summary{display:flex;align-items:center;color:hsl(var(--muted-foreground))}.workspace-actions[open] summary{color:hsl(var(--foreground))}
+.household-spaces-overview{display:inline-flex;align-items:center;min-height:44px;padding-inline:8px;font-size:.75rem;color:hsl(var(--primary));white-space:nowrap}
+
+.sync-coverage-workspace{max-width:48rem}.sync-coverage-rows{display:grid;gap:12px}.sync-coverage-rows>article:not([data-selected="true"]){display:none}.sync-coverage-kind{display:none}
+@media(min-width:1024px){
+ .sync-coverage-workspace{max-width:none}
+ .sync-coverage-selector{display:none}
+ .sync-coverage-rows>article,.sync-coverage-rows>article:not([data-selected="true"]){display:grid;grid-template-columns:minmax(130px,1fr) minmax(0,4fr);align-items:center;gap:20px}
+ .sync-coverage-rows>article>div{margin-top:0}
+ .sync-coverage-kind{display:inline}
+}
+
+/* The same outlook: a desktop workspace and a concise phone entry point. */
+.household-outlook{margin-top:30px;min-width:0}.outlook-mobile-card{display:none}
+.outlook-section-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}.outlook-section-heading h2{font-size:1rem;font-weight:600}.outlook-section-heading h1{font-size:1.6rem;font-weight:650}.outlook-section-heading p{font-size:.75rem;color:hsl(var(--muted-foreground));margin-top:5px}.outlook-section-heading>a{display:flex;align-items:center;gap:6px;min-height:44px;font-size:.8125rem;color:hsl(var(--primary))}
+.outlook-workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr);gap:24px;align-items:stretch}
+.outlook-badge{padding:4px 9px;border-radius:7px;background:hsl(var(--primary)/.08);color:hsl(var(--primary));font-size:.6875rem}
+.outlook-accounts{display:flex;flex-wrap:wrap;gap:6px;margin:-8px 0 18px}.outlook-accounts button{min-height:44px;padding:8px 12px;border-radius:10px;font-size:.8125rem;border:1px solid transparent;color:hsl(var(--muted-foreground))}.outlook-accounts button[aria-pressed=true]{background:hsl(var(--primary)/.09);border-color:hsl(var(--primary)/.18);color:hsl(var(--primary))}
+.outlook-forecast-summary{display:flex;align-items:center;justify-content:space-between;gap:16px}.outlook-forecast-summary>div>span{display:block;font-size:.75rem;color:hsl(var(--muted-foreground))}.outlook-forecast-summary strong{display:block;margin-top:5px;font-size:clamp(1.4rem,2vw,2rem);font-weight:620;letter-spacing:-.025em}.outlook-forecast-summary>p{font-size:.6875rem;color:hsl(var(--muted-foreground));max-width:130px;line-height:1.6}
+.outlook-chart svg{display:block;width:100%;height:auto;overflow:visible}.outlook-grid-line{stroke:hsl(var(--border)/.45);stroke-width:1}.outlook-buffer-line{stroke:hsl(var(--muted-foreground)/.65);stroke-width:1;stroke-dasharray:5 5}.outlook-projection-line{stroke:hsl(var(--primary));stroke-width:3;stroke-linecap:round;stroke-dasharray:6 5}.outlook-point-halo{fill:hsl(var(--primary)/.1)}.outlook-point{fill:hsl(var(--primary))}.outlook-point[data-low=true]{fill:hsl(var(--destructive))}.outlook-chart-missing{font-size:12px;fill:hsl(var(--muted-foreground))}
+.outlook-months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));text-align:center;margin-top:-15px}.outlook-months>div>span{font-size:.75rem;color:hsl(var(--muted-foreground))}.outlook-months strong{display:block;font-size:clamp(.8rem,1vw,1rem);font-weight:580;margin-top:3px;white-space:nowrap}.outlook-months strong[data-low=true]{color:hsl(var(--destructive))}.outlook-months small{display:block;font-size:.625rem;color:hsl(var(--muted-foreground));margin-top:3px}
+.outlook-buffer-key{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:18px;font-size:.6875rem;color:hsl(var(--muted-foreground))}.outlook-buffer-key i{width:18px;border-top:1px dashed currentColor}
+.outlook-data-note{font-size:.6875rem;color:hsl(var(--muted-foreground));line-height:1.7;margin-top:18px}.outlook-data-note>a{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:hsl(var(--primary))}
+.outlook-upcoming{display:flex;flex-direction:column}.outlook-upcoming-list{list-style:none;margin:0;padding:0}.outlook-upcoming-list li+li{border-top:1px solid hsl(var(--border)/.55)}.outlook-upcoming-list a,.outlook-upcoming-list li>div{display:flex;align-items:center;gap:10px;min-height:67px;padding:12px 0;min-width:0}.outlook-event-icon{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:9px;background:hsl(var(--primary)/.06);color:hsl(var(--primary))}.outlook-event-copy{min-width:0;flex:1}.outlook-event-copy strong{font-size:.8125rem;font-weight:550;overflow-wrap:anywhere}.outlook-event-copy small{display:block;font-size:.6875rem;color:hsl(var(--muted-foreground));line-height:1.6;margin-top:3px}.outlook-event-amount{display:flex;align-items:center;gap:5px;font-size:.8125rem;white-space:nowrap}.outlook-event-amount>svg{color:hsl(var(--muted-foreground))}.outlook-related{display:flex;gap:18px;flex-wrap:wrap;margin-top:auto;padding-top:10px}.outlook-related>a{display:inline-flex;align-items:center;min-height:44px;font-size:.75rem;color:hsl(var(--primary))}.outlook-related-icon{display:inline-grid;place-items:center;flex:none;width:30px;height:30px;border-radius:9px;background:hsl(var(--primary)/.1);color:hsl(var(--primary));margin-inline-end:8px}
+.outlook-full-page{margin-top:0}.outlook-full-page .outlook-section-heading{margin-bottom:24px}
+@media(min-width:768px) and (max-width:1099px){.outlook-workspace{grid-template-columns:1fr}.outlook-chart{max-width:600px;margin-inline:auto;width:100%}}
+@media(max-width:767px){
+ .household-outlook{margin-top:24px}.household-outlook:not(.outlook-full-page) .outlook-expanded{display:none}
+ .outlook-mobile-card{display:block}.outlook-mobile-heading{display:flex;align-items:center;justify-content:space-between;font-size:.9375rem;font-weight:600}.outlook-mobile-heading>span{display:flex;align-items:center;gap:8px}.outlook-mobile-heading svg{color:hsl(var(--primary))}.outlook-mobile-card>p{font-size:.75rem;color:hsl(var(--muted-foreground));margin-top:14px}.outlook-mobile-card>strong{display:block;font-size:1.65rem;font-weight:600;margin-top:4px;letter-spacing:-.025em}.outlook-estimate-label{font-size:.6875rem;color:hsl(var(--muted-foreground))}.outlook-mobile-next{display:flex;align-items:center;gap:10px;border-top:1px solid hsl(var(--border)/.65);margin-top:16px;padding-top:14px;font-size:.75rem}.outlook-mobile-next>svg{flex:none;color:hsl(var(--muted-foreground))}.outlook-mobile-next small{display:block;margin-top:4px;color:hsl(var(--muted-foreground));font-size:.6875rem}.outlook-mobile-link{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-top:10px;font-size:.75rem;color:hsl(var(--primary))}
+ .outlook-full-page{margin-top:0}.outlook-workspace{grid-template-columns:1fr;gap:18px}.outlook-section-heading{align-items:start;flex-wrap:wrap;gap:4px}.outlook-section-heading h1{font-size:1.4rem}.outlook-forecast-summary{gap:10px}.outlook-forecast-summary>p{max-width:95px}.outlook-months strong{font-size:.8rem}.outlook-event-icon{display:none}.outlook-chart svg{min-height:140px}.outlook-accounts{margin-bottom:14px}.outlook-accounts button{font-size:.75rem;padding-inline:10px}.outlook-data-note{font-size:.6875rem}
+}
+
+/* Outlook polish: a softly filled projection, with precise values and a richer phone summary. */
+.household-outlook{--outlook-violet:265 45% 43%;--outlook-amber:30 80% 34%;--outlook-teal:174 70% 28%}
+.dark .household-outlook{--outlook-violet:265 78% 78%;--outlook-amber:37 90% 68%;--outlook-teal:171 61% 63%}
+.outlook-chart{margin-top:12px}.outlook-chart svg{overflow:hidden}
+.outlook-fill-start{stop-color:hsl(var(--primary));stop-opacity:.2}.outlook-fill-end{stop-color:hsl(var(--primary));stop-opacity:.015}
+.outlook-projection-line{stroke-width:3;stroke-dasharray:8 4}
+.outlook-buffer-line{stroke:hsl(var(--outlook-amber)/.8);stroke-dasharray:4 6}
+.outlook-point{stroke:hsl(var(--card));stroke-width:2}.outlook-point-halo{fill:hsl(var(--primary)/.13)}
+.outlook-point-guide{stroke:hsl(var(--primary)/.12);stroke-width:1;stroke-dasharray:2 5}
+.outlook-months{margin-top:0;gap:6px}.outlook-months>div{padding:8px 4px;border-radius:10px;background:hsl(var(--primary)/.045)}
+.outlook-buffer-key{margin-top:12px;font-size:.75rem}.outlook-buffer-key i{border-color:hsl(var(--outlook-amber));border-top-width:2px}
+.outlook-event-icon[data-kind=card]{color:hsl(var(--primary));background:hsl(var(--primary)/.09)}
+.outlook-event-icon[data-kind=cheque]{color:hsl(var(--outlook-teal));background:hsl(var(--outlook-teal)/.09)}
+.outlook-event-icon[data-kind=loan]{color:hsl(var(--outlook-violet));background:hsl(var(--outlook-violet)/.09)}
+.outlook-event-icon[data-kind=purchase]{color:hsl(var(--outlook-amber));background:hsl(var(--outlook-amber)/.09)}
+@media(max-width:767px){
+ .outlook-mobile-card{padding:16px;background:linear-gradient(145deg,hsl(var(--primary)/.06),transparent 55%),hsl(var(--card))}
+ .outlook-mobile-heading{min-height:44px;gap:6px}.outlook-mobile-heading>span:first-child{flex:1}.outlook-mobile-heading .outlook-badge{font-size:.625rem;font-weight:500;white-space:nowrap}
+ .outlook-mobile-card .outlook-accounts{margin:8px 0 14px;padding:3px;border:1px solid hsl(var(--border)/.7);border-radius:12px;background:hsl(var(--card)/.65);gap:4px}
+ .outlook-mobile-card .outlook-accounts button{flex:1;min-height:44px;padding:7px 6px;min-width:0}
+ .outlook-mobile-metrics{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:10px}.outlook-mobile-metrics>div{padding:8px 0}.outlook-mobile-metrics span:not(.money-number):not(.money-symbol){font-size:.6875rem}.outlook-mobile-metrics>div>span{display:block;color:hsl(var(--muted-foreground));line-height:1.6}.outlook-mobile-metrics strong{display:block;margin-top:4px;font-size:1.45rem;font-weight:650;line-height:1.4}
+ .outlook-mobile-metrics .outlook-lowest{padding:8px 10px;background:hsl(var(--outlook-violet)/.07);border-radius:12px;color:hsl(var(--outlook-violet))}.outlook-lowest strong{font-size:1.1rem}.outlook-lowest>span{color:inherit!important}
+ .outlook-mobile-metrics [data-low=true]{color:hsl(var(--destructive))}.outlook-lowest[data-low=true]{background:hsl(var(--destructive)/.07)}
+ .outlook-chart-compact{margin-top:4px}.outlook-chart-compact svg{min-height:0}.outlook-chart-compact .outlook-months>div{padding:7px 2px}.outlook-chart-compact .outlook-months strong{font-size:.8125rem}.outlook-chart-compact .outlook-buffer-key{font-size:.6875rem;margin-top:8px}
+ .outlook-mobile-status{font-size:.75rem;line-height:1.5;color:hsl(var(--muted-foreground));margin-top:10px}.outlook-mobile-status[data-warning=true]{color:hsl(var(--destructive))}
+ .outlook-mobile-agenda{border-top:1px solid hsl(var(--border)/.6);margin-top:12px;padding-top:12px}.outlook-mobile-agenda>div{display:flex;justify-content:space-between;gap:8px;align-items:center}.outlook-mobile-agenda h3{font-size:.75rem;font-weight:600}.outlook-mobile-agenda>div>span{font-size:.6875rem;color:hsl(var(--muted-foreground))}.outlook-mobile-agenda ol{list-style:none;padding:0;margin:4px 0 0}.outlook-mobile-agenda li{display:flex;align-items:center;gap:8px;padding:8px 0;min-height:54px}.outlook-mobile-agenda .outlook-event-icon{display:grid;width:30px;height:30px}.outlook-mobile-agenda .outlook-event-copy strong{font-size:.75rem}.outlook-mobile-agenda li>.money-amount{font-size:.8125rem}.outlook-mobile-agenda>p{font-size:.75rem;color:hsl(var(--muted-foreground));margin-top:8px}
+ .outlook-mobile-link{margin-top:4px;min-height:44px;border-top:1px solid hsl(var(--border)/.6);font-weight:550}
+ .outlook-mobile-card>p.outlook-mobile-disclaimer{font-size:.625rem;line-height:1.5;margin-top:0;color:hsl(var(--muted-foreground))}
+ .outlook-mobile-heading:active,.outlook-mobile-link:active{opacity:.65}.outlook-accounts button:active{background:hsl(var(--primary)/.15)}
+}
+@media(max-width:767px){
+ .outlook-mobile-heading{flex-wrap:wrap}.outlook-mobile-heading>span:first-child{min-width:0;flex:1 1 45%}.outlook-mobile-heading .outlook-badge{white-space:normal}
+ .outlook-mobile-card .outlook-accounts button{flex:1 1 7rem}
+ .outlook-mobile-metrics{grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr))}
+ .outlook-chart-compact .outlook-months{grid-template-columns:repeat(auto-fit,minmax(min(100%,4.5rem),1fr))}
+ .outlook-mobile-agenda>div{flex-wrap:wrap}.outlook-mobile-agenda li{flex-wrap:wrap}.outlook-mobile-agenda li>.money-amount{margin-inline-start:auto}
+}
+
+/* Phone Overview begins with the data; its period lives beside the budget in the app bar. */
+.home-mobile-title,.household-budget-mobile,.household-header-month{display:none}
+@media(max-width:767px){
+ .household-home>.home-heading,.household-budget-desktop,.household-header-actions>.household-desktop-refresh{display:none}
+ .home-mobile-title,.household-budget-mobile,.household-header-month{display:block}
+ .household-header-leading{gap:8px}.household-budget-control{flex:1 1 0;min-width:0}
+ .household-header-month{flex:1 1 0;min-width:0}
+ .household-header-month .home-month-picker{display:block;min-width:0;width:100%}
+ .household-header-month select,.household-budget-mobile select{width:100%;min-width:0;max-width:100%;min-height:44px;padding:6px 8px;font-size:.8125rem;border-radius:10px;background:hsl(var(--muted));color:hsl(var(--foreground))}
+ .household-header-month select:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+ .household-budget-mobile .household-space-name{font-size:.8125rem;line-height:1.4}
+}
+
+@media(max-width:767px){
+ .household-home{gap:0}
+ .household-header-month select,.household-budget-mobile select{appearance:auto;padding-inline-end:4px}
+}
+
+@media(max-width:767px){.outlook-related-icon{display:none}}

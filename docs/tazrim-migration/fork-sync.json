@@ -1,20 +1,19 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
-  "sourceBranch": "codex/budgit-household-ui",
-  "sourceCommit": "7ffff52",
+  "sourceBranch": "codex/platform-adaptive-ui",
+  "sourceCommit": "d1ed8242ffbfd3d4e207259974e9b2330fc9de6c",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "upstreamMain": "ab9b47948b39ab34e926fdc4a715e101b86d7248",
-  "status": "Source checkpoint: five-page navigation, compact account card, Settings tiles and a searchable catalog retaining all prior routes. Not a production release.",
+  "status": "Reviewed Planning interface and calculator prototype. Local build and browser checks completed.",
   "validation": {
     "build": "passed",
     "typecheck": "passed",
-    "regressionTests": 1362,
+    "regressionTests": 1458,
     "coreChecks": 15,
-    "focusedNavigationChecks": 14,
-    "browser": "No new browser or physical-iPhone acceptance claimed."
+    "browser": "Synthetic phone and desktop checks cover the Planning layout, calculator, draft recovery, and row actions."
   },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496"
+  "productionApplicationCommit": "ae73b6391dbf018e372fe7fa294282540df90e10"
 }

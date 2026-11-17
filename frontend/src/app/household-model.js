@@ -1,13 +1,13 @@
 import {cashAccountList,cashSourceRecords,monthAt} from '../../../src/budget.js'
 import {tazrimDisplaySnapshot} from '../../../src/tazrim-display-model.js'
 import {withViewQuery} from './navigation-query.js'
-export const mainPages=['/','/accounts','/plans','/savings','/analysis','/categories','/more']
+export const mainPages=['/','/accounts','/savings','/more']
 /** Space changes keep the period, never another space's record/filter/action. */
 export function householdSpaceHref(path,search,id){
  const query=new URLSearchParams(search),next=new URLSearchParams()
  for(const key of ['year','month','demo'])if(query.has(key))next.set(key,query.get(key))
  if(id!=='personal')next.set('budget',id)
- const lists=['/','/accounts','/savings','/more','/income','/monthly','/loans','/plans','/plans/scenario','/recurring','/categories','/categories/manage','/categories/limits','/search','/analysis','/details/manage','/checks','/accounts/transfers','/accounts/assignments','/card-setup','/incoming','/upload','/upload/history','/actions','/investment','/goals','/overview','/overview/transfers','/overview/migration','/start','/about','/settings','/settings/spaces','/settings/forecast','/settings/profile','/settings/security','/settings/history','/settings/device-draft','/settings/access','/settings/gmail','/settings/drive','/settings/wallet','/settings/report-expectations','/savings/accounts','/savings/returns','/savings/allocation','/savings/transfer','/savings/transfers','/savings/schedule']
+ const lists=['/','/outlook','/accounts','/savings','/more','/income','/monthly','/loans','/plans','/plans/scenario','/recurring','/categories','/categories/manage','/categories/limits','/search','/analysis','/details/manage','/checks','/accounts/transfers','/accounts/assignments','/card-setup','/incoming','/upload','/upload/history','/actions','/investment','/goals','/overview','/overview/transfers','/overview/migration','/start','/about','/settings','/settings/spaces','/settings/forecast','/settings/profile','/settings/security','/settings/history','/settings/device-draft','/settings/access','/settings/gmail','/settings/drive','/settings/wallet','/settings/report-expectations','/savings/accounts','/savings/returns','/savings/allocation','/savings/transfer','/savings/transfers','/savings/schedule']
  const parent=/^\/(accounts|banks|cards)\//.test(path)?'/accounts':householdFallback(path)
  const destination=lists.includes(path)?path:parent
  return destination+(next.size?'?'+next:'')
@@ -66,6 +66,7 @@ export function householdSaveDestination(location,fallback=householdFallback(loc
 
 /** Useful parent for a deep link opened without an in-app trail. */
 export function householdFallback(path,search=''){
+ if(path==='/outlook')return '/'
  const cardAction=path.match(/^\/cards\/([^/]+)\/(?:payer|stop|no-activity|billing(?:\/[^/]+)?)$/)
  if(cardAction)return '/cards/'+cardAction[1]
  const accountMonthly=path.match(/^\/accounts\/([^/]+)\/monthly(?:\/correction)?$/)

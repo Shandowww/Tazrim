@@ -8,3 +8,11 @@ test('Scenario uses the original forecast and shortest-payment search, retains s
 test('Replacing a priced item combines fees once and preserves metadata and all recorded months',()=>{const p=base(),r=initialScenarioRow(p,'draft-id','2026-10','old');assert.equal(r.draft.amount,'102');assert.equal(r.draft.fees,'0');r.draft.amount='120.01';const next=prepareScenario(p,[r]).plan;assert.equal(next.expenses.length,1);assert.equal(next.expenses[0].id,'old');assert.equal(next.expenses[0].amount,120.01);assert.equal(next.expenses[0].fees,0);assert.deepEqual(next.expenses[0].note,{keep:true});assert.deepEqual(next.months,p.months)})
 test('Disabled new rows do not enter a scenario; existing-item deletion, income conversion and colliding identities are refused',()=>{const p=base(),r=row(p);r.enabled=false;assert.deepEqual(prepareScenario(p,[r]).plan,p);const old=initialScenarioRow(p,'draft','2026-10','old');assert.throws(()=>prepareScenario(p,[{...old,enabled:false}]));for(const rows of [[row(p,'old')],[row(p),row(p)],[old,{...old,id:'different'}],[{...row(p),draft:{...row(p).draft,kind:'income'}}],[{...row(p),draft:{...row(p).draft,fees:'2'}}]])assert.throws(()=>prepareScenario(p,rows));assert.throws(()=>shortestScenarioSplit(p,[row(p)],'new','invalid'))})
 test('Replacing card payment with direct payment clears stale card assignment while preserving unrelated metadata',()=>{const p=base();p.expenses[0].source='card';p.expenses[0].cardId='card1';const r=initialScenarioRow(p,'draft','2026-10','old');r.draft.source='direct';r.draft.cardId='';const item=prepareScenario(p,[r]).plan.expenses[0];assert.equal(item.cardId,undefined);assert.deepEqual(item.note,{keep:true})})
+test('Changing only the installment count preserves the saved price and fees',()=>{
+ const plan=base(),purchase=initialScenarioRow(plan,'draft','2026-10','old')
+ purchase.draft.payments='3'
+ const {items,plan:next}=prepareScenario(plan,[purchase])
+ assert.equal(next.expenses.length,1)
+ assert.deepEqual(next.expenses[0],{...plan.expenses[0],payments:3})
+ assert.equal(items[0].amount+items[0].fees,102)
+})

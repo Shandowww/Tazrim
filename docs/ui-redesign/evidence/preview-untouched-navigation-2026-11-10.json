@@ -1,0 +1,52 @@
+{
+  "applicationSource": "21db47d",
+  "previewUrl": "https://adaptive.budgit.duckdns.org/next?year=2026&month=10&review=21db47d",
+  "productionInterfaceReplaced": false,
+  "reproduction": {
+    "untouchedEditor": "/next/card-setup/new",
+    "injectedFailure": "IndexedDB open never returns",
+    "before": {
+      "navigationStayedOnEditor": true,
+      "falseSavingDialog": true,
+      "discardAndRetryDisabled": true,
+      "beforeUnloadWarningWithoutEdits": true
+    },
+    "after": {
+      "navigationReachedOverview": true,
+      "openDialogs": 0,
+      "storageErrorAfterFiveSeconds": true,
+      "navigationAfterErrorReachedAccounts": true,
+      "sampleFinancialRevision": 1
+    }
+  },
+  "change": [
+    "Device-draft reading is no longer registered as an active mutation.",
+    "IndexedDB open has a five-second deadline and explicit blocked-open handling; late connections close.",
+    "A new route gets its own Suspense loading surface so navigation remains visible and interruptible."
+  ],
+  "verification": {
+    "buildAndTypecheck": "passed",
+    "regressionsIncludingReaders": 1448,
+    "coreChecks": 15,
+    "browserChecks": 123,
+    "runtimeErrors": [],
+    "financialWrites": 0,
+    "financialRecordsUnchanged": true,
+    "controlledFailures": [
+      "stalled draft open on untouched editor",
+      "storage-open timeout",
+      "navigation after storage failure",
+      "withheld lazy screen JavaScript",
+      "new destination while old module still pending"
+    ],
+    "hostedBeforeAfterReproductionPassed": true
+  },
+  "runtimeFrontendSHA256": "0f30d5ae3ba3d743d9fe86e828e11f795bf01402b72f88fe680c85f8144f7155",
+  "hostedHashMatchesLocalBuild": true,
+  "previewReadOnlyRoot": true,
+  "previewDataMounts": 0,
+  "productionServiceIdentitiesFrontendHashAndHealthPreserved": true,
+  "oldPreviewContainerRetired": true,
+  "productionPromotionRequiresApproval": true,
+  "physicalIPhoneAcceptance": false
+}

@@ -1,3 +1,73 @@
+## Project workflow and responsive design — 2026-11-17
+
+- **Prototype approval before any Git push:** For every proposed Budgit change, show Tal a reviewable local prototype or preview first and wait for his explicit approval of that specific version before pushing to any remote. Local implementation, tests and commits are allowed before approval; a request to make a change, an earlier general publishing/backup approval, or approval of a different prototype is not approval to push this version. This rule overrides older instructions to push completed stages or keep GitHub backups immediately updated. Do not push the Budgit backup branch or the Tazrim fork export until approval.
+- **Separate phone and desktop interface designs:** The phone browser and phone PWA use the same compact mobile interface. The desktop web browser retains its separate established desktop layout and navigation, including the sidebar, More and Settings views. Share data and application behavior, but apply mobile navigation and visual changes only to phone widths unless Tal explicitly requests a desktop redesign. Use the existing 768px responsive breakpoint; review both a phone width and a desktop width, including the breakpoint, in each interface prototype. A PWA launch should not select a different design from a phone browser at the same width.
+
+## Adaptive desktop and PWA layout published — 2026-11-12
+
+Reviewed application source `ae73b63` is verified live at `https://budgit.duckdns.org/next`. Desktop uses the wider workspace, simplified task navigation, report coverage and forecast. Phone/PWA uses compact overview, month and budget selectors, richer outlook and minimal Back controls. Existing Budgit styling, Hebrew RTL, currency placement, financial calculations and guarded drafts remain. The preview account switcher was independently verified with two disposable budgets; the hosted sample contains only one budget.
+
+Clean candidate build/typecheck, prior preview's 1,458 regressions, 24 focused and 15 core checks, plus 208 built-candidate contracts pass. Fresh verified backup, isolated financial/access/rollback/intake/automation/retained-asset gates, 1,018 prior-source files, 172 live runtime files, all 50 authoritative tables, keys/configuration and adjacent services were verified. Public health/auth/deep-route checks pass. No production financial edits, Sites change or new physical-iPhone acceptance. Evidence: `docs/ui-redesign/evidence/release-platform-adaptive-2026-11-12.json`. Use guarded app refresh after saving drafts.
+
+**Current application source is `work/budgit-household-ui/work/platform-adaptive-ui`, branch `codex/platform-adaptive-ui`, source checkpoint `ae73b63`.** Preserve unrelated WIP in the outer checkouts. This supersedes older live and preview-only status below.
+
+## Compact mobile Overview header — preview, 2026-11-12
+
+Review-only application `0414b15` is verified at `https://adaptive.budgit.duckdns.org/next?year=2026&month=10`. Mobile Overview starts at the financial summary, without the eyebrow/visible page title. Its month dropdown sits beside the mobile budget dropdown. More contains report updating, the same guarded refresh command and All spaces when applicable. The mobile refresh icon moves out of the header; pull refresh remains. Desktop keeps title/month/budget/refresh controls; report uploading remains in Reports rather than Overview. Financial calculations and records are unchanged.
+
+Build/typecheck, 1,458 regressions, 24 focused checks and 15 core checks pass. Light/dark browser checks cover 320–1440px, 44px controls, no overflow, shared-budget/month retention, viewer labels, report navigation and menu refresh. Synthetic financial bytes remained unchanged with zero financial writes (the fixture counted two nonfinancial requests). Hosted checks pass with unchanged sample revision 1 and matching frontend hash. Production/adjacent identities, production frontend and health are preserved; prior preview retired. Evidence: `docs/ui-redesign/evidence/compact-mobile-overview-preview-2026-11-12.json`; scope: `docs/ui-redesign/COMPACT-MOBILE-OVERVIEW-2026-11-12.md`.
+
+**Preview only. Wait for Tal’s explicit approval before production promotion.** No physical-iPhone/installed-PWA or new physical pull-gesture acceptance is claimed.
+
+## Refined graph and richer mobile outlook — preview, 2026-11-11
+
+Review-only application `76340c5` is verified at `https://adaptive.budgit.duckdns.org/next?year=2026&month=10`. The accepted desktop layout now has a curved dashed forecast, subtle area fill, clear month/value cells and an amber buffer guide. The mobile card includes account controls, three balances/chart, the lowest expected month, buffer and two upcoming payments with type colours. Header/footer links retain the selected account on the full outlook. Original calculations, saved data and menu remain unchanged.
+
+Build/typecheck, 13 focused tests and 15 core checks pass. Light/dark browser checks span 320–1920px and landscape; currency/44px targets, keyboard account selection, full-route retention and Back pass. At 200% root text the new card reflows within 320px; the surrounding existing Overview has 3px overflow, so whole-app enlarged-text acceptance is not claimed. Hosted checks and frontend hash match pass; sample revision remains 1 and records are unchanged. Production/adjacent identities, production frontend and health are preserved. Prior preview retired. Evidence: `docs/ui-redesign/evidence/outlook-polish-preview-2026-11-11.json`.
+
+**Preview only. Wait for Tal’s explicit approval before production promotion.** No new physical-iPhone or installed-PWA acceptance is claimed.
+
+## Desktop and PWA outlook — preview, 2026-11-11
+
+Review-only application `54839f4` is verified at `https://adaptive.budgit.duckdns.org/next?year=2026&month=10`. Overview now shows a per-account three-month forecast and upcoming saved commitments on desktop. On phones, one compact card opens `/outlook` with the minimal Back control and Overview tab selected. Original design, theme, currency isolation and financial calculations remain. Missing/partial balances are not fabricated, stale reporting is disclosed, and reminders do not add deductions. Synthetic future examples are preview-only.
+
+Build/typecheck, 1,458 regressions, 15 core checks and 13 focused checks pass. Light/dark browser checks cover 320–1920px, currency spacing, account controls, Basic mode and phone navigation. Hosted desktop/phone/account switching/Back checks pass, sample revision remains 1 with unchanged records, and the hosted frontend matches the local build. Production/adjacent service identities, production frontend and health are preserved. Prior preview retired. Evidence: `docs/ui-redesign/evidence/outlook-preview-2026-11-11.json`; scope: `docs/ui-redesign/OUTLOOK-PROTOTYPE-2026-11-11.md`.
+
+**Production remains unchanged. Wait for Tal’s explicit approval of the reviewed design before promotion.** No new physical-iPhone or installed-PWA acceptance is claimed.
+
+## All-account report coverage on desktop — preview, 2026-11-11
+
+Review-only application `128b3a5` is verified at `https://adaptive.budgit.duckdns.org/next/incoming?sync=missing`. At widths >=1024px the coverage map fills available content width and shows every bank/card row with aligned six-month cells, without an entity dropdown. Narrow screens retain the selector and selected row. Original entity/month detail routes and coverage semantics are unchanged. Build/typecheck, 7 focused coverage contracts, 15 core checks and 44 browser checks pass, including light/dark, 320–1920px, detail/return, privacy/viewer and zero financial writes. Hosted five-row desktop and selected-card phone checks pass, sample revision remains 1 and the frontend matches the local build. Production/adjacent identities, production frontend and health are preserved; prior preview retired. Evidence: `docs/ui-redesign/evidence/wide-report-coverage-preview-2026-11-11.json`.
+
+**Production remains unchanged. Wait for Tal’s explicit approval of the reviewed design before promotion.** No new physical-iPhone acceptance is claimed.
+
+## Simplified workspace navigation preview — 2026-11-11
+
+Review-only application `e719b5c` is verified at `https://adaptive.budgit.duckdns.org/next`. Six financial workspaces retain only 9 secondary entries (previously 22). Record editing, report/manual-entry settings, category management, forecast settings and savings allocation live in context. Expenses includes search and recurring patterns; Savings separates goals/balances from deposits, with monthly/one-off planning together. Settings groups account/sharing, privacy/recovery and connections; existing identity-validated capability facts control server-admin and legacy Wallet links. Guided setup is in Help. Original financial commands/routes, theme, currency repair, mode/role guards and draft semantics remain.
+
+Build/typecheck, 1,452 regressions, 15 core checks and 171 browser checks pass, with zero financial writes and byte-identical synthetic records. Hosted menu/recurring navigation/settings/phone deposit checks pass, local and hosted frontend hashes match and sample revision remains 1. Production/adjacent identities, production frontend and health are preserved. Prior preview retired. Evidence: `docs/ui-redesign/evidence/simplified-workspaces-preview-2026-11-11.json`; design scope: `docs/ui-redesign/SIMPLIFIED-WORKSPACES-2026-11-11.md`.
+
+**Production remains unchanged. Wait for Tal’s explicit approval of the reviewed design before promotion.** No new physical-iPhone acceptance is claimed.
+
+## Established design, task menu and currency preview — 2026-11-11
+
+Review-only application `41d7799` is verified at `https://adaptive.budgit.duckdns.org/next`. Keep the accepted wider adaptive layout with Budgit’s original theme/backdrop. Six desktop task areas replace the flat inventory; secondary tools are contextual, Settings/Help remain in the footer and phone More has five task choices. Shekel amounts use explicit symbol-left isolation and spacing. Build/typecheck, 1,452 regressions, 15 core checks and 151 browser checks pass, with zero financial writes and byte-identical sample records. Hosted theme/menu/currency/phone-report navigation checks pass; frontend matches local build and sample revision remains 1. Bounded in-memory preview has no host data mounts. Production/adjacent identities, production frontend and health are preserved. Prior preview retired. Evidence: `docs/ui-redesign/evidence/task-menu-currency-preview-2026-11-11.json`.
+
+**Production remains unchanged. Wait for Tal’s explicit approval of the reviewed design before promotion.** No new physical-iPhone acceptance is claimed.
+
+## Preview navigation repair — 2026-11-10
+
+Review-only preview source `21db47d` is verified at `https://adaptive.budgit.duckdns.org/next`. A controlled storage-open stall reproduced an untouched editor incorrectly blocking navigation as an active save. Draft reading is now separate from saving; storage open has a bounded failure and late-connection cleanup. Lazy-screen loading is explicit and interruptible. Build/typecheck, 1,448 regressions, 15 core checks and 123 browser checks pass; hosted before/after failure injection confirms free untouched navigation, an actionable timeout and unchanged sample revision. Production identities, frontend hash and health were preserved. Evidence: `docs/ui-redesign/evidence/preview-untouched-navigation-2026-11-10.json`. The previous preview container was retired. The restriction on production promotion until Tal approves the design remains.
+
+## Apple Design preview revision — 2026-11-10
+
+Adaptive preview application `c1b546d` is hosted separately at `https://adaptive.budgit.duckdns.org/next` with sample records in memory, no data mounts and bounded resources. Current draft-navigation source `42f23a7` is integrated. The overview and working surfaces were revised using the user-invoked Apple Design skill after the first prototype was rejected. Build/typecheck, 1,445 regressions, 15 core checks, responsive browser checks and hosted draft/Back/navigation checks pass. Existing production and adjacent service identities, production frontend hash and health were preserved. Evidence: `docs/ui-redesign/evidence/apple-adaptive-preview-2026-11-10.json`.
+
+**This is a review preview, not approval to replace production.** Tal explicitly requested seeing the design before it replaces the current interface. Preserve the approval restriction below; wait for explicit approval of the reviewed design before any production promotion.
+
+## Adaptive redesign: preview before publication — 2026-11-10
+
+Tal requested minimal Back chevrons and reviewing this redesign before it replaces the current design. Keep the chevron visually small with a 44px touch target. Do not publish `codex/platform-adaptive-ui` over production until Tal explicitly approves the reviewed design. This is a task-specific restriction overriding earlier standing publication authorization. The isolated local preview uses sample records only; see `docs/ui-redesign/PLATFORM-ADAPTIVE-2026-11-10.md` and `scripts/preview-platform.mjs`.
 ## Form drafts across navigation published — 2026-11-10
 
 Application `70a302a` is verified live. Ordinary recoverable forms retain exact unfinished input in encrypted actor/budget/editor-scoped device drafts before navigation. Financial Save stays explicit. Settings offers draft discovery, editor return, export and deliberate discard; legacy complete-plan recovery is retained. All 39 raw-form adapters and 19 justified guard exceptions are documented in `docs/ui-redesign/FORM-DRAFT-NAVIGATION-IMPLEMENTATION-2026-11-10.md`.

@@ -98,7 +98,7 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  const reportHref=(report:IncomingReport)=>report.route?href('/upload/'+encodeURIComponent(report.route.reportId)+'/group?'+new URLSearchParams({syncReturn:returnList}),report.route):''
  const nextLabel=(report:IncomingReport)=>{const job=jobs.find(job=>job.id===report.id);return report.lifecycle==='digested'?'הטיפול הושלם':report.lifecycle==='partial'?'נשאר טיפול להשלמה':syncWaiting(report,job)?'בהכנה אוטומטית':job?.manualOnly?'נדרשת בדיקת היסטוריית הקליטה':job?.status==='attention'?'דורש טיפול':report.route?'מוכן להמשך בדיקה':report.verificationState==='verified'?'נדרש זיהוי ושיוך':'נדרש אישור פענוח'}
  const step=Math.min(3,Math.max(1,Number(query.get('syncStep'))||1)),connectionsPage=Math.max(1,Number(query.get('connectionPage'))||1),connectionsPages=Math.max(1,Math.ceil((snapshot?.connections.length??0)/6)),connectionPage=Math.min(connectionsPage,connectionsPages)
- return <div className="mx-auto min-w-0 max-w-3xl space-y-4 [overflow-wrap:anywhere]">
+ return <div className={"mx-auto min-w-0 space-y-4 [overflow-wrap:anywhere] "+(view==='missing'?'sync-coverage-workspace':'max-w-3xl')}>
   <PageHeading>סנכרון דוחות</PageHeading>
   <p className="text-xs text-muted-foreground">תיבה פרטית לכל התקציבים שלך · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>
   <nav aria-label="תצוגות בתוך מרכז הסנכרון" className="grid grid-cols-4 gap-1 rounded-xl bg-muted p-1">

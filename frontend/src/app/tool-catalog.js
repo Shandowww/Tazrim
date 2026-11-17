@@ -1,7 +1,7 @@
 /** Every secondary Budgit destination, grouped once for the compact navigation. */
 export const toolGroups = [
   { title: 'תכנון', items: [
-    ['/plans/scenario', 'מחשבון רכישה'], ['/income', 'הכנסות עתידיות'],
+    ['/income', 'הכנסות עתידיות'],
     ['/monthly', 'עדכון חודשי'], ['/recurring', 'חיובים קבועים'],
     ['/loans', 'הלוואות'], ['/checks', 'צ׳קים'], ['/goals', 'יעדים חודשיים'],
     ['/settings/forecast', 'בסיס התחזית'], ['/investment', 'סימולציית השקעות'],

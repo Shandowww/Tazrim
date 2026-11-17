@@ -9,8 +9,6 @@ import {
   Ellipsis,
   Target,
   Settings,
-  ListTodo,
-  Tags,
   type LucideIcon,
 } from 'lucide-react'
 import type { PagedAccountKind } from '@/lib/accounts/routes'
@@ -63,9 +61,8 @@ export const SECTION_ITEMS: Record<NavSectionKey, NavSectionItem> = {
 export const MAIN_NAV: NavItem[] = [
   { type: 'link', href: '/', label: 'תמונה כללית', icon: LayoutDashboard },
   { type: 'link', href: '/accounts', label: 'חשבונות', icon: Building2 },
-  { type: 'link', href: '/plans', label: 'תכנון', icon: ListTodo },
   { type: 'link', href: '/savings', label: 'מטרות', icon: Target },
-  { type: 'link', href: '/categories', label: 'קטגוריות', icon: Tags },
+  { type: 'link', href: '/more', label: 'עוד', icon: Ellipsis },
 ]
 
 export const TOOLS_NAV: NavLinkItem = { type: 'link', href: '/more', label: 'כל הכלים', icon: Ellipsis }

@@ -1,10 +1,13 @@
+import {ChartNoAxesCombined,ChevronDown,Plus,Sparkles,Trash2} from 'lucide-react'
+import {PlanningMonthField} from './planning-month-field'
 import {useFormDraft} from './use-form-draft'
+import {MoneyAmount} from './money-amount'
 import {PageHeading} from './page-heading'
 import {ScenarioComparison} from './scenario-comparison'
 import {useRef,useState} from 'react'
 import {cashAccountList,scenarioAssessment,validatePlan} from '../../../src/budget.js'
 import {initialScenarioRow,prepareScenario,shortestScenarioSplit,type ScenarioRow} from './scenario-command'
-import {plannedItemCards,type PlannedItemDraft} from './planned-item-command'
+import {plannedItemCards,plannedItemSchedule,type PlannedItemDraft} from './planned-item-command'
 import {savePreparedPlan,SaveConflict} from './plan-save'
 import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
@@ -13,22 +16,149 @@ import BackLink from './back-link'
 import Link from './link'
 import {groupAmountText,groupedAmountChange} from './amount-format'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
-const input='mt-1 h-11 w-full rounded-xl border bg-card px-3 text-sm tabular-nums',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50',money=(n:number|null)=>n===null?'לא ידוע':new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(n)
+const input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-base tabular-nums',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 function currentMonth(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).formatToParts(new Date());return parts.find(p=>p.type==='year')!.value+'-'+parts.find(p=>p.type==='month')!.value}
-function Editor({budget,base,onSaved}:{budget:BudgetState;base:BudgetResponse;onSaved:(s:string)=>void}){
- const plan=base.plan!,[asOf]=useState(currentMonth),[rows,setRows]=useState<ScenarioRow[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[hint,setHint]=useState(''),[blocked,setBlocked]=useState(false),flight=useRef(false),guard=useDraftGuard(),href=usePeriodHref(),accounts=cashAccountList(plan),dirty=rows.length>0
- const change=(next:ScenarioRow[])=>{setRows(next);setError(null);setHint('');onSaved('')}
- const update=(id:string,key:keyof PlannedItemDraft,value:string)=>change(rows.map(row=>{if(row.id!==id)return row;const draft={...row.draft,[key]:value};if(['cashAccountId','source','firstMonth'].includes(key)&&draft.cardId&&!plannedItemCards(plan,draft).some((c:any)=>c.id===draft.cardId))draft.cardId='';return{...row,draft}}))
- const add=(originalId='')=>{try{change([...rows,initialScenarioRow(plan,crypto.randomUUID(),asOf<String(plan.startMonth)?String(plan.startMonth):asOf,originalId)])}catch(e){setError(e instanceof Error?e.message:'הפריט אינו זמין.')}}
+export function ScenarioEditor({budget,base,onSaved,onSaveComplete,demo=false,onDemoSaved,embedded=false,purchaseId='',detailsHref,readOnlyReason=''}:{budget:BudgetState;base:BudgetResponse;onSaved:(s:string)=>void;onSaveComplete?:()=>void;demo?:boolean;onDemoSaved?:(plan:any)=>void;embedded?:boolean;purchaseId?:string;detailsHref?:string;readOnlyReason?:string}){
+ const plan=base.plan!,[asOf]=useState(currentMonth),[rows,setRows]=useState<ScenarioRow[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[hint,setHint]=useState<{text:string;rowId?:string}|null>(null),[blocked,setBlocked]=useState(false),flight=useRef(false),newPurchase=useRef(''),addButton=useRef<HTMLButtonElement>(null),guard=useDraftGuard(),href=usePeriodHref(),accounts=cashAccountList(plan),dirty=rows.length>0
+ const firstMonth=asOf<String(plan.startMonth)?String(plan.startMonth):asOf
+ const [blankPurchase]=useState(()=>initialScenarioRow(plan,crypto.randomUUID(),firstMonth,purchaseId))
+ const displayedRows=rows.length?rows:[blankPurchase]
+ const change=(next:ScenarioRow[])=>{setRows(next);setError(null);setHint(null);onSaved('')}
+ const update=(id:string,key:keyof PlannedItemDraft,value:string)=>change(displayedRows.map(row=>{if(row.id!==id)return row;const draft={...row.draft,[key]:value};if(['cashAccountId','source','firstMonth'].includes(key)&&draft.cardId&&!plannedItemCards(plan,draft).some((c:any)=>c.id===draft.cardId))draft.cardId='';return{...row,draft}}))
+ const add=(originalId='')=>{try{const row=initialScenarioRow(plan,crypto.randomUUID(),firstMonth,originalId);newPurchase.current=row.id;change([...(purchaseId?displayedRows:rows),row])}catch(e){setError(e instanceof Error?e.message:'הפריט אינו זמין.')}}
  let preview:ReturnType<typeof prepareScenario>|null=null,previewError=''
- try{if(rows.length)preview=prepareScenario(plan,rows)}catch(e){previewError=e instanceof Error?e.message:'יש לבדוק את נתוני התרחיש.'}
- const saveRaw=async()=>{if(flight.current||!dirty||blocked)return false;flight.current=true;setBusy(true);setError(null);try{const result=await savePreparedPlan({budgetId:budget.budgetId,base,plan:prepareScenario(plan,rows).plan});budget.accept(result);onSaved(result.recovered?'שמירת התרחיש אושרה מול התקציב השמור.':'התרחיש נוסף לתכנון. דיווחי אמת נשמרו.');return true}catch(e){if(e instanceof AccessError){budget.invalidate(e.message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(e instanceof Error?e.message:'התרחיש לא נשמר.');return false}finally{flight.current=false;setBusy(false)}}
- const formDraft=useFormDraft({kind:'scenario',dirty,busy,discard:()=>{setRows([]);setError(null);setBlocked(false);setHint('')},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'scenario',period:asOf,values:rows,baseline:[] as ScenarioRow[],restore:value=>{setRows(value)},mutationPending:blocked,enabled:true}),save=formDraft.save
- const backup=()=>{try{const prepared=prepareScenario(plan,rows).plan,url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan:prepared},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-scenario-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setHint('גיבוי התכנון הועבר לדפדפן להורדה.')}catch(e){setError(e instanceof Error?e.message:'יש לתקן את התכנון לפני גיבוי.')}}
- const shortest=(row:ScenarioRow)=>{try{const payments=shortestScenarioSplit(plan,rows,row.id,asOf);if(payments===null){setHint('לא נמצאה פריסה של 1–60 תשלומים ששומרת על רף הביטחון בכל התקופה. ייתכן שחסרה יתרה או שקיימת בעיה בנתוני החשבונות.');return}update(row.id,'payments',String(payments));setHint('נבחרו '+payments+' תשלומים לפי התחזית הנוכחית; שאר הפריטים נשארו קבועים. זו הערכה בלבד.')}catch(e){setError(e instanceof Error?e.message:'יש להשלים את נתוני התרחיש.')}}
+ try{if(dirty||purchaseId)preview=prepareScenario(plan,displayedRows)}catch(e){previewError=e instanceof Error?e.message:'יש לבדוק את נתוני התרחיש.'}
+ const saveRaw=async()=>{if(flight.current||!dirty||blocked||readOnlyReason)return false;flight.current=true;setBusy(true);setError(null);try{const prepared=prepareScenario(plan,rows).plan;if(demo){onDemoSaved?.(prepared);onSaved(purchaseId?'הרכישה עודכנה בדוגמה הזמנית בלבד.':'הרכישה נוספה לדוגמה הזמנית בלבד.');return true}const result=await savePreparedPlan({budgetId:budget.budgetId,base,plan:prepared});budget.accept(result);onSaved(result.recovered?'שמירת התרחיש אושרה מול התקציב השמור.':purchaseId?'הרכישה עודכנה בתכנון.':'התרחיש נוסף לתכנון. דיווחי אמת נשמרו.');return true}catch(e){if(e instanceof AccessError){budget.invalidate(e.message);return false}if(e instanceof SaveConflict)setBlocked(true);setError(e instanceof Error?e.message:'התרחיש לא נשמר.');return false}finally{flight.current=false;setBusy(false)}}
+ const formDraft=useFormDraft({kind:'scenario',dirty,busy,discard:()=>{setRows([]);setError(null);setBlocked(false);setHint(null)},save:blocked||readOnlyReason?undefined:saveRaw},{budgetId:demo?'demo':budget.budgetId,base,kind:'scenario',record:purchaseId||'new',context:purchaseId?'purchase':'',period:asOf,values:rows,baseline:purchaseId?blankPurchase.draft:[],restore:value=>{setRows(value)},mutationPending:blocked}),save=formDraft.save
+ const backup=()=>{try{const prepared=prepareScenario(plan,rows).plan,url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan:prepared},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-scenario-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setHint({text:'גיבוי התכנון הועבר לדפדפן להורדה.'})}catch(e){setError(e instanceof Error?e.message:'יש לתקן את התכנון לפני גיבוי.')}}
+ const shortest=(row:ScenarioRow)=>{try{const payments=shortestScenarioSplit(plan,displayedRows,row.id,asOf);if(payments===null){setHint({rowId:row.id,text:'לא נמצאה פריסה השומרת על רף הביטחון. ייתכן שחסרים נתוני יתרה.'});return}update(row.id,'payments',String(payments));setHint({rowId:row.id,text:payments===1?'נבחר תשלום אחד לפי התחזית הנוכחית.':'נבחרו '+payments+' תשלומים לפי התחזית הנוכחית.'})}catch(e){setError(e instanceof Error?e.message:'יש להשלים את נתוני התרחיש.')}}
  const assessment=preview?scenarioAssessment(preview.rows,asOf):null
  if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
- return <div className="space-y-5"><p className="text-sm text-muted-foreground">עד 12 רכישות · הניסוי נשמר רק באישור מפורש.</p><fieldset disabled={busy} className="space-y-4"><div className="surface space-y-3 rounded-xl p-4"><button type="button" disabled={rows.length>=12} onClick={()=>add()} className={button}>הוספת רכישה לניסוי</button><label className="block text-sm">שינוי רכישה קיימת בתוך הניסוי<select className={input} value="" disabled={rows.length>=12} onChange={e=>{if(e.target.value)add(e.target.value)}}><option value="">בחירת פריט קיים</option>{(plan.expenses as any[]).filter(e=>e.kind==='expense'&&!rows.some(r=>r.originalId===e.id)).map(e=><option key={e.id} value={e.id}>{e.name}</option>)}</select></label></div>{rows.map((row,i)=><section key={row.id} className="surface space-y-4 rounded-xl p-4"><h2 className="font-semibold">רכישה {i+1}{row.originalId?' · החלפת פריט קיים':''}</h2><label className="block text-sm">שם רכישה {i+1}<input className={input} maxLength={100} value={row.draft.name} onChange={e=>update(row.id,'name',e.target.value)}/></label><label className="block text-sm">מחיר סופי כולל עמלות · רכישה {i+1} · ₪<input className={input} dir="ltr" inputMode="decimal" maxLength={32} value={groupAmountText(row.draft.amount)} onChange={e=>groupedAmountChange(e,(value:string)=>update(row.id,'amount',value))}/></label><div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm">חודש ראשון · רכישה {i+1}<input type="month" className={input} value={row.draft.firstMonth} onChange={e=>update(row.id,'firstMonth',e.target.value)}/></label><label className="block text-sm">מספר תשלומים · רכישה {i+1}<input className={input} dir="ltr" inputMode="numeric" maxLength={2} value={row.draft.payments} onChange={e=>update(row.id,'payments',e.target.value)}/></label></div><label className="block text-sm">פריסת תשלומים · רכישה {i+1}<input type="range" className="mt-3 w-full accent-primary" min={1} max={60} value={Number(row.draft.payments)||1} onChange={e=>update(row.id,'payments',e.target.value)}/></label>{accounts.length>0&&<label className="block text-sm">חשבון משלם · רכישה {i+1}<select className={input} value={row.draft.cashAccountId} onChange={e=>update(row.id,'cashAccountId',e.target.value)}><option value="">בחירת חשבון מפורשת</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>}<label className="block text-sm">אופן תשלום · רכישה {i+1}<select className={input} value={row.draft.source} onChange={e=>update(row.id,'source',e.target.value)}><option value="direct">ישירות מהחשבון</option><option value="card">כרטיס אשראי</option></select></label>{row.draft.source==='card'&&<label className="block text-sm">כרטיס לחיוב · רכישה {i+1}<select className={input} value={row.draft.cardId} onChange={e=>update(row.id,'cardId',e.target.value)}><option value="">בחירת כרטיס</option>{plannedItemCards(plan,row.draft).map((c:any)=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>}<div className="flex flex-wrap gap-3"><button type="button" onClick={()=>shortest(row)} className={button}>חיפוש הפריסה הקצרה · רכישה {i+1}</button><button type="button" onClick={()=>change(rows.filter(r=>r.id!==row.id))} className={button}>הוצאה מהניסוי · רכישה {i+1}</button></div>{row.originalId&&<p className="text-sm text-muted-foreground">הוצאה מהניסוי משאירה את הפריט המקורי בתקציב.</p>}</section>)}</fieldset>{previewError&&<p role="status" className="rounded-xl border p-4 text-sm">{previewError}</p>}{hint&&<p role="status" className="surface rounded-xl p-4 text-sm">{hint}</p>}{preview&&<section className="surface space-y-4 rounded-xl p-4"><h2 className="font-semibold">השוואת תחזיות · מחודש <bdi dir="ltr">{asOf}</bdi></h2><p className="text-sm text-muted-foreground">התחזית אינה יתרה מאושרת או הבטחה למסגרת אשראי. הפריסה הקצרה נבדקת לכל התקופה, כששאר הפריטים קבועים. פריטים חדשים בתרחיש נבדקים כהוצאה נוספת גם אם הדיווח החודשי כולל תכנון.</p>{accounts.length?preview.accounts.map((a:any)=>{const considered=a.rows.filter((r:any)=>r.month>=asOf),unknown=considered.some((r:any)=>r.balance===null||r.issues.length),low=unknown?null:considered.reduce((min:any,r:any)=>!min||r.balance<min.balance?r:min,null);return <div key={a.account.id} className="rounded-xl border p-3 text-sm"><h3 className="font-semibold">{a.account.label}</h3><p>{unknown?'חסרה יתרה או שיש נתונים שדורשים בדיקה. אין מסקנה בטוחה לחשבון הזה.':low?<>יתרה חזויה נמוכה: <bdi>{money(low.balance)}</bdi> · <bdi dir="ltr">{low.month}</bdi></>:'אין תקופה להשוואה.'}</p></div>}):assessment&&<p className="text-sm">יתרה חזויה נמוכה: <bdi>{money(assessment.balance)}</bdi> · <bdi dir="ltr">{assessment.month}</bdi> · רף ביטחון <bdi>{money(Number(plan.buffer))}</bdi></p>}<ScenarioComparison preview={preview} asOf={asOf}/>{accounts.length>0&&<p className="text-sm text-muted-foreground">הטבלה מציגה תחזית מצרפית בלבד. חשבון עם יתרה לא ידועה אינו נעשה בטוח בגלל יתרה בחשבון אחר.</p>}</section>}{error&&<p role="alert" className="rounded-xl border border-destructive p-4 text-sm text-destructive">{error}</p>}<div className="surface household-scenario-actions rounded-xl p-4"><p role="status" className="text-sm">{busy?'שומרים תכנון…':dirty?'הניסוי עדיין לא אושר לשמירה.':'לא נוספו רכישות לניסוי.'}</p><button type="button" disabled={!preview?.items.length||busy||blocked} onClick={()=>void save()} className="min-h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50">שמירת התרחיש בתכנון</button><button type="button" disabled={!preview||busy} onClick={backup} className={button}>גיבוי התכנון</button>{blocked&&<button type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)} className={button}>טעינת הגרסה השמורה</button>}</div><BackLink href={href('/plans')}>חזרה לתכנון</BackLink></div>
+ const existingPurchases=(plan.expenses as {id:string;kind:string;name:string}[]).filter(item=>item.kind==='expense'&&item.id!==purchaseId&&!rows.some(row=>row.originalId===item.id))
+ return <div className={embedded?'scenario-workspace scenario-workspace--embedded':'scenario-workspace'}>
+  <div className="scenario-content">
+   <div className="scenario-columns">
+    <fieldset disabled={busy} className="scenario-form">
+     {displayedRows.map((row,i)=>{
+      const number=i+1
+      const item=preview?.items.find((item:{id:string})=>item.id===(row.originalId||row.id))
+      const schedule=item?plannedItemSchedule(item):[]
+      const first=schedule[0],last=schedule.at(-1)
+      return <section key={row.id} className="scenario-purchase">
+       <header className="scenario-section-heading scenario-purchase-heading">
+        <h3>{rows.length>1?'רכישה '+number+(row.originalId?' · החלפת פריט קיים':''):row.originalId?'שינוי רכישה קיימת':'חישוב רכישה חדשה'}</h3>
+        {dirty&&(!purchaseId||row.originalId!==purchaseId)&&<button type="button" className="scenario-remove" aria-label={'הוצאה מהניסוי · רכישה '+number} onClick={()=>{change(rows.filter(item=>item.id!==row.id));addButton.current?.focus()}}>
+         <Trash2 size={18} aria-hidden/>
+        </button>}
+       </header>
+       <label className="scenario-price">
+        <span>מחיר סופי כולל עמלות</span>
+        <span className="scenario-price-input" dir="ltr">
+         <span aria-hidden="true">₪</span>
+         <input className="scenario-price-value" autoFocus={newPurchase.current===row.id} aria-label={'מחיר סופי כולל עמלות בשקלים · רכישה '+number} dir="ltr" inputMode="decimal" maxLength={32}
+          placeholder="0" value={groupAmountText(row.draft.amount)} onChange={event=>groupedAmountChange(event,(value:string)=>update(row.id,'amount',value))}/>
+        </span>
+       </label>
+       <label className="block text-sm">שם רכישה {number}
+        <input className={input} maxLength={100} value={row.draft.name} onChange={event=>update(row.id,'name',event.target.value)}/>
+       </label>
+       <div className="scenario-split">
+        <label className="block text-sm">מספר תשלומים · רכישה {number}
+         <input className={input} dir="ltr" inputMode="numeric" maxLength={2} value={row.draft.payments} onChange={event=>update(row.id,'payments',event.target.value)}/>
+        </label>
+        <div className="scenario-slider">
+         <input type="range" min={1} max={60} dir="rtl" aria-label={'פריסת תשלומים · רכישה '+number}
+          value={Math.max(1,Math.min(60,Number(row.draft.payments)||1))}
+          onChange={event=>update(row.id,'payments',event.target.value)}/>
+         <div aria-hidden="true"><span>1</span><span>60</span></div>
+        </div>
+        {first&&last&&<p className="scenario-installment">
+         <strong><MoneyAmount value={first.amount} minimumFractionDigits={2}/></strong> {schedule.length===1?'בתשלום אחד':'לתשלום'}
+         {last.amount!==first.amount&&<> · תשלום אחרון <MoneyAmount value={last.amount} minimumFractionDigits={2}/></>}
+        </p>}
+       </div>
+       <PlanningMonthField label={'חודש ראשון · רכישה '+number} className={input} value={row.draft.firstMonth} startMonth={plan.startMonth as string} onChange={value=>update(row.id,'firstMonth',value)}/>
+       {accounts.length>0&&<label className="block text-sm">חשבון משלם · רכישה {number}
+        <select className={input} value={row.draft.cashAccountId} onChange={event=>update(row.id,'cashAccountId',event.target.value)}>
+         <option value="">בחירת חשבון מפורשת</option>
+         {accounts.map(account=><option key={account.id} value={account.id}>{account.label}</option>)}
+        </select>
+       </label>}
+       <label className="block text-sm">אופן תשלום · רכישה {number}
+        <select className={input} value={row.draft.source} onChange={event=>update(row.id,'source',event.target.value)}>
+         <option value="direct">ישירות מהחשבון</option><option value="card">כרטיס אשראי</option>
+        </select>
+       </label>
+       {row.draft.source==='card'&&<label className="block text-sm">כרטיס לחיוב · רכישה {number}
+        <select className={input} value={row.draft.cardId} onChange={event=>update(row.id,'cardId',event.target.value)}>
+         <option value="">בחירת כרטיס</option>
+         {plannedItemCards(plan,row.draft).map((card:any)=><option key={card.id} value={card.id}>{card.name}</option>)}
+        </select>
+       </label>}
+       <button type="button" disabled={!dirty&&!purchaseId} aria-label={'חיפוש הפריסה הקצרה · רכישה '+number} onClick={()=>shortest(row)} className="scenario-find">
+        <Sparkles size={18} aria-hidden/>חיפוש הפריסה הקצרה
+       </button>
+       {hint?.rowId===row.id&&<p role="status" className="scenario-note">{hint.text}</p>}
+       {row.originalId&&<p className="scenario-note">הוצאה מהניסוי משאירה את הפריט המקורי בתקציב.</p>}
+      </section>
+     })}
+     {dirty&&<button ref={addButton} type="button" disabled={rows.length>=12} onClick={()=>add()} className="scenario-add">
+      <Plus size={18} aria-hidden/>הוספת רכישה נוספת
+     </button>}
+     {detailsHref&&<Link href={detailsHref} className="inline-flex min-h-11 items-center text-sm text-primary underline">עריכת פרטי רכישה</Link>}
+     {existingPurchases.length>0&&<details className="scenario-existing scenario-replace">
+      <summary>שינוי רכישה קיימת<ChevronDown size={18} aria-hidden/></summary>
+      <label className="block p-3 pt-0 text-sm">בחירת רכישה
+       <select className={input} value="" disabled={rows.length>=12} onChange={event=>{if(event.target.value)add(event.target.value)}}>
+        <option value="">בחירת פריט קיים</option>
+        {existingPurchases.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}
+       </select>
+      </label>
+     </details>}
+    </fieldset>
+    <section className="scenario-forecast">
+     <header className="scenario-section-heading">
+      <h3>{preview?'השוואת תחזיות':'השפעה על התחזית'}</h3>
+      <ChartNoAxesCombined size={20} aria-hidden/>
+     </header>
+     {preview?<>
+      <p className="scenario-note">תחזית מחודש <bdi dir="ltr">{asOf}</bdi>. הסכומים הם הערכה.</p>
+      {accounts.length?preview.accounts.map((account:any)=>{
+       const considered=account.rows.filter((row:any)=>row.month>=asOf)
+       const unknown=considered.some((row:any)=>row.balance===null||row.issues.length)
+       const low=unknown?null:considered.reduce((min:any,row:any)=>!min||row.balance<min.balance?row:min,null)
+       return <div key={account.account.id} className="scenario-balance">
+        <h4>{account.account.label}</h4>
+        {unknown?<p>היתרה או נתוני החשבון חסרים.</p>:low?<p>יתרה חזויה נמוכה <strong><MoneyAmount value={low.balance} minimumFractionDigits={2}/></strong><bdi dir="ltr">{low.month}</bdi></p>:<p>אין תקופה להשוואה.</p>}
+       </div>
+      }):assessment&&<div className="scenario-balance">
+       <h4>יתרה חזויה נמוכה</h4>
+       <strong><MoneyAmount value={assessment.balance} minimumFractionDigits={2}/></strong>
+       <p><bdi dir="ltr">{assessment.month}</bdi> · רף ביטחון <MoneyAmount value={Number(plan.buffer)} minimumFractionDigits={2}/></p>
+      </div>}
+      <ScenarioComparison preview={preview} asOf={asOf} initiallyOpen={!embedded}/>
+      <details className="scenario-existing">
+       <summary>איך התחזית מחושבת<ChevronDown size={18} aria-hidden/></summary>
+       <p className="scenario-note p-3 pt-0">הפריסה הקצרה נבדקת לכל התקופה, כששאר הפריטים קבועים. רכישות חדשות בתרחיש נבדקות כהוצאה נוספת גם אם הדיווח החודשי כולל תכנון.</p>
+      </details>
+     </>:<p className="scenario-note" role={previewError?'status':undefined}>{previewError||'הזינו את פרטי הרכישה כדי לראות איך הפריסה תשפיע על היתרה.'}</p>}
+    </section>
+   </div>
+  </div>
+  <footer className="scenario-footer">
+   {error&&<p role="alert" className="scenario-error">{error}</p>}
+   {readOnlyReason&&<p role="status" className="scenario-note">{readOnlyReason}</p>}
+   {hint&&!hint.rowId&&<p role="status" className="scenario-note">{hint.text}</p>}
+   {formDraft.status&&embedded&&<p role="status" className="scenario-note">{formDraft.status}</p>}
+   <div className="scenario-footer-actions">
+    <button type="button" disabled={!dirty||!preview?.items.length||busy||blocked||!!readOnlyReason} onClick={()=>void save().then(saved=>{if(saved)onSaveComplete?.()})}
+     className="scenario-save">{busy?'שומרים תכנון…':demo?(purchaseId?'עדכון הרכישה בדוגמה':'הוספה לדוגמה הזמנית'):(purchaseId?'שמירת השינויים בתכנון':'שמירת התרחיש בתכנון')}</button>
+    {!demo&&<button type="button" disabled={!dirty||!preview||busy} onClick={backup} className={button}>גיבוי התכנון</button>}
+    {blocked&&!demo&&<button type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)} className={button}>טעינת הגרסה השמורה</button>}
+   </div>
+  </footer>
+  {!embedded&&<BackLink href={href('/plans')}>חזרה לתכנון</BackLink>}
+ </div>
 }
 export function ScenarioPage({fixture,budget}:{fixture:boolean;budget:BudgetState}){
  const [message,setMessage]=useState(''),href=usePeriodHref()
@@ -36,5 +166,5 @@ export function ScenarioPage({fixture,budget}:{fixture:boolean;budget:BudgetStat
  if(budget.status==='loading'||budget.refreshPending)return <p role="status">טוען תכנון…</p>
  if(budget.status==='error')return <p role="alert">{budget.message}</p>
  const plan=budget.value.plan,reason=!plan||plan.format||!validatePlan(plan)?'התקציב אינו זמין לניסוי בתצוגה הזו.':budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'שמירה מוגנת אינה זמינה בשרת הזה.':null
- return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">מחשבון רכישה</PageHeading><Link href={href('/income')} className="inline-flex min-h-11 items-center text-primary underline">הכנסות עתידיות והערכות</Link>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface space-y-3 rounded-xl p-4"><p>{reason}</p><BackLink href={href('/plans')}>חזרה לתכנון</BackLink></section>:<Editor key={budget.budgetId+'/'+budget.value.accountId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
+ return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">מחשבון רכישה</PageHeading><Link href={href('/income')} className="inline-flex min-h-11 items-center text-primary underline">הכנסות עתידיות והערכות</Link>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface space-y-3 rounded-xl p-4"><p>{reason}</p><BackLink href={href('/plans')}>חזרה לתכנון</BackLink></section>:<ScenarioEditor key={budget.budgetId+'/'+budget.value.accountId+'/'+budget.value.revision} budget={budget} base={budget.value} onSaved={setMessage}/>}</div>
 }

@@ -65,8 +65,6 @@ body,.font-sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sa
 @media(prefers-reduced-motion:reduce){.household-back{transition:none}}
 .household-menu{padding:8px 16px}.household-menu h2{margin:8px 0}.household-menu a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;min-height:50px;font-size:15px}.household-menu a+a{border-top:1px solid hsl(var(--border))}
 .household-utility-links{display:grid;padding:4px 14px}.household-utility-links a{display:flex;align-items:center;min-height:44px;padding:8px 0;color:hsl(var(--primary));font-size:14px;line-height:1.4;overflow-wrap:anywhere}.household-utility-links a+a{border-top:1px solid hsl(var(--border))}
-.household-scenario-actions{display:grid;gap:10px}.household-scenario-actions>button{width:100%;min-width:0;min-height:44px;padding:8px 12px;line-height:1.35}
-@media(min-width:640px){.household-scenario-actions{display:flex;flex-wrap:wrap;align-items:center}.household-scenario-actions>p{flex:1 1 180px}.household-scenario-actions>button{width:auto}}
 .dark{color-scheme:dark}html:not(.dark){color-scheme:light}
 @media(min-width:768px){.household-tabs{display:none}.household-page{--household-gap:20px}.household-history{padding:24px}.household-bars{height:160px}}
 @media(max-width:360px){.household-history{padding:12px}.household-months{margin-inline:-6px}.household-totals{grid-template-columns:1fr;gap:6px}.household-totals>div{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.household-totals strong{font-size:16px}.household-legend{gap:8px}}
@@ -87,7 +85,7 @@ body,.font-sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sa
 .household-card-detail{min-width:0;padding:16px}.household-card-detail>.household-title{min-width:0;flex-wrap:wrap}.household-card-detail>.household-title h2{min-width:0;overflow-wrap:anywhere}.household-card-detail>.household-title h2 bdi{white-space:normal;overflow-wrap:anywhere}.household-card-detail>.household-title>strong{font-size:25px}.household-detail-period,.household-detail-note{font-size:12px;color:hsl(var(--muted-foreground));margin:8px 0}.household-category-row{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 0;border-bottom:1px solid hsl(var(--border));font-size:14px}.household-category-row>span:first-child{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;flex-shrink:0}.household-category-row>span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}.household-category-label{display:inline-flex;align-items:center;gap:8px}.household-category-label i{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 @media(min-width:768px){.household-bank-list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
 .household-cheque{border-top:1px solid hsl(var(--border));padding-block:4px}.household-cheque summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;min-height:64px;list-style:none}.household-cheque summary::-webkit-details-marker{display:none}.household-cheque summary strong{font-size:15px;overflow-wrap:anywhere}.household-cheque summary small{grid-column:1/-1;color:hsl(var(--muted-foreground));font-size:12px}.household-loan-summary{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;font-size:14px}.household-loan-summary>span{color:hsl(var(--muted-foreground))}
-.household-screen .surface{border-radius:var(--household-radius);border:1px solid hsl(var(--border));background-color:hsl(var(--card))}.household-screen h1{font-size:24px;line-height:1.3;letter-spacing:-.5px}.household-screen input:not([type=checkbox]):not([type=radio]):not([type=range]),.household-screen textarea,.household-screen select,.household-shell header select{font-size:16px}.household-report-page{max-width:1080px}.household-screen details>summary{min-height:44px}.household-screen .surface .surface{box-shadow:none}
+.household-screen .surface{border-radius:var(--household-radius);border:1px solid hsl(var(--border));background-color:hsl(var(--card))}.household-screen h1{font-size:24px;line-height:1.3;letter-spacing:-.5px}.household-screen input:not(.scenario-price-value):not([type=checkbox]):not([type=radio]):not([type=range]),.household-screen textarea,.household-screen select,.household-shell header select{font-size:16px}.household-report-page{max-width:1080px}.household-screen details>summary{min-height:44px}.household-screen .surface .surface{box-shadow:none}
 .household-header{background:hsl(var(--background));padding:calc(8px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left))}.household-topbar{max-width:760px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-height:44px}.household-header-actions{display:flex;align-items:center;gap:0}.household-header-actions>button,.household-header-actions>a{display:grid;place-items:center;width:44px;min-width:44px;min-height:44px;border-radius:12px}.household-space-switch{display:flex;min-width:0;gap:2px;border-radius:12px;background:hsl(var(--muted))}.household-space-switch>button{flex:1;min-width:0;height:44px;padding:4px 6px;border-radius:12px;font-size:14px;color:hsl(var(--muted-foreground));line-height:18px}.household-space-switch>button>span{display:block;min-width:0}.household-space-switch>button[aria-pressed=true]{color:hsl(var(--primary));background:hsl(var(--card));box-shadow:inset 0 0 0 1px hsl(var(--border)),0 1px 3px hsl(var(--foreground)/.04);font-weight:600}.household-space-switch small{display:block;font-size:10px;line-height:12px}.household-space-switch>button:focus-visible,.household-space-select select:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}.household-space-full{display:none}.household-space-select{display:block;min-width:0}.household-space-select select{width:100%;height:44px;padding:6px 10px;border-radius:12px;background:hsl(var(--muted))}.household-space-name{min-width:0;font-size:14px;color:hsl(var(--muted-foreground));overflow-wrap:anywhere}.household-page-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;min-width:0;width:100%}.household-page-heading>h1{flex:1 1 110px;min-width:0;overflow-wrap:anywhere}.household-period{min-width:0;width:200px;max-width:100%;flex:none}.household-period>div{height:48px}.household-period>div>button{min-width:44px;width:44px;height:44px}.household-period>div>button[data-state]{min-width:0;width:auto;flex:1;padding-inline:3px;font-size:12px}.household-title:has(>.household-page-heading){flex-wrap:wrap}.household-title>.household-page-heading{flex:1 1 280px}
 @media(min-width:768px){.household-space-short{display:none}.household-space-full{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.household-space-switch>button{font-size:15px}.household-period{width:220px}}
 @media(max-width:374px){.household-page-heading>h1{flex-basis:100%}.household-period{margin-inline-start:auto}}
@@ -156,3 +154,245 @@ body,.font-sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sa
 .household-card-flip-hint{top:58px;right:16px;left:auto;transform:none;max-width:calc(100% - 130px);font-size:10px;text-align:right}
 .household-card-bottom .household-payer{width:calc(50% - 44px);flex:none}
 .household-card-face[data-issuer=cal]:not([data-club]) .household-card-issuer img,.household-card-face[data-club=hitechzone] .household-card-issuer img{filter:brightness(0) invert(1)}
+
+
+.planning-calculator-launch {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:48px;
+  padding:8px 16px; border-radius:14px; background:hsl(var(--primary)); color:hsl(var(--primary-foreground));
+  font-size:.9375rem; font-weight:700; cursor:pointer; touch-action:manipulation;
+}
+.planning-calculator-launch:hover { filter:brightness(1.08); }
+.planning-calculator-launch:active { filter:brightness(.9); }
+.planning-calculator-launch:focus-visible,.planning-note summary:focus-visible { outline:2px solid hsl(var(--primary)); outline-offset:2px; }
+.planning-note { font-size:.8125rem; }
+.planning-note summary { display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; min-block-size:44px; padding:6px 10px; list-style:none; cursor:pointer; }
+.planning-note summary::-webkit-details-marker { display:none; }
+.planning-note summary>svg { flex:none; color:hsl(var(--muted-foreground)); }
+.planning-note:not([open]) summary>svg { transform:rotate(90deg); }
+.planning-note-more { color:hsl(var(--primary)); }
+.planning-note>p { padding:0 12px 10px; color:hsl(var(--muted-foreground)); line-height:1.55; }
+
+/* The calculator sheet scrolls independently between its header and actions. */
+.planning-calculator-dialog {
+  position:fixed;
+  inset:0;
+  margin:auto;
+  width:min(960px,calc(100% - 32px));
+  max-width:none;
+  max-height:min(90dvh,900px);
+  padding:0;
+  overflow:hidden;
+  border:1px solid hsl(var(--border));
+  border-radius:24px;
+  background:hsl(var(--background));
+  color:hsl(var(--foreground));
+  box-shadow:0 24px 72px rgb(0 0 0 / .28);
+}
+.planning-calculator-dialog::backdrop { background:rgb(0 0 0 / .56); }
+.planning-calculator-inner { display:flex; flex-direction:column; max-height:min(90dvh,900px); }
+.planning-calculator-header {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:14px 20px;
+  border-block-end:1px solid hsl(var(--border));
+  background:hsl(var(--card));
+}
+.planning-calculator-header h2 { font-size:1.25rem; font-weight:700; }
+.planning-calculator-header p,.scenario-note { color:hsl(var(--muted-foreground)); font-size:.875rem; line-height:1.5; }
+.planning-calculator-icon,.planning-calculator-close { display:grid; width:44px; height:44px; place-items:center; border-radius:14px; }
+.planning-calculator-icon { background:hsl(var(--primary)/.12); color:hsl(var(--primary)); }
+.planning-calculator-close { background:hsl(var(--muted)); color:hsl(var(--foreground)); }
+
+.scenario-workspace { display:flex; flex-direction:column; gap:12px; min-height:0; }
+.scenario-workspace--embedded { gap:0; }
+.scenario-content { min-height:0; }
+.scenario-workspace--embedded .scenario-content {
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  padding:16px 20px 24px;
+  scroll-padding-block:16px;
+}
+.scenario-columns,.scenario-form,.scenario-purchase,.scenario-forecast,.scenario-split {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-content:start;
+  min-inline-size:0;
+  gap:12px;
+}
+.scenario-section-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+.scenario-section-heading h3,.scenario-section-heading h4 { font-weight:700; }
+.scenario-purchase-heading { min-height:44px; }
+.scenario-add { justify-self:start; }
+.scenario-purchase,.scenario-forecast,.scenario-existing {
+  border:1px solid hsl(var(--border));
+  border-radius:18px;
+  background:hsl(var(--card));
+}
+.scenario-purchase,.scenario-forecast { padding:16px; }
+.scenario-add,.scenario-find,.scenario-remove {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding-inline:12px;
+  border-radius:12px;
+  background:hsl(var(--primary)/.1);
+  color:hsl(var(--primary));
+  font-size:.875rem;
+  font-weight:600;
+}
+.scenario-remove { min-width:44px; padding-inline:0; background:hsl(var(--muted)); color:hsl(var(--foreground)); }
+.scenario-price {
+  display:grid;
+  gap:4px;
+  padding:12px 16px;
+  border-radius:14px;
+  background:hsl(var(--primary)/.08);
+  font-size:.875rem;
+  font-weight:600;
+}
+.scenario-price-input { display:flex; align-items:center; gap:6px; color:hsl(var(--primary)); font-size:clamp(1.4rem,4vw,2.1rem); font-variant-numeric:tabular-nums; }
+.scenario-price-value { width:100%; font:inherit; min-width:0; min-height:44px; border-radius:6px; background:transparent; color:hsl(var(--foreground)); }
+.scenario-split { gap:8px; }
+.scenario-slider { display:grid; gap:0; }
+.scenario-slider input { width:100%; min-height:44px; accent-color:hsl(var(--primary)); }
+.scenario-slider>div { display:flex; justify-content:space-between; padding-inline:4px; color:hsl(var(--muted-foreground)); font-size:.8125rem; }
+.scenario-installment { font-size:.875rem; }
+.scenario-existing summary { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:44px; padding:8px 12px; cursor:pointer; list-style:none; }
+.scenario-replace { background:transparent; }
+.scenario-replace summary { color:hsl(var(--muted-foreground)); }
+.scenario-existing summary::-webkit-details-marker { display:none; }
+.scenario-existing[open]>summary svg { transform:rotate(180deg); }
+.scenario-forecast>section { min-inline-size:0; }
+.scenario-forecast>.scenario-section-heading svg { color:hsl(var(--primary)); }
+.scenario-balance { display:grid; gap:4px; padding:12px; border-radius:12px; background:hsl(var(--muted)/.65); }
+.scenario-balance h4,.scenario-balance p { font-size:.875rem; }
+.scenario-balance p { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; }
+.scenario-balance strong { font-size:1.125rem; font-variant-numeric:tabular-nums; }
+.scenario-error { color:hsl(var(--destructive)); font-size:.875rem; }
+.scenario-footer { display:grid; gap:8px; padding:12px 16px; border:1px solid hsl(var(--border)); border-radius:16px; background:hsl(var(--card)); }
+.scenario-workspace--embedded .scenario-footer { flex:none; padding:12px 20px; border-width:1px 0 0; border-radius:0; }
+.scenario-footer-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.scenario-save { flex:1 1 auto; min-height:44px; padding:8px 16px; border-radius:12px; background:hsl(var(--primary)); color:hsl(var(--primary-foreground)); font-weight:650; }
+.scenario-workspace button:disabled { opacity:.5; }
+.scenario-workspace button:enabled,.planning-calculator-close { cursor:pointer; touch-action:manipulation; }
+.scenario-workspace button:enabled:active,.planning-calculator-close:active { filter:brightness(.87); }
+.scenario-workspace :is(button,input,select,summary):focus-visible,.planning-calculator-close:focus-visible { outline:2px solid hsl(var(--primary)); outline-offset:2px; }
+.planning-calculator-inner>p { padding:16px 20px; }
+
+@media(min-width:1024px) {
+  .scenario-workspace--embedded .scenario-columns { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:start; }
+}
+@media(max-width:767px) {
+  .planning-calculator-dialog {
+    inset:auto 0 0;
+    width:100%;
+    max-height:calc(100dvh - max(12px,env(safe-area-inset-top)));
+    border-width:1px 0 0;
+    border-radius:24px 24px 0 0;
+  }
+  .planning-calculator-inner { max-height:inherit; }
+  .planning-calculator-header,.scenario-workspace--embedded .scenario-content,.scenario-workspace--embedded .scenario-footer {
+    padding-left:max(14px,env(safe-area-inset-left));
+    padding-right:max(14px,env(safe-area-inset-right));
+  }
+  .scenario-workspace--embedded .scenario-footer { padding-bottom:max(12px,env(safe-area-inset-bottom)); }
+}
+@media(prefers-reduced-motion:no-preference) {
+  .planning-calculator-dialog[open] { animation:calculator-enter .2s ease-out; }
+  @keyframes calculator-enter { from { opacity:0; transform:translateY(12px); } }
+}
+
+.planned-swipe-row { position:relative; overflow:hidden; }
+.planned-swipe-front {
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:56px;
+  padding-block:4px;
+  background:hsl(var(--card));
+  touch-action:pan-y pinch-zoom;
+  transition:transform .18s ease-out;
+}
+.planned-swipe-front[data-open=true] { transform:translateX(144px); }
+.planned-swipe-front[data-dragging=true] { transition:none; }
+.planned-swipe-toggle { display:grid; flex:0 0 44px; min-height:44px; place-items:center; border-radius:12px; color:hsl(var(--muted-foreground)); }
+.planned-swipe-toggle:hover,.planned-swipe-toggle[aria-expanded=true] { background:hsl(var(--muted)); color:hsl(var(--foreground)); }
+.planned-swipe-actions { position:absolute; inset-block:0; inset-inline-end:0; display:flex; width:144px; }
+.planned-swipe-actions>* {
+  display:flex; flex:1; flex-direction:column; justify-content:center; align-items:center; gap:4px;
+  background:hsl(var(--primary)/.12); color:hsl(var(--foreground)); font-size:.875rem; font-weight:600;
+}
+.planned-swipe-actions>.planned-swipe-remove { background:hsl(var(--destructive)/.14); color:hsl(var(--foreground)); }
+.planned-swipe-actions>:active { filter:brightness(.85); }
+.planned-swipe-front :focus-visible,.planned-swipe-actions :focus-visible { outline:2px solid hsl(var(--primary)); outline-offset:-3px; }
+@media(prefers-reduced-motion:reduce) { .planned-swipe-front { transition:none; } }
+
+.planned-list { display:grid; gap:24px; }
+.planned-list-heading {
+  margin-block-end:8px;
+  padding-inline:4px;
+  font-size:1rem;
+  font-weight:700;
+}
+.planned-list-group { border-radius:16px; overflow:hidden; }
+.planned-entry {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:"icon name amount" "icon schedule amount";
+  align-items:center;
+  column-gap:10px;
+  row-gap:4px;
+  inline-size:100%;
+  min-inline-size:0;
+  min-block-size:64px;
+  padding:10px 12px;
+  text-align:start;
+}
+.planned-swipe-front .planned-entry { padding-inline-end:0; }
+.planned-entry-icon {
+  grid-area:icon;
+  display:grid;
+  inline-size:36px;
+  block-size:36px;
+  place-items:center;
+  border-radius:12px;
+  background:hsl(var(--muted));
+  color:hsl(var(--primary));
+}
+.planned-entry-name { grid-area:name; font-size:.9375rem; font-weight:650; overflow-wrap:anywhere; }
+.planned-entry-schedule {
+  grid-area:schedule;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  column-gap:12px;
+  row-gap:2px;
+  color:hsl(var(--muted-foreground));
+  font-size:.8125rem;
+}
+.planned-entry-amount { grid-area:amount; justify-self:end; font-size:.9375rem; font-weight:650; font-variant-numeric:tabular-nums; }
+.planned-entry-amount .money-amount { white-space:nowrap; }
+.planned-list-group .planned-swipe-front { padding:0; padding-inline-end:4px; }
+.planned-list-group .planned-swipe-toggle { margin-inline-end:4px; }
+button.planned-entry:active,a.planned-entry:active { background:hsl(var(--muted)/.55); }
+.planned-entry:focus-visible { outline:2px solid hsl(var(--primary)); outline-offset:-3px; }
+
+@media(max-width:359px) {
+  .planned-entry { grid-template-columns:auto minmax(0,1fr); grid-template-areas:"icon name" "icon schedule" "icon amount"; }
+  .planned-entry-amount { justify-self:start; }
+}
+@media(min-width:768px) {
+  .planned-entry {
+    grid-template-columns:auto minmax(0,1fr) minmax(9rem,1fr) minmax(6rem,.7fr);
+    grid-template-areas:"icon name schedule amount";
+    column-gap:16px;
+    padding-inline:16px;
+  }
+}

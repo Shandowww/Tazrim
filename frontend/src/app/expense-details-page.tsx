@@ -1,3 +1,4 @@
+import {MoneyAmount} from './money-amount'
 import {PageHeading} from './page-heading'
 import {householdLinkState} from './household-model'
 import {householdCategory} from './household-categories'
@@ -17,7 +18,7 @@ import { demoHouseholdPlan } from './demo-fixture'
 
 export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categories' | 'search' | 'source'; fixture: boolean; budget: ReturnType<typeof useBudget> }) {
   const location=useLocation(),{ search, state } = location, navigate = useNavigate(), { id } = useParams(), params = new URLSearchParams(search)
-  const managementHref=withViewQuery('/details/manage',search),limitsHref=withViewQuery('/categories/limits',search)
+  const managementHref=withViewQuery('/details/manage?method=variable',search),limitsHref=withViewQuery('/categories/limits',search)
   const options = periodFor(search)
   if (!fixture && budget.status === 'loading') return <section className="surface rounded-xl p-6" role="status">טוען פירוט…</section>
   if (!fixture && budget.status === 'error') return <section className="surface rounded-xl p-6" role="alert">{budget.message}</section>
@@ -46,17 +47,17 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
     {typeof state?.setupSavedMessage==='string'&&(!state?.setupSavedScope||budget.status==='ready'&&state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId)&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
       <section className="surface rounded-xl p-5 space-y-3"><h2 className="font-semibold"><bdi>{raw.name}</bdi></h2>
         <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
-          <dt>סכום מקורי שנשמר</dt><dd><bdi dir="ltr">{formatCurrency(raw.amountCents / 100)}</bdi></dd>
+          <dt>סכום מקורי שנשמר</dt><dd><MoneyAmount value={raw.amountCents / 100} minimumFractionDigits={2}/></dd>
           <dt>תאריך רכישה</dt><dd><bdi dir="ltr">{raw.date}</bdi></dd><dt>חודש חיוב</dt><dd><bdi dir="ltr">{raw.month}</bdi></dd>
           <dt>רישום בסיכום החודש</dt><dd>{raw.accounting === 'included' ? 'כלול בסכומים החודשיים' : 'פריט נוסף לפי הכללים הקיימים'}</dd>
           <dt>מקור</dt><dd>{statement ? 'שורת דוח שנקלטה' : 'פירוט שמור ללא מסמך מקור'}</dd>
           {statement && <><dt>מנפיק בדוח</dt><dd><bdi>{statement.issuer === 'cal' ? 'כאל' : 'ישראכרט'}</bdi></dd><dt>מועד חיוב בדוח</dt><dd><bdi dir="ltr">{statement.dueDate}</bdi></dd>
-            <dt>סכום עסקה מקורי בדוח</dt><dd><bdi dir="ltr">{formatCurrency(statement.originalCents / 100)}</bdi></dd>
+            <dt>סכום עסקה מקורי בדוח</dt><dd><MoneyAmount value={statement.originalCents / 100} minimumFractionDigits={2}/></dd>
             {statement.foreignCents !== undefined && <><dt>סכום במטבע מקור</dt><dd><bdi dir="ltr">{(statement.foreignCents / 100).toFixed(2)} {statement.originalCurrency || ''}</bdi></dd></>}
             {statement.page && <><dt>עמוד בדוח</dt><dd><bdi>{statement.page}</bdi></dd></>}
           </>}
         </dl>{statement?.notes && <p className="text-sm break-words"><bdi>{statement.notes}</bdi></p>}
-        {source.row.split && <p className="text-sm text-muted-foreground">הרשומה פוצלה לצורך ניתוח. הסכום של החלק שנבחר הוא <bdi dir="ltr">{formatCurrency(source.row.cents / 100)}</bdi>; הסכום המקורי מוצג כאן בנפרד ואינו נוסף אליו.</p>}
+        {source.row.split && <p className="text-sm text-muted-foreground">הרשומה פוצלה לצורך ניתוח. הסכום של החלק שנבחר הוא <MoneyAmount value={source.row.cents / 100} minimumFractionDigits={2}/>; הסכום המקורי מוצג כאן בנפרד ואינו נוסף אליו.</p>}
       </section><p className="text-sm text-muted-foreground">אלה השדות שנשמרו בעת הקליטה, ללא טעינה או העברה של הקובץ המקורי. שדות המקור מיועדים לקריאה בלבד; אפשר לעדכן סיווג ופיצול לניתוח בנפרד.</p>
     </div>
   }
@@ -64,18 +65,18 @@ export function ExpenseDetailsPage({ mode, fixture, budget }: { mode: 'categorie
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const data = new FormData(event.currentTarget); navigate(href('/' + mode, { query: String(data.get('query') || '').trim() || null, page: null }),{state:householdLinkState(location,'/'+mode)}) }
   const searchControls=<details className="surface rounded-xl p-4" open={mode==='search'||!!options.query}><summary className="min-h-11 cursor-pointer text-sm">חיפוש לפי בית עסק</summary><p className="mt-3 text-sm text-muted-foreground">החיפוש בפירוט שנפרע במרחב ובתקופת החיוב שנבחרו, לפי שם בית העסק המוצג. הוא אינו מחפש בכל תנועות הבנק או בקבצים.</p><form key={(fixture?'demo':budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:budget.budgetId) + '/' + options.query} onSubmit={submit} className="mt-3 flex flex-wrap gap-3"><label className="flex-1 min-w-0 text-sm">שם בית עסק<input name="query" type="search" maxLength={80} defaultValue={options.query} className="mt-1 min-h-11 w-full rounded-lg border bg-card px-3 py-2" /></label><button className="self-end min-h-11 rounded-lg border px-4 py-2 text-sm" type="submit">חיפוש</button></form></details>
   return <div className="mx-auto max-w-7xl space-y-5">
-    <div className="flex flex-wrap items-center justify-between gap-3"><PageHeading className="text-2xl font-semibold">{mode === 'search' ? 'חיפוש בפירוט שנפרע' : 'קטגוריות ופירוט'}</PageHeading><Link className="inline-flex min-h-11 items-center text-primary underline text-sm" href={href(mode === 'search' ? '/categories' : '/search', { page: null })}>{mode === 'search' ? 'פתיחת הקטגוריות' : 'חיפוש בפירוט'}</Link></div>
+    <PageHeading className="text-2xl font-semibold">{mode === 'search' ? 'חיפוש בהוצאות' : 'הוצאות לפי קטגוריות'}</PageHeading>
     {fixture && <p className="text-sm text-muted-foreground">נתוני דוגמה בלבד</p>}
     {typeof state?.setupSavedMessage==='string'&&(!state?.setupSavedScope||budget.status==='ready'&&state.setupSavedScope===budget.value.accountId+'/'+budget.budgetId)&&<p role="status" className="surface rounded-xl p-4 text-sm">{state.setupSavedMessage}</p>}
     {(options.category || options.account || options.card) && <div className="text-sm">מסננים פעילים: <bdi>{options.category || ''}</bdi>{options.account && ' · חשבון נבחר'}{options.card && ' · כרטיס נבחר'} · <Link className="inline-flex min-h-11 items-center text-primary underline" href={href('/' + mode, { category: null, account: null, card: null, page: null })}>ניקוי מסננים</Link></div>}
-    {mode==='search'&&searchControls}
+    {searchControls}
     <section className="surface rounded-xl p-5"><h2 className="font-semibold">סיכום הפירוט המסונן</h2><dl className="mt-3 grid grid-cols-2 gap-3"><div className="col-span-2"><dt className="text-sm text-muted-foreground">נטו בפירוט</dt><dd className="text-2xl font-semibold"><bdi dir="ltr">{view.valueCents === null ? 'אין פירוט' : formatCurrency(view.valueCents / 100)}</bdi></dd></div><div><dt className="text-sm text-muted-foreground">רכישות מפורטות</dt><dd><bdi dir="ltr">{view.rows.length ? formatCurrency(view.purchasesCents / 100) : 'אין פירוט'}</bdi></dd></div><div><dt className="text-sm text-muted-foreground">זיכויים מפורטים</dt><dd><bdi dir="ltr">{view.rows.length ? formatCurrency(view.refundsCents === 0 ? 0 : -view.refundsCents / 100) : 'אין פירוט'}</bdi></dd></div></dl><p className="mt-3 text-sm text-muted-foreground">{view.coverage.explanation} אין כאן הוכחת כיסוי מלא או הוצאה נוספת על סיכום החודש.{view.coverage.pendingCount ? (view.coverage.pendingCount === 1 ? ' רשומה ממתינה אחת אינה כלולה בסיכום הזה.' : ` ${view.coverage.pendingCount} רשומות ממתינות אינן כלולות בסיכום הזה.`) : ''}</p></section>
     {mode === 'categories' && <CategoryDonut pagePath="/categories" data={view.positiveCategories} colors={Object.fromEntries(view.categories.map(row=>[row.category,householdCategory(row.category,plan).color]))} selectedCategory={options.category} title="רכישות חיוביות בפירוט לפי קטגוריה" emptyText="אין רכישות חיוביות מפורטות לתקופה זו" />}
-    {mode === 'categories' && view.categories.length > 0 && <section className="surface rounded-xl p-5"><h2 className="font-semibold">נטו לפי קטגוריה, אחרי זיכויים</h2><ul className="mt-3 divide-y">{view.categories.map(row => <li key={row.category}><Link className="flex items-center justify-between gap-3 py-3 text-sm" href={href('/categories', { category: options.category === row.category ? null : row.category, page: null })}><span className="household-category-label"><i style={{background:householdCategory(row.category,plan).color}} aria-hidden/><bdi>{row.category}</bdi></span><bdi dir="ltr">{formatCurrency(row.cents / 100)}</bdi></Link></li>)}</ul><p className="mt-2 text-sm text-muted-foreground">התרשים מציג רכישות חיוביות בלבד; הרשימה הזו שומרת גם קטגוריות עם זיכוי נטו.</p></section>}
-    {mode==='categories'&&searchControls}
+    {mode === 'categories' && view.categories.length > 0 && <section className="surface rounded-xl p-5"><h2 className="font-semibold">נטו לפי קטגוריה, אחרי זיכויים</h2><ul className="mt-3 divide-y">{view.categories.map(row => <li key={row.category}><Link className="flex items-center justify-between gap-3 py-3 text-sm" href={href('/categories', { category: options.category === row.category ? null : row.category, page: null })}><span className="household-category-label"><i style={{background:householdCategory(row.category,plan).color}} aria-hidden/><bdi>{row.category}</bdi></span><MoneyAmount value={row.cents / 100} minimumFractionDigits={2}/></Link></li>)}</ul><p className="mt-2 text-sm text-muted-foreground">התרשים מציג רכישות חיוביות בלבד; הרשימה הזו שומרת גם קטגוריות עם זיכוי נטו.</p></section>}
+
     <section className="surface rounded-xl p-4 sm:p-6"><h2 className="font-semibold">הרשומות השמורות</h2><p className="text-sm text-muted-foreground">תאריכי השורות הם תאריכי הרכישה; הסינון הוא לפי חודש החיוב.</p><p className="text-sm text-muted-foreground" role="status">{view.rows.length === 1 ? 'רשומה אחת' : `${view.rows.length} רשומות`} · עמוד {page} מתוך {Math.ceil(view.rows.length / 50) || 1}</p>{shown.length ? <SearchResultList categoryColors={Object.fromEntries(view.categories.map(row=>[row.category,householdCategory(row.category,plan).color]))} results={detailSearchResults(plan, shown)} terms={options.query ? [options.query] : []} /> : <p className="py-8 text-sm text-muted-foreground">אין פירוט שנפרע התואם לתקופה ולמסננים. חוסר פירוט אינו אפס.</p>}
       {view.rows.length > 50 && <nav className="mt-4 flex gap-4" aria-label="עמודי פירוט">{page > 1 && <Link className="text-primary underline" href={href('/' + mode, { page: String(page - 1) })}>העמוד הקודם</Link>}{page * 50 < view.rows.length && <Link className="text-primary underline" href={href('/' + mode, { page: String(page + 1) })}>העמוד הבא</Link>}</nav>}
     </section>
-    <details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">ניהול קטגוריות ופירוט</summary><nav className="household-account-actions" aria-label="פעולות פירוט וקטגוריות"><Link href={withViewQuery('/categories/manage',search)}>ניהול מילון הקטגוריות</Link><Link href={limitsHref}>תקרות הוצאה לפי קטגוריה</Link><Link href={managementHref}>ניהול צ׳קים ופירוט ידני</Link></nav></details>
+    <details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">ניהול קטגוריות ופירוט</summary><nav className="household-account-actions" aria-label="פעולות פירוט וקטגוריות"><Link href={withViewQuery('/categories/manage',search)}>ניהול מילון הקטגוריות</Link><Link href={limitsHref}>תקרות הוצאה לפי קטגוריה</Link><Link href={managementHref}>הוספה ועריכה של פירוט ידני</Link></nav></details>
   </div>
 }

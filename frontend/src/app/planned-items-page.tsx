@@ -1,8 +1,9 @@
 import {useFormDraft} from './use-form-draft'
 import {PageHeading} from './page-heading'
-import {useRef,useState} from 'react'
+import {MoneyAmount} from './money-amount'
+import {useEffect,useRef,useState,type MouseEvent} from 'react'
 import {useLocation,useParams} from 'react-router-dom'
-import {cashAccountList} from '../../../src/budget.js'
+import {cashAccountList,createDemoPlan} from '../../../src/budget.js'
 import {plannedItemEligibility,initialPlannedItemDraft,plannedItemDraftFingerprint,plannedItemCards,preparePlannedItem,preparePlannedItemRemoval,plannedItemSchedule,type PlannedItemDraft} from './planned-item-command'
 import {savePreparedPlan,SaveConflict} from './plan-save'
 import {AccessError,type BudgetResponse} from './budget-api'
@@ -11,6 +12,11 @@ import {useFinancialDraft,useDraftGuard} from './draft-guard'
 import {useSavedReturn} from './use-saved-return'
 import Link from './link'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
+import {ArrowDownLeft,Calculator,ChevronDown,Pencil,ShoppingBag,Trash2,X} from 'lucide-react'
+import {PlannedRowActions} from './planned-row-actions'
+import {PlanningMonthField} from './planning-month-field'
+import {ScenarioEditor} from './scenario-page'
+import {ConfirmDialog} from '../tazrim/components/ui/confirm-dialog'
 const input='mt-1 h-11 w-full rounded-xl border bg-card px-3 text-sm tabular-nums',money=(n:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(n)
 function currentMonth(){const p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).formatToParts(new Date());return p.find(v=>v.type==='year')!.value+'-'+p.find(v=>v.type==='month')!.value}
 function ItemEditor({budget,base,id,create,month,onSaved}:{budget:BudgetState;base:BudgetResponse;id:string;create:boolean;month:string;onSaved:(s:string)=>void}){
@@ -24,7 +30,131 @@ function ItemEditor({budget,base,id,create,month,onSaved}:{budget:BudgetState;ba
  const formDraft=useFormDraft({kind:'item',dirty,busy,discard:()=>{setDraft(baseline);setError(null);setBlocked(false)},save:blocked?undefined:saveRaw},{budgetId:budget.budgetId,base,kind:'planned-item',record:create?'new':id,period:create?month:'',values:draft,baseline:baseline,restore:value=>{setDraft(value)},mutationPending:blocked,enabled:true}),save=formDraft.save
  const backup=()=>{try{const url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan:prepared()},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-planned-item-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){setError(e instanceof Error?e.message:'יש לתקן את הפרטים לפני הכנת גיבוי.')}}
  if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
- return <form className="space-y-5" onSubmit={e=>{e.preventDefault();void save()}}><fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">פרטי התכנון</h2><p className="text-sm text-muted-foreground">מוסיפים רק סכומים שעדיין לא נכללו בהערכות החודשיות. זהו תכנון; הוא אינו מאשר רכישה, הכנסה או תשלום בפועל.</p><label className="block text-sm">שם הפריט<input className={input} maxLength={100} value={draft.name} onChange={e=>update('name',e.target.value)}/></label><label className="block text-sm">סוג הפריט<select className={input} value={draft.kind} onChange={e=>update('kind',e.target.value)}><option value="expense">הוצאה מתוכננת</option><option value="income">הכנסה צפויה נוספת</option></select></label><div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm">סכום כולל לכל התשלומים · ₪<input className={input} dir="ltr" inputMode="decimal" maxLength={32} value={draft.amount} onChange={e=>update('amount',e.target.value)}/></label>{draft.kind==='expense'&&<label className="block text-sm">עמלות לכל הפריסה · ₪<input className={input} dir="ltr" inputMode="decimal" maxLength={32} value={draft.fees} onChange={e=>update('fees',e.target.value)}/></label>}<label className="block text-sm">חודש ראשון<input type="month" className={input} value={draft.firstMonth} min={base.plan?.startMonth as string} onChange={e=>update('firstMonth',e.target.value)}/></label><label className="block text-sm">מספר תשלומים<input className={input} dir="ltr" inputMode="numeric" maxLength={2} value={draft.payments} onChange={e=>update('payments',e.target.value)}/></label></div>{cashAccountList(base.plan).length>0&&<label className="block text-sm">חשבון משלם או מקבל<select className={input} value={draft.cashAccountId} onChange={e=>update('cashAccountId',e.target.value)}><option value="">בחירת חשבון מפורשת</option>{cashAccountList(base.plan).map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>}{draft.kind==='expense'&&<label className="block text-sm">אופן תשלום<select className={input} value={draft.source} onChange={e=>update('source',e.target.value)}><option value="direct">הוצאה ישירה מהחשבון</option><option value="card">תשלום בכרטיס</option></select></label>}{draft.kind==='expense'&&draft.source==='card'&&<label className="block text-sm">כרטיס לחיוב<select className={input} value={draft.cardId} onChange={e=>update('cardId',e.target.value)}><option value="">בחירת כרטיס</option>{plannedItemCards(base.plan,draft).map((c:any)=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>}</fieldset>{schedule&&<section className="surface rounded-xl p-4"><h2 className="font-semibold">פריסת התכנון</h2><p className="mt-1 text-sm text-muted-foreground">חלוקה לפי החישוב הקיים, כולל עמלות ועיגול בתשלום האחרון. דיווחים שכבר כוללים תכנון מונעים הוספה כפולה לפי הסימון השמור.</p><details className="mt-3"><summary className="min-h-11 cursor-pointer text-sm">{schedule.length===1?'תשלום אחד':`${schedule.length} תשלומים`} · {money(schedule.reduce((n,r)=>Math.round((n+r.amount)*100)/100,0))}</summary><ul className="divide-y">{schedule.map(r=><li key={r.month} className="flex min-h-11 items-center justify-between gap-3 text-sm"><bdi dir="ltr">{r.month}</bdi><bdi>{money(r.amount)}</bdi></li>)}</ul></details></section>}{error&&<p role="alert" className="rounded-xl border border-destructive p-4 text-sm text-destructive">{error}</p>}<div className="surface flex flex-wrap items-center gap-3 rounded-xl p-4"><p role="status" className="min-w-0 flex-1 text-sm">{busy?'שומרים את התכנון…':dirty?'יש שינויים שעדיין לא נשמרו':'אין שינויים לשמירה'}</p><button type="submit" disabled={!dirty||busy||blocked} className="h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50">שמירת הפריט</button><button type="button" disabled={!dirty||busy} onClick={backup} className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50">גיבוי הטיוטה</button>{blocked&&<button type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)} className="h-11 rounded-xl border px-4 text-sm">טעינת הגרסה השמורה</button>}</div></form>
+ return <form className="space-y-5" onSubmit={e=>{e.preventDefault();void save()}}><fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">פרטי התכנון</h2><p className="text-sm text-muted-foreground">מוסיפים רק סכומים שעדיין לא נכללו בהערכות החודשיות. זהו תכנון; הוא אינו מאשר רכישה, הכנסה או תשלום בפועל.</p><label className="block text-sm">שם הפריט<input className={input} maxLength={100} value={draft.name} onChange={e=>update('name',e.target.value)}/></label><label className="block text-sm">סוג הפריט<select className={input} value={draft.kind} onChange={e=>update('kind',e.target.value)}><option value="expense">הוצאה מתוכננת</option><option value="income">הכנסה צפויה נוספת</option></select></label><div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm">סכום כולל לכל התשלומים · ₪<input className={input} dir="ltr" inputMode="decimal" maxLength={32} value={draft.amount} onChange={e=>update('amount',e.target.value)}/></label>{draft.kind==='expense'&&<label className="block text-sm">עמלות לכל הפריסה · ₪<input className={input} dir="ltr" inputMode="decimal" maxLength={32} value={draft.fees} onChange={e=>update('fees',e.target.value)}/></label>}<PlanningMonthField label="חודש ראשון" className={input} value={draft.firstMonth} startMonth={base.plan?.startMonth as string} onChange={value=>update('firstMonth',value)}/><label className="block text-sm">מספר תשלומים<input className={input} dir="ltr" inputMode="numeric" maxLength={2} value={draft.payments} onChange={e=>update('payments',e.target.value)}/></label></div>{cashAccountList(base.plan).length>0&&<label className="block text-sm">חשבון משלם או מקבל<select className={input} value={draft.cashAccountId} onChange={e=>update('cashAccountId',e.target.value)}><option value="">בחירת חשבון מפורשת</option>{cashAccountList(base.plan).map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>}{draft.kind==='expense'&&<label className="block text-sm">אופן תשלום<select className={input} value={draft.source} onChange={e=>update('source',e.target.value)}><option value="direct">הוצאה ישירה מהחשבון</option><option value="card">תשלום בכרטיס</option></select></label>}{draft.kind==='expense'&&draft.source==='card'&&<label className="block text-sm">כרטיס לחיוב<select className={input} value={draft.cardId} onChange={e=>update('cardId',e.target.value)}><option value="">בחירת כרטיס</option>{plannedItemCards(base.plan,draft).map((c:any)=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>}</fieldset>{schedule&&<section className="surface rounded-xl p-4"><h2 className="font-semibold">פריסת התכנון</h2><p className="mt-1 text-sm text-muted-foreground">חלוקה לפי החישוב הקיים, כולל עמלות ועיגול בתשלום האחרון. דיווחים שכבר כוללים תכנון מונעים הוספה כפולה לפי הסימון השמור.</p><details className="mt-3"><summary className="min-h-11 cursor-pointer text-sm">{schedule.length===1?'תשלום אחד':`${schedule.length} תשלומים`} · {money(schedule.reduce((n,r)=>Math.round((n+r.amount)*100)/100,0))}</summary><ul className="divide-y">{schedule.map(r=><li key={r.month} className="flex min-h-11 items-center justify-between gap-3 text-sm"><bdi dir="ltr">{r.month}</bdi><bdi>{money(r.amount)}</bdi></li>)}</ul></details></section>}{error&&<p role="alert" className="rounded-xl border border-destructive p-4 text-sm text-destructive">{error}</p>}<div className="surface flex flex-wrap items-center gap-3 rounded-xl p-4"><p role="status" className="min-w-0 flex-1 text-sm">{busy?'שומרים את התכנון…':dirty?'יש שינויים שעדיין לא נשמרו':'אין שינויים לשמירה'}</p><button type="submit" disabled={!dirty||busy||blocked} className="h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50">שמירת הפריט</button><button type="button" disabled={!dirty||busy} onClick={backup} className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50">גיבוי הטיוטה</button>{blocked&&<button type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)} className="h-11 rounded-xl border px-4 text-sm">טעינת הגרסה השמורה</button>}</div></form>
+}
+const plannedMonthFormat=new Intl.DateTimeFormat('he-IL',{month:'long',year:'numeric',timeZone:'UTC'})
+const plannedGroups=[{kind:'expense',title:'הוצאות מתוכננות'},{kind:'income',title:'הכנסות צפויות'}] as const
+type PlannedRow = {id:string;name:string;kind:'income'|'expense';amount:number;fees:number;firstMonth:string;payments:number}
+function PlanningList({budget,base,onDemoSaved,initialMessage=''}:{budget:BudgetState;base:BudgetResponse;onDemoSaved?:(plan:any)=>void;initialMessage?:string}){
+ const demo=!!onDemoSaved,href=usePeriodHref(),{state}=useLocation(),items=base.plan?.expenses as PlannedRow[]
+ const recoveredId=typeof state?.planningPurchaseId==='string'?state.planningPurchaseId:''
+ const [selection,setSelection]=useState<string|null>(()=>state?.openPlanningCalculator===true?(recoveredId||''):null)
+ const [message,setMessage]=useState(initialMessage),[demoRemoval,setDemoRemoval]=useState<PlannedRow|null>(null),[removeError,setRemoveError]=useState(''),[expandedRow,setExpandedRow]=useState<string|null>(null)
+ const dialog=useRef<HTMLDialogElement>(null),trigger=useRef<HTMLButtonElement>(null),opener=useRef<HTMLButtonElement|null>(null)
+ const committed=useRef(false),guard=useDraftGuard()
+ const missing=!!selection&&!items.some(item=>item.id===selection&&item.kind==='expense')
+ const open=selection!==null&&!missing
+ const readOnlyReason=!demo&&budget.status==='ready'?(budget.spaces.find(space=>space.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד. אפשר לבדוק פריסה ללא שמירה.':base.writeIdentityBound!==true?'שמירה מוגנת אינה זמינה בשרת הזה.':''):''
+ useEffect(()=>{
+  if(!open)return
+  const element=dialog.current
+  element?.showModal()
+  return()=>{element?.close();(opener.current?.isConnected?opener.current:trigger.current)?.focus()}
+ },[open])
+ const close=()=>{
+  const hadDraft=guard.registry.getSnapshot().dirty
+  guard.run(()=>{
+   if(hadDraft&&!committed.current&&guard.registry.getSnapshot().dirty)setMessage('טיוטת המחשבון נשמרה במכשיר.')
+   setSelection(null)
+  },'navigation')
+ }
+ const openPlanningCalculator=(event:MouseEvent<HTMLButtonElement>,purchaseId='')=>{
+  opener.current=event.currentTarget.closest('.planned-swipe-row')?.querySelector<HTMLButtonElement>('.planned-row-open')??event.currentTarget
+  setExpandedRow(null)
+  committed.current=false
+  setMessage('')
+  setSelection(purchaseId)
+ }
+ const removeSample=()=>{
+  if(!demoRemoval||!onDemoSaved)return
+  try{
+   onDemoSaved(preparePlannedItemRemoval(base.plan,demoRemoval.id))
+   setDemoRemoval(null)
+   setMessage('הפריט הוסר מהדוגמה הזמנית.')
+   trigger.current?.focus()
+  }catch(e){setRemoveError(e instanceof Error?e.message:'לא ניתן להסיר את הפריט.')}
+ }
+ return <div className="mx-auto max-w-3xl space-y-5">
+  <PageHeading className="text-2xl font-semibold">פריטים מתוכננים</PageHeading>
+  {message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}
+  {missing&&<p role="status" className="surface rounded-xl p-4 text-sm">הרכישה כבר אינה זמינה בתכנון. ניתן לעיין בטיוטה בהגדרות.</p>}
+  <button ref={trigger} type="button" className="planning-calculator-launch"
+   aria-haspopup="dialog" aria-expanded={open&&selection===''} onClick={event=>openPlanningCalculator(event)}>
+   <Calculator size={18} aria-hidden/>מחשבון רכישה
+  </button>
+  {open&&<dialog ref={dialog} dir="rtl" aria-labelledby="planning-calculator-title" className="planning-calculator-dialog"
+   onCancel={event=>{event.preventDefault();close()}} onClick={event=>{if(event.target===event.currentTarget)close()}}>
+   <div className="planning-calculator-inner">
+    <header className="planning-calculator-header">
+     <span className="planning-calculator-icon"><Calculator size={22} aria-hidden/></span>
+     <div><h2 id="planning-calculator-title">מחשבון רכישה</h2><p>פריסת תשלומים והשפעה על היתרה</p></div>
+     <button type="button" className="planning-calculator-close" aria-label="סגירת המחשבון" onClick={close}><X size={20} aria-hidden/></button>
+    </header>
+    <ScenarioEditor key={selection+'/'+base.revision} purchaseId={selection??''} embedded demo={demo} readOnlyReason={readOnlyReason} budget={budget} base={base}
+     detailsHref={!demo&&!readOnlyReason&&selection?href('/plans/'+encodeURIComponent(selection)+'/edit'):undefined}
+     onDemoSaved={onDemoSaved} onSaved={nextMessage=>{committed.current=!!nextMessage;setMessage(nextMessage)}} onSaveComplete={()=>setSelection(null)}/>
+   </div>
+  </dialog>}
+  <PlanningNote demo={demo}/>
+  {!demo&&<Link href={href('/plans/new')} className="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm">הוספת פריט מתוכנן</Link>}
+  {items.length?<div className="planned-list">
+   {plannedGroups.map(({kind,title})=>{
+    const groupItems=items.filter(item=>item.kind===kind)
+    if(!groupItems.length)return null
+    const purchase=kind==='expense',Icon=purchase?ShoppingBag:ArrowDownLeft
+    return <section key={kind} aria-labelledby={'planned-'+kind+'-heading'}>
+     <h2 id={'planned-'+kind+'-heading'} className="planned-list-heading">{title}</h2>
+     <ul className="surface planned-list-group divide-y">{groupItems.map(item=>{
+      const editHref=href('/plans/'+encodeURIComponent(item.id)+'/edit')
+      const rowClass='planned-entry'
+      const summary=<>
+       <span className="planned-entry-icon"><Icon size={19} aria-hidden/></span>
+       <strong className="planned-entry-name"><bdi>{item.name}</bdi></strong>
+       <span className="planned-entry-schedule">
+        <time dateTime={item.firstMonth}><bdi>{plannedMonthFormat.format(new Date(item.firstMonth+'-01T00:00:00Z'))}</bdi></time>
+        <span>{item.payments===1?'תשלום אחד':`${item.payments} תשלומים`}</span>
+       </span>
+       <span className="planned-entry-amount"><MoneyAmount value={item.amount+item.fees} minimumFractionDigits={2}/></span>
+      </>
+      const removeLabel='הסרה מהתכנון · '+item.name
+      const editLabel='עריכה · '+item.name
+      const editContent=<><Pencil size={16} aria-hidden/>עריכה</>
+      const removeContent=<><Trash2 size={16} aria-hidden/>הסרה</>
+      const entry=purchase?<button type="button" className={rowClass+' planned-row-open'} aria-haspopup="dialog"
+       onClick={event=>openPlanningCalculator(event,item.id)}>{summary}</button>
+       :demo?<div className={rowClass}>{summary}</div>:<Link className={rowClass} href={editHref}>{summary}</Link>
+      if(readOnlyReason||demo&&!purchase)return <li key={item.id}>{entry}</li>
+      return <PlannedRowActions key={item.id} label={item.name} expanded={expandedRow===item.id}
+       onExpandedChange={expanded=>setExpandedRow(expanded?item.id:null)} actions={<>
+        {purchase?<button type="button" aria-label={editLabel} onClick={event=>openPlanningCalculator(event,item.id)}>{editContent}</button>
+         :<Link href={editHref} aria-label={editLabel}>{editContent}</Link>}
+        {demo?<button type="button" className="planned-swipe-remove" aria-label={removeLabel}
+         onClick={()=>{setRemoveError('');setDemoRemoval(item)}}>{removeContent}</button>
+         :<Link href={href('/plans/'+encodeURIComponent(item.id)+'/remove')} className="planned-swipe-remove" aria-label={removeLabel}>{removeContent}</Link>}
+       </>}>{entry}</PlannedRowActions>
+     })}</ul>
+    </section>
+   })}
+  </div>:<p className="surface rounded-xl p-4 text-sm">עדיין אין פריטים מתוכננים.</p>}
+  {demo&&<ConfirmDialog open={!!demoRemoval} onOpenChange={next=>{if(!next)setDemoRemoval(null)}} onConfirm={removeSample}
+   title="להסיר מהתכנון?" description={<><bdi>{demoRemoval?.name}</bdi> יוסר מהדוגמה הזמנית.</>}
+   confirmLabel="הסרה מהתכנון" cancelLabel="ביטול" error={removeError}/>}
+ </div>
+}
+function PlanningNote({demo=false}:{demo?:boolean}){
+ return <details className="surface planning-note">
+  <summary>
+   <ChevronDown size={16} aria-hidden/>
+   <span>{demo?'התכנון משפיע על התחזית · דוגמה זמנית':'התכנון משפיע על התחזית'}</span>
+   <span className="planning-note-more">מידע נוסף</span>
+  </summary>
+  <p>{demo?'פריט שנשמר בתקציב ישפיע על תחזיות החודשים הבאים. פריטים שמוסיפים לדוגמה זמינים עד לרענון הדף.':'פריסת תשלומים והכנסות צפויות משפיעות על תחזיות החודשים הבאים. התכנון אינו מאשר רכישה, הכנסה או תשלום בפועל. פריט מתוכנן נשמר רק באישור מפורש.'}</p>
+ </details>
+}
+function DemoPlanningPage({budget}:{budget:BudgetState}){
+ const [plan,setPlan]=useState(()=>createDemoPlan('2026-10'))
+ const base:BudgetResponse={accountId:'demo',accountEmail:'',revision:0,plan}
+ return <PlanningList budget={budget} base={base} onDemoSaved={setPlan}/>
 }
 function downloadPlan(plan:any,name:string){const url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function PlannedItemRemoval({budget,base,id,onSaved}:{budget:BudgetState;base:BudgetResponse;id:string;onSaved:(s:string)=>void}){
@@ -36,11 +166,21 @@ function PlannedItemRemoval({budget,base,id,onSaved}:{budget:BudgetState;base:Bu
 export function PlannedItemsPage({mode,fixture,budget}:{mode:'list'|'new'|'edit'|'remove';fixture:boolean;budget:BudgetState}){
  const {id:routeId}=useParams(),{search,state}=useLocation(),href=usePeriodHref(),[newId]=useState(()=>crypto.randomUUID()),[completed,setCompleted]=useState<string|null>(null),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'?state.setupSavedMessage:''),id=mode==='new'?(completed??newId):(routeId??''),create=mode==='new'&&!completed,q=new URLSearchParams(search),asOf=currentMonth(),year=q.get('year')||asOf.slice(0,4),part=q.get('month')||asOf.slice(5),selected=/^20\d{2}$/.test(year)&&/^(?:[1-9]|1[0-2]|0[1-9])$/.test(part)?year+'-'+String(Number(part)).padStart(2,'0'):asOf
  const returnAfterSave=useSavedReturn(budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:'')
- if(fixture)return <section className="surface rounded-xl p-6">נתוני הדוגמה אינם נשמרים. יש לפתוח תקציב שמור לתכנון.</section>
+ if(fixture)return <DemoPlanningPage budget={budget}/>
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען תכנון…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>
  const plan=budget.value.plan
  if(!plan||plan.format)return <section className="surface rounded-xl p-6">{plan?'התקציב מוצפן.':'אין תקציב שמור.'} </section>
- const reason=mode==='list'?null:budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת אינה זמינה בשרת הזה.':mode==='remove'&&completed?null:plannedItemEligibility(plan,id,create)
- return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">{mode==='list'?'פריטים מתוכננים':mode==='remove'?'הסרת פריט מהתכנון':create?'הוספת פריט מתוכנן':'עריכת פריט מתוכנן'}</PageHeading>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{mode==='list'?<><Link href={href('/loans')} className="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm">החזר הלוואות</Link><Link href={href('/plans/new')} className="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm">הוספת פריט מתוכנן</Link><section className="surface rounded-xl p-4"><p className="text-sm text-muted-foreground">רכישות, תשלומים והכנסות צפויות שנוספו לתכנון. הסכומים אינם אישור לביצוע בפועל.</p>{!(plan.expenses as any[]).length?<p className="mt-4 text-sm">עדיין אין פריטים מתוכננים.</p>:<ul className="mt-3 divide-y">{(plan.expenses as any[]).map(e=><li key={e.id}><Link href={href('/plans/'+encodeURIComponent(e.id)+'/edit')} className="flex min-h-11 flex-wrap items-center justify-between gap-3 py-3 text-sm"><span><bdi>{e.name}</bdi> · {e.kind==='income'?'הכנסה צפויה':'הוצאה מתוכננת'}</span><span><bdi>{money(e.amount+e.fees)}</bdi> · <bdi dir="ltr">{e.firstMonth}</bdi> · {e.payments===1?'תשלום אחד':`${e.payments} תשלומים`}</span></Link><Link href={href('/plans/'+encodeURIComponent(e.id)+'/remove')} className="inline-flex min-h-11 items-center text-destructive underline">הסרה מהתכנון · {e.name}</Link></li>)}</ul>}</section><Link href={href('/plans/scenario')} className="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm">מחשבון וניסוי רכישות</Link></>:reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:mode==='remove'?completed?<p role="status">{message}</p>:<PlannedItemRemoval key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} onSaved={s=>{setMessage(s);returnAfterSave(s);setCompleted(id)}}/>:<ItemEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} create={create} month={selected} onSaved={s=>{setMessage(s);returnAfterSave(s);if(s&&create)setCompleted(id)}}/>}{mode!=='list'&&<Link href={href('/plans')} className="inline-flex min-h-11 items-center text-sm text-primary underline">כל הפריטים המתוכננים</Link>}</div>
+ if(mode==='list')return <PlanningList budget={budget} base={budget.value} initialMessage={message}/>
+ const reason=budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת אינה זמינה בשרת הזה.':mode==='remove'&&completed?null:plannedItemEligibility(plan,id,create)
+ return <div className="mx-auto max-w-3xl space-y-5">
+  <PageHeading className="text-2xl font-semibold">{mode==='remove'?'הסרת פריט מהתכנון':create?'הוספת פריט מתוכנן':'עריכת פריט מתוכנן'}</PageHeading>
+  {message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}
+  {reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>
+   :mode==='remove'?completed?<p role="status">{message}</p>:<PlannedItemRemoval key={budget.budgetId+'/'+id+'/'+budget.value.revision}
+    budget={budget} base={budget.value} id={id} onSaved={s=>{setMessage(s);returnAfterSave(s);setCompleted(id)}}/>
+   :<ItemEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} budget={budget} base={budget.value} id={id} create={create} month={selected}
+    onSaved={s=>{setMessage(s);returnAfterSave(s);if(s&&create)setCompleted(id)}}/>}
+  <Link href={href('/plans')} className="inline-flex min-h-11 items-center text-sm text-primary underline">כל הפריטים המתוכננים</Link>
+ </div>
 }

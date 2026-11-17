@@ -1,0 +1,74 @@
+{
+  "applicationSource": "c1b546d",
+  "branch": "codex/platform-adaptive-ui",
+  "integratedCurrentSource": "42f23a7",
+  "productionInterfaceReplaced": false,
+  "approvalRequired": true,
+  "previewUrl": "https://adaptive.budgit.duckdns.org/next?year=2026&month=10",
+  "sampleDataOnly": true,
+  "previewStorage": "in-memory SQLite; no host mounts",
+  "previewContainer": {
+    "readOnlyRoot": true,
+    "memoryLimitBytes": 268435456,
+    "cpuLimit": 0.5,
+    "hostDataMounts": 0,
+    "publicHostPorts": 0
+  },
+  "runtimeFrontendSHA256": "501e13c5a672865a55da6182674d8bae593ef63f18134af158d5966889d3119c",
+  "runtimeMatchesLocalBuild": true,
+  "productionPreservation": {
+    "containerImageAndStartedAtUnchanged": true,
+    "frontendHashUnchanged": true,
+    "healthUnchanged": true,
+    "parkingAndProxyContainerIdentitiesUnchanged": true,
+    "routingChange": "new exact preview hostname only; validated reload; prior config retained for rollback"
+  },
+  "verification": {
+    "buildAndTypecheck": "passed",
+    "regressionsIncludingReaders": 1445,
+    "coreChecks": 15,
+    "localBrowserChecks": 118,
+    "localBrowserRuntimeErrors": [],
+    "localBrowserFinancialWrites": 0,
+    "localBrowserFinancialRecordsUnchanged": true,
+    "viewports": [
+      320,
+      390,
+      768,
+      1024,
+      1440,
+      1920
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "hostedBrowser": {
+      "secureContext": true,
+      "webCryptoAvailable": true,
+      "localDraftRestoredExactly": true,
+      "navigationWithoutSaveDiscardPrompt": true,
+      "untouchedRoutes": [
+        "/next/savings",
+        "/next/loans",
+        "/next/checks",
+        "/next/settings",
+        "/next"
+      ],
+      "openDialogsAfterNavigation": 0,
+      "phoneBackTarget": {
+        "width": 44,
+        "height": 44,
+        "atRTLLeadingEdge": true
+      },
+      "visiblePhoneFormPanels": 1,
+      "overflow": false,
+      "sampleFinancialRevisionAfterInteraction": 1
+    }
+  },
+  "limitations": [
+    "No physical-iPhone acceptance claimed.",
+    "Other existing editors retain their existing structure.",
+    "The preview is separate from the production design and requires user review before promotion."
+  ]
+}

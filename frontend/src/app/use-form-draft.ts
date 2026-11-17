@@ -62,7 +62,7 @@ export function useFormDraft<T>(entry:DraftEntry,input:Input<T>){
  const discard=async()=>{if(scopeRef.current!==scope)return false;const instance=writer.current;if(!instance)return false
   try{if(!await instance.remove())return false;if(mounted.current){entryRef.current.discard();setUnresolved(false);setView({ready:true,status:''})}return true}catch(e){if(mounted.current)setView(v=>({...v,status:e instanceof Error?e.message:'לא ניתן להסיר טיוטה.'}));return false}}
 
- useFinancialDraft({...entry,dirty:entry.dirty||edited,busy:entry.busy||localSaving||!view.ready,save:entry.dirty&&entry.save?()=>saveWith():undefined,mutationPending:input.mutationPending||unresolved,
+ useFinancialDraft({...entry,dirty:entry.dirty||edited,busy:entry.busy||localSaving,save:entry.dirty&&entry.save?()=>saveWith():undefined,mutationPending:input.mutationPending||unresolved,
   local:enabled?{status:view.status,discard,export:()=>formDraftEnvelope(scope,latest.current.base.revision,latest.current.values,latest.current.baseline,'/next'+location.pathname+location.search),restored:restored.current,durable:()=>!saving.current&&!!writer.current&&view.ready&&writer.current.durable()&&JSON.stringify(writer.current.latest)===JSON.stringify(latest.current.values),flush:()=>saving.current?Promise.resolve(false):persist()}:undefined})
  return {save:()=>saveWith(),saveWith,capture,confirmSaved,ready:view.ready,status:view.status}
 }

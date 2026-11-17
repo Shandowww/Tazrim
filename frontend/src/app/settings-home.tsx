@@ -26,3 +26,4 @@ export function SettingsHome({theme,onThemeChange,email}:{theme:string;onThemeCh
   <nav className="household-settings-grid" aria-label="מסכי הגדרות וכלים">{tiles.map(({href,title,summary,icon:Icon})=><Link key={href} href={withViewQuery(href,search,import.meta.env.DEV)} className="surface household-settings-tile"><span className="household-settings-icon"><Icon size={21} aria-hidden/></span><span className="household-settings-tile-copy"><strong>{title}</strong><small>{summary}</small></span><ChevronLeft size={18} aria-hidden/></Link>)}</nav>
  </div>
 }
+

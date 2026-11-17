@@ -10,7 +10,10 @@ function normalize(plan:any,rows:ScenarioRow[]){
  if(row.originalId&&(!old||old.kind!=='expense'||originals.has(row.originalId)||!row.enabled)||!row.originalId&&plan.expenses.some((e:any)=>e.id===row.id))throw Error('הפריט הקיים אינו זמין להחלפה. הסרה מתבצעת בנפרד.');if(row.originalId)originals.add(row.originalId)
  if(row.draft.kind!=='expense'||row.draft.fees!=='0')throw Error('יש להזין מחיר סופי אחד הכולל עמלות, עבור הוצאה בלבד.')
  const id=row.originalId||row.id,prepared=preparePlannedItem(plan,id,{...row.draft,name:row.draft.name.trim()||'רכישה '+(i+1)},!row.originalId),item=prepared.expenses.find((e:any)=>e.id===id)
- return{...item,id:row.id,originalId:row.originalId,enabled:row.enabled}
+ // A change to the schedule alone keeps the saved price and fee breakdown.
+ const originalTotal=old&&Math.round((old.amount+old.fees)*100)
+ const price=old&&originalTotal===Math.round(item.amount*100)?{amount:old.amount,fees:old.fees}:null
+ return{...item,...price,id:row.id,originalId:row.originalId,enabled:row.enabled}
  })
 }
 /** Stable IDs make an explicit uncertain-save retry acknowledge the same prepared scenario. */

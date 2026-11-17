@@ -1,3 +1,4 @@
+import {MoneyAmount} from './money-amount'
 import {useState} from 'react'
 
 const money=(cents:number)=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS'}).format(cents/100)
@@ -16,8 +17,8 @@ export function ReportTransactionDetails({rows,kind,accounts=[],sourceName}:{row
      <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1"><bdi dir="ltr">{entry.date||'לא נמסר תאריך'}</bdi><span>{direction}</span><bdi dir="ltr" className="font-semibold">{Number.isFinite(amount)?money(amount):'לא נמסר סכום במקור'}</bdi></p>
      <dl className="space-y-1 text-xs text-muted-foreground">
       {fields.filter(([,value])=>value!==undefined&&value!==null&&String(value).trim()!=='').map(([label,value])=><div key={label} className="min-w-0 break-words"><dt className="inline">{label}: </dt><dd className="inline"><bdi dir="auto" className="[overflow-wrap:anywhere]">{String(value)}</bdi></dd></div>)}
-      {kind==='bank'&&Number.isFinite(row.balanceCents)&&<div><dt className="inline">יתרה לאחר התנועה: </dt><dd className="inline"><bdi dir="ltr">{money(row.balanceCents)}</bdi></dd></div>}
-      {kind==='card'&&Number.isFinite(entry.originalCents)&&entry.originalCents!==amount&&<div><dt className="inline">סכום העסקה המקורי: </dt><dd className="inline"><bdi dir="ltr">{money(entry.originalCents)}</bdi></dd></div>}
+      {kind==='bank'&&Number.isFinite(row.balanceCents)&&<div><dt className="inline">יתרה לאחר התנועה: </dt><dd className="inline"><MoneyAmount value={(row.balanceCents)/100} minimumFractionDigits={2}/></dd></div>}
+      {kind==='card'&&Number.isFinite(entry.originalCents)&&entry.originalCents!==amount&&<div><dt className="inline">סכום העסקה המקורי: </dt><dd className="inline"><MoneyAmount value={(entry.originalCents)/100} minimumFractionDigits={2}/></dd></div>}
      </dl>
     </li>
    })}

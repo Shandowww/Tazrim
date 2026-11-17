@@ -1,10 +1,10 @@
+import {MoneyAmount} from '../../../app/money-amount'
 import type { ReactNode } from 'react'
 import Link from '../../../app/link'
 import { useLocation } from 'react-router-dom'
 import { detailResultHref } from '../../../app/navigation-query'
 import { Building2, CreditCard, EyeOff, Repeat } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
-import { formatCurrency } from '@/lib/utils/currency'
 import { highlightParts, type SearchResult } from '@/lib/search/query'
 
 /** Text with every term wrapped in <mark> */
@@ -133,7 +133,7 @@ export function SearchResultList({ categoryColors,results, terms, activeIndex, o
                 )}
               >
                 {/* Budgit preserves the signed source amount; refunds remain negative and green */}
-                <bdi dir="ltr">{formatCurrency(r.amount)}</bdi>{income && <span className="sr-only"> זיכוי</span>}
+                <MoneyAmount value={r.amount} minimumFractionDigits={2}/>{income && <span className="sr-only"> זיכוי</span>}
               </span>
             </Link>
             {actions && <div className={cn('shrink-0', compact ? 'pt-2' : 'pt-3')}>{actions(r)}</div>}

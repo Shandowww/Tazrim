@@ -1,0 +1,163 @@
+{
+  "date": "2026-11-11",
+  "applicationSource": "e719b5c",
+  "publication": "Isolated sample-data preview only; explicit design approval required before production promotion",
+  "url": "https://adaptive.budgit.duckdns.org/next?year=2026&month=10&review=e719b5c",
+  "navigation": {
+    "financialWorkspaces": 6,
+    "previousSecondaryEntries": 22,
+    "currentSecondaryEntries": 9,
+    "previousTotalDestinations": 30,
+    "currentTotalDestinations": 17,
+    "contextualMaintenance": true,
+    "originalRoutesAndFinancialCommandsRetained": true
+  },
+  "validation": {
+    "build": "passed",
+    "typecheck": "passed",
+    "regressions": 1452,
+    "coreChecks": 15,
+    "browserChecks": 171,
+    "browserRuntimeErrors": [],
+    "financialWrites": 0,
+    "syntheticRecordsByteIdentical": true,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440,
+      1920
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "covered": [
+      "Contextual manual report entry",
+      "Expense search stays in its workspace",
+      "Focused manual-detail list omits cheque inventory",
+      "Savings balance/allocation/redistribution/calculator remain reachable",
+      "Monthly and one-off deposits share one workspace",
+      "Forecast settings and affordability calculator stay reachable",
+      "Settings backup is not duplicated",
+      "Server-admin and legacy Wallet navigation follow existing verified capability facts",
+      "Untouched editor storage stall and timeout",
+      "Interruptible lazy navigation",
+      "Exact form draft restoration and partial invalid input",
+      "Currency symbol position and spacing",
+      "RTL tab swipe, carousel exclusion, keyboard skip link and reduced motion"
+    ]
+  },
+  "hosted": {
+    "frontendSha256": "14208a3d43dca2369c926b22faaf8a98637f25e0585bf1c5a8480ea768aa29a4",
+    "matchesLocalBuild": true,
+    "desktop": {
+      "areas": [
+        "תמונה כללית",
+        "חשבונות",
+        "דוחות",
+        "הוצאות",
+        "תכנון",
+        "חיסכון"
+      ],
+      "primary": "199 72% 38%",
+      "backdrop": "url(\"https://adaptive.budgit.duckdns.org/ui-assets/tazrim/lines-light.svg\")",
+      "currency": [
+        {
+          "text": "₪ 15,000",
+          "left": true,
+          "gap": 9.59375
+        },
+        {
+          "text": "₪ 3,440.99",
+          "left": true,
+          "gap": 9.59375
+        },
+        {
+          "text": "₪ 940.99",
+          "left": true,
+          "gap": 9.59375
+        },
+        {
+          "text": "₪ 15,800",
+          "left": true,
+          "gap": 3
+        },
+        {
+          "text": "₪ 0",
+          "left": true,
+          "gap": 3
+        },
+        {
+          "text": "₪ 43.21",
+          "left": true,
+          "gap": 3.8984375
+        },
+        {
+          "text": "₪ 25.3",
+          "left": true,
+          "gap": 3.8984375
+        },
+        {
+          "text": "₪ 18.5",
+          "left": true,
+          "gap": 3.8984375
+        },
+        {
+          "text": "₪ 14",
+          "left": true,
+          "gap": 3.8984375
+        }
+      ],
+      "revision": 1,
+      "overflow": false
+    },
+    "settings": {
+      "heading": "הגדרות אפליקציה",
+      "groups": [
+        "אפשרויות תצוגה מתקדמות",
+        "חשבון ושיתוף",
+        "פרטיות ושחזור",
+        "חיבורים"
+      ],
+      "retryVisible": false,
+      "overflow": false
+    },
+    "recurringNavigation": "Expense submenu -> recurring charges; active item and final heading verified",
+    "phoneSavingsTabs": [
+      "מטרות ויתרות",
+      "הפקדות"
+    ],
+    "phoneDeposits": {
+      "heading": "הפקדות לחיסכון",
+      "actions": [
+        "תכנון הפקדה חד־פעמית",
+        "תכנון הפקדה חודשית"
+      ],
+      "revision": 1,
+      "overflow": false
+    }
+  },
+  "isolation": {
+    "container": "budgit-adaptive-preview-e719b5c",
+    "database": "in-memory",
+    "sampleDataOnly": true,
+    "hostDataMounts": 0,
+    "readOnlyFilesystem": true,
+    "memoryMiB": 256,
+    "cpuLimit": 0.5,
+    "previousPreviewRetired": "budgit-adaptive-preview-41d7799",
+    "serverReceiptDirectory": "/opt/budgit-previews/adaptive-e719b5c"
+  },
+  "preservation": {
+    "productionAndAdjacentServiceIdentitiesImagesAndStartedAt": "byte-identical before/after/final",
+    "productionFrontend": "byte-identical before/after/final",
+    "productionHealth": "unchanged; ok:true, loginConfigured:true",
+    "productionRecordsTouched": false
+  },
+  "limits": [
+    "No physical iPhone acceptance",
+    "Production not promoted"
+  ]
+}

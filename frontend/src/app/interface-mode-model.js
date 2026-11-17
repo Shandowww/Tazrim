@@ -5,7 +5,7 @@ export function modeStorageKey(accountId){return 'budgit-interface-mode:'+encode
 export function initialInterfaceMode(saved,hasPlan){return interfaceModes.includes(saved)?saved:hasPlan?'expert':'basic'}
 export function routeInterfaceMode(href){
  const path=String(href).split(/[?#]/)[0].replace(/\/$/,'')||'/'
- if(path==='/incoming')return 'basic'
+ if(path==='/incoming'||path==='/outlook')return 'basic'
  if(['/','/accounts','/banks','/cards','/checks','/loans','/savings','/categories','/more','/plans/scenario','/actions','/notices','/settings','/about','/start','/accounts/new','/card-setup/new','/settings/security','/settings/profile','/settings/spaces','/settings/gmail','/settings/drive','/settings/device-draft'].includes(path))return 'basic'
  if(/^\/(banks|cards)\/[^/]+$/.test(path)||/^\/notices\//.test(path)||/^\/settings\/gmail\/notices\//.test(path))return 'basic'
  if(/^\/accounts\/[^/]+\/(?:activity|edit)$/.test(path)||path==='/card-setup'||/^\/card-setup\/[^/]+$/.test(path))return 'basic'

@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-12",
+  "sourceCommit": "ae73b6391dbf018e372fe7fa294282540df90e10",
+  "applicationCodeCommit": "0414b15",
+  "previousSourceCommit": "70a302af58d8d9165c8f3c83a3ec4fe0f0377496",
+  "url": "https://budgit.duckdns.org/next",
+  "candidateAndLiveImage": "sha256:04087cc788701d85a44c11ca1e374e714422935f9441c029c79f4e06383cda09",
+  "sourceArchiveSha256": "94802660625a8e5d94fec6d483f21aa5f9ea791cdca0c7314d6b26236dee0d3f",
+  "priorSourceFilesMatched": 1018,
+  "candidateBuildAndTypecheck": "passed",
+  "previewRegressions": 1458,
+  "previewFocusedChecks": 24,
+  "previewCoreChecks": 15,
+  "candidateBackendContracts": {"passed": 208, "failed": 0},
+  "freshSQLiteBackupVerified": true,
+  "isolatedGates": {"financial": true, "access": true, "candidateStartup": true, "rollbackFinancial": true, "rollbackAccess": true, "retainedAssets": true, "intakeRestore": true, "automation": true},
+  "live": {"health": {"ok": true, "loginConfigured": true}, "runtimeFilesMatched": 172, "runtimeMismatch": 0, "authoritativeTablesPreserved": 50, "integrity": true, "foreignKeys": true, "configurationAndKeysPreserved": true, "adjacentServicesPreserved": true, "publicAuthenticationAndDeepRoutes": true},
+  "switcher": "verified in separate disposable fixture with two budgets; hosted preview has one synthetic budget",
+  "limitations": ["No new physical iPhone or installed PWA acceptance", "Authenticated production visual flow was not exercised; preview browser validation and live runtime hash were used"]
+}

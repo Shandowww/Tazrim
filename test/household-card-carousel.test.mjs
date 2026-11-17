@@ -24,12 +24,12 @@ test('Selected card has an immediately visible, scoped edit action, while viewer
 const budget=plan=>({status:'ready',value:{plan,accountId:'synthetic'},budgetId:'personal',spaces:[]})
 function walk(node,predicate){if(!node||typeof node!=='object')return [];return [...(predicate(node)?[node]:[]),...[node.props?.children].flat(Infinity).flatMap(child=>walk(child,predicate))]}
 function harness({reduced=false,deferred=false}={}){
- const refs=[],timers=new Map(),frames=[],effects=[],navigations=[],flushes=[],scrolls=[]
- let cursor=0,serial=0,tree,pendingLocation=null,location={search:'?year=2026&month=10&walletCard=card1',state:{kept:true}},plan=fixture()
+ const states=[],refs=[],timers=new Map(),frames=[],effects=[],navigations=[],flushes=[],scrolls=[]
+ let cursor=0,stateCursor=0,serial=0,tree,pendingLocation=null,location={search:'?year=2026&month=10&walletCard=card1',state:{kept:true}},plan=fixture()
  const style=new Map(),stage={dataset:{},style:{setProperty:(key,value)=>style.set(key,value)},get offsetWidth(){flushes.push({dragging:stage.dataset.dragging,offset:style.get('--wallet-drag-x')});return 400},isConnected:true,clientWidth:400,querySelector:()=>({getBoundingClientRect:()=>({width:100})})}
  const jsx=(type,props,key)=>({type,props,key})
- const Page=load({useLocation:()=>location,useNavigate:()=>((href,options)=>{navigations.push({href,options});const next={...location,search:href.slice(href.indexOf('?'))};if(deferred)pendingLocation=next;else location=next})},{react:{...React,useRef:value=>refs[cursor++]??(refs[cursor-1]={current:value}),useEffect:callback=>effects.push(callback),useLayoutEffect:callback=>effects.push(callback)},'react/jsx-runtime':{jsx,jsxs:jsx,Fragment:'fragment'},'react-dom':{flushSync:callback=>callback()},window:{matchMedia:()=>({matches:reduced}),scrollY:432,scrollTo:options=>scrolls.push(options)},setTimeout:callback=>{timers.set(++serial,callback);return serial},clearTimeout:id=>timers.delete(id),requestAnimationFrame:callback=>frames.push(callback)})
- function render(){cursor=0;const effectStart=effects.length,page=Page({budget:budget(plan),fixture:false});tree=page.type(page.props);refs[1].current=stage;effects.slice(effectStart+1).forEach(callback=>callback());return tree}
+ const Page=load({useLocation:()=>location,useNavigate:()=>((href,options)=>{navigations.push({href,options});const next={...location,search:href.slice(href.indexOf('?'))};if(deferred)pendingLocation=next;else location=next})},{react:{...React,useState:initial=>{const index=stateCursor++;if(!(index in states))states[index]=typeof initial==='function'?initial():initial;return [states[index],value=>{states[index]=value}]},useRef:value=>refs[cursor++]??(refs[cursor-1]={current:value}),useEffect:callback=>effects.push(callback),useLayoutEffect:callback=>effects.push(callback)},'react/jsx-runtime':{jsx,jsxs:jsx,Fragment:'fragment'},'react-dom':{flushSync:callback=>callback()},window:{matchMedia:()=>({matches:reduced}),scrollY:432,scrollTo:options=>scrolls.push(options)},setTimeout:callback=>{timers.set(++serial,callback);return serial},clearTimeout:id=>timers.delete(id),requestAnimationFrame:callback=>frames.push(callback)})
+ function render(){cursor=0;stateCursor=0;const effectStart=effects.length,page=Page({budget:budget(plan),fixture:false});tree=page.type(page.props);refs[1].current=stage;effects.slice(effectStart+1).forEach(callback=>callback());return tree}
  function advance(){for(const [id,callback]of timers){timers.delete(id);callback()}}
  function paint(){while(frames.length)frames.shift()()}
  render()
@@ -56,10 +56,10 @@ test('Actual card page renders signed/zero charges, two side copies and categori
  const plan=fixture(),before=JSON.stringify(plan)
  const Page=load({useLocation:()=>({search:'?year=2026&month=10&walletCard=card1'}),useNavigate:()=>()=>{}})
  const html=renderToStaticMarkup(React.createElement(Page,{budget:budget(plan),fixture:false}))
- assert.match(html,/household-card-charge[^>]*><bdi dir="ltr">[^<]*123\.45/)
+ assert.match(html,/household-card-charge[^>]*><bdi class="money-amount" dir="ltr"><span class="money-symbol">₪<\/span> <span class="money-number">123\.45/)
  assert.equal((html.match(/class="household-wallet-peek (?:left|right)"/g)??[]).length,2)
  assert.equal((html.match(/class="household-wallet-peek far-(?:left|right)"[^>]*aria-hidden="true"/g)??[]).length,2)
- assert.match(html,/household-card-charge[^>]*><bdi dir="ltr">[^<]*0/)
+ assert.match(html,/household-card-charge[^>]*><bdi class="money-amount" dir="ltr"><span class="money-symbol">₪<\/span> <span class="money-number">0/)
  const detail=html.split('class="surface household-card-detail"')[1]
  assert.doesNotMatch(detail.split('household-detail-period')[0],/<strong|123\.45/)
  assert.match(detail,/household-category-row/);assert.match(detail,/23\.45/)

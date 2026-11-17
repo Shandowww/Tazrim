@@ -1,7 +1,8 @@
+import {MoneyAmount} from './money-amount'
 import {CardFeeFlip} from './card-fee-flip'
 import {CardClubMark} from '../tazrim/components/accounts/card-club-mark'
 import {PageHeading} from './page-heading'
-import {useEffect,useLayoutEffect,useRef} from 'react'
+import {useEffect,useLayoutEffect,useRef,useState} from 'react'
 import {useLocation,useNavigate} from 'react-router-dom'
 import {ChevronLeft,ChevronRight,ShoppingBasket,Pill,Fuel,ShoppingBag,House,Landmark,Tag} from 'lucide-react'
 import {networkLabel,providerKey} from '../tazrim/lib/accounts/brands'
@@ -15,7 +16,7 @@ import {withViewQuery} from './navigation-query'
 import {demoHouseholdPlan} from './demo-fixture'
 import type {BudgetState} from './use-budget'
 import Link from './link'
-const remembered=new Map<string,string>(),money=(n:number|null)=>n===null?'אין דיווח':new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:2}).format(n)
+const rememberedViews=new Map<string,string>(),remembered=new Map<string,string>()
 const icons={food:ShoppingBasket,pharmacy:Pill,fuel:Fuel,shopping:ShoppingBag,home:House,loans:Landmark,other:Tag}
 function WalletDots({cards,selectedId,select,step}:{cards:Array<{id:string;displayName:string;cardLastFour?:string|null}>;selectedId:string;select:(id:string)=>void;step:(delta:number)=>void}){
  const ref=useRef<HTMLDivElement>(null)
@@ -30,6 +31,8 @@ function WalletDots({cards,selectedId,select,step}:{cards:Array<{id:string;displ
 }
 function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
  const location=useLocation(),navigate=useNavigate(),period=periodFor(location.search),query=new URLSearchParams(location.search),pointer=useRef<{x:number;y:number;id:number;dragging:boolean}|null>(null),stageRef=useRef<HTMLDivElement>(null),swipeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pendingScroll=useRef<number|null>(null),suppressFlip=useRef(false)
+ const [accountView,setAccountView]=useState(()=>query.has('walletCard')?'cards':rememberedViews.get(scope)??'banks')
+ const selectAccountView=(view:string)=>{rememberedViews.set(scope,view);if(rememberedViews.size>30)rememberedViews.delete(rememberedViews.keys().next().value!);setAccountView(view)}
  useEffect(()=>()=>{if(swipeTimer.current){clearTimeout(swipeTimer.current);swipeTimer.current=null}pointer.current=null},[scope,location.search,plan])
  useLayoutEffect(()=>{
   resetSwipe(true)
@@ -93,13 +96,14 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
    {card.cardLastFour&&<bdi dir="ltr">•••• {card.cardLastFour}</bdi>}
   </div>
   {card.club&&<CardClubMark club={card.club}/>}
-  <span className="household-card-charge" data-missing={card.total===null}><bdi dir={card.total===null?'auto':'ltr'}>{walletCardCharge(card,period)}</bdi></span>
+  <span className="household-card-charge" data-missing={card.total===null}>{card.total===null?<bdi>{walletCardCharge(card,period)}</bdi>:<MoneyAmount value={card.total} minimumFractionDigits={2}/>}</span>
   <div className="household-card-bottom"><div className="household-card-marks">{card.cardNetwork&&<span className="household-card-network" data-network={card.cardNetwork} role="img" aria-label={networkLabel(card.cardNetwork)??card.cardNetwork}><NetworkMark network={card.cardNetwork}/></span>}</div><div className="household-card-issuer">{hasProviderLogo(card.issuer)?<ProviderLogo provider={card.issuer}/>:card.issuer==='bank'?<span>כרטיס בנקאי</span>:null}</div><div className="household-payer">{card.payer?<span>מחויב מ־<bdi>{card.payer.name}</bdi></span>:<span>אין שיוך לחשבון משלם</span>}</div></div>
  </div>
  const peeks=walletNeighbors(view.cards,selected?.id)
  const coverage=selected?cardDetailCoverage(selected):null
- return <div className="household-page household-accounts"><div className="household-title"><PageHeading>החשבונות והכרטיסים</PageHeading>{!viewer&&<Link className="household-update" href={href('/accounts/new')}>הוספת חשבון</Link>}</div>
- <section className="household-bank-list" aria-label="חשבונות בנק">{view.banks.map(bank=><article className="surface household-bank" key={bank.id}><div className="household-bank-heading"><ProviderLogo provider={bank.provider}/><div><h2><bdi>{bank.displayName}</bdi></h2>{!hasProviderLogo(bank.provider)&&bank.provider&&<p><bdi>{bank.provider}</bdi></p>}</div></div><div className="household-bank-balance"><span>{bank.balance?<>יתרה ל־<bdi dir="ltr">{bank.balance.date.split('-').reverse().join('.')}</bdi></>:'יתרה לא דווחה בתקופה'}</span><strong><bdi>{money(bank.balance?.value??null)}</bdi></strong></div><details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('banks',bank.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></article>)}{!view.banks.length&&<p className="surface household-empty">עדיין אין חשבונות בנק במרחב.</p>}</section>
+ return <div className="household-page household-accounts" data-mobile-view={accountView}><div className="household-title"><PageHeading>החשבונות והכרטיסים</PageHeading>{!viewer&&<Link className="household-update" href={href('/accounts/new')}>הוספת חשבון</Link>}</div>
+ <nav className="mobile-account-sections" aria-label="סוגי חשבונות"><button type="button" aria-pressed={accountView==='banks'} onClick={()=>selectAccountView('banks')}>חשבונות בנק</button><button type="button" aria-pressed={accountView==='cards'} onClick={()=>selectAccountView('cards')}>כרטיסי אשראי</button></nav>
+ <section className="household-bank-list" aria-label="חשבונות בנק">{view.banks.map(bank=><article className="surface household-bank" key={bank.id}><div className="household-bank-heading"><ProviderLogo provider={bank.provider}/><div><h2><bdi>{bank.displayName}</bdi></h2>{!hasProviderLogo(bank.provider)&&bank.provider&&<p><bdi>{bank.provider}</bdi></p>}</div></div><div className="household-bank-balance"><span>{bank.balance?<>יתרה ל־<bdi dir="ltr">{bank.balance.date.split('-').reverse().join('.')}</bdi></>:'יתרה לא דווחה בתקופה'}</span><strong><MoneyAmount value={bank.balance?.value??null} minimumFractionDigits={2} missing="אין דיווח"/></strong></div><details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('banks',bank.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></article>)}{!view.banks.length&&<p className="surface household-empty">עדיין אין חשבונות בנק במרחב.</p>}</section>
  <section className="household-wallet" aria-roledescription="קרוסלה" aria-label="כרטיסי אשראי">
   <div className="household-title"><h2>כרטיסי האשראי</h2><span>{selected?index+1+' מתוך '+view.cards.length:'אין כרטיסים'}</span></div>
   {selected&&<>
@@ -142,12 +146,12 @@ function Overview({plan,scope,viewer}:{plan:any;scope:string;viewer:boolean}){
     <div className="household-wallet-selected" role="group" tabIndex={0} aria-live="polite" aria-label={selected.displayName+' '+(selected.cardLastFour??'')}><CardFeeFlip key={scope+'/'+selected.id+'/'+location.search} card={selected} canFlip={()=>!suppressFlip.current&&!swipeTimer.current&&pendingScroll.current===null}>{face(selected)}</CardFeeFlip></div>
    </div>
    <div className="household-wallet-controls"><button type="button" onClick={()=>step(1)} disabled={view.cards.length<2} aria-label="הכרטיס הבא"><ChevronRight size={20}/></button><WalletDots cards={view.cards} selectedId={selected.id} select={select} step={step}/><button type="button" onClick={()=>step(-1)} disabled={view.cards.length<2} aria-label="הכרטיס הקודם"><ChevronLeft size={20}/></button></div>
-   <p className="household-wallet-total">{view.cards.every(c=>c.total!==null)?<>סה״כ בכרטיסים בתקופה: <bdi>{money(view.cards.reduce((s,c)=>s+(c.total??0),0))}</bdi></>:'חסר דיווח בחלק מהכרטיסים'}</p>
+   <p className="household-wallet-total">{view.cards.every(c=>c.total!==null)?<>סה״כ בכרטיסים בתקופה: <MoneyAmount value={view.cards.reduce((s,c)=>s+(c.total??0),0)} minimumFractionDigits={2}/></>:'חסר דיווח בחלק מהכרטיסים'}</p>
   </>}
   {!viewer&&<Link className="household-back" href={href('/card-setup/new')}>הוספת כרטיס</Link>}
  </section>
- {selected&&<section className="surface household-card-detail" aria-live="polite"><div className="household-title"><h2><bdi>{selected.displayName}</bdi>{selected.cardLastFour&&<> · <bdi>{selected.cardLastFour}</bdi></>}</h2>{!viewer&&<Link className="household-update" href={href('/card-setup/'+encodeURIComponent(selected.id))}>עריכת פרטי הכרטיס</Link>}</div><p className="household-detail-period">{period.month?period.year+'-'+period.month:'שנת '+period.year}</p>{selected.details.categories.map((row:{category:string;cents:number})=>{const category=householdCategory(row.category,plan),Icon=icons[category.kind as keyof typeof icons];return <Link className="household-category-row" key={row.category} href={href('/categories?card='+encodeURIComponent(selected.id)+'&category='+encodeURIComponent(row.category))}><span style={{color:category.color,background:`color-mix(in srgb, ${category.color} 14%, transparent)`}}><Icon size={19}/></span><span>{row.category}</span><bdi>{money(row.cents/100)}</bdi></Link>})}{coverage?.remainder!=null&&coverage.remainder!==0&&<p className="household-detail-note">{coverage.remainder>=0?'ללא פירוט: ':'הפירוט חורג מסך החיוב ב־'}<bdi>{money(Math.abs(coverage.remainder))}</bdi></p>}{coverage?.detailed===null&&<p className="household-detail-note">אין פירוט שנפרע לתקופה זו.</p>}<details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('cards',selected.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></section>}
- <details className="surface household-bank"><summary>ניהול חשבונות ודוחות</summary><nav className="household-account-actions">{accountWorkflows('banks','',viewer).concat(accountWorkflows('cards','',viewer)).filter((a,i,all)=>all.findIndex(b=>b.href===a.href)===i).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></div>
+ {selected&&<section className="surface household-card-detail" aria-live="polite"><div className="household-title"><h2><bdi>{selected.displayName}</bdi>{selected.cardLastFour&&<> · <bdi>{selected.cardLastFour}</bdi></>}</h2>{!viewer&&<Link className="household-update" href={href('/card-setup/'+encodeURIComponent(selected.id))}>עריכת פרטי הכרטיס</Link>}</div><p className="household-detail-period">{period.month?period.year+'-'+period.month:'שנת '+period.year}</p>{selected.details.categories.map((row:{category:string;cents:number})=>{const category=householdCategory(row.category,plan),Icon=icons[category.kind as keyof typeof icons];return <Link className="household-category-row" key={row.category} href={href('/categories?card='+encodeURIComponent(selected.id)+'&category='+encodeURIComponent(row.category))}><span style={{color:category.color,background:`color-mix(in srgb, ${category.color} 14%, transparent)`}}><Icon size={19}/></span><span>{row.category}</span><MoneyAmount value={row.cents/100} minimumFractionDigits={2}/></Link>})}{coverage?.remainder!=null&&coverage.remainder!==0&&<p className="household-detail-note">{coverage.remainder>=0?'ללא פירוט: ':'הפירוט חורג מסך החיוב ב־'}<MoneyAmount value={Math.abs(coverage.remainder)} minimumFractionDigits={2}/></p>}{coverage?.detailed===null&&<p className="household-detail-note">אין פירוט שנפרע לתקופה זו.</p>}<details><summary>פרטים ופעולות</summary><nav className="household-account-actions">{accountWorkflows('cards',selected.id,viewer).map(action=><Link href={href(action.href)} key={action.href}>{action.label}</Link>)}</nav></details></section>}
+</div>
 }
 export function HouseholdAccountsPage({budget,fixture}:{budget:BudgetState;fixture:boolean}){
  const {search}=useLocation()

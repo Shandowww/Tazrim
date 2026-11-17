@@ -1,0 +1,225 @@
+{
+  "date": "2026-11-11",
+  "application": "76340c5",
+  "preview": "https://adaptive.budgit.duckdns.org/next?year=2026&month=10",
+  "productionChanged": false,
+  "validation": {
+    "buildTypecheck": true,
+    "focusedTests": 13,
+    "coreChecks": 15,
+    "priorFullRegressionCheckpoint": "54839f4: 1458; not rerun for this component/CSS-only refinement",
+    "light": [
+      {
+        "width": 320,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 375,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 390,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 430,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 768,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 844,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 1440,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      },
+      {
+        "width": 1920,
+        "theme": "",
+        "noOverflow": true,
+        "currency": true,
+        "touchTargets": true
+      }
+    ],
+    "dark": [
+      {
+        "width": 320,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 601.53125,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 375,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 614.359375,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 617.859375,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 430,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 627.1953125,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 0,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 844,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 0,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 0,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      },
+      {
+        "width": 1920,
+        "theme": "dark",
+        "noOverflow": true,
+        "currency": true,
+        "cardHeight": 0,
+        "months": [
+          "9,350",
+          "7,400",
+          "9,050"
+        ],
+        "touchTargets": true
+      }
+    ],
+    "localDataUnchanged": true,
+    "hostedDataUnchanged": true,
+    "hostedPhone": {
+      "width": 320,
+      "noOverflow": true,
+      "months": [
+        "9,350",
+        "7,400",
+        "9,050",
+        "6,000"
+      ],
+      "lowest": "היתרה הנמוכה · דצמ׳\n₪\n7,400",
+      "agenda": 2,
+      "heading": "מבט קדימה3 חודשים · הערכה"
+    },
+    "hostedDesktop": {
+      "path": "/next",
+      "columns": "657.445px 424.164px",
+      "noOverflow": true,
+      "curvedPaths": 2,
+      "filledAreas": 2,
+      "months": [
+        "9,350",
+        "7,400",
+        "9,050"
+      ]
+    },
+    "accountSwitchAndFullRouteRetention": true,
+    "back": true,
+    "keyboardEnter": true,
+    "enlargedText": "At 200% root font size the new card fits 320px and metric/month grids reflow. Surrounding existing Overview has 3px overflow.",
+    "frontendSha256": "13c0da7224673d2aa656f612a99e99e955b2d12a2e468a240f086e37d62293d4"
+  },
+  "isolation": {
+    "container": "budgit-adaptive-preview-76340c5",
+    "readOnly": true,
+    "hostMounts": 0,
+    "memoryMiB": 256,
+    "cpus": 0.5,
+    "productionAdjacentIdentitiesUnchanged": true,
+    "productionFrontendUnchanged": true,
+    "productionHealthUnchanged": true,
+    "previousPreviewRetired": true,
+    "remoteEvidence": "/opt/budgit-previews/adaptive-76340c5"
+  },
+  "limits": [
+    "No physical iPhone or installed PWA acceptance",
+    "No reduced-motion emulation; no new animations introduced",
+    "Forecast is monthly; curve does not represent daily balances or statistical confidence"
+  ]
+}

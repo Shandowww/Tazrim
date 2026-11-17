@@ -1,4 +1,7 @@
+import {AdaptiveSections} from './adaptive-sections'
 import {useFormDraft} from './use-form-draft'
+import Link from './link'
+import {withViewQuery} from './navigation-query'
 import {PageHeading} from './page-heading'
 import {useRef,useState} from 'react'
 import {useSavedReturn} from './use-saved-return'
@@ -22,24 +25,28 @@ function AccountEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:
  if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
  return <form className="space-y-5" onSubmit={event=>{event.preventDefault();void save()}}>
   <div className="max-w-md"><BankElement provider={cashAccountList(base.plan).find(a=>a.id===id)?.bankName??''} name={draft.label} colorChoice={draft.color||null} emptyText="תצוגת שם וצבע בלבד · ללא יתרה מדווחת" /></div>
+  <AdaptiveSections labels={['פרטי החשבון','יתרות ותכנון']} disabled={busy}>
   <fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">פרטי חשבון הבנק</h2>
    <label className="block text-sm">שם החשבון<input className={input} name="account-label" value={draft.label} maxLength={80} onChange={event=>update('label',event.target.value)} /></label>
    <label className="block text-sm">צבע החשבון<select className={input} value={draft.color} onChange={event=>update('color',event.target.value)}><option value="">לפי ברירת המחדל של החשבון</option>{accountColors.map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
+  </fieldset>
+  <fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">יתרות ותכנון</h2>
    <label className="block text-sm">כרית מזומן · ₪<input className={input} dir="ltr" inputMode="decimal" name="account-buffer" value={draft.buffer} maxLength={32} onChange={event=>update('buffer',event.target.value)} /></label>
    <label className="block text-sm">יתרת פתיחה לחשבון · ₪<input className={input} dir="ltr" inputMode="decimal" name="account-opening" value={draft.opening} maxLength={32} onChange={event=>update('opening',event.target.value)} /></label><p className="text-sm text-muted-foreground">ריק בחשבון חדש משאיר יתרה לא ידועה; אפס הוא יתרה מפורשת. אפשר להזין מינוס ליתרה שלילית. יתרת פתיחה אינה דיווח בנק או הכנסה.</p>
    <label className="block text-sm">חודש יתרת הפתיחה<input type="month" className={input} value={draft.openingMonth} min={base.plan?.startMonth as string} max={asOf} disabled={!draft.opening.trim()} onChange={event=>update('openingMonth',event.target.value)} /></label>
    <p className="text-sm text-muted-foreground">החשבון נשמר רק במרחב הנבחר. הוספתו אינה משייכת אליו סכומי חודשים, כרטיסים או התחייבויות ואינה משנה את יתרת התקציב הכוללת. תנועות המקור, דיווחי הבנק ושיוכי הכרטיסים נשמרים. יתרת פתיחה ידנית אינה משנה את הנתונים בקובץ הבנק.</p>
   </fieldset>
+  </AdaptiveSections>
   {error&&<p className="rounded-xl border border-destructive p-4 text-sm text-destructive" role="alert">{error}</p>}
   <div className="surface flex flex-wrap items-center gap-3 rounded-xl p-4"><p role="status" className="flex-1 text-sm">{busy?'שומרים את החשבון…':dirty?'יש שינויים שעדיין לא נשמרו':'אין שינויים לשמירה'}</p><button type="submit" disabled={!dirty||busy||blocked} className="h-11 rounded-xl bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50">שמירת החשבון</button><button type="button" disabled={!dirty||busy} onClick={backup} className="h-11 rounded-xl border px-4 text-sm disabled:opacity-50">גיבוי הטיוטה</button>{blocked&&<button type="button" disabled={busy} onClick={()=>guard.run(budget.refresh)} className="h-11 rounded-xl border px-4 text-sm">טעינת הגרסה השמורה</button>}</div>
  </form>
 }
 export function AccountPage({create=false,fixture,budget}:{create?:boolean;fixture:boolean;budget:BudgetState}){
- const {id:routeId}=useParams(),{state}=useLocation(),[newId]=useState(()=>crypto.randomUUID()),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'?state.setupSavedMessage:''),[completedId,setCompletedId]=useState<string|null>(null),id=create?(completedId??newId):(routeId??'')
+ const {id:routeId}=useParams(),{state,search}=useLocation(),[newId]=useState(()=>crypto.randomUUID()),[message,setMessage]=useState(()=>typeof state?.setupSavedMessage==='string'?state.setupSavedMessage:''),[completedId,setCompletedId]=useState<string|null>(null),id=create?(completedId??newId):(routeId??'')
  const returnAfterSave=useSavedReturn(budget.status==='ready'?budget.value.accountId+'/'+budget.budgetId:'')
  if(fixture)return <section className="surface rounded-xl p-6">נתוני הדוגמה אינם נשמרים. יש לפתוח תקציב שמור לעריכת חשבונות.</section>
  if(budget.status==='loading'||budget.refreshPending)return <section role="status" className="surface rounded-xl p-6">טוען חשבון…</section>
  if(budget.status==='error')return <section role="alert" className="surface rounded-xl p-6">{budget.message}</section>
  const reason=budget.spaces.find(s=>s.id===budget.budgetId)?.role==='viewer'?'התקציב פתוח לצפייה בלבד.':budget.value.writeIdentityBound!==true?'השמירה המוגנת עדיין אינה זמינה בשרת הזה.':manualAccountEligibility(budget.value.plan,create&&!completedId?'':id)
- return <div className="mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">{create&&!completedId?'הוספת חשבון בנק':'עריכת חשבון בנק'}</PageHeading><p className="text-sm text-muted-foreground"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:<AccountEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} id={id} create={create&&!completedId} budget={budget} base={budget.value} onSaved={value=>{setMessage(value);returnAfterSave(value);if(value&&create)setCompletedId(id)}} />}</div>
+ return <div className="adaptive-editor mx-auto max-w-3xl space-y-5"><PageHeading className="text-2xl font-semibold">{create&&!completedId?'הוספת חשבון בנק':'עריכת חשבון בנק'}</PageHeading><p className="text-sm text-muted-foreground"><bdi>{budget.spaces.find(s=>s.id===budget.budgetId)?.name}</bdi> · <bdi dir="ltr">{budget.value.accountEmail}</bdi></p>{message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}{reason?<section className="surface rounded-xl p-6"><p>{reason}</p></section>:<AccountEditor key={budget.budgetId+'/'+id+'/'+budget.value.revision} id={id} create={create&&!completedId} budget={budget} base={budget.value} onSaved={value=>{setMessage(value);returnAfterSave(value);if(value&&create)setCompletedId(id)}} />}{!create&&<details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">אפשרויות מתקדמות לחשבון</summary><Link href={withViewQuery('/overview/migration',search)} className="inline-flex min-h-11 items-center text-primary underline">מעבר חשבון בין מרחבים</Link></details>}</div>
 }

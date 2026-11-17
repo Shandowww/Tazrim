@@ -1,46 +1,31 @@
+import {useEffect,useState} from 'react'
 import {useInterfaceMode} from './interface-mode'
 import {modeAllows} from './interface-mode-model'
 import {useLocation} from 'react-router-dom'
 import {withViewQuery} from './navigation-query'
+import {loadExpectations} from './report-expectations-api'
+import {loadWallet} from './wallet-api'
+import type {BudgetState} from './use-budget'
 import Link from './link'
-const nativeWorkflows=[
- ['/settings/access','ניהול כניסה לשרת · למנהל השרת'],
- ['/analysis','מדדי הוצאה, השוואה ותצוגות שמורות'],
- ['/settings/wallet','Apple Pay · חיבור האייפון ובדיקת הייבוא'],
- ['/settings/gmail','מצב Gmail ועדכוני בנק פרטיים'],
- ['/settings/drive','גיבוי חיצוני ב־Google Drive · למנהל השרת'],
- ['/overview/migration','סקירת מעבר רישום חשבון בין מרחבים'],
- ['/goals','יעדים חודשיים והתקדמות מדיווחי אמת'],
- ['/settings/forecast','בסיס התחזית והערכות קבועות'],
- ['/start','התחלה מודרכת לתקציב חדש'],
- ['/settings/profile','שם לתצוגה וחשבון מחובר'],
- ['/overview','תמונה כוללת · חשבונות ומטרות'],
- ['/settings/device-draft','טיוטה שמורה במכשיר'],
- ['/settings/security','הצפנה, נעילה, שחזור וייבוא גיבוי'],
- ['/actions','התראות ותזכורות אישיות'],
- ['/notices','עדכוני בנקים ומנפיקים'],
- ['/upload','מרכז הדוחות והמקורות השמורים'],
- ['/settings/report-expectations','דוחות צפויים ומועדי הגעה'],
- ['/upload/history','היסטוריית ייבוא בנק וביטול קליטה'],
- ['/investment','סימולציית השקעות ויעד חודשי'],
- ['/savings/schedule','תכנון הפקדות חודשיות לחיסכון'],
- ['/savings/transfers','העברות חיסכון ואישור ביצוע'],
- ['/details/manage','ניהול צ׳קים ופירוט ידני'],
- ['/categories/manage','ניהול מילון הקטגוריות'],
- ['/categories/limits','תקרות הוצאה לפי קטגוריה'],
- ['/accounts/transfers','העברות בתכנון בין חשבונות עו״ש'],
- ['/accounts/assignments','שיוך כרטיסים והתחייבויות לחשבונות'],
- ['/card-setup','פרטי הכרטיסים'],
-] as const
 const groups=[
- {label:'דוחות וניתוח',paths:['/analysis','/actions','/notices','/upload','/upload/history','/settings/report-expectations','/categories/manage','/categories/limits','/details/manage']},
- {label:'תכנון וחיסכון',paths:['/goals','/settings/forecast','/investment','/savings/schedule','/savings/transfers']},
- {label:'חשבונות ומרחבים',paths:['/overview','/overview/migration','/accounts/transfers','/accounts/assignments','/card-setup','/start']},
- {label:'פרטיות וגיבוי',paths:['/settings/security','/settings/device-draft','/settings/drive','/settings/gmail']},
- {label:'פרופיל וחיבורים נוספים',paths:['/settings/profile','/settings/access','/settings/wallet']},
+ {label:'חשבון ושיתוף',links:[['/settings/profile','פרופיל והחשבון המחובר'],['/settings/spaces','מרחבים ושיתוף']]},
+ {label:'פרטיות ושחזור',links:[['/settings/security','הצפנה, נעילה ושחזור'],['/settings/device-draft','טיוטות במכשיר'],['/settings/history','יומן שינויים וגיבוי']]},
+ {label:'חיבורים',links:[['/settings/gmail','חיבור Gmail'],['/incoming?sync=settings','מקורות דוחות ותזמון']]},
 ]
-export function ExistingWorkflowLinks(){
- const {search}=useLocation(),{mode}=useInterfaceMode()
- const visible=groups.map(group=>({...group,paths:group.paths.filter(path=>modeAllows(mode,path))})).filter(group=>group.paths.length)
- return <section className="surface household-bank"><h2 className="font-semibold">ניהול והגדרות נוספות</h2>{visible.map(group=><details key={group.label}><summary className="min-h-11 py-3 text-sm">{group.label}</summary><ul className="divide-y">{nativeWorkflows.filter(([path])=>group.paths.includes(path)).map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary underline" href={withViewQuery(path,search,import.meta.env.DEV)}>{label}</Link></li>)}</ul></details>)}</section>
+/** Settings reads existing capability facts only. Financial ownership is not server administration. */
+export function ExistingWorkflowLinks({budget,fixture}:{budget:BudgetState;fixture:boolean}){
+ const {search}=useLocation(),{mode}=useInterfaceMode(),[facts,setFacts]=useState<{scope:string;admin:boolean;wallet:boolean;failed:boolean}|null>(null),[retry,setRetry]=useState(0)
+ const actor=budget.status==='ready'?budget.value:null,scope=actor?actor.accountId+'/'+budget.budgetId:'',viewer=budget.status==='ready'&&budget.spaces.find(space=>space.id===budget.budgetId)?.role==='viewer'
+ useEffect(()=>{
+  setFacts(null);if(!actor||fixture)return
+  let active=true
+  const c=new AbortController(),timer=setTimeout(()=>c.abort(),15000)
+  void Promise.allSettled([loadExpectations(budget.budgetId,actor,c.signal),viewer?Promise.resolve(null):loadWallet(budget.budgetId,actor,new Date().toISOString().slice(0,7),c.signal)]).then(([actions,wallet])=>{
+   if(active&&!c.signal.aborted)setFacts({scope,admin:actions.status==='fulfilled'&&actions.value.actions.backupAdmin===true,wallet:wallet.status==='fulfilled'&&!!wallet.value?.connections.some(connection=>!connection.revoked),failed:actions.status==='rejected'||wallet.status==='rejected'})
+  }).finally(()=>clearTimeout(timer))
+  c.signal.addEventListener('abort',()=>{if(active)setFacts(previous=>previous??{scope,admin:false,wallet:false,failed:true})},{once:true})
+  return()=>{active=false;clearTimeout(timer);c.abort()}
+ },[scope,actor?.accountEmail,fixture,viewer,retry])
+ const current=facts?.scope===scope?facts:null,visible=groups.map(group=>({...group,links:group.links.filter(([path])=>modeAllows(mode,path))})).filter(group=>group.links.length)
+ return <section className="surface household-bank"><h2 className="font-semibold">הגדרות נוספות</h2>{visible.map(group=><details key={group.label}><summary className="min-h-11 py-3 text-sm">{group.label}</summary><ul className="divide-y">{group.links.map(([path,label])=><li key={path}><Link className="flex min-h-11 items-center py-2 text-sm text-primary" href={withViewQuery(path,search,import.meta.env.DEV)}>{label}</Link></li>)}</ul>{group.label==='חיבורים'&&current?.wallet&&<Link className="flex min-h-11 items-center text-sm text-primary" href={withViewQuery('/settings/wallet',search,import.meta.env.DEV)}>ניהול חיבורי Wallet קיימים</Link>}</details>)}{current?.admin&&<details><summary className="min-h-11 py-3 text-sm">ניהול השרת</summary><Link className="flex min-h-11 items-center text-sm text-primary" href={withViewQuery('/settings/drive',search,import.meta.env.DEV)}>גיבוי ב־Google Drive</Link><Link className="flex min-h-11 items-center text-sm text-primary" href={withViewQuery('/settings/access',search,import.meta.env.DEV)}>ניהול כניסה לשרת</Link></details>}{current?.failed&&<p role="status" className="text-sm text-muted-foreground">לא ניתן לבדוק את כל החיבורים וההרשאות. <button type="button" className="min-h-11 text-primary underline" onClick={()=>setRetry(value=>value+1)}>בדיקה שוב</button></p>}</section>
 }

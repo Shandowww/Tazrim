@@ -1,3 +1,4 @@
+import {MoneyAmount} from './money-amount'
 import {PageHeading} from './page-heading'
 import {useLocation,useParams, useNavigate} from 'react-router-dom'
 import {bankActivityView} from './bank-activity-read'
@@ -7,7 +8,6 @@ import {demoHouseholdPlan} from './demo-fixture'
 import type {useBudget} from './use-budget'
 import Link from './link'
 import BackLink from './back-link'
-import {formatCurrency} from '../tazrim/lib/utils/currency'
 
 export function BankActivityPage({fixture,budget}:{fixture:boolean;budget:ReturnType<typeof useBudget>}) {
  const {id=''}=useParams(),{search}=useLocation(),navigate=useNavigate(),options=periodFor(search),params=new URLSearchParams(search)
@@ -20,7 +20,7 @@ export function BankActivityPage({fixture,budget}:{fixture:boolean;budget:Return
  try{view=bankActivityView(plan,id,options)}catch(e){return <p role="alert">{e instanceof Error?e.message:'לא ניתן להציג את התנועות.'}</p>}
  const pages=Math.max(1,Math.ceil(view.rows.length/50)),page=Math.min(pages,Math.max(1,Math.floor(Number(params.get('page'))||1))),rows=view.rows.slice((page-1)*50,page*50)
  const pageHref=(number:number)=>{const next=new URLSearchParams(search);next.set('page',String(number));return '?'+next}
- const money=(cents:number)=><bdi dir="ltr">{formatCurrency(cents/100)}</bdi>
+ const money=(cents:number)=><MoneyAmount value={cents/100} minimumFractionDigits={2}/>
  return <div className="mx-auto max-w-5xl space-y-5">
   <BackLink href={href('/accounts')}>חזרה לחשבונות</BackLink>
   <PageHeading className="text-2xl font-semibold">תנועות החשבון · <bdi>{view.account.label}</bdi></PageHeading>
