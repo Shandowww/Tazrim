@@ -39,6 +39,18 @@
     "cause": "A pre-existing working report-preparation job advanced in the normal background timer during activation. Its state became attention, a prepared source/lifecycle/notice row was added and its intake routing approval advanced. Budget tables were unchanged and no existing report-source rows were replaced or removed.",
     "recovery": "The queue settled with no working/queued jobs. Repeated fresh backup, candidate/security/restore/compatible-rollback and unchanged strict final preservation gates passed. No exclusion was added to hide report-table changes."
   },
+  "sourceBackups": {
+    "primaryRepository": "Shandowww/monthly-flow-budget",
+    "primaryBranch": "main",
+    "applicationCommit": "9b46647b741b5876531a176b3ead404bc2ff8e11",
+    "releaseTag": "v1.6.0",
+    "forkRepository": "Shandowww/Tazrim",
+    "forkBranch": "codex/budgit-react-frontend",
+    "forkCommit": "f4c2f586120c12330bfa7550fa74f0554f3e2fb3",
+    "exportedSourceCommit": "7a395886f778608db960fcc2d74c9b434e152eb9",
+    "trackedSourceFilesVerified": 1100,
+    "independentHistoryAndNoticesPreserved": true
+  },
   "limits": [
     "Bank scopes must be explicitly configured in the guarded bank-account editor; no production account was configured by the agent.",
     "No new physical iPhone or installed-PWA acceptance.",

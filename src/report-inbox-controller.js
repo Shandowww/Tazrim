@@ -2,6 +2,7 @@ import {clone,creditCards,cashAccountList,cashPlanningBase} from './budget.js';
 import {bankIdentity,bankPreview,bankDefaultMonthModes,bankPlannedDirect,bankRememberedRules,applyBankImport} from './bank-import-model.js';
 import {prepareCardStatement,statementMerchant,statementGroups,statementBatchGroups} from './card-statement-model.js';
 import {inboxHash,applyReportInbox,inboxTarget,inboxCardLast4} from './report-inbox-model.js';
+import {bankMatchLink,bankMatchLinkKey} from './report-bank-match.js';
 
 // Extracted from the original report inbox. Both interfaces use this one workflow.
 // Only the supplied review state is updated; the saved financial plan is never mutated.
@@ -30,14 +31,35 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    const options={id:item.id,accountId:item.target,label:account.label,bankName:(account.bankName??item.provider)||undefined,personal:stored?.personal===true,rules,from:item.from,to:item.to,fileName:item.name,choices,modes:{},reportScope:item.bankOptions.scope,directIncluded:item.directIncluded,asOf:month,coverageConfirmed:true,monthsConfirmed:true};
    let preview=bankPreview(working,records,options);
    if(preview.rows.some(r=>r.state==='migrated'))item.warning='בדוח יש מקור שסומן במעבר חשבון. קליטתו מחדש חסומה גם אם נבחר חשבון אחר; יש לבדוק את המקור לפני קליטה.';
-   for(const row of preview.rows.filter(r=>r.state==='conflict')){
-    const decision=item.decisions[row.line],previous=working.bankImport?.entries.find(e=>e.key===row.key),canMatch=previous?.fingerprint===row.fingerprint;
-    const match={type:'duplicate',id:String(row.line),row,canMatch,previous,previousFile:working.bankImport?.batches.find(b=>b.id===previous?.batchId)?.file,decision:decision==='new'||decision==='same'&&canMatch?decision:'',storedDecision:decision??''};
-    // Keep the original evidence and every choice visible, including choices restored from older drafts.
-    item.matchReviews.push(match);
-    if(decision==='same'&&canMatch)records=records.map(r=>r.line===row.line?{...r,missingReference:false}:r);
-    else if(decision==='new')records=await Promise.all(records.map(async r=>r.line===row.line?{...r,key:await inboxHash(item.hash+':'+r.line+':'+r.key),missingReference:false}:r));
-    else item.questions.push({type:'duplicate',row,canMatch,previous});
+   const conflicts=preview.rows.filter(row=>{
+    const choice=item.decisions[row.line];
+    return row.state==='conflict'||row.state==='new'&&(choice==='same'||bankMatchLinkKey(choice));
+   });
+   if(conflicts.length){
+    const entries=new Map((working.bankImport?.entries??[]).filter(entry=>entry.accountId===item.target).map(entry=>[entry.key,entry]));
+    const batches=new Map((working.bankImport?.batches??[]).map(batch=>[batch.id,batch.file]));
+    const guarded=working.importMigrationGuards?.movements??[], protectedKeys=new Set(guarded.map(entry=>entry.key)), protectedPrints=new Set(guarded.map(entry=>entry.fingerprint));
+    const reserved=new Map(preview.rows.filter(row=>['duplicate','duplicate-file'].includes(row.state)).map(row=>[row.key,'automatic']));
+    const edits=new Map();
+    const linkFor=(row,entry)=>entry&&!protectedKeys.has(entry.key)&&!protectedPrints.has(entry.fingerprint)&&!reserved.has(entry.key)?bankMatchLink(row,entry,item.target):'';
+    for(const row of conflicts){
+     const choice=item.decisions[row.line],previous=entries.get(row.key),selected=choice==='same'?previous:entries.get(bankMatchLinkKey(choice));
+     const exact=previous?.fingerprint===row.fingerprint&&!reserved.has(row.key)&&!protectedKeys.has(row.key)&&!protectedPrints.has(row.fingerprint);
+     // Legacy exact choices also support saved records without original row metadata.
+     const linked=choice==='same'&&exact||!!selected&&linkFor(row,selected)===choice;
+     const decision=choice==='new'||linked?choice:'';
+     item.matchReviews.push({type:'duplicate',id:String(row.line),row,canMatch:exact,previous,previousFile:batches.get(previous?.batchId),decision,storedDecision:choice??''});
+     if(linked){reserved.set(selected.key,String(row.line));edits.set(row.line,{key:selected.key,fingerprint:selected.fingerprint,missingReference:false});}
+     else if(choice==='new')edits.set(row.line,{key:await inboxHash(item.hash+':'+row.line+':'+row.key),missingReference:false});
+     else item.questions.push({type:'duplicate',row,canMatch:exact,previous});
+    }
+    for(const match of item.matchReviews){
+     match.reservedBankKeys=reserved;
+     match.protectedBankKeys=protectedKeys;
+     match.protectedBankFingerprints=protectedPrints;
+     if(reserved.has(match.row.key)&&reserved.get(match.row.key)!==match.id)match.canMatch=false;
+    }
+    records=records.map(record=>edits.has(record.line)?{...record,...edits.get(record.line)}:record);
    }
    preview=bankPreview(working,records,options);options.modes=bankDefaultMonthModes(working,preview,month,options.reportScope);
    for(const m of preview.months){if(item.monthDecisions[m.month]==='skip')options.modes[m.month]='skip';if(options.modes[m.month]==='skip'&&m.newCount&&item.monthDecisions[m.month]!=='skip')item.questions.push({type:'protected-month',month:m.month});if(options.modes[m.month]!=='skip'&&bankPlannedDirect(working,m.month,item.target).length&&typeof item.directIncluded[m.month]!=='boolean')item.questions.push({type:'direct',month:m.month});}

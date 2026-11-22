@@ -106,12 +106,13 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
   const {parsed}=await readAutomaticSource(metadata(row).name,bytes);
   if(parsed.skip||parsed.activity||parsed.sheets||!['bank','card'].includes(parsed.kind)||parsed.kind!==choice.kind)throw serviceError('מבנה המקור דורש בדיקה ידנית.',409);
   access=budgetAccess(db,user,budget,{isAllowed,write:true});const current=source(access.scope,id);if(!current||current.revision!==revision||current.source_hash!==row.source_hash)throw serviceError('המקור השתנה בזמן הבדיקה.',409);
-  const item={...parsed,id,hash:row.source_hash,storedId:id,storedRevision:revision,name:metadata(row).name,target:choice.target,payer:choice.payer,decisions:{},directIncluded:choice.directIncluded??{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false};
+  const decisions=parsed.kind==='bank'&&!reuseRemoved?choice.decisions??{}:{};
+  const item={...parsed,id,hash:row.source_hash,storedId:id,storedRevision:revision,name:metadata(row).name,target:choice.target,payer:choice.payer,decisions,directIncluded:choice.directIncluded??{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false};
   const ui={blank:false,startMonth:access.plan.startMonth,items:[item],newAccounts:[],newCards:[],categoryChoices:new Map(),bankChoices:new Map(saved.bankChoices??[]),duplicates:0,merchantRules:[]};
   await buildReportInbox(access.plan,ui,{month:new Date(now()).toISOString().slice(0,7),today:new Date(now()).toISOString().slice(0,10),classifier,activityAPI});
   if(ui.issues||!item.already||item.preview?.replacement)throw serviceError('נמצאו שינויים או בדיקות נדרשות; יש להמשיך בסקירה לפני שמירה.',409);
   const candidates=(access.plan.reportInbox?.receipts??[]).filter(r=>r.kind===item.kind&&r.target===item.target&&fullReportReceipt(access.plan,r));
-  const receipt=item.kind==='card'?candidates.find(r=>r.reference===item.report?.dueDate):candidates.find(r=>access.plan.bankImport?.batches?.some(b=>b.id===r.reference&&b.accountId===item.target&&b.from<=item.from&&b.to>=item.to));
+  const receipt=item.kind==='card'?candidates.find(r=>r.reference===item.report?.dueDate):item.matchReviews.length?null:candidates.find(r=>access.plan.bankImport?.batches?.some(b=>b.id===r.reference&&b.accountId===item.target&&b.from<=item.from&&b.to>=item.to));
   const bankProof=!receipt&&item.kind==='bank'?bankDuplicateProof(access.plan,item):null;
   if(!receipt&&!bankProof)throw serviceError('אין עדות כספית עדכנית להשלמה ללא שינוי.',409);
   const reference=receipt?.reference??'bank-evidence:'+bankProof.digest,financialHash=receipt?.hash??bankProof.digest;

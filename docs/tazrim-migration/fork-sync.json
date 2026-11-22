@@ -1,21 +1,27 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "7a395886f778608db960fcc2d74c9b434e152eb9",
+  "sourceCommit": "05090218d42137288043e7a2e4debed5b88f3192",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "status": "Approved bank-account-scoped classifications and shared-only housing types are verified live on Budgit.",
+  "history": "Tracked source snapshot with its independent fork history.",
+  "status": "Approved iPhone duplicate review is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1504,
+    "applicationAndReaderTests": 1506,
     "coreChecks": 15,
-    "focusedTests": 9,
-    "syntheticBrowserChecks": 20,
-    "prototypeWidths": [390, 767, 768, 1440],
-    "production": "Fresh verified backup, exact-commit/image security, isolated financial/access/restore/compatible-rollback gates, all 184 runtime files and all 53 authoritative tables verified on final activation. Initial strict preservation rollback/retry is recorded in the release evidence. Configuration, keys and adjacent services retained."
+    "prototypeWidths": [
+      375,
+      390,
+      430,
+      667,
+      767,
+      768,
+      1440
+    ],
+    "production": "Exact CI, image scan, verified backup, isolated financial/access/restore/rollback, 186 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "9b46647b741b5876531a176b3ead404bc2ff8e11",
-  "productionVersion": "v1.6.0",
-  "productionBuild": "59590933a1"
+  "productionApplicationCommit": "c413c34e35d5d3bc91c56493aa6d9d0ec3b725fc",
+  "productionVersion": "v1.7.0",
+  "productionBuild": "16447f2dd1"
 }

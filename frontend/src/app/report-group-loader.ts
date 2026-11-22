@@ -12,7 +12,7 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
  const activityFollowup=roots.length===1&&roots[0].state==='committed'&&roots[0].lifecycle==='partial'&&roots[0].draft?.items?.find((item:any)=>item.storedId===roots[0].id)?.activity&&roots[0].review?.categories!=='later'
  const bankFollowup=roots.length===1&&roots[0].state==='committed'&&roots[0].lifecycle==='partial'&&roots[0].kind==='bank'
  if(roots.length===1&&roots[0].state==='committed'&&(roots[0].activeDraft||activityFollowup||bankFollowup))reimport=true
- if(reimport&&roots.length===1&&roots[0].state!=='committed'&&roots[0].completionKind==='declared-duplicate'){await updateReportLifecycle(budgetId,base,roots[0],'reopen',{},fetcher);roots[0]={...roots[0],lifecycle:'partial',completionKind:null};reimport=false;}
+ if(reimport&&roots.length===1&&roots[0].state!=='committed'&&(roots[0].completionKind==='declared-duplicate'||roots[0].completionKind==='duplicate'&&roots[0].draft?.items?.length===1)){await updateReportLifecycle(budgetId,base,roots[0],'reopen',{},fetcher);roots[0]={...roots[0],lifecycle:'partial',completionKind:null};reimport=false;}
  if(!reimport&&roots.every(source=>source.originalRemoved||source.lifecycle==='digested'||source.state==='committed'))return{ui:null as any,sources:roots,resultOnly:true,activitySupported:library.activityCycleReceipts===true,storageAllowed:false}
  if(reimport&&(ids.length!==1||roots[0].state!=='committed'))throw Error('יש לבחור מקור יחיד שכבר נקלט לבדיקה מחודשת.')
  if(reimport&&roots[0].lifecycle==='digested')await updateReportLifecycle(budgetId,base,roots[0],'reopen',{},fetcher)

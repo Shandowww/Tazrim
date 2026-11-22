@@ -1,0 +1,48 @@
+{
+  "version": "v1.7.0",
+  "commit": "c413c34e35d5d3bc91c56493aa6d9d0ec3b725fc",
+  "build": "16447f2dd1",
+  "verifiedAt": "2026-11-23T01:22:23+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Focused iPhone duplicate review, evidence-bound linking of eligible saved bank movements, verified no-change completion, and saved duplicate decision receipts.",
+  "approval": "Tal approved the preview of the exact application commit in the approval card.",
+  "previousVersion": "v1.6.0",
+  "previousCommit": "9b46647b741b5876531a176b3ead404bc2ff8e11",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45082098119",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1506,
+    "coreChecks": 15,
+    "wholeReportDeclarationBrowserChecks": 20,
+    "phoneAndDesktopWidths": [
+      375,
+      390,
+      430,
+      667,
+      767,
+      768,
+      1440
+    ],
+    "phoneWorkflow": "Saved progress and reload, evidence selection, focus, 44px controls, large text, dark, reduced motion, all 13 rows verified to completion, and reopening of the saved decision receipt.",
+    "mixedImport": "A real isolated service committed one new bank charge and preserved the matched existing charge. A repeated request recovered the saved result without replay.",
+    "cardReview": "A differing manual detail amount was disclosed before the link action."
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-c413c34e.BBknHJ/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-c413c34e.hM8wbz/",
+  "candidateImage": "sha256:782fae8cab6a788ac582e7d7b8098e1206c68ddc9ad3384acc7a01ee855a44a4",
+  "rollbackImage": "sha256:894987f280a3a707b4e41161d3b05f827b9b86ea1cae8b96a024cd81a8347aef",
+  "validation": {
+    "immutableImageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 186,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "preserved"
+  },
+  "limits": [
+    "Browser QA used synthetic data. A physical iPhone was not used to verify this release.",
+    "No production report was reviewed or imported by the agent."
+  ]
+}

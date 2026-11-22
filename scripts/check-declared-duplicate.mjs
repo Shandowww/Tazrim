@@ -13,8 +13,10 @@ try{
  const audit=()=>fetch(origin+'/__audit').then(r=>r.json()),data=await audit(),id=data.cases.unverified.id;
  await page.context().addCookies([{name:'qa-case',value:'unverified',url:origin}]);
  await page.goto(origin+'/next/upload/'+id+'/group');
- const start=page.getByRole('button',{name:'סימון הדוח ככפול וסיום ללא קליטה',exact:true});await start.waitFor();
- check(await page.getByText('אין כרגע התאמה שהמערכת יכולה לאשר.',{exact:false}).count()>0,'duplicate closure is available without an automatic row match');
+ const declarationMenu=page.locator('summary').filter({hasText:'הדוח כולו כבר טופל?'});
+ const start=page.getByRole('button',{name:'סימון הדוח ככפול וסיום ללא קליטה',exact:true});
+ await declarationMenu.click();await start.waitFor();
+ check(await page.getByText('כדי להשתמש ברישום קיים, בחרו אותו בהשוואה אם יש מספיק ראיות.',{exact:false}).count()>0,'duplicate closure is available without an automatic row match');
  for(const [width,scheme]of [[375,'light'],[767,'light'],[768,'dark'],[1440,'dark']]){
   await page.setViewportSize({width,height:900});await page.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await start.click();
   const heading=page.getByRole('heading',{name:'סיום ללא קליטה — הדוח כולו כפול',exact:true});await heading.waitFor();
@@ -37,7 +39,7 @@ try{
  const after=await audit();check(after.financialWrites===0&&Object.values(after.cases).every(value=>value.unchanged),'closure leaves every synthetic budget unchanged with zero financial writes');
  await page.goto(origin+'/next/upload/'+id+'/group');await page.getByRole('heading',{name:/נקלט/}).waitFor();
  check(await page.getByText('הדוח סומן ככפול לפי בחירתך',{exact:false}).isVisible(),'saved completion explains the explicit decision and retained source');
- await page.getByRole('link',{name:'בדיקה מחודשת של המקור',exact:true}).click();await start.waitFor();check(true,'reopening restores the original review without re-upload');
+ await page.getByRole('link',{name:'בדיקה מחודשת של המקור',exact:true}).click();await declarationMenu.click();await start.waitFor();check(true,'reopening restores the original review without re-upload');
  check(errors.length===0,'no browser runtime errors');
  console.log(JSON.stringify({checks:checks.length,origin}));
 }finally{await browser.close();fixture.kill('SIGTERM');}

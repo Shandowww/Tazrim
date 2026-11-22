@@ -1,4 +1,5 @@
 import {matchReviewId} from './report-classification-model.ts'
+import {bankMatchLink} from '../../../src/report-bank-match.js'
 const text=(value:unknown)=>String(value??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLowerCase()
 export function matchDifferences(incoming:any,saved:any){
  const source=saved.source??{},result:string[]=[]
@@ -20,9 +21,23 @@ export function bankMatchCandidates(plan:any,item:any,match:any,query=''){
   const priority=entry.key===match.previous?.key?0:sameDate&&sameAmount?1:sameReference?2:sameDate?3:sameAmount&&entry.month===incoming.date?.slice(0,7)?4:5
   const date=source.date??'',dateParts=date.split('-'),displayDate=dateParts.length===3?dateParts.reverse().join('/'):'',amount=entry.cents/100
   const searchable=[source.description,source.details,source.beneficiary,source.purpose,source.reference,date,displayDate,entry.month,amount,amount.toFixed(2),new Intl.NumberFormat('he-IL').format(amount),batch?.file].map(text).join(' ')
-  return {entry,batch,saved:storedKeys.has(entry.key),priority,differences:matchDifferences(incoming,entry),authorized:match.canMatch===true&&entry.key===match.previous?.key,searchable}
- }).filter((candidate:any)=>search?search.split(' ').every(word=>candidate.searchable.includes(word)):candidate.priority<5).sort((a:any,b:any)=>a.priority-b.priority||(b.entry.source?.date??'').localeCompare(a.entry.source?.date??''))
+  const reserved=match.reservedBankKeys?.get(entry.key)
+  const available=(!reserved||reserved===match.id)&&!match.protectedBankKeys?.has(entry.key)&&!match.protectedBankFingerprints?.has(entry.fingerprint)
+  const authorized=available&&match.canMatch===true&&entry.key===match.previous?.key
+  const link=authorized?'same':available?bankMatchLink(incoming,entry,item.target):''
+  return {entry,batch,saved:storedKeys.has(entry.key),priority,differences:matchDifferences(incoming,entry),authorized,link,searchable}
+ }).filter((candidate:any)=>search?search.split(' ').every(word=>candidate.searchable.includes(word)):candidate.priority<5).sort((a:any,b:any)=>Number(!!b.link)-Number(!!a.link)||a.priority-b.priority||(b.entry.source?.date??'').localeCompare(a.entry.source?.date??''))
 }
 export function reportMatchRows(review:any){
  return (review?.items??[]).flatMap((item:any,itemIndex:number)=>item.skip?[]:(item.matchReviews??[]).map((match:any)=>({item,itemIndex,match,id:matchReviewId(itemIndex,match.id)})))
+}
+
+export function reportMatchCounts(review:any){
+ const decisions=reportMatchRows(review).map(({match}:ReturnType<typeof reportMatchRows>[number])=>match.decision)
+ return {
+  linked: decisions.filter((choice:string)=>choice&&choice!=='new').length,
+  separate: decisions.filter((choice:string)=>choice==='new').length,
+  open: decisions.filter((choice:string)=>!choice).length,
+  total: decisions.length,
+ }
 }

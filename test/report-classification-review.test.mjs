@@ -83,3 +83,66 @@ test('Card manual-detail matching also retains reversible New and existing-detai
  for(const [value,pending]of [['new',0],['',1],['manual',0],['',1]]){await changeReportInbox(p,next,{dataset:{inboxDuplicate:'0',row:id},value});await build(p,next);assert.equal(next.items[0].matchReviews.length,1);assert.equal(next.items[0].matchReviews[0].decision,value);assert.equal(next.items[0].questions.filter(q=>q.type==='card-match').length,pending);}
  assert.equal(JSON.stringify(p),before);
 });
+
+test('A mixed bank report can link a strongly evidenced legacy row and import just the genuinely new charge',async()=>{
+ const initial=plan(),existing=record(1,-1000,'תשלום שכבר נרשם',''),newCharge=record(2,-2300,'תשלום חדש','new-ref');
+ const original=ui([bank([existing])]);original.items[0].name='legacy-bank.xlsx';
+ original.bankChoices.set(inboxBankGroupKey(original.items[0],existing),{field:'variable',refund:false});
+ await build(initial,original);
+ const saved=original.build,legacyKey='9'.repeat(64);
+ saved.bankImport.entries[0].key=legacyKey;
+ const before=JSON.stringify(saved),next=ui([bank([existing,newCharge])]);
+ next.items[0].id='different-report';
+ next.items[0].hash='f'.repeat(64);
+ next.bankChoices.set(inboxBankGroupKey(next.items[0],newCharge),{field:'variable',refund:false});
+ await build(saved,next);
+ assert.equal(next.build,null);
+ const match=next.items[0].matchReviews[0];
+ const [candidate]=bankMatchCandidates(saved,next.items[0],match);
+ assert.equal(candidate.entry.key,legacyKey);
+ assert.equal(match.canMatch,false);
+ assert.match(candidate.link,/^bank-match:/);
+ await changeReportInbox(saved,next,{dataset:{inboxDuplicate:'0',row:'1'},value:candidate.link});
+ await build(saved,next);
+ assert.equal(next.issues,0);
+ assert.equal(next.readyRows,1);
+ assert.deepEqual(next.build.bankImport.entries.map(row=>row.cents),[-1000,-2300]);
+ assert.equal(next.build.months['2026-02'].values.variable,33);
+ assert.deepEqual(next.build.bankImport.entries[0],saved.bankImport.entries[0]);
+ assert.equal(JSON.stringify(saved),before);
+ const draft=reportInboxDraft(next,'mobile-duplicate-review');
+ const resumed={...ui(structuredClone(draft.items)),bankChoices:new Map(draft.bankChoices)};
+ await build(saved,resumed);
+ assert.equal(resumed.items[0].matchReviews[0].decision,candidate.link);
+ assert.deepEqual(resumed.build,next.build);
+ const changed=structuredClone(saved);
+ changed.bankImport.entries[0].fingerprint='8'.repeat(64);
+ await build(changed,resumed);
+ assert.equal(resumed.build,null);
+ assert.equal(resumed.items[0].matchReviews[0].decision,'');
+});
+
+test('Two pending rows cannot claim the same saved bank movement and a stale or protected witness remains open',async()=>{
+ const initial=plan(),existing=record(1,-1000,'תשלום שכבר נרשם',''),original=ui([bank([existing])]);
+ original.items[0].name='legacy-bank.xlsx';
+ original.bankChoices.set(inboxBankGroupKey(original.items[0],existing),{field:'variable',refund:false});
+ await build(initial,original);
+ const saved=original.build;
+ saved.bankImport.entries[0].key='9'.repeat(64);
+ const next=ui([bank([existing,{...existing,line:2}])]);
+ next.items[0].id='different-report';next.items[0].hash='f'.repeat(64);
+ await build(saved,next);
+ const match=next.items[0].matchReviews[0],link=bankMatchCandidates(saved,next.items[0],match)[0].link;
+ next.items[0].decisions={1:link,2:link};
+ await build(saved,next);
+ assert.deepEqual(next.items[0].matchReviews.map(row=>row.decision),[link,'']);
+ assert.equal(next.build,null);
+ assert.equal(bankMatchCandidates(saved,next.items[0],next.items[0].matchReviews[1])[0].link,'');
+ next.items[0].decisions={1:link.replace(/:[a-f0-9]{64}$/u,':'+ '0'.repeat(64))};
+ await build(saved,next);
+ assert.equal(next.items[0].matchReviews[0].decision,'');
+ saved.importMigrationGuards={movements:[{key:saved.bankImport.entries[0].key,fingerprint:saved.bankImport.entries[0].fingerprint}]};
+ await build(saved,next);
+ assert.equal(next.items[0].preview.rows.every(row=>row.state==='migrated'),true);
+ assert.equal(next.build,null);
+});
