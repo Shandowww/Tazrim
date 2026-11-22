@@ -5,6 +5,10 @@ body:has(.household-shell){font-optical-sizing:auto}
 .household-shell main{padding:28px 20px 112px;min-width:0;outline:none}
 .household-screen{max-width:1360px;width:100%;margin-inline:auto}
 .household-page{width:100%;max-width:1360px;gap:24px}
+/* Wrap report prose/source tokens without splitting isolated dates or money. */
+.household-report-page fieldset{min-inline-size:0}
+.household-report-page bdi:not([dir=ltr]){white-space:normal;overflow-wrap:anywhere}
+.household-report-page fieldset :is(h2,h3)>bdi{white-space:normal;overflow-wrap:anywhere}
 .household-screen h1,.household-page h1{font-size:clamp(1.5rem,2.2vw,1.9rem);line-height:1.18;letter-spacing:-.025em;font-weight:650}
 .household-screen h2{letter-spacing:-.015em}
 
@@ -397,3 +401,10 @@ button.household-account-space:active{background:hsl(var(--primary)/.16)}
 button.household-account-space:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:-2px}
 
 @media(max-width:767px){.outlook-related-icon{display:none}}
+
+.household-settings-appearance .household-appearance-fields{display:grid;flex:1;min-width:0;gap:8px}
+.appearance-select{position:relative;display:block;min-width:0;max-width:65%}
+.household-appearance-fields .appearance-select select{appearance:none;max-width:100%;padding-inline:10px 30px;text-overflow:ellipsis}
+.appearance-select svg{position:absolute;inset-inline-end:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:hsl(var(--muted-foreground))}
+@media(max-width:359px){.household-settings-appearance .household-settings-icon{display:none}}
+.household-appearance-fields select:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}

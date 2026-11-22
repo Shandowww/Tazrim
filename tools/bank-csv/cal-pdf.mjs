@@ -9,8 +9,41 @@ function lineText(items){const runs=[];for(const i of [...items].sort((a,b)=>x(b
 const text=items=>lines(items).map(r=>lineText(r.items)).join(' ');
 const compact=items=>text(items).replace(/\s/g,'');
 const bounds=[[500,545],[420,500],[380,420],[280,380],[250,280],[190,250],[130,190]];
-const cells=items=>bounds.map(([lo,hi])=>items.filter(i=>x(i)>=lo-.5&&right(i)<=hi+.5));
+const cells=(items,columns=bounds)=>columns.map(([lo,hi])=>items.filter(i=>x(i)>=lo-.5&&right(i)<=hi+.5));
+const futureBounds=[[500,545],[420,500],[380,420],[305,380],[280,305],[220,280],[185,220],[130,185]];
+const futureHeading=/^פירוטעסק(?:ו|או)תלחיובעתידי$/;
+const fullDate=/^\d{2}\/\d{2}\/\d{4}$/;
+const printedDate=/^\d{2}\/\d{2}\/\d{2}(?:\d{2})?$/;
 function money(items,requiredILS=false){const value=text(items),match=/^(₪|EU|USD|EUR|GBP|\$|€|£)\s*([+\-\d,.()]+)$/.exec(value);if(!match||requiredILS&&match[1]!=='₪')fail();const cents=parseMoney(match[2]);if(cents===null)fail();return{cents,currency:({'₪':'ILS',EU:'EUR','$':'USD','€':'EUR','£':'GBP'})[match[1]]??match[1]};}
+function verifyFutureAppendix(rows,dueDate){
+ const headings=rows.filter(row=>futureHeading.test(compact(row.items))),footers=rows.filter(row=>compact(row.items)==='ריביותאשראילכרטיס');
+ if(headings.length!==1||footers.length!==1)fail();
+ const section=rows.filter(row=>row.y<headings[0].y&&row.y>footers[0].y&&row.items.some(item=>x(item)>=130));
+ const [header,subheader,...body]=section;
+ if(!header||!subheader||!body.length||headings[0].y-header.y>18||header.y-subheader.y>9)fail();
+ const labels=row=>cells(row.items,futureBounds).map(compact);
+ if(labels(header).join('|')!=='תאריך|שםביתהעסק|ענף|פירוט|כרטיס|סכום|תאריך|סכום'||labels(subheader).join('|')!=='העסקה||||הוצג|העסקה|חיוב|חיוב')fail();
+ if(rows.some(row=>(row.y>=subheader.y||row.y<=footers[0].y)&&printedDate.test(compact(cells(row.items)[0]))))fail();
+ let hasCharge=false;
+ for(const row of body){
+  const items=row.items.filter(item=>x(item)>=130),groups=cells(items,futureBounds);
+  if(items.some(item=>groups.filter(group=>group.includes(item)).length!==1))fail();
+  const [purchase,merchant,category,notes,presented,original,billing,billed]=groups;
+  if(hasCharge&&!purchase.length&&!presented.length&&!original.length&&!billing.length&&!billed.length&&(merchant.length||category.length||notes.length))continue;
+  const purchaseDate=text(purchase),billingDate=text(billing);
+  if(!merchant.length||!fullDate.test(purchaseDate)||!printedDate.test(billingDate)||parseDate(billingDate)<=dueDate)fail();
+  parseDate(purchaseDate);money(original);money(billed,true);hasCharge=true;
+ }
+ if(!hasCharge)fail();
+}
+function monthlyRowCells(items){
+ const groups=cells(items);
+ for(const item of items){
+  if(x(item)<278||x(item)>=279.5||right(item)<=280.5||right(item)>284||!/^[א-ת]$/.test(item.str)||groups[4].some(other=>Math.abs(y(item)-y(other))<.8))continue;
+  if(groups[3].some(other=>Math.abs(y(item)-y(other))<.1&&Math.abs(right(item)-x(other))<.1))groups[3].push(item);
+ }
+ return groups;
+}
 export function inspectCalPDF(pages){
  if(!Array.isArray(pages)||!pages.length||pages.length>20)fail();
  const all=pages.flatMap(p=>p.items.filter(i=>clean(i.str)));
@@ -26,17 +59,23 @@ export function inspectCalPDF(pages){
   const identity=rows.filter(r=>/המסתייםב-?\d{4}/.test(compact(r.items))).map(r=>compact(r.items));
   for(const row of identity){const m=/המסתייםב-?(\d{4})(?!\d)/.exec(row);if(!m)fail();ids.add(m[1]);}
   if(!identity.length||ids.size!==1)fail();
-  const headers=rows.filter(r=>{const c=cells(r.items);return compact(c[0])==='תאריך'&&compact(c[1])==='שםביתהעסק'&&compact(c[2])==='ענף'&&compact(c[3])==='פירוט'&&compact(c[4])==='כרטיס'&&compact(c[5])==='סכום'&&compact(c[6])==='סכום';});if(headers.length!==1)fail();
-  const header=headers[0],second=rows.find(r=>r.y<header.y&&r.y>header.y-9),sub=second&&cells(second.items);if(!sub||compact(sub[0])!=='העסקה'||compact(sub[4])!=='הוצג'||compact(sub[5])!=='העסקה'||compact(sub[6])!=='חיוב')fail();
+  const headers=rows.filter(r=>{const c=cells(r.items);return compact(c[0])==='תאריך'&&compact(c[1])==='שםביתהעסק'&&compact(c[2])==='ענף'&&compact(c[3])==='פירוט'&&compact(c[4])==='כרטיס'&&compact(c[5])==='סכום'&&compact(c[6])==='סכום';});
   const summaryRows=rows.filter(r=>r.items.some(i=>/סה"כ לתאריך/.test(i.str)));
-  if(index<pages.length-1&&summaryRows.length||index===pages.length-1&&summaryRows.length!==1)fail();
+  if(summaries){
+   if(index!==pages.length-1||headers.length||summaryRows.length)fail();
+   verifyFutureAppendix(rows,dueDate);continue;
+  }
+  if(headers.length!==1)fail();
+  const header=headers[0],second=rows.find(r=>r.y<header.y&&r.y>header.y-9),sub=second&&cells(second.items);if(!sub||compact(sub[0])!=='העסקה'||compact(sub[4])!=='הוצג'||compact(sub[5])!=='העסקה'||compact(sub[6])!=='חיוב')fail();
+  if(summaryRows.length>1||index===pages.length-1&&!summaryRows.length)fail();
   const summary=summaryRows[0];if(summary){const label=summary.items.find(i=>/סה"כ לתאריך/.test(i.str)),m=/^סה"כ לתאריך (\d{2}\/\d{2}\/\d{2}(?:\d{2})?)$/.exec(clean(label.str));if(!m||parseDate(m[1])!==dueDate)fail();declaredTotal=money(cells(summary.items)[6],true).cents;summaries++;}
+  if(summary&&index<pages.length-1&&rows.some(row=>row.y<summary.y&&printedDate.test(compact(cells(row.items)[0]))))fail();
   const bottom=summary?.y??195,table=items.filter(i=>y(i)<second.y-2&&y(i)>bottom+2&&x(i)>=130),tableRows=lines(table),anchors=tableRows.filter(r=>cells(r.items)[0].length);
   if(!anchors.length)fail();const used=new Set();
   for(const [j,anchor]of anchors.entries()){
-   const c=cells(anchor.items),dateString=text(c[0]);if(!/^\d{2}\/\d{2}\/\d{4}$/.test(dateString))fail();const date=parseDate(dateString),billed=money(c[6],true),original=money(c[5]);
-   const lower=anchors[j+1]?.y??bottom,body=table.filter(i=>y(i)<=anchor.y+.8&&y(i)>lower+2),groups=cells(body);
-   if(groups.flat().length!==body.length)fail();body.forEach(i=>{if(used.has(i))fail();used.add(i);});
+   const c=cells(anchor.items),dateString=text(c[0]);if(!fullDate.test(dateString))fail();const date=parseDate(dateString),billed=money(c[6],true),original=money(c[5]);
+   const lower=anchors[j+1]?.y??bottom,body=table.filter(i=>y(i)<=anchor.y+.8&&y(i)>lower+2),groups=monthlyRowCells(body);
+   const assigned=groups.flat();if(assigned.length!==body.length||new Set(assigned).size!==body.length)fail();body.forEach(i=>{if(used.has(i))fail();used.add(i);});
    if(groups[0].length!==c[0].length||groups[5].length!==c[5].length||groups[6].length!==c[6].length)fail();
    const merchant=text(groups[1]),notes=text(groups[3]);if(!merchant||merchant.length>100||notes.length>2000)fail();
    entries.push({date,merchant,amountCents:billed.cents,originalCents:original.currency==='ILS'?original.cents:billed.cents,notes,page:index+1,...(original.currency!=='ILS'?{originalCurrency:original.currency,foreignCents:original.cents}:{})});

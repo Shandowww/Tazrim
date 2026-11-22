@@ -1,0 +1,43 @@
+{
+  "status": "local prototype only; no push or deployment",
+  "base": "v1.3.0 / 3b8ae10a7eb9760646532e3f5ef05e6d3203f5f2",
+  "build": "4c2aac6e83",
+  "preview": "http://127.0.0.1:63482/next/upload/5f0f6876-322e-43c9-b041-382a2b559ae0/group?preview=unverified",
+  "scope": "Explicit whole-report duplicate declaration closes selected unimported reports without financial writes, even when no row match is available. Separate from evidence-based duplicate matching.",
+  "retention": "Original sources and saved drafts are retained; declared duplicates are exempt from timed removal and can be reopened.",
+  "validation": {
+    "build": "passed",
+    "coreChecks": 15,
+    "regressions": 1479,
+    "browserChecks": 20,
+    "widths": [
+      375,
+      767,
+      768,
+      1440
+    ],
+    "appearance": [
+      "light",
+      "dark",
+      "reduced motion"
+    ],
+    "financialWritesInBrowser": 0,
+    "serviceCoverage": [
+      "unresolved bank conflicts",
+      "lost success retry",
+      "source and budget revision refusal",
+      "atomic groups",
+      "reopen preserves siblings",
+      "foreign scope refusal",
+      "shared viewer and downgraded editor refusal",
+      "stale draft and financial import refusal after closure"
+    ]
+  },
+  "limits": [
+    "Whole-report decision; it does not skip an individual row in a report containing new transactions.",
+    "No physical iPhone acceptance.",
+    "Unrelated checkout work excluded from the isolated preview."
+  ],
+  "isolatedPreviewRoot": "/tmp/budgit-declared-duplicate-preview-20261122",
+  "previewSession": 95595
+}

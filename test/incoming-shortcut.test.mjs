@@ -10,11 +10,11 @@ test('Incoming folder workflow defaults to retain, offers verified-upload cleanu
  for(const action of w.WFWorkflowActions){assert.ok(!['file.move','runworkflow','runscript'].includes(short(action)));const p=action.WFWorkflowActionParameters;const walk=v=>{if(!v||typeof v!=='object')return;if(v.Type==='ActionOutput')assert.ok(seen.has(v.OutputUUID));Object.values(v).forEach(walk)};walk(p);if(p.WFControlFlowMode===0)stack.push(p.GroupingIdentifier);if(p.WFControlFlowMode===1)assert.equal(stack.at(-1),p.GroupingIdentifier);if(p.WFControlFlowMode===2)assert.equal(stack.pop(),p.GroupingIdentifier);seen.add(p.UUID)}assert.equal(stack.length,0);
  assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='file.delete').length,1);assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='gettext'&&a.WFWorkflowActionParameters.WFTextActionText==='retain').length,1);
  const qa=JSON.parse(execFileSync('python3',['-B','-c',"import importlib.util,json;s=importlib.util.spec_from_file_location('builder','scripts/build-incoming-shortcut.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(json.dumps(m.build({'endpoint':'http://127.0.0.1:54321/api/imports/incoming','token':'x'*43,'qaName':'Budgit-Incoming-QA-test'})))"],{encoding:'utf8'}));
- const deletion=qa.WFWorkflowActions.find(a=>short(a)==='file.delete');assert.equal(deletion.WFWorkflowActionParameters.WFDeleteImmediatelyDelete,false);assert.equal(deletion.WFWorkflowActionParameters.WFInput.Value.VariableName,'BudgitFreshMatches');
+ const deletion=qa.WFWorkflowActions.find(a=>short(a)==='file.delete');assert.equal(deletion.WFWorkflowActionParameters.WFDeleteImmediatelyDelete,false);assert.equal(deletion.WFWorkflowActionParameters.WFInput.Value.VariableName,'BudgitFreshFile');
  assert.ok(!w.WFWorkflowActions.some(a=>short(a)==='text.changecase'));
  const filters=w.WFWorkflowActions.filter(a=>short(a)==='conditional').map(a=>a.WFWorkflowActionParameters.WFConditionalActionString);
  for(const extension of ['csv','xlsx','pdf','PDF','.XLSX'])assert.ok(filters.includes(extension));
- assert.ok(w.WFWorkflowActions.some(a=>short(a)==='urlencode'&&a.WFWorkflowActionParameters.WFEncodeMode==='Encode'));assert.ok(w.WFWorkflowActions.some(a=>short(a)==='getvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='error')); assert.ok(JSON.stringify(w).includes('BudgitSkipped'));assert.ok(JSON.stringify(w).includes('BudgitExamined'));
+ assert.ok(w.WFWorkflowActions.some(a=>short(a)==='urlencode'&&a.WFWorkflowActionParameters.WFEncodeMode==='Encode'));assert.ok(w.WFWorkflowActions.some(a=>short(a)==='getvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='error'));assert.ok(JSON.stringify(w).includes('BudgitSkipped'));assert.ok(JSON.stringify(w).includes('BudgitIssues'));
  assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='file.getfoldercontents').length,2);assert.equal(w.WFWorkflowActions.filter(a=>short(a)==='downloadurl').length,3);assert.ok(!JSON.stringify(w).includes('/Users/'));assert.ok(!JSON.stringify(w).includes('http://127.0.0.1'));
 })
 test('Native receipt conditions use concrete Text inputs and a receipt ID for catalog presence',()=>{
@@ -95,8 +95,10 @@ test('Generated receipt graph accepts truthful removed acknowledgments and refus
  const connectionId='synthetic-connection',sourceHash='a'.repeat(64),removed={receiptId:'synthetic-receipt',sourceHash,connectionId,stored:false,completed:true,completionAcknowledged:true,originalRemoved:true,cleanupEligible:false,processingState:'completed-original-removed'};
  for(const cached of [false,true]){
   const run=r=>runIncomingWorkflow(w,{catalog:{version:2,connectionId,receipts:cached?{[sourceHash]:r}:{}},receipt:r});
-  assert.equal(run(removed).exited,false);assert.equal(run({...removed,stored:true,originalRemoved:false}).exited,false);
-  for(const patch of [{stored:'false'},{stored:undefined},{completed:'true'},{completed:false},{completionAcknowledged:false},{originalRemoved:false},{cleanupEligible:true},{connectionId:'another'},{sourceHash:'b'.repeat(64)},{receiptId:''},{processingState:'received'}])assert.equal(run({...removed,...patch}).exited,true,JSON.stringify({cached,patch}));
+  assert.match(run(removed).summary,/הושלמו בעבר: 1/);assert.equal(run({...removed,stored:true,originalRemoved:false}).issues.length,0);
+  for(const patch of [{stored:'false'},{stored:undefined},{completed:'true'},{completed:false},{completionAcknowledged:false},{originalRemoved:false},{cleanupEligible:true},{connectionId:'another'},{sourceHash:'b'.repeat(64)},{receiptId:''},{processingState:'received'}]){
+   const result=run({...removed,...patch});assert.equal(result.exited,false);assert.equal(result.issues.length,1,JSON.stringify({cached,patch}));assert.equal(result.uploaded.length,0);assert.equal(result.deleted.length,0);
+  }
  }
  assert.equal(runIncomingWorkflow(w,{catalog:{version:1,receipts:{}},receipt:removed}).exited,true);
 });
@@ -118,7 +120,7 @@ test('Day-0 native graph deletes only fresh exact files after independently veri
   for(const patch of [{stored:false},{stored:'true'},{deviceCleanupVersion:undefined},{deviceCleanupVersion:2},{storageVerified:undefined},{storageVerified:false},{storageVerified:'true'},{deviceCopyRemovable:false},{deviceCopyRemovable:'true'},{originalRemoved:true},{connectionId:'other'},{sourceHash:'b'.repeat(64)},{receiptId:'other'}]){
    const rejected=runIncomingWorkflow(w,{...options,freshReceipt:{...proof,...patch}});assert.equal(rejected.deleted.length,0,JSON.stringify({cached,patch}));
   }
-  const changed=runIncomingWorkflow(w,{...options,hashFile:f=>f.changed?'b'.repeat(64):sourceHash,freshFiles:[{name:'synthetic.csv',extension:'csv',changed:true}]});assert.equal(changed.deleted.length,0);assert.equal(changed.exited,true);
+  const changed=runIncomingWorkflow(w,{...options,hashFile:f=>f.changed?'b'.repeat(64):sourceHash,freshFiles:[{name:'synthetic.csv',extension:'csv',changed:true}]});assert.equal(changed.deleted.length,0);assert.equal(changed.exited,false);assert.match(changed.summary,/הקובץ השתנה/);
   for(const freshFiles of [[],[{name:'synthetic.csv',extension:'csv'},{name:'synthetic.csv',extension:'csv'}],[{name:'synthetic.csv',extension:'pdf'}]])assert.equal(runIncomingWorkflow(w,{...options,freshFiles}).deleted.length,0);
   let attempts=0;assert.throws(()=>runIncomingWorkflow(w,{...options,deleteFile:()=>{attempts++;throw Error('Synthetic Files denial')}}),/denial/);assert.equal(attempts,1);
   // A removed-original acknowledgment is truthful, but cannot transfer a copy.
@@ -126,12 +128,12 @@ test('Day-0 native graph deletes only fresh exact files after independently veri
   const expired=runIncomingWorkflow(w,{...options,receipt:removed,freshReceipt:removed,catalog:{version:2,connectionId,receipts:cached?{[sourceHash]:removed}:{}}});assert.equal(expired.exited,false);assert.equal(expired.deleted.length,0);
  }
 });
-test('The tenth new file is verified and cleaned before the batch bound stops the native graph',async()=>{
+test('The ten-POST limit defers additional new files and still reaches the summary',async()=>{
  const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),sourceHash='a'.repeat(64),connectionId='synthetic-connection';
  const receipt={receiptId:'synthetic-receipt',sourceHash,connectionId,stored:true,deviceCleanupVersion:1,storageVerified:true,deviceCopyRemovable:true,originalRemoved:false};
  const files=Array.from({length:11},(_,i)=>({name:'synthetic-'+i+'.csv',extension:'csv'}));
  const result=runIncomingWorkflow(configuredWorkflow(),{catalog:{version:2,connectionId,receipts:{}},receipt,files});
- assert.equal(result.exited,true);assert.equal(result.uploaded.length,10);assert.equal(result.deleted.length,10);assert.ok(!result.deleted.includes(files[10]));
+ assert.equal(result.exited,false);assert.equal(result.uploaded.length,10);assert.equal(result.deleted.length,10);assert.ok(!result.deleted.includes(files[10]));assert.match(result.summary,/נדחו לסבב הבא: 1/);
 });
 
 test('Actual loopback storage proofs verify originals without importing and expose fresh-proof faults',async()=>{
@@ -183,10 +185,26 @@ test('Upload-key setup accepts surrounding clipboard whitespace and refuses malf
 
 test('Nested native file scans bind their own repeat outputs rather than an ambiguous Repeat Item name',()=>{
  const w=workflow(),loops=w.WFWorkflowActions.filter(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.repeat.each'&&a.WFWorkflowActionParameters.WFControlFlowMode===0);
- assert.equal(loops.length,2);const [outer,inner]=loops.map(a=>a.WFWorkflowActionParameters.UUID);
+ assert.equal(loops.length,3);const [outer,cleanup,inner]=loops.map(a=>a.WFWorkflowActionParameters.UUID);
  const source=w.WFWorkflowActions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.setvariable'&&a.WFWorkflowActionParameters.WFVariableName==='BudgitSource');assert.equal(source.WFWorkflowActionParameters.WFInput.Value.OutputUUID,outer);
- const fresh=w.WFWorkflowActions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.appendvariable'&&a.WFWorkflowActionParameters.WFVariableName==='BudgitFreshMatches');assert.equal(fresh.WFWorkflowActionParameters.WFInput.Value.OutputUUID,inner);
+ const fresh=w.WFWorkflowActions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.setvariable'&&a.WFWorkflowActionParameters.WFVariableName==='BudgitFreshFile');assert.equal(fresh.WFWorkflowActionParameters.WFInput.Value.OutputUUID,inner);
+ const saved=w.WFWorkflowActions.find(a=>a.WFWorkflowActionParameters.WFDictionaryKey==='budgitLocalName'&&a.WFWorkflowActionIdentifier.endsWith('getvalueforkey'));assert.equal(saved.WFWorkflowActionParameters.WFInput.Value.OutputUUID,cleanup);
  assert.ok(!JSON.stringify(w).includes('"VariableName":"Repeat Item"'));
+});
+test('Native cleanup queue binds its local filename as an interpolated Text value',()=>{
+ const actions=workflow().WFWorkflowActions;
+ const queue=actions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.setvalueforkey'&&a.WFWorkflowActionParameters.WFDictionaryKey==='budgitLocalName');
+ const binding=queue?.WFWorkflowActionParameters.WFDictionaryValue;
+ assert.equal(binding?.WFSerializationType,'WFTextTokenString');
+ assert.equal(binding.Value.string,'\ufffc');
+ const filename=binding.Value.attachmentsByRange['{0, 1}'];
+ const source=actions.find(a=>a.WFWorkflowActionParameters.UUID===filename.OutputUUID);
+ assert.equal(source?.WFWorkflowActionIdentifier,'is.workflow.actions.gettext');
+ assert.equal(source.WFWorkflowActionParameters.WFTextActionText.Value.string,'\ufffc.\ufffc');
+ const post=actions.find(a=>a.WFWorkflowActionIdentifier==='is.workflow.actions.downloadurl'&&a.WFWorkflowActionParameters.WFHTTPMethod==='POST');
+ const [urlFilename]=Object.values(post.WFWorkflowActionParameters.WFURL.Value.attachmentsByRange);
+ const encoded=actions.find(a=>a.WFWorkflowActionParameters.UUID===urlFilename.OutputUUID);
+ assert.deepEqual(encoded?.WFWorkflowActionParameters.WFInput.Value.attachmentsByRange['{0, 1}'],filename);
 });
 test('A multi-file folder deletes only the fresh matching item for each independently verified hash',async()=>{
  const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),connectionId='synthetic';
@@ -194,4 +212,33 @@ test('A multi-file folder deletes only the fresh matching item for each independ
  const r=hash=>({receiptId:'receipt-'+hash[0],sourceHash:hash,connectionId,stored:true,originalRemoved:false,deviceCleanupVersion:1,storageVerified:true,deviceCopyRemovable:true});
  const result=runIncomingWorkflow(configuredWorkflow(),{catalog:{version:2,connectionId,receipts:{}},files,hashFile:file=>file.hash,receipt:(_url,file)=>r(file.hash),freshReceipt:url=>r(new URL(url).searchParams.get('hash'))});
  assert.equal(result.exited,false);assert.deepEqual(result.deleted,files.slice(0,2));assert.deepEqual(result.uploaded,files.slice(0,2).map(f=>f.name));assert.ok(!result.deleted.includes(files[2]));
+});
+
+test('Ambiguous cleanup does not prevent either upload, does not delete that copy, and identifies it in the summary',async()=>{
+ const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),connectionId='synthetic';
+ const files=[{name:'shared.xlsx',extension:'xlsx',hash:'a'.repeat(64)},{name:'recent.xlsx',extension:'xlsx',hash:'b'.repeat(64)}];
+ const proof=hash=>({receiptId:'receipt-'+hash[0],sourceHash:hash,connectionId,stored:true,originalRemoved:false,deviceCleanupVersion:1,storageVerified:true,deviceCopyRemovable:true});
+ const options={catalog:{version:2,connectionId,receipts:{}},files,hashFile:file=>file.hash,receipt:(_url,file)=>proof(file.hash),freshReceipt:url=>proof(new URL(url).searchParams.get('hash'))};
+ const result=runIncomingWorkflow(configuredWorkflow(),{...options,freshFiles:[...files,{...files[0]}]});
+ assert.deepEqual(result.requests.map(r=>r.method),['GET','POST','POST','GET','GET']);assert.deepEqual(result.uploaded,['shared.xlsx','recent.xlsx']);assert.deepEqual(result.deleted,[files[1]]);
+ assert.match(result.issues[0],/shared\.xlsx.*חד־משמעי/);assert.match(result.notifications.at(-1),/הועלו: 2.*בעיות: 1/);assert.match(result.summary,/הוסרו מהמכשיר: 1/);
+ assert.throws(()=>runIncomingWorkflow(configuredWorkflow(),{...options,deleteFile:(_file,requests)=>{assert.equal(requests.filter(r=>r.method==='POST').length,2);throw Error('OS denied cleanup');}}),/OS denied cleanup/);
+});
+
+test('A rejected first POST does not block the second and a duplicate is not counted as a new upload',async()=>{
+ const {runIncomingWorkflow}=await import('./helpers/incoming-workflow-runner.mjs'),connectionId='synthetic';
+ const files=[{name:'large.xlsx',extension:'xlsx',hash:'a'.repeat(64)},{name:'valid.xlsx',extension:'xlsx',hash:'b'.repeat(64)}];
+ const result=runIncomingWorkflow(configuredWorkflow('retain'),{catalog:{version:2,connectionId,receipts:{}},files,hashFile:file=>file.hash,receipt:(_url,file)=>file===files[0]?{error:'Synthetic rejection'}:{receiptId:'stored',sourceHash:file.hash,connectionId,stored:true,duplicate:true}});
+ assert.equal(result.requests.filter(r=>r.method==='POST').length,2);assert.deepEqual(result.uploaded,[]);assert.deepEqual(result.deleted,[]);
+ assert.match(result.summary,/כבר שמורים: 1/);assert.match(result.summary,/large\.xlsx: Synthetic rejection/);assert.match(result.summary,/valid\.xlsx/);
+});
+
+test('Native two-file review uses distinct allowlisted fixture bytes and verifies both stored copies without importing',async()=>{
+ const qa=await startIncomingShortcutQA({distinctFiles:true});try{
+  const headers={authorization:'Bearer '+qa.token},bytes=qa.filenames.map(name=>readFileSync(join(qa.input,name)));
+  const send=(name,body)=>fetch(qa.endpoint+'?name='+encodeURIComponent(name),{method:'POST',headers,body});
+  assert.notDeepEqual(bytes[0],bytes[1]);assert.equal((await send(qa.filenames[0],bytes[1])).status,422);
+  for(const [index,name] of qa.filenames.entries())assert.equal((await send(name,bytes[index])).status,201);
+  assert.deepEqual(await qa.verifyStoredOriginal(),{verified:true,sourceHashMatches:true,financialCommits:0,budgets:0});
+ }finally{await qa.close();}
 });

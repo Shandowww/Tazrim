@@ -1,0 +1,195 @@
+.report-category-picker {
+  min-inline-size: 0;
+}
+
+.report-category-picker-trigger,
+.report-category-picker-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  min-block-size: 44px;
+  inline-size: 100%;
+  padding: .5rem .75rem;
+  border-radius: .75rem;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.report-category-picker-trigger {
+  margin-block-start: .25rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  font-size: .875rem;
+}
+
+.report-category-picker-trigger:disabled {
+  opacity: .5;
+}
+
+.report-category-picker-trigger svg,
+.report-category-picker-option svg {
+  flex: none;
+}
+
+.report-category-picker-dialog {
+  inline-size: min(29rem, calc(100% - 2rem));
+  block-size: min(31rem, calc(100dvh - 2rem));
+  margin: auto;
+  padding: 0;
+  border: 1px solid hsl(var(--border));
+  border-radius: 1.25rem;
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  box-shadow: 0 16px 55px rgb(0 0 0 / .28);
+}
+
+.report-category-picker-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-category-picker-dialog::backdrop {
+  background: rgb(0 0 0 / .48);
+}
+
+.report-category-picker-header {
+  padding: .5rem .875rem .875rem;
+  border-block-end: 1px solid hsl(var(--border));
+}
+
+.report-category-picker-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding-inline-start: .25rem;
+  margin-block-end: .35rem;
+  font-weight: 600;
+}
+
+.report-category-picker-title button {
+  display: grid;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  place-items: center;
+  border-radius: .75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.report-category-picker-search {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  padding-inline: .75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: .75rem;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.report-category-picker-search input {
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  background: transparent;
+  color: hsl(var(--foreground));
+  font-size: 1rem;
+}
+
+.report-category-picker-search:focus-within,
+.report-category-picker :is(button,input):focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.report-category-picker-search input:focus-visible {
+  outline: none;
+}
+
+.report-category-picker-results {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: .5rem .875rem .875rem;
+}
+
+.report-category-picker-group {
+  border-block-start: 1px solid hsl(var(--border));
+  margin-block-start: .375rem;
+  padding-block-start: .375rem;
+}
+
+.report-category-picker-group h4 {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem .25rem;
+  font-size: .875rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.report-category-picker-dot {
+  flex: 0 0 .625rem;
+  block-size: .625rem;
+  border-radius: 50%;
+}
+
+.report-category-picker-option small {
+  display: block;
+  color: hsl(var(--muted-foreground));
+  font-size: .8125rem;
+}
+
+.report-category-picker-option[aria-pressed='true'],
+.report-category-picker button:active {
+  background: hsl(var(--accent));
+}
+
+@media (hover: hover) {
+  .report-category-picker button:not(:disabled):hover {
+    background: hsl(var(--accent));
+  }
+}
+
+.report-category-picker-empty {
+  padding: .75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+@media (max-width: 767px) {
+  .report-category-picker-dialog {
+    inline-size: calc(100% - 1rem);
+    block-size: min(34rem, 70dvh, calc(100dvh - env(safe-area-inset-top) - 1rem));
+    margin-block: auto max(.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+.report-category-picker-group h4:has(button) {
+  padding: 0;
+}
+
+.report-category-picker-group h4 button {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-block-size: 44px;
+  inline-size: 100%;
+  padding: .5rem .75rem;
+  border-radius: .75rem;
+  text-align: start;
+}
+
+.report-category-picker-group h4 button svg {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+.report-category-picker-group h4 button[aria-expanded='true'] svg {
+  rotate: 180deg;
+}
+
+.report-category-picker-group .report-category-picker-option {
+  padding-inline-start: 1.875rem;
+}

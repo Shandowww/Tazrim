@@ -13,12 +13,13 @@ import {SessionControls} from './app/session-controls'
 import {GlobalActionCenter} from './app/global-action-center'
 import {AccountMenu} from './app/account-menu'
 import {SettingsHome} from './app/settings-home'
+import {AppearanceSettings} from './app/appearance-settings'
 import {ComparisonGoalsPage} from './app/comparison-goals-page'
 import {ForecastSettingsPage} from './app/forecast-settings-page'
 import {OnboardingPage} from './app/onboarding-page'
 import {ProfilePage} from './app/profile-page'
 import {ExistingWorkflowLinks} from './app/existing-workflow-links'
-import { StrictMode, Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { StrictMode, Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { createBrowserRouter, RouterProvider, Route, Routes, useLocation, useNavigate, ScrollRestoration, type Location } from 'react-router-dom'
@@ -28,7 +29,7 @@ import {WorkspaceActions} from './app/workspace-actions'
 import {WorkspaceNavigation} from './app/workspace-navigation'
 import {installTabSwipe} from './app/tab-swipe'
 import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
-import { AppearanceContext } from './app/appearance'
+import { AppearanceContext, readPalette, savePalette, type Palette } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoHouseholdPlan } from './app/demo-fixture'
 import { budgetNavigation } from './app/budget-adapter'
@@ -42,6 +43,7 @@ import { useBudget, type BudgetResponse } from './app/use-budget'
 import './tazrim/globals.css'
 import './app.css'
 import './platform-layout.css'
+import './porcelain-ink.css'
 import Link from './app/link'
 import {PageLoadBoundary} from './app/page-load-boundary'
 
@@ -49,6 +51,7 @@ const AdminAccessPage = lazy(async () => ({ default: (await import('./app/admin-
 const AnalysisPage = lazy(async () => ({ default: (await import('./app/analysis-page')).AnalysisPage }))
 const WalletPage = lazy(async () => ({ default: (await import('./app/wallet-page')).WalletPage }))
 const GmailPage = lazy(async () => ({ default: (await import('./app/gmail-page')).GmailPage }))
+const PurchaseNotesPage = lazy(async () => ({ default: (await import('./app/purchase-notes-page')).PurchaseNotesPage }))
 const DriveBackupPage = lazy(async () => ({ default: (await import('./app/drive-backup-page')).DriveBackupPage }))
 const MigrationPage = lazy(async () => ({ default: (await import('./app/migration-page')).MigrationPage }))
 const TransferMatchesPage = lazy(async () => ({ default: (await import('./app/transfer-matches-page')).TransferMatchesPage }))
@@ -216,6 +219,7 @@ function App() {
     return opaqueKey
   }, [scrollActor])
   const [theme, setTheme] = useState(() => { try { return localStorage.getItem('budgit-react-appearance') || 'system' } catch { return 'system' } })
+  const [palette, setPalette] = useState(readPalette)
   const [systemDark, setSystemDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches)
   useEffect(() => {
     const media = matchMedia('(prefers-color-scheme: dark)')
@@ -224,7 +228,23 @@ function App() {
     return () => media.removeEventListener('change', update)
   }, [])
   const dark = theme === 'dark' || (theme === 'system' && systemDark)
-  useEffect(() => { document.documentElement.classList.toggle('dark', dark) }, [dark])
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('dark', dark)
+    root.toggleAttribute('data-porcelain-ink', palette === 'porcelain-ink')
+  }, [dark, palette])
+  const appearanceSettings = {
+    theme,
+    palette,
+    onThemeChange(value: string) {
+      setTheme(value)
+      try { localStorage.setItem('budgit-react-appearance', value) } catch { /* Keep the in-memory selection. */ }
+    },
+    onPaletteChange(value: Palette) {
+      setPalette(value)
+      savePalette(value)
+    },
+  }
   useEffect(()=>installPullRefresh({document,window,refresh:refreshApp,isBusy:()=>appRefreshState.pending||budget.refreshPending||budget.status==='loading'||guard.navigationPending||guard.registry.getSnapshot().busy,onHint:setPullHint,onProgress:setPullProgress}),[guard,refreshApp,appRefreshState.pending,budget.refreshPending,budget.status])
   useEffect(()=>installTabSwipe({document,window,pathname,navigate:(path:string)=>navigate(withViewQuery(path,search,import.meta.env.DEV),{replace:true,state:{householdTrail:[]}}),isBusy:()=>accountChanged||appRefreshState.pending||budget.status!=='ready'&&!fixture||guard.navigationPending||guard.registry.getSnapshot().busy}),[pathname,search,routeScopeKey,accountChanged,appRefreshState.pending,budget.status,fixture,guard,navigate])
   const actualPlan: BudgetResponse['plan'] = budget.status === 'ready' ? budget.value.plan : null
@@ -341,6 +361,7 @@ function App() {
               <Route path="/analysis" element={<AnalysisPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/wallet" element={<WalletPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/gmail" element={<GmailPage fixture={fixture} budget={budget}/>} />
+              <Route path="/settings/purchase-notes" element={<PurchaseNotesPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/gmail/notices/:id" element={<GmailPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/access" element={<AdminAccessPage fixture={fixture} budget={budget}/>} />
               <Route path="/settings/drive" element={<DriveBackupPage fixture={fixture} budget={budget}/>} />
@@ -350,7 +371,16 @@ function App() {
               <Route path="/goals" element={<ComparisonGoalsPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/start" element={<OnboardingPage key={budgetId} fixture={fixture} budget={budget}/>} />
               <Route path="/settings/profile" element={<ProfilePage key={budgetId} fixture={fixture} budget={budget}/>} />
-              <Route path="/settings" element={<><div className="md:hidden"><SettingsHome theme={theme} email={budget.status==='ready'?budget.value.accountEmail:undefined} onThemeChange={value=>{setTheme(value);try{localStorage.setItem('budgit-react-appearance',value)}catch{}}}/></div><div className="hidden md:block"><div className="household-page"><PageHeading mobilePeriod={false} className="text-2xl font-semibold">הגדרות אפליקציה</PageHeading>{!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}<details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">אפשרויות תצוגה מתקדמות</summary><InterfaceModeSelector/><InterfaceLayoutSetting/></details><label className="surface flex items-center gap-3 rounded-xl p-4">מראה <select className="rounded-lg border bg-card p-2" value={theme} onChange={event => { setTheme(event.target.value); try { localStorage.setItem('budgit-react-appearance', event.target.value) } catch { /* System appearance remains usable without storage. */ } }}><option value="system">מערכת</option><option value="light">בהיר</option><option value="dark">כהה</option></select></label><ExistingWorkflowLinks budget={budget} fixture={fixture}/></div></div></>} />
+              <Route path="/settings" element={<>
+                <div className="md:hidden"><SettingsHome appearance={appearanceSettings} email={budget.status==='ready'?budget.value.accountEmail:undefined}/></div>
+                <div className="hidden md:block"><div className="household-page">
+                  <PageHeading mobilePeriod={false} className="text-2xl font-semibold">הגדרות אפליקציה</PageHeading>
+                  {!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}
+                  <details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">אפשרויות תצוגה מתקדמות</summary><InterfaceModeSelector/><InterfaceLayoutSetting/></details>
+                  <AppearanceSettings {...appearanceSettings}/>
+                  <ExistingWorkflowLinks budget={budget} fixture={fixture}/>
+                </div></div>
+              </>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
               <Route path="*" element={<PendingPage title="העמוד אינו זמין" />} />
             </Routes></InterfaceModeBoundary>}

@@ -50,6 +50,10 @@ for item in actions {
     check(String(cString: class_getName(object_getClass(native)!)) != "WFMissingAction", "Unavailable native definition: \(identifier)")
     let unknown = Set(parameters.keys).subtracting(declared).subtracting(controlKeys)
     check(unknown.isEmpty, "Unknown native parameters in \(identifier): \(unknown.sorted())")
+    if identifier == "is.workflow.actions.setvalueforkey", parameters["WFDictionaryKey"] as? String == "budgitLocalName" {
+        let state = native.perform(NSSelectorFromString("parameterStateForKey:"), with: "WFDictionaryValue")?.takeUnretainedValue()
+        check(state != nil, "Native Set Dictionary Value decoded budgitLocalName as an empty value")
+    }
     checked += 1
 }
 let count = action("is.workflow.actions.count", ["WFCountType": "Characters"])

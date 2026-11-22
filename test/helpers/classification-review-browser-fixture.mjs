@@ -8,6 +8,8 @@ import * as classifier from '../../tools/bank-csv/classifier.mjs';
 const bytes=Buffer.from('תאריך,תיאור,סכום,יתרה\n'+Array.from({length:13},(_,i)=>`${String(i+1).padStart(2,'0')}/02/2026,${i===12?'תשלום נוסף לדוגמה':i?'תשלום לדוגמה':'משכורת'},${i?-10:1000},${1000-i*10}`).join('\n'));
 const fortyBytes=Buffer.from('תאריך,תיאור,סכום,יתרה\n'+Array.from({length:40},(_,i)=>{const date=new Date(Date.UTC(2026,1,1+i)).toISOString().slice(0,10).split('-').reverse().join('/');return `${date},${i?'תשלום בדיקה '+i:'משכורת'},${i?-10:1000},${2000-i*10}`}).join('\n'));
 const cases={conflicts:await guidedFixture({sourceBytes:bytes,sourceName:'file.csv'}),fresh:await guidedFixture({sourceBytes:bytes,sourceName:'new.csv'}),card:await guidedFixture(),unverified:await guidedFixture({sourceBytes:fortyBytes,sourceName:'forty.csv'}),manual:await guidedFixture()};
+const arrival=await cases.card.receive(Buffer.concat([cases.card.bytes,Buffer.from('\n% separate incoming preview\n')]),'new-card.pdf');
+cases.card.arrivalId=(await arrival.json()).receiptId;
 for(const name of ['conflicts','unverified']){
  const c=cases[name],seed=await c.load();await buildReportInbox(seed.base.plan,seed.group.ui,{month:'2026-11',today:'2026-11-09',classifier,activityAPI:null});
  for(const row of seed.group.ui.items[0].preview.rows)seed.group.ui.bankChoices.set(inboxBankGroupKey(seed.group.ui.items[0],row),{field:row.amountCents>0?'salary':'variable',refund:false});
@@ -29,8 +31,9 @@ const current=await(await cases.fresh.req('alice','/api/plan')).json();await cas
 cases.fresh.db.prepare('INSERT INTO budget_members VALUES(?,?,?)').run(shared.id,'bob','bob@example.test');cases.fresh.db.prepare('INSERT INTO budget_member_roles VALUES(?,?,?)').run(shared.id,'bob','viewer');cases.fresh.initialFinancial=cases.fresh.financial();
 let financialWrites=0;
 const server=http.createServer(async(request,response)=>{try{
- if(request.url==='/__audit'){response.setHeader('Content-Type','application/json');response.end(JSON.stringify({cases:Object.fromEntries(Object.entries(cases).map(([name,c])=>[name,{id:c.id,sourceRevision:c.sourceRow().revision,unchanged:c.financial()===c.initialFinancial}])),shared:shared.id,financialWrites}));return;}
- const cookies=String(request.headers.cookie??''),name=/qa-case=(fresh|card|unverified|manual)/.exec(cookies)?.[1]??'conflicts',c=cases[name],user=cookies.includes('qa-user=bob')?'bob':'alice';
+ if(request.url==='/__audit'){response.setHeader('Content-Type','application/json');response.end(JSON.stringify({cases:Object.fromEntries(Object.entries(cases).map(([name,c])=>[name,{id:c.id,arrivalId:c.arrivalId??null,sourceRevision:c.sourceRow().revision,unchanged:c.financial()===c.initialFinancial}])),shared:shared.id,financialWrites}));return;}
+ const cookies=String(request.headers.cookie??''),preview=new URL(request.url,'http://localhost').searchParams.get('preview'),name=/qa-case=(fresh|card|unverified|manual)/.exec(cookies)?.[1]??(['fresh','card','unverified','manual'].includes(preview)?preview:'conflicts'),c=cases[name],user=cookies.includes('qa-user=bob')?'bob':'alice';
+ if(['fresh','card','unverified','manual'].includes(preview))response.setHeader('Set-Cookie','qa-case='+preview+'; Path=/; SameSite=Lax');
  const chunks=[];for await(const chunk of request)chunks.push(chunk);const body=Buffer.concat(chunks),headers=new Headers(request.headers);headers.set('origin',c.origin);headers.set('host',new URL(c.origin).host);headers.set('cookie','__Host-mf_session='+user);
  if(request.method==='PUT'&&request.url.startsWith('/api/plan')||request.method==='POST'&&body.toString().includes('"action":"commit"'))financialWrites++;
  const result=await c.app(new Request(c.origin+request.url,{method:request.method,headers,...(body.length?{body}:{})}));response.writeHead(result.status,Object.fromEntries(result.headers));response.end(Buffer.from(await result.arrayBuffer()));

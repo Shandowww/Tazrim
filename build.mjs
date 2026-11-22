@@ -53,6 +53,7 @@ copyFileSync('src/space-migration-model.js','dist/server/space-migration-model.j
 copyFileSync('src/wallet-text-model.js','dist/server/wallet-text-model.js');
 copyFileSync('src/card-metadata.js','dist/server/card-metadata.js');
 copyFileSync('src/gmail-filter-model.js','dist/server/gmail-filter-model.js');
+copyFileSync('src/purchase-notes-model.js','dist/server/purchase-notes-model.js');
 copyFileSync('src/space-savings-model.js','dist/server/space-savings-model.js');
 copyFileSync('src/space-savings-migration.js','dist/server/space-savings-migration.js');
 copyFileSync('src/manual-account-migration.js','dist/server/manual-account-migration.js');

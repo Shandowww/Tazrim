@@ -1,0 +1,59 @@
+/* Porcelain & Ink overlays the palette without changing financial colors or motion. */
+html[data-bg][data-porcelain-ink] {
+  --background: 219 37% 92%;
+  --card: 216 60% 98%;
+  --muted: 217 45% 92%;
+  --muted-foreground: 219 28% 34%;
+  --primary: 220 65% 35%;
+  --primary-foreground: 0 0% 100%;
+  --border: 216 29% 80%;
+  --porcelain-glaze: #7ba7ce;
+  --porcelain-reflection: #c0d6e1;
+  --surface-raised: var(--card);
+  --surface-overlay: var(--card);
+  --surface-edge: var(--border);
+  --input: var(--border);
+  --secondary: var(--muted);
+  --accent: var(--muted);
+  --ring: var(--primary);
+  background-color: hsl(var(--background));
+}
+
+html.dark[data-bg][data-porcelain-ink] {
+  --background: 218 39% 12%;
+  --card: 218 32% 19%;
+  --muted: 219 33% 24%;
+  --muted-foreground: 218 27% 74%;
+  --primary: 214 80% 77%;
+  --primary-foreground: 221 53% 13%;
+  --border: 218 23% 34%;
+  --porcelain-glaze: #2d608f;
+  --porcelain-reflection: #507aa6;
+}
+
+html[data-bg][data-porcelain-ink] body {
+  background-image:
+    repeating-radial-gradient(circle at 6% -15%, transparent 0 41px, color-mix(in srgb, var(--porcelain-glaze) 35%, transparent) 42px 43px, transparent 44px 67px),
+    radial-gradient(ellipse at 12% 14%, var(--porcelain-glaze), transparent 71%),
+    radial-gradient(ellipse at 95% 94%, var(--porcelain-reflection), transparent 74%);
+  background-size: 100% 100%;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+
+html[data-bg][data-porcelain-ink] body::before { display: none; }
+
+[data-porcelain-ink] .home-summary {
+  background-image: linear-gradient(125deg, hsl(var(--card)), hsl(var(--accent) / .72));
+  box-shadow: var(--elevation-2);
+}
+
+[data-porcelain-ink] .home-panel { box-shadow: var(--elevation-1); }
+
+/* Wallet cards keep the glass rim and tint without showing the baked Tazrim pattern. */
+[data-porcelain-ink] .glass__bake { display: none; }
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  html[data-bg][data-porcelain-ink] body,
+  [data-porcelain-ink] .home-summary { background-image: none; }
+}

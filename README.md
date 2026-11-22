@@ -1,3 +1,15 @@
+> **Start with the [current Budgit project instructions](AGENTS.md).** They record the live Hetzner version, active worktree, Git destinations, and deprecated OpenAI Sites copy. Release entries below describe their original checkpoints.
+
+## Shortcut cleanup filename binding — local candidate
+
+The `delete-after-upload` branch now passes the filename to Set Dictionary Value as interpolated Text. Apple’s action decoder previously treated the bare variable reference as missing, so the Shortcut could stop while queuing cleanup even after one report had reached the inbox. The native schema diagnostic now checks that the value decodes, not just that the parameter key exists. Existing storage proof, exact file matching and byte recheck still govern deletion. Use `retain` on the installed copy to avoid this branch until a fixed installer is available.
+
+## Folder sync and Excel reversals — local candidate
+
+The folder Shortcut attempts uploads before optional device cleanup. The run summary separates new uploads, previously saved files, previously completed reports, deferred or unsupported items, problems, and device removals. It returns a per-file breakdown as Shortcut output. A cleanup warning leaves that file in the folder; it no longer interrupts other uploads. Native macOS or iOS permission and transport interruptions can still stop a Shortcut action. `retain` remains the default.
+
+The bank reader recognizes an Excel negative debit as a reversal only if the entire ILS running-balance sequence reconciles exactly in one chronological direction. Reversals still require review and the existing save and overlap safeguards apply. To check two distinct fixture uploads without your inbox or budget, run `node scripts/incoming-shortcut-native-qa.mjs --distinct --delete-after-upload`, or inspect a workbook locally with `node tools/bank-csv/serve.mjs` at `http://127.0.0.1:5175/`. The latter does not upload or save anything.
+
 ## Form drafts across navigation published — 2026-11-10
 
 Application `70a302a` is verified live. Ordinary recoverable forms retain exact unfinished input in encrypted actor/budget/editor-scoped device drafts before navigation. Financial Save stays explicit. Settings offers draft discovery, editor return, export and deliberate discard; legacy complete-plan recovery is retained. All 39 raw-form adapters and 19 justified guard exceptions are documented in `docs/ui-redesign/FORM-DRAFT-NAVIGATION-IMPLEMENTATION-2026-11-10.md`.
@@ -277,14 +289,14 @@ Tal retired Sites from the publication workflow. Budgit runs on the existing Het
 The authenticated React interface is live at https://budgit.duckdns.org/next from application commit1457bf0. The existing root interface stays available as a rollout fallback; Sites and hosting resources are unchanged. Fresh verified backup/isolated financial, stored-record, access, HTTP and encrypted-source checks passed; running hashes/health/login and unchanged budgets/revisions/sharing/access/key records were verified. Parking is unchanged. Exact final source passes1094 regressions, build/typecheck and15 core checks. See docs/tazrim-migration/release-2026-11-01.json and RESUME.md for evidence and real-device/platform/provider limitations. Historical preparation/SSH-blocked notes below are superseded.
 
 
-## Active publication destination — 2026-10-18
+## Hetzner publication decision — historical, 2026-10-18
 
 Tal explicitly approved publishing this canonical checkout to `https://budgit.duckdns.org` on the existing server and backing up the same commit to GitHub. Leave Sites unchanged. This overrides older Sites publication instructions below; retain the historical Site identity for build validation only. Use a fresh verified SQLite backup, an isolated financial preflight and rollback image before updating the service; verify runtime build hash, health and unauthenticated access afterward. No hosting/resource upgrade is authorized.
 
 
-## One current source — 2026-10-11
+## Checkout relocation — historical, 2026-10-11
 
-The canonical checkout is `/Users/talshandor/Documents/personal-projects/monthly-flow`. `/Users/talshandor/Documents/ChatGPT/Monthly Flow Budget` now contains only a relocation notice, with no independent source checkout. Open the canonical project in Codex for all future work. Always work here, retain the Site ID in SOURCE-OF-TRUTH.json, and publish the same commit to Sites and the GitHub backup. Build refuses a different Site identity. The app menu displays a content-derived build identifier; refresh an already-open app to load published changes. HTML and budget responses use no-store.
+The October relocation moved the project into the outer `monthly-flow` checkout. The former `Documents/ChatGPT/Monthly Flow Budget` location holds a relocation notice. Follow the project instructions linked above for the current source.
 
 The former personal-projects checkout is preserved at `/Users/talshandor/Documents/personal-projects/monthly-flow-legacy-2026-10-11`. It includes unpublished Apple Pay integration work and the wife's old Site identity. It is an archive, not a source to edit or deploy. Do not merge its hosting identity or copy its source over this checkout. Reconcile any needed feature individually with tests.
 

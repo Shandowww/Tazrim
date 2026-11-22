@@ -1,11 +1,41 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {zero} from '../src/budget.js'
-import {matchIncomingReport} from '../frontend/src/app/incoming-report-routing.ts'
+import {createVault,unlockVault} from '../src/vault.js'
+import {incomingRoutingOptions,matchIncomingReport} from '../frontend/src/app/incoming-report-routing.ts'
+import {incomingRoutingBudgets} from '../frontend/src/app/report-intake-api.ts'
 import {readReportContent} from '../frontend/src/app/report-reader.ts'
+import {acceptVaultUnlock,forgetNativeVault,nativeVaultSession} from '../frontend/src/app/vault-session.ts'
 const key='a'.repeat(64)
 const plan=(alias='1234',provider='cal')=>({startMonth:'2026-01',opening:0,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],creditCards:[{id:'card1',name:'כרטיס',alias,provider}],cashPlanning:{accounts:[{id:'bank',label:'חשבון',bankName:'hapoalim',buffer:0}],months:{},cardAccounts:{},transfers:[]}})
 const budget=(id,extra={})=>({id,name:id,role:'owner',locked:false,plan:plan(),...extra})
+test('Manual routing distinguishes an unconfigured shared space from locked, accountless, and read-only spaces',()=>{
+ const personal=budget('personal'),shared=budget('shared',{plan:null,locked:true}),locked=budget('locked',{locked:true}),viewer=budget('viewer',{role:'viewer'}),empty=budget('empty',{plan:{...plan(),cashPlanning:undefined}})
+ const {targets,unavailable}=incomingRoutingOptions([personal,shared,locked,viewer,empty],'bank')
+ assert.deepEqual(targets,[{value:'["personal","bank"]',label:'personal · חשבון'}])
+ assert.deepEqual(unavailable.map(({id,reason})=>[id,reason]),[['shared','unconfigured'],['locked','locked'],['viewer','viewer'],['empty','no-targets']])
+ assert.deepEqual(incomingRoutingOptions([empty],'card').targets,[{value:'["empty","card1"]',label:'empty · כרטיס · 1234'}])
+ const setup={...shared,role:'editor',plan:plan(),locked:false}
+ assert.deepEqual(incomingRoutingOptions([personal,setup],'bank').targets.map(({value})=>JSON.parse(value)),[['personal','bank'],['shared','bank']])
+})
+test('Background routing reads preserve the active vault unlock without unlocking or revealing other spaces',async()=>{
+ const password='synthetic routing fixture',activePlan={...plan(),demo:false,setupCompleted:true},privatePlan={...plan('9876'),demo:false,setupCompleted:true}
+ const [sharedVault,personalVault]=await Promise.all([createVault(activePlan,password,'shared'),createVault(privatePlan,password,'personal:actor')])
+ const account={accountId:'actor',accountEmail:'actor@example.test'},personal={id:'personal',name:'אישי',role:'owner'},shared={id:'shared',name:'משותף',role:'editor'},spaces=[personal,shared]
+ const response=(space,envelope)=>({...account,budget:space,revision:7,plan:envelope})
+ const active=response(shared,sharedVault.envelope)
+ const fetcher=async url=>Response.json(url==='/api/budgets'?{...account,budgets:spaces}:url.endsWith('=personal')?response(personal,personalVault.envelope):active)
+ try{
+  await acceptVaultUnlock('shared',active,await unlockVault(sharedVault.envelope,password))
+  const routing=await incomingRoutingBudgets('actor','shared',spaces,new AbortController().signal,fetcher)
+  assert.equal(routing[0].locked,true)
+  assert.equal(routing[0].plan.keyId,personalVault.envelope.keyId)
+  assert.equal(routing[1].locked,false)
+  assert.deepEqual(routing[1].plan,activePlan)
+  assert.ok(nativeVaultSession('shared',active))
+  assert.deepEqual(incomingRoutingOptions(routing,'bank').targets.map(({value})=>JSON.parse(value)),[['shared','bank']])
+ }finally{forgetNativeVault()}
+})
 test('A unique issuer and card digits match across personal/shared spaces, while collisions and contradictions require review',()=>{
  const item={kind:'card',identity:'cal:1234',identityKey:key,provider:'cal'}
  assert.equal(matchIncomingReport(item,[budget('personal'),budget('shared',{plan:plan('5678')})],[]).candidates[0].budget,'personal')

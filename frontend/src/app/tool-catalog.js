@@ -1,3 +1,5 @@
+import {navigationLabels} from './navigation-sections.js'
+
 /** Every secondary Budgit destination, grouped once for the compact navigation. */
 export const toolGroups = [
   { title: 'תכנון', items: [
@@ -8,10 +10,11 @@ export const toolGroups = [
     ['/savings/schedule', 'הפקדות חודשיות'], ['/savings/transfers', 'העברות חיסכון'],
   ] },
   { title: 'דוחות וניתוח', items: [
-    ['/incoming', 'סנכרון דוחות'], ['/upload', 'דוחות ומקורות'],
+    ['/incoming', navigationLabels.sync], ['/upload', navigationLabels.sources],
     ['/upload/history', 'היסטוריית קליטה'], ['/analysis', 'מדדים וניתוח מקורות'],
     ['/search', 'חיפוש בפירוט'], ['/actions', 'התראות ותזכורות'],
     ['/notices', 'עדכוני בנקים ומנפיקים'], ['/settings/report-expectations', 'דוחות צפויים'],
+    ['/settings/purchase-notes', 'פתקי קנייה'],
     ['/details/manage', 'ניהול פירוט ידני'], ['/categories/manage', 'עריכת קטגוריות'],
     ['/categories/limits', 'תקרות הוצאה'],
   ] },

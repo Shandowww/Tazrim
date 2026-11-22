@@ -1,0 +1,77 @@
+{
+  "version": "v1.5.0",
+  "commit": "9adb73eadba1d7d105b7a877ce68c4e5367c77aa",
+  "build": "72cf69e8e9",
+  "verifiedAt": "2026-11-22 (Israel time)",
+  "production": "https://budgit.duckdns.org/next/settings/purchase-notes",
+  "scope": "Private Google Sheets purchase context from Instinct, exact signed-amount/date/card suggestions, and one-transaction category choices through the original report importer. Notes do not create expenses or change totals.",
+  "approval": "Tal explicitly approved the reviewed prototype for publication: I apprive.",
+  "previousVersion": "v1.4.0",
+  "previousCommit": "e137a864759934e5d3a30ee7d5766f8a52d9603b",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45011434257",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1495,
+    "coreChecks": 15,
+    "purchaseNoteBrowserChecks": 25,
+    "existingDuplicateBrowserChecks": 20,
+    "phoneBreakpointDesktopWidths": [
+      375,
+      390,
+      667,
+      767,
+      768,
+      1440
+    ],
+    "appearance": [
+      "light",
+      "dark",
+      "reduced motion"
+    ],
+    "settingsTextScale": "200%",
+    "browserFinancialWrites": 0
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-9adb73ea.Fdk7k3/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-9adb73ea.0mYER7/",
+  "candidateImage": "sha256:171e6802d6de8b2669ec1e7ac01ae978f810461385c8b1e76982896338c9e7ae",
+  "compatibleRollbackImage": "sha256:57df4df88ad74df71a4afa347010f2128deaf95cb685da1eb55ab993e4559d20",
+  "compatibleRollbackCommit": "5cdfc8ab811479203739b64f9926a4e09ebb5841",
+  "originalRollbackImage": "sha256:8fd205b626a9e55b2d6018d36ebfc7253d64ff4ddcd7e9cf3326b983b88c689b",
+  "validation": {
+    "githubSecurity": "passed",
+    "immutableCandidateImageSecurity": "passed",
+    "compatibleRollbackImageSecurity": "passed",
+    "freshVerifiedBackup": "passed",
+    "candidateFinancialAccessRestore": "passed",
+    "originalRollbackFinancialAccess": "passed",
+    "compatibleRollbackFinancialAccessAndRowDraftGuard": "passed",
+    "runtimeFiles": 184,
+    "existingAuthoritativeTablesPreserved": 50,
+    "newPrivateNoteTables": 3,
+    "configurationKeysAndAdjacentServices": "unchanged",
+    "publicHealth": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedPurchaseNotes": 401,
+    "loginProtectedPurchaseNotesRoute": "passed"
+  },
+  "sourcePreference": {
+    "userProvidedSheetPrefilled": true,
+    "accountMatched": true,
+    "connected": false,
+    "notesImported": 0,
+    "financialWrites": 0,
+    "existingStoredTablesPreservedDuringPreferenceSave": 51,
+    "note": "The preference check also preserves the reference-interest cache excluded by the release authoritative-table policy. No sheet identifier or account identifier is stored in this evidence."
+  },
+  "rehearsalRecovery": "The first restore stopped on a full filesystem before production mutation. Removed only the two task-created Trivy scan caches (3.4 GB), retained backups/security logs and repeated financial/access/restore/rollback checks against the same immutable scanned image and verified snapshot. No resource upgrade.",
+  "activationGuard": "An initial activation command stopped before mutation on a stale release-script directory reference. The reference was corrected; the subsequent activation passed.",
+  "limits": [
+    "Actual Google consent and the first real sheet read remain user setup.",
+    "Cloud Sheets API enablement could not be verified with the expired local Cloud CLI session.",
+    "Instinct must prepare and maintain the Purchases tab.",
+    "ILS notes only; no exchange-rate inference.",
+    "No new physical-iPhone/Safari or installed-PWA acceptance.",
+    "Unrelated appearance and forecast prototypes were excluded and preserved.",
+    "Automatic deployment remains disabled."
+  ]
+}

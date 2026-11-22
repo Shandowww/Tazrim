@@ -1,7 +1,36 @@
+# Budgit source, hosting, and Git workflow
+
+## Current source and live release — verified 2026-11-22 (Israel time)
+
+- **Production** is [Budgit on Hetzner](https://budgit.duckdns.org/next). Approved release `v1.5.0` runs commit `9adb73eadba1d7d105b7a877ce68c4e5367c77aa`, build `72cf69e8e9`. **פתקי קנייה** connects a private Google Sheet maintained by Instinct and shows purchase context beside report transactions. Repeated-merchant purchases can retain separate categories through the original draft/import flow. Notes never add expenses or change totals. Tal's supplied sheet is prefilled privately; Google consent and the first real sheet read remain user setup. Build/typecheck, 1,495 regressions, 15 core checks, 25 purchase-note and 20 existing duplicate browser checks pass. Exact-commit GitHub/image security, verified backups, financial/access/restore/compatible-rollback gates, 184 runtime files and all 50 pre-existing authoritative tables pass; configuration, keys and adjacent services are unchanged. Three private note tables were added. Tested rollback `5cdfc8ab` retains the v1.4.0 interface and refuses unsupported transaction-category drafts before import. Evidence: `docs/ui-redesign/evidence/release-purchase-notes-2026-11-22.json`. Isolated source: `/private/tmp/budgit-purchase-notes-release.e0BE7S/source`; unrelated local work is preserved. Automatic deployments remain off. Save drafts and use guarded app refresh. No new physical-iPhone/PWA acceptance is claimed.
+- **Work here** in `/Users/talshandor/Documents/personal-projects/monthly-flow/work/budgit-household-ui/work/platform-adaptive-ui`, on local `main`. This is a linked worktree of the Git repository in `work/budgit-household-ui`. Open this worktree in Codex and read its instructions before editing. The production commit comes from the verified deployment, regardless of the latest working commit or GitHub's default branch.
+- **Primary Git repository** is [Shandowww/monthly-flow-budget](https://github.com/Shandowww/monthly-flow-budget), remote `github` at `git@github-personal:Shandowww/monthly-flow-budget.git`. `main` is the branch for ongoing Budgit work. The last independently verified remote source for the deployed commit is `github/codex/platform-adaptive-ui`. See the migration status below for the state of GitHub `main`. `master` and `codex/hetzner-google` are earlier source lines.
+- **Tazrim fork** is [Shandowww/Tazrim](https://github.com/Shandowww/Tazrim), at `git@github-personal:Shandowww/Tazrim.git`. Its `codex/budgit-react-frontend` branch is a tracked-source export with separate Git history. Snapshot `c1c858f` records Budgit source `269841c` in its `docs/tazrim-migration/fork-sync.json`. The fork's `main` tracks upstream Tazrim. Make Budgit fixes in the active Budgit worktree. For approved fork updates, use the snapshot export workflow and preserve upstream history and notices.
+- **Ignore OpenAI Sites** for Budgit development, testing, deployment, and data. `monthly-flow-budget.t88s.chatgpt.site` is the deprecated OpenAI Sites copy with separate, unsynced data. The older Linoy-owned Site is also outside the workflow. Leave both Sites alone. Keep `.openai/hosting.json` and the matching project ID in `SOURCE-OF-TRUTH.json` for the existing build validation.
+
+### Main branch and numbered releases
+
+- **Migration status, 2026-11-18.** Local `main` is based on the exact deployed commit. GitHub `main` was last verified at the old Sites commit `5ff2469`, an ancestor 441 commits behind production. GitHub still defaults to `codex/hetzner-google`. The local migration and `v1.0.0` tag are ready for review. After approval, fast-forward GitHub `main` and publish the annotated tag, then verify the main-branch CI run before changing the GitHub default. Retain the old branches and update this status once the remote migration is verified.
+- **Release numbering.** Use annotated Git tags `vMAJOR.MINOR.PATCH` for approved releases. Increment PATCH for compatible fixes, MINOR for compatible features, and MAJOR for breaking changes. Pick the next version from the latest released tag and record the exact version, commit, and runtime build ID after deployment. Keep published tags immutable. A commit on `main` becomes live only after a verified Hetzner deployment.
+- **Initial baseline.** `v1.0.0` records the already deployed commit `269841c`. The migration adds documentation and CI setup on top of that baseline. It requires no redeploy.
+
+### Superseded checkouts and branches
+
+| Location or branch | Role |
+| --- | --- |
+| Outer `monthly-flow` checkout, `codex/hetzner-google` | Historical server source and workspace entry point. Preserve its local theme and Shortcut work. |
+| `work/budgit-household-ui`, `codex/budgit-household-ui` | Parent Git checkout and earlier household UI line. Preserve its local changes. Use its nested `work/platform-adaptive-ui` for current app work. |
+| `codex/tazrim-react-frontend`, `codex/report-classification-review`, `codex/statement-evidence-release`, `codex/fix-bank-activity` | Earlier implementation or release work. Retain for reference and recovery. |
+| `work/react-acceptance`, `work/canonical-loan-fix`, `work/tazrim-acceptance-export`, and generated release/export folders under `work/` | Historical acceptance, recovery, or snapshot checkouts. Use the remote Tazrim branch and its provenance for the current export. |
+| Sibling `monthly-flow-legacy-2026-10-11`; former `Documents/ChatGPT/Monthly Flow Budget` location | Local archive with older unpublished work; relocation notice, respectively. |
+
+Use release notes below as dated evidence. Earlier references to a current source, pending preview, or publishing workflow describe their original checkpoints. Update the production commit, runtime build ID, and evidence reference in this section after verifying an approved deployment.
+
 ## Project workflow and responsive design — 2026-11-17
 
 - **Prototype approval before any Git push:** For every proposed Budgit change, show Tal a reviewable local prototype or preview first and wait for his explicit approval of that specific version before pushing to any remote. Local implementation, tests and commits are allowed before approval; a request to make a change, an earlier general publishing/backup approval, or approval of a different prototype is not approval to push this version. This rule overrides older instructions to push completed stages or keep GitHub backups immediately updated. Do not push the Budgit backup branch or the Tazrim fork export until approval.
 - **Separate phone and desktop interface designs:** The phone browser and phone PWA use the same compact mobile interface. The desktop web browser retains its separate established desktop layout and navigation, including the sidebar, More and Settings views. Share data and application behavior, but apply mobile navigation and visual changes only to phone widths unless Tal explicitly requests a desktop redesign. Use the existing 768px responsive breakpoint; review both a phone width and a desktop width, including the breakpoint, in each interface prototype. A PWA launch should not select a different design from a phone browser at the same width.
+- **Layout only, one app — clarified 2026-11-18:** Shared destinations use the same name, route, and workflow on phone and desktop. The navigation controls can be arranged differently to fit each screen, but do not move or rename a tool independently on one platform.
 
 ## Adaptive desktop and PWA layout published — 2026-11-12
 
@@ -9,7 +38,7 @@ Reviewed application source `ae73b63` is verified live at `https://budgit.duckdn
 
 Clean candidate build/typecheck, prior preview's 1,458 regressions, 24 focused and 15 core checks, plus 208 built-candidate contracts pass. Fresh verified backup, isolated financial/access/rollback/intake/automation/retained-asset gates, 1,018 prior-source files, 172 live runtime files, all 50 authoritative tables, keys/configuration and adjacent services were verified. Public health/auth/deep-route checks pass. No production financial edits, Sites change or new physical-iPhone acceptance. Evidence: `docs/ui-redesign/evidence/release-platform-adaptive-2026-11-12.json`. Use guarded app refresh after saving drafts.
 
-**Current application source is `work/budgit-household-ui/work/platform-adaptive-ui`, branch `codex/platform-adaptive-ui`, source checkpoint `ae73b63`.** Preserve unrelated WIP in the outer checkouts. This supersedes older live and preview-only status below.
+The November 12 deployed source checkpoint was `ae73b63`. See the current release above.
 
 ## Compact mobile Overview header — preview, 2026-11-12
 
@@ -366,14 +395,14 @@ Build/typecheck,1,108 regressions and15 core checks pass, including actual CSV a
 Tal retired Sites from the publication workflow. Budgit runs on the existing Hetzner server at https://budgit.duckdns.org; publish there and back up the same completed source to GitHub. Older instructions to publish to Sites or preserve its audience are superseded. Retain historical Site identity only as source provenance/build validation. Hosted deletion could not be performed: the connected Sites account returns NOT_FOUND for this project and lists only the separate older Site, which must not be touched. Do not claim deletion.
 
 
-## Active publication destination — 2026-10-18
+## Hetzner publication decision — historical, 2026-10-18
 
 Tal explicitly approved publishing this canonical checkout to `https://budgit.duckdns.org` on the existing server and backing up the same commit to GitHub. Leave Sites unchanged. This overrides older Sites publication instructions below; retain the historical Site identity for build validation only. Use a fresh verified SQLite backup, an isolated financial preflight and rollback image before updating the service; verify runtime build hash, health and unauthenticated access afterward. No hosting/resource upgrade is authorized.
 
 
-## One current source — 2026-10-11
+## Checkout relocation — historical, 2026-10-11
 
-The canonical checkout is `/Users/talshandor/Documents/personal-projects/monthly-flow`. `/Users/talshandor/Documents/ChatGPT/Monthly Flow Budget` now contains only a relocation notice, with no independent source checkout. Open the canonical project in Codex for all future work. Always work here, retain the Site ID in SOURCE-OF-TRUTH.json, and publish the same commit to Sites and the GitHub backup. Build refuses a different Site identity. The app menu displays a content-derived build identifier; refresh an already-open app to load published changes. HTML and budget responses use no-store.
+The October relocation moved the project into the outer `monthly-flow` checkout. The former `Documents/ChatGPT/Monthly Flow Budget` location holds a relocation notice. The current source and hosting are listed at the top. The app menu displays a content-derived build identifier. Use guarded refresh to load a published update.
 
 The former personal-projects checkout is preserved at `/Users/talshandor/Documents/personal-projects/monthly-flow-legacy-2026-10-11`. It includes unpublished Apple Pay integration work and the wife's old Site identity. It is an archive, not a source to edit or deploy. Do not merge its hosting identity or copy its source over this checkout. Reconcile any needed feature individually with tests.
 
@@ -382,13 +411,13 @@ Read README.md and PROJECT-HANDOFF.md before changing this app.
 
 This is a personal monthly cash-flow planner. Preserve the user's workflow: monthly card totals, income, transfers, savings/investments, occasional income and planned purchases, without individual transaction tracking. Keep the UI in Hebrew, RTL, with Apple-inspired system typography and mobile navigation. Isolate numeric amounts from RTL text so signs and currency remain readable.
 
-The source is plain JavaScript, CSS and a Cloudflare-compatible Worker. Build with `node build.mjs`; verify relevant changes with `node verify.mjs`; preview locally with `node preview.mjs` (port 5173). Production stores budgets in D1 by authenticated user ID. The local SQLite preview uses a separate test identity; never introduce that identity into production. Preserve validation, user isolation, revision conflict checks and protection against double-counting card installments.
+Budgit runs on Node and SQLite with a React interface and the existing JavaScript financial model. Build with `node build.mjs`, verify relevant changes with `node verify.mjs`, and preview locally with `node preview.mjs` (port 5173). Keep preview identities and data isolated. Preserve validation, user isolation, revision conflict checks and protection against double-counting card installments.
 
-This folder is the separate copy registered under the user's own Sites account. Reuse `.openai/hosting.json` for future publishing. The previous Site belongs to the user's wife and must remain untouched. Live budgets are not copied with source files. Import any exported budget through the app settings and save it under the current user identity.
+The former Sites copy has separate data. Application source files do not contain budget backups.
 
 No new server or paid resource upgrade has been requested. Keep the app lightweight. Offline support remains optional; chart axes and home-screen metadata are implemented.
 
-Read APP-GUIDELINES.md for the user's general app appearance and behaviour defaults. Pull-down refresh and the desktop refresh action must preserve unsaved budget or item edits; failed refreshes preserve the last usable budget. Keep the existing Site audience, including the invited viewer, when publishing.
+Read APP-GUIDELINES.md for the user's general app appearance and behaviour defaults. Pull-down refresh and the desktop refresh action must preserve unsaved budget or item edits; failed refreshes preserve the last usable budget.
 
 Provide a System / Light / Dark appearance setting, defaulting to System and remembered per device. This app uses a Spent-inspired soft, playful palette and an original decorative neighborhood; retain readable financial values and actual-only achievements.
 
@@ -498,7 +527,7 @@ Fast browser interaction exposed a passive-effect interval before nested periodi
 Remaining acceptance: other pages/workflow matrix, long-label/empty/loading/error states, full keyboard/reduced-motion/reference comparison/download completion, actual device/PRF/Face ID/Google authorization and live-source/backup/preflight/rollback/release gates. Do not treat the bounded analysis checks as full application acceptance.
 
 
-## Current published frontend — 2026-11-01
+## Frontend release — historical, 2026-11-01
 
 Application1457bf0 is active at the authenticated https://budgit.duckdns.org/next entry after fresh verified backup, isolated actual-backup preservation/financial/access/HTTP/decryption checks and tested previous-image compatibility. Original root/interface and Sites are unchanged; no hosting upgrade or real-record edits were performed. Current evidence: docs/tazrim-migration/release-2026-11-01.json and RESUME.md. Do not treat historical SSH blockers or completed feature-connection lists as current work. Real-iPhone/touch/platform PRF/Face ID/provider consent limits remain documented. Preserve unrelated canonical WIP; documentation checkpoints after1457bf0 are not new runtime activations.
 

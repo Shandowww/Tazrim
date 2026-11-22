@@ -2,14 +2,15 @@
 // Requires the owner to import the signed QA revision and approve native prompts.
 import {execFileSync,spawn} from 'node:child_process';
 import {randomBytes} from 'node:crypto';
-import {writeFileSync,rmSync,existsSync,chmodSync} from 'node:fs';
+import {writeFileSync,rmSync,existsSync,chmodSync,readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {createInterface} from 'node:readline';
 import {startIncomingShortcutQA} from './incoming-shortcut-qa.mjs';
 
 const cleanup=process.argv.includes('--delete-after-upload')?'delete-after-upload':'retain';
-if(process.argv.slice(2).some(arg=>arg!=='--delete-after-upload'))throw Error('Only --delete-after-upload is supported');
-const qa=await startIncomingShortcutQA();
+const distinctFiles=process.argv.includes('--distinct');
+if(process.argv.slice(2).some(arg=>!['--delete-after-upload','--distinct'].includes(arg)))throw Error('Only --delete-after-upload and --distinct are supported');
+const qa=await startIncomingShortcutQA({distinctFiles});
 const shortcutName='Budgit-Incoming-QA-day0-'+new URL(qa.origin).port+'-'+randomBytes(3).toString('hex');
 const directory=join(qa.input,'..'),config=join(directory,'config.json'),unsigned=join(directory,'qa.wflow'),signed=join(directory,shortcutName+'.shortcut');
 writeFileSync(config,JSON.stringify({endpoint:qa.endpoint,token:qa.token,qaName:shortcutName,cleanupMode:cleanup}),{mode:0o600,flag:'wx'});
@@ -39,12 +40,13 @@ rl.on('line',async line=>{
   else if(command==='import'){await qa.completeSavedImport();console.log('Original isolated review/import saved; fresh full-import cleanup receipt verified. Stored originals retained.');}
   else if(command==='run'){
    const started=new Date().toISOString();
-   child=spawn('shortcuts',['run',shortcutName,'--input-path',qa.input],{stdio:['ignore','pipe','pipe']});
+   const output=join(directory,'run-summary.txt');rmSync(output,{force:true});
+   child=spawn('shortcuts',['run',shortcutName,'--input-path',qa.input,'--output-path',output,'--output-type','public.plain-text'],{stdio:['ignore','pipe','pipe']});
    const errors=[];child.stderr.on('data',v=>errors.push(v));child.stdout.resume();
    const timer=setTimeout(()=>child?.kill('SIGTERM'),60000);
    const result=await new Promise(resolve=>child.once('exit',(code,signal)=>resolve({code,signal})));
    clearTimeout(timer);child=null;
-   console.log(JSON.stringify({started,...result,stderr:Buffer.concat(errors).toString().replaceAll(qa.token,'[redacted]'),stats:qa.stats(),storedOriginal:await qa.verifyStoredOriginal(),fixturesRemaining:qa.filenames.filter(name=>existsSync(join(qa.input,name)))}));
+   console.log(JSON.stringify({started,...result,summary:existsSync(output)?readFileSync(output,'utf8').replaceAll(qa.token,'[redacted]'):null,stderr:Buffer.concat(errors).toString().replaceAll(qa.token,'[redacted]'),stats:qa.stats(),storedOriginal:await qa.verifyStoredOriginal(),fixturesRemaining:qa.filenames.filter(name=>existsSync(join(qa.input,name)))}));
   }else console.log('Commands: status, run, reset, import, mode <fault-mode>, close');
  }catch(error){console.log(String(error.message).replaceAll(qa.token,'[redacted]'));}finally{busy=false;}
 });

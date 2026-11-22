@@ -1,0 +1,866 @@
+{
+  "scope": "Local review candidate; no push or deployment",
+  "cause": "Report text inherited white-space:nowrap from .household-page bdi. Descriptions, source filenames and references could widen the RTL document.",
+  "change": "Allow isolated report text to wrap, while explicit dir=ltr dates and financial amounts retain nowrap.",
+  "fixture": "Disposable classification-review fixture, with long rendered description, filename and reference fields; no real records.",
+  "before": {
+    "evidence": [
+      {
+        "scheme": "light",
+        "width": 320,
+        "viewport": 952,
+        "pageWidth": 952,
+        "left": -631,
+        "right": -631,
+        "detailWidth": 288,
+        "mainWidth": 320,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 254
+          }
+        ]
+      },
+      {
+        "scheme": "light",
+        "width": 390,
+        "viewport": 953,
+        "pageWidth": 953,
+        "left": -561,
+        "right": -561,
+        "detailWidth": 358,
+        "mainWidth": 390,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 324
+          }
+        ]
+      },
+      {
+        "scheme": "light",
+        "width": 430,
+        "viewport": 952,
+        "pageWidth": 952,
+        "left": -521,
+        "right": -521,
+        "detailWidth": 398,
+        "mainWidth": 430,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 364
+          }
+        ]
+      },
+      {
+        "scheme": "light",
+        "width": 767,
+        "viewport": 952,
+        "pageWidth": 952,
+        "left": -184,
+        "right": -184,
+        "detailWidth": 735,
+        "mainWidth": 767,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 701
+          }
+        ]
+      },
+      {
+        "scheme": "light",
+        "width": 768,
+        "viewport": 1208,
+        "pageWidth": 1208,
+        "left": -439,
+        "right": -439,
+        "detailWidth": 472,
+        "mainWidth": 520,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 438
+          }
+        ]
+      },
+      {
+        "scheme": "light",
+        "width": 1440,
+        "viewport": 1440,
+        "pageWidth": 1440,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 1105.625,
+        "mainWidth": 1192,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 320,
+        "viewport": 952,
+        "pageWidth": 952,
+        "left": -631,
+        "right": -631,
+        "detailWidth": 288,
+        "mainWidth": 320,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 254
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 254
+          }
+        ]
+      },
+      {
+        "scheme": "dark",
+        "width": 390,
+        "viewport": 953,
+        "pageWidth": 953,
+        "left": -561,
+        "right": -561,
+        "detailWidth": 358,
+        "mainWidth": 390,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 324
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 324
+          }
+        ]
+      },
+      {
+        "scheme": "dark",
+        "width": 430,
+        "viewport": 952,
+        "pageWidth": 952,
+        "left": -521,
+        "right": -521,
+        "detailWidth": 398,
+        "mainWidth": 430,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 364
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 364
+          }
+        ]
+      },
+      {
+        "scheme": "dark",
+        "width": 767,
+        "viewport": 952,
+        "pageWidth": 952,
+        "left": -184,
+        "right": -184,
+        "detailWidth": 735,
+        "mainWidth": 767,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 701
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 701
+          }
+        ]
+      },
+      {
+        "scheme": "dark",
+        "width": 768,
+        "viewport": 1208,
+        "pageWidth": 1208,
+        "left": -439,
+        "right": -439,
+        "detailWidth": 472,
+        "mainWidth": 520,
+        "overflow": [
+          {
+            "tag": "SUMMARY",
+            "cls": "min-h-11 cursor-pointer py-2",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "H3",
+            "cls": "inline font-semibold",
+            "text": "מה נשאר לבדוק · 13",
+            "ws": "normal",
+            "width": 127.734375
+          },
+          {
+            "tag": "BDI",
+            "cls": "",
+            "text": "13",
+            "ws": "nowrap",
+            "width": 19.265625
+          },
+          {
+            "tag": "P",
+            "cls": "text-sm text-muted-foreground",
+            "text": "כל בדיקה פותחת את התנועה או ההחלטה המתאימה. קטגוריות הוצאה אופציונליות מוצגות בנפרד.",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "UL",
+            "cls": "divide-y",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "LI",
+            "cls": "space-y-2 py-3 text-sm",
+            "text": "בדיקה אם התנועה כבר נרשמהshared-january-november-2026-original-bank-account-statement.xlsxועד הבית –",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "P",
+            "cls": "font-medium",
+            "text": "בדיקה אם התנועה כבר נרשמה",
+            "ws": "normal",
+            "width": 438
+          },
+          {
+            "tag": "P",
+            "cls": "break-words text-muted-foreground",
+            "text": "shared-january-november-2026-original-bank-account-statement.xlsx",
+            "ws": "normal",
+            "width": 438
+          }
+        ]
+      },
+      {
+        "scheme": "dark",
+        "width": 1440,
+        "viewport": 1440,
+        "pageWidth": 1440,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 1105.625,
+        "mainWidth": 1192,
+        "overflow": []
+      }
+    ],
+    "financialWrites": 0
+  },
+  "after": {
+    "evidence": [
+      {
+        "scheme": "light",
+        "width": 320,
+        "viewport": 320,
+        "pageWidth": 320,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 288,
+        "mainWidth": 320,
+        "overflow": []
+      },
+      {
+        "scheme": "light",
+        "width": 390,
+        "viewport": 390,
+        "pageWidth": 390,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 358,
+        "mainWidth": 390,
+        "overflow": []
+      },
+      {
+        "scheme": "light",
+        "width": 430,
+        "viewport": 430,
+        "pageWidth": 430,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 398,
+        "mainWidth": 430,
+        "overflow": []
+      },
+      {
+        "scheme": "light",
+        "width": 767,
+        "viewport": 767,
+        "pageWidth": 767,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 735,
+        "mainWidth": 767,
+        "overflow": []
+      },
+      {
+        "scheme": "light",
+        "width": 768,
+        "viewport": 768,
+        "pageWidth": 768,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 472,
+        "mainWidth": 520,
+        "overflow": []
+      },
+      {
+        "scheme": "light",
+        "width": 1440,
+        "viewport": 1440,
+        "pageWidth": 1440,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 1105.625,
+        "mainWidth": 1192,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 320,
+        "viewport": 320,
+        "pageWidth": 320,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 288,
+        "mainWidth": 320,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 390,
+        "viewport": 390,
+        "pageWidth": 390,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 358,
+        "mainWidth": 390,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 430,
+        "viewport": 430,
+        "pageWidth": 430,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 398,
+        "mainWidth": 430,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 767,
+        "viewport": 767,
+        "pageWidth": 767,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 735,
+        "mainWidth": 767,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 768,
+        "viewport": 768,
+        "pageWidth": 768,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 472,
+        "mainWidth": 520,
+        "overflow": []
+      },
+      {
+        "scheme": "dark",
+        "width": 1440,
+        "viewport": 1440,
+        "pageWidth": 1440,
+        "left": 0,
+        "right": 0,
+        "detailWidth": 1105.625,
+        "mainWidth": 1192,
+        "overflow": []
+      }
+    ],
+    "financialWrites": 0
+  },
+  "additionalChecks": [
+    "Build and TypeScript pass",
+    "200% text at 390px fits viewport",
+    "MoneyAmount retains nowrap",
+    "15 core checks pass",
+    "2 report-review workflow tests pass"
+  ],
+  "limits": [
+    "Headless Chromium mobile emulation; no physical iPhone/Safari acceptance."
+  ],
+  "screenshots": [
+    "work/ui-redesign/report-overflow-after-390-light.png",
+    "work/ui-redesign/report-overflow-after-390-dark.png",
+    "work/ui-redesign/report-overflow-after-768-light.png",
+    "work/ui-redesign/report-overflow-after-1440-dark.png"
+  ]
+}

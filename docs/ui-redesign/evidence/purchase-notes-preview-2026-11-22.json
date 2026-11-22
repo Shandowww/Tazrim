@@ -1,0 +1,52 @@
+{
+  "feature": "Instinct purchase notes through private Google Sheets",
+  "status": "approved-release-candidate",
+  "sourceBase": "c5970bc8b01c7a5388205f9ecd376a556d9e3328",
+  "dirtyWorktreePreserved": true,
+  "realSheetReadOrEdited": false,
+  "productionChangedByThisTask": false,
+  "pushed": false,
+  "validation": {
+    "buildAndTypecheck": "pass",
+    "applicationAndReaderTests": 1487,
+    "coreChecks": 15,
+    "syntheticBrowserChecks": 25,
+    "browserRuntimeErrors": 0,
+    "browserFinancialWrites": 0,
+    "browserFinancialRecordsUnchanged": true,
+    "browserWidths": [
+      375,
+      390,
+      667,
+      767,
+      768,
+      1440
+    ],
+    "appearance": [
+      "light",
+      "dark",
+      "reduced-motion"
+    ],
+    "settingsTextScale": "200%",
+    "perPurchaseCategories": "original draft/resume/atomic commit; lost successful response recovers once"
+  },
+  "localEvidence": "work/purchase-notes-preview/results.json",
+  "limits": [
+    "Actual Google OAuth and Sheets API enablement are unverified",
+    "The real sheet is configured only after account authorization",
+    "Instinct must prepare and maintain the Purchases tab",
+    "Only ILS notes are accepted",
+    "No physical iPhone or installed-PWA acceptance",
+    "Original release, backup and compatible rollback gates remain required"
+  ],
+  "approval": "Tal explicitly approved this specific prototype for publication: I apprive.",
+  "releaseBase": "97baed7551398d15122d6945b1d5805b80c567f2",
+  "compatibleRollbackCommit": "5cdfc8ab811479203739b64f9926a4e09ebb5841",
+  "releaseValidation": {
+    "buildAndTypecheck": "pass",
+    "applicationAndReaderTests": 1495,
+    "coreChecks": 15,
+    "syntheticBrowserChecks": 25,
+    "sourceIsolation": "Unrelated appearance and forecast work excluded; current live v1.4.0 report fixes retained."
+  }
+}

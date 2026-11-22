@@ -1,20 +1,20 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
-  "sourceBranch": "codex/platform-adaptive-ui",
-  "sourceCommit": "269841c8ce6e19eec193a439fe871750700a2d6c",
+  "sourceBranch": "main",
+  "sourceCommit": "b0898654c2f8ad74f203f550169f9453cf15919a",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
-  "upstreamMain": "ab9b47948b39ab34e926fdc4a715e101b86d7248",
-  "status": "Approved desktop sidebar controls and extended swipeable mobile month history.",
-  "validation": {
-    "build": "passed",
-    "typecheck": "passed",
-    "regressionTests": 1460,
-    "coreChecks": 15,
-    "browser": "Synthetic touch and desktop browser checks cover cross-year browsing, scoped histories, budget switching, keyboard use, and the 767/768px transition.",
-    "production": "Active on Budgit. Verified backup, candidate and rollback preflights, 222 container contracts, 172 runtime files, 50 authoritative tables, and public access checks passed."
-  },
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "productionApplicationCommit": "269841c8ce6e19eec193a439fe871750700a2d6c"
+  "status": "Approved purchase notes are verified live on Budgit; the actual private sheet awaits user Google consent.",
+  "validation": {
+    "applicationAndReaderTests": 1495,
+    "coreChecks": 15,
+    "syntheticBrowserChecks": 25,
+    "existingDuplicateBrowserChecks": 20,
+    "production": "Fresh verified backups, exact-commit/image security, isolated financial/access/restore/compatible rollback gates, all 184 runtime files and all 50 pre-existing authoritative tables verified. Three private note tables added. Configuration, keys and adjacent services retained."
+  },
+  "productionApplicationCommit": "9adb73eadba1d7d105b7a877ce68c4e5367c77aa",
+  "productionVersion": "v1.5.0",
+  "productionBuild": "72cf69e8e9"
 }

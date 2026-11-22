@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {createRequire} from 'node:module'
 import {readFileSync} from 'node:fs'
 import {build} from '../frontend/node_modules/esbuild/lib/main.js'
+import {navigationLabels} from '../frontend/src/app/navigation-sections.js'
 const require=createRequire(new URL('../frontend/package.json',import.meta.url)),React=require('react'),{renderToStaticMarkup}=require('react-dom/server')
 const compiled=await build({entryPoints:['frontend/src/app/household-navigation.tsx'],bundle:true,write:false,format:'cjs',platform:'node',jsx:'automatic',external:['react','react/jsx-runtime','react-router-dom'],define:{'import.meta.env.DEV':'false'},logLevel:'silent',plugins:[{name:'shell-boundaries',setup(builder){builder.onResolve({filter:/^\.\/(link|back-link|interface-mode|page-heading)$/},args=>({path:args.path,namespace:'shell'}));builder.onLoad({filter:/.*/,namespace:'shell'},args=>({contents:args.path==='./page-heading'?'export const PageHeading=({children})=><h1>{children}</h1>':args.path==='./interface-mode'?'export const useInterfaceMode=()=>({mode:globalThis.menuTestMode});export const InterfaceModeSelector=()=>null':'export default function Link({href,children,...props}){return <a href={href}>{children}</a>}',loader:'jsx'}))}}]})
 function render(mode,component){
@@ -31,7 +32,8 @@ test('Retained menu entries lead to existing distinct tools and keep selected sp
  }
  for(const route of ['/checks','/loans','/incoming','/upload','/upload/history','/analysis','/overview'])assert.ok(markup.includes('href="'+route+'?'),route)
  const profile=readFileSync('frontend/src/app/account-menu.tsx','utf8'),settings=readFileSync('frontend/src/app/settings-home.tsx','utf8')
- assert.match(profile,/\['\/settings','הגדרות'/)
+ assert.match(profile,/\['\/settings',\s*navigationLabels\.settings\b/)
+ assert.equal(navigationLabels.settings,'הגדרות')
  assert.match(settings,/href:'\/more'/)
  assert.match(settings,/href:'\/about'/)
 })

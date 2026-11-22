@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import XLSX from './vendor/xlsx-mini.cjs';
 import {checkXlsxContainer,readXlsx,listSheets,inspectSheet} from './xlsx-reader.mjs';
 import {normalizeRows} from './parser.mjs';
+import {inspectIntake} from './intake-reader.mjs';
 import {makeFixture,zipFixture} from './xlsx-fixture.mjs';
 test('Actual compressed XLSX preserves Hebrew, sheet selection, physical row numbers, typed dates and cents',()=>{
  const workbook=readXlsx(makeFixture(),XLSX);assert.equal(listSheets(workbook).length,2);assert.equal(listSheets(workbook)[1].empty,true);
@@ -24,6 +25,25 @@ test('Hapoalim-style XLSX maps all ten columns and mixes Excel dates with Hebrew
  assert.equal(inspection.mapping.description,1);assert.equal(inspection.mapping.details,2);assert.equal(inspection.mapping.balance,6);
  assert.equal(result.records[1].date,'2026-09-20');assert.equal(result.records[1].details,'פרטים לדוגמה');
  assert.equal(result.records[1].valueDate,'2026-09-20');assert.equal(result.records[1].beneficiary,'מוטב לדוגמה');assert.equal(result.records[1].purpose,'תשלום לדוגמה');assert.equal(result.records[1].reference,'001002');assert.equal(result.records[1].amountCents,-10025);assert.equal(result.summary.netCents,1840000);
+});
+test('Excel negative debits become reviewable reversals only with an unambiguous ILS balance trail',()=>{
+ const workbook=readXlsx(makeFixture({hapoalim:true}),XLSX),sheet=workbook.Sheets['תנועות'];
+ sheet.E5={t:'n',v:-100.25,w:'-100.25'};
+ sheet.G5={t:'n',v:28600.5,w:'28,600.50'};
+ const inspection=inspectSheet(workbook,'תנועות',XLSX);
+ const inspect=rows=>inspectIntake([{...inspection,rows}]);
+ const [opening,reversal]=inspection.rows.slice(-2),header=inspection.rows.slice(0,-2);
+ for(const rows of [[opening,reversal],[reversal,opening]]){
+  const result=inspect([...header,...rows]);assert.equal(result.kind,'bank');assert.equal(result.records.filter(row=>row.valid).length,2);
+  const verified=result.records.find(row=>row.reversal);assert.equal(verified.amountCents,10025);assert.equal(verified.debitCents,-10025);
+ }
+ for(const cells of [reversal.cells.map((value,index)=>index===6?'28400':value),reversal.cells.map((value,index)=>index===6?'':value),reversal.cells.map((value,index)=>index===5?'1':value)]){
+  const result=inspect([...header,opening,{...reversal,cells}]);assert.equal(result.records[1].valid,false);assert.equal(result.records[1].amountCents,null);
+ }
+ assert.equal(inspect([...header,reversal]).records[0].valid,false);
+ const negativeCredit={...reversal,cells:reversal.cells.map((value,index)=>index===4?'':index===5?'-100.25':value)};
+ assert.equal(inspect([...header,opening,negativeCredit]).records[1].valid,false);
+ assert.equal(normalizeRows({...inspection,format:'csv'}).records[1].valid,false);
 });
 test('Cached formulas are visible as source evidence but not evaluated or included in financial totals',()=>{
  const inspection=inspectSheet(readXlsx(makeFixture({formula:true}),XLSX),'תנועות',XLSX),result=normalizeRows(inspection);

@@ -10,7 +10,7 @@ import Link from './link'
 const groups=[
  {label:'חשבון ושיתוף',links:[['/settings/profile','פרופיל והחשבון המחובר'],['/settings/spaces','מרחבים ושיתוף']]},
  {label:'פרטיות ושחזור',links:[['/settings/security','הצפנה, נעילה ושחזור'],['/settings/device-draft','טיוטות במכשיר'],['/settings/history','יומן שינויים וגיבוי']]},
- {label:'חיבורים',links:[['/settings/gmail','חיבור Gmail'],['/incoming?sync=settings','מקורות דוחות ותזמון']]},
+ {label:'חיבורים',links:[['/settings/purchase-notes','פתקי קנייה'],['/settings/gmail','חיבור Gmail'],['/incoming?sync=settings','מקורות דוחות ותזמון']]},
 ]
 /** Settings reads existing capability facts only. Financial ownership is not server administration. */
 export function ExistingWorkflowLinks({budget,fixture}:{budget:BudgetState;fixture:boolean}){

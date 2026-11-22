@@ -11,4 +11,15 @@ export function calTextFixture(){return [0,1].map((index)=>{const h=index?763:51
  if(index)items.push(item('הודעה לכרטיס המסתיים ב-1234',300,560,230),item('• עדכון יתרת ההטבה בתכנית הבדיקה: 0 ש״ח.',280,540,255),item('• לידיעתך, מסגרת הכרטיס מתעדכנת מדי רבעון.',280,515,255));
  return{width:555.59,height:833.39,items};});}
 
-export function calPDFFixture(){const p=calTextFixture();for(const page of p)for(const i of page.items){i.transform[0]=i.width*2/i.str.length;if(/[א-ת]/.test(i.str))i.str=i.str.replace(/\d+(?:[./]\d+)*/g,v=>[...v].reverse().join(''));}return pdfFixture(p);}
+export function calFutureTextFixture(){
+ const [monthly,appendix]=calTextFixture();
+ monthly.items.push(item('סה"כ לתאריך 15/10/26',350,485,140),item('₪ 100.00',145,485,37));
+ appendix.items=appendix.items.filter(entry=>entry.transform[5]>=780||entry.transform[5]<=560);
+ appendix.items.push(item('פירוט עסקות לחיוב עתידי',450,746,86),item('ריביות אשראי לכרטיס',230,689,74));
+ for(const [label,left,width] of [['תאריך',515,20],['שם בית העסק',440,58],['ענף',390,20],['פירוט',355,20],['כרטיס',282,20],['סכום',255,20],['תאריך',195,20],['סכום',160,20]])appendix.items.push(item(label,left,735,width));
+ for(const [label,left] of [['העסקה',515],['הוצג',282],['העסקה',255],['חיוב',195],['חיוב',160]])appendix.items.push(item(label,left,729,20));
+ appendix.items.push(...glyphs('10/10/2026',538,718),item('חנות עתידית',450,718,48),item('₪ 90.00',240,718,34),...glyphs('15/11/26',216,718),item('₪ 90.00',145,718,36),item('המשך',395,709,20));
+ return [monthly,appendix];
+}
+
+export function calPDFFixture(pages=calTextFixture()){for(const page of pages)for(const row of page.items){row.transform[0]=row.width*2/row.str.length;if(/[א-ת]/.test(row.str))row.str=row.str.replace(/\d+(?:[./]\d+)*/g,value=>[...value].reverse().join(''));}return pdfFixture(pages);}

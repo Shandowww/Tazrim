@@ -4,7 +4,7 @@ import {House, Landmark, Target, ListTodo, Tags, ChevronLeft, Search} from 'luci
 import {PageHeading} from './page-heading'
 import {useInterfaceMode, InterfaceModeSelector} from './interface-mode'
 import {modeAllows} from './interface-mode-model'
-import {visibleNavigation} from './navigation-sections'
+import {navigationLabels,visibleNavigation} from './navigation-sections'
 import {mainPages, returnDestination, householdTrail, householdFallback} from './household-model'
 import {withViewQuery} from './navigation-query'
 import {toolGroups} from './tool-catalog'
@@ -22,11 +22,11 @@ export function HouseholdBack(){
 }
 
 const tabs=[
- {href:'/',label:'ראשי',icon:House},
- {href:'/accounts',label:'חשבונות',icon:Landmark},
- {href:'/plans',label:'תכנון',icon:ListTodo},
- {href:'/savings',label:'מטרות',icon:Target},
- {href:'/categories',label:'קטגוריות',icon:Tags},
+ {href:'/',label:navigationLabels.overview,icon:House},
+ {href:'/accounts',label:navigationLabels.accounts,icon:Landmark},
+ {href:'/plans',label:navigationLabels.planning,icon:ListTodo},
+ {href:'/savings',label:navigationLabels.savings,icon:Target},
+ {href:'/categories',label:navigationLabels.spending,icon:Tags},
 ]
 
 function activeTab(pathname:string){

@@ -125,8 +125,8 @@ export function MobileMonthPicker({months, selected, anchor = selected, label, d
         <span aria-live="polite">{rangeLabel}</span>
         <button type="button" aria-label="חודשים הבאים" data-month-next aria-disabled={pageNumber === lastPage} onClick={() => movePage(1)}><ChevronLeft size={17} aria-hidden/></button>
       </div>}
-      <div className="mobile-month-grid">
-        {[...visible].reverse().map(month => <button key={month} type="button" data-month-choice aria-label={monthLabel(month)} aria-pressed={month === selected}
+      <div className="mobile-month-grid" dir="rtl">
+        {visible.map(month => <button key={month} type="button" data-month-choice aria-label={monthLabel(month)} aria-pressed={month === selected}
           onClick={() => {closeAndFocus(); if (month !== selected) onChange(month)}}>
           {month === selected && <Check size={13} aria-hidden/>}
           <span>{monthName(month)}</span><bdi dir="ltr">{month.slice(0, 4)}</bdi>

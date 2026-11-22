@@ -1,0 +1,52 @@
+{
+  "version": "v1.3.1",
+  "commit": "2fa652e5ff545a6d42df3e183e2b72a9f0f43546",
+  "build": "eab4417634",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Wrap isolated report prose, filenames and reference fields within the viewport while preserving isolated dates and money; contain fieldset intrinsic sizing.",
+  "approval": "Tal approved the reviewed local overflow fix in this thread.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45005545595",
+  "localValidation": {
+    "regressions": 1473,
+    "coreChecks": 15,
+    "overflowLayouts": 12,
+    "widths": [
+      320,
+      390,
+      430,
+      767,
+      768,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "enlargedText": "200% at 390px passed",
+    "workflowBrowserChecks": 20,
+    "financialWrites": 0
+  },
+  "previousVersion": "v1.3.0",
+  "previousCommit": "3b8ae10a7eb9760646532e3f5ef05e6d3203f5f2",
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-2fa652e5.vnMCVq/",
+  "limits": [
+    "No new physical iPhone/Safari acceptance.",
+    "Unrelated local prototypes and appearance work excluded.",
+    "Automatic deployment remains disabled."
+  ],
+  "verifiedAt": "2026-11-22 (Israel time)",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-2fa652e5.R9V0Kc/",
+  "candidateImage": "sha256:ae16cb53496d03bff508e0d7f647f87a6bd1167a9682f48b2d5fbb00fc08270c",
+  "rollbackImage": "sha256:8840d3e64ebf15d7cd0bbf00071c8b1c316453b7420808861d252a94743edfb0",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "candidateFinancialAccessRestore": "passed",
+    "rollbackFinancialAccess": "passed",
+    "runtimeFiles": 180,
+    "authoritativeTablesPreserved": 50,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "unchanged"
+  }
+}

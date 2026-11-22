@@ -1,0 +1,53 @@
+{
+  "version": "v1.4.0",
+  "commit": "e137a864759934e5d3a30ee7d5766f8a52d9603b",
+  "build": "e51177a5ac",
+  "verifiedAt": "2026-11-22 (Israel time)",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Explicit whole-report duplicate declaration closes selected unimported reports without a financial import, including reports without an automatic row match. Original sources and saved drafts are retained and may be reopened.",
+  "approval": "Tal approved the reviewed manual whole-report duplicate-closure prototype in this thread.",
+  "previousVersion": "v1.3.1",
+  "previousCommit": "2fa652e5ff545a6d42df3e183e2b72a9f0f43546",
+  "preservedPriorFix": "Report text wrapping from v1.3.1 is retained.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45009919630",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "regressions": 1479,
+    "coreChecks": 15,
+    "browserChecks": 20,
+    "widths": [
+      375,
+      767,
+      768,
+      1440
+    ],
+    "appearance": [
+      "light",
+      "dark",
+      "reduced motion"
+    ],
+    "financialWritesInBrowser": 0
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-e137a864.Itc8pr/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-e137a864.DpKn3U/",
+  "candidateImage": "sha256:8fd205b626a9e55b2d6018d36ebfc7253d64ff4ddcd7e9cf3326b983b88c689b",
+  "rollbackImage": "sha256:ae16cb53496d03bff508e0d7f647f87a6bd1167a9682f48b2d5fbb00fc08270c",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "candidateFinancialAccessRestore": "passed",
+    "rollbackFinancialAccess": "passed",
+    "runtimeFiles": 180,
+    "authoritativeTablesPreserved": 50,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "unchanged"
+  },
+  "activationGuard": "Initial attempt stopped before mutation on historical server AGENTS.md drift. The server document was preserved and excluded from the install list. All application paths matched the prior deployed archive; the second activation passed.",
+  "limits": [
+    "Whole-report decision; does not skip individual rows within a report containing new transactions.",
+    "No physical iPhone/Safari acceptance.",
+    "Unrelated local prototypes excluded.",
+    "Automatic deployment remains disabled."
+  ]
+}

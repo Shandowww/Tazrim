@@ -1,20 +1,25 @@
 import {modeAllows} from './interface-mode-model.js'
 
+export const navigationLabels={
+ overview:'תמונה כללית',accounts:'חשבונות',sync:'סנכרון דוחות',sources:'מקורות והעלאה',
+ spending:'הוצאות',planning:'תכנון',savings:'חיסכון',settings:'הגדרות',
+}
+
 // Navigation only: each destination remains its existing guarded workflow.
 export const navigationSections=[
- {key:'overview',label:'תמונה כללית',description:'המצב החודשי במבט אחד',items:[['/','תמונה כללית']]},
- {key:'accounts',label:'חשבונות',description:'בנקים, כרטיסים והעברות',items:[['/accounts','בנקים וכרטיסים'],['/accounts/transfers','העברות בין חשבונות']]},
- {key:'reports',label:'דוחות',description:'תיבת כניסה, מקורות והיסטוריה',items:[['/incoming','תיבת כניסה'],['/upload','מקורות והעלאה'],['/upload/history','היסטוריית קליטה']]},
- {key:'spending',label:'הוצאות',description:'קטגוריות, השוואות וחיובים קבועים',items:[['/categories','קטגוריות ופירוט'],['/analysis','השוואות'],['/recurring','חיובים קבועים']]},
- {key:'planning',label:'תכנון',description:'רכישות, הכנסות, הלוואות וצ׳קים',items:[['/plans','רכישות ותשלומים'],['/income','הכנסות'],['/loans','הלוואות'],['/checks','צ׳קים']]},
- {key:'savings',label:'חיסכון',description:'מטרות והפקדות',items:[['/savings','מטרות ויתרות'],['/savings/transfers','הפקדות']]},
- {key:'settings',label:'הגדרות',description:'מראה, פרטיות, גיבוי ושיתוף',items:[['/settings','הגדרות']]},
+ {key:'overview',label:navigationLabels.overview,description:'המצב החודשי במבט אחד',items:[['/',navigationLabels.overview]]},
+ {key:'accounts',label:navigationLabels.accounts,description:'בנקים, כרטיסים והעברות',items:[['/accounts','בנקים וכרטיסים'],['/accounts/transfers','העברות בין חשבונות']]},
+ {key:'reports',label:navigationLabels.sync,description:'תיבת כניסה, מקורות והיסטוריה',items:[['/incoming',navigationLabels.sync],['/upload',navigationLabels.sources],['/upload/history','היסטוריית קליטה']]},
+ {key:'spending',label:navigationLabels.spending,description:'קטגוריות, השוואות וחיובים קבועים',items:[['/categories','קטגוריות ופירוט'],['/analysis','השוואות'],['/recurring','חיובים קבועים']]},
+ {key:'planning',label:navigationLabels.planning,description:'רכישות, הכנסות, הלוואות וצ׳קים',items:[['/plans','רכישות ותשלומים'],['/income','הכנסות'],['/loans','הלוואות'],['/checks','צ׳קים']]},
+ {key:'savings',label:navigationLabels.savings,description:'מטרות והפקדות',items:[['/savings','מטרות ויתרות'],['/savings/transfers','הפקדות']]},
+ {key:'settings',label:navigationLabels.settings,description:'מראה, פרטיות, גיבוי ושיתוף',items:[['/settings',navigationLabels.settings]]},
  {key:'help',label:'עזרה',description:'הסברים על העבודה עם האפליקציה',items:[['/about','עזרה']]},
 ]
 // Removed submenu entries remain available beside the records or settings they affect.
 export const contextualNavigation=[
  {paths:['/accounts'],label:'הגדרות חשבונות',links:[['/accounts/assignments','השלמת שיוך חשבון משלם']]},
- {paths:['/upload','/upload/history','/monthly','/notices','/settings/report-expectations'],label:'הגדרות ומידע על דוחות',links:[['/incoming?sync=settings','חיבורים ומועדי דוחות'],['/notices','הודעות מהדוחות'],['/monthly','הזנה ידנית לחודש הנבחר']]},
+ {paths:['/upload','/upload/history','/monthly','/notices','/settings/report-expectations','/settings/purchase-notes'],label:'הגדרות ומידע על דוחות',links:[['/incoming?sync=settings','חיבורים ומועדי דוחות'],['/settings/purchase-notes','פתקי קנייה'],['/notices','הודעות מהדוחות'],['/monthly','הזנה ידנית לחודש הנבחר']]},
  {paths:['/plans','/income','/plans/scenario'],label:'הגדרות התכנון',links:[['/settings/forecast','הערכות בסיס לתחזית'],['/goals','יעדים חודשיים']]},
 ]
 export function visibleNavigation(mode){return navigationSections.map(section=>({...section,items:section.items.filter(([path])=>modeAllows(mode,path)),tools:/** @type {string[][]} */ ([]) })).filter(section=>section.items.length)}

@@ -1,5 +1,7 @@
 // A bounded semantic check of the generated native graph. This is not an iOS
 // execution claim: it covers branches, references and strict receipt values.
+import {createHash} from 'node:crypto';
+
 export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=receipt,bytes=Buffer.from('synthetic'),files,freshFiles,hashFile=()=> 'a'.repeat(64),deleteFile}={}){
  const outputs=new Map(),variables=new Map(),notifications=[],requests=[],deleted=[];let exited=false,enumerations=0;
  const initialFiles=files??[{name:'synthetic.csv',extension:'csv',bytes}];
@@ -23,9 +25,10 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=recei
    case 'comment':break;
    case 'file':result='synthetic-folder';break;
    case 'file.getfoldercontents':result=enumerations++===0?initialFiles:(freshFiles??initialFiles).filter(file=>!deleted.includes(file));break;
-   case 'file.delete':{const items=value(p.WFInput);for(const item of items){deleteFile?.(item);deleted.push(item);}break;}
+   case 'file.delete':{const input=value(p.WFInput),items=Array.isArray(input)?input:[input];for(const item of items){deleteFile?.(item,requests);deleted.push(item);}break;}
    case 'gettext':result=native(value(p.WFTextActionText));break;
    case 'getvalueforkey':{let input=value(p.WFInput);if(typeof input==='string'){try{input=JSON.parse(input)}catch{input={}}}result=input?.[value(p.WFDictionaryKey)];break;}
+   case 'setvalueforkey':{const key=value(p.WFDictionaryKey),binding=p.WFDictionaryValue;if(binding==null||binding.WFSerializationType==='WFTextTokenAttachment')throw Error('No Value Provided for '+key);result={...value(p.WFDictionary),[key]:value(binding)};break;}
    case 'getitemtype':{const input=value(p.WFInput);result=typeof input==='boolean'?'Boolean':typeof input==='string'?'Text':typeof input==='number'?'Number':input==null?'Nothing':'Dictionary';break;}
    case 'count':{const input=value(p.Input);result=p.WFCountType==='Characters'?native(input).length:Array.isArray(input)?input.length:input==null?0:1;break;}
    case 'list':result=[];break;
@@ -34,7 +37,7 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=recei
    case 'properties.files':result=p.WFContentItemPropertyName==='Name'?value(p.WFInput).name:value(p.WFInput).extension;break;
    case 'text.replace':result=native(value(p.WFInput)).replace(new RegExp(p.WFReplaceTextFind.replace('(?i)',''),p.WFReplaceTextCaseSensitive?'':'i'),p.WFReplaceTextReplace);break;
    case 'urlencode':result=encodeURIComponent(native(value(p.WFInput)));break;
-   case 'hash':{const input=value(p.WFInput);result=hashFile(Array.isArray(input)?input[0]:input);break;}
+   case 'hash':{const input=value(p.WFInput);result=typeof input==='string'?createHash('sha256').update(input).digest('hex'):hashFile(Array.isArray(input)?input[0]:input);break;}
    case 'downloadurl':{const url=value(p.WFURL);const header=p.WFHTTPHeaders?.Value?.WFDictionaryFieldValueItems?.find(h=>value(h.WFKey)==='Authorization');requests.push({url,method:p.WFHTTPMethod,authorization:header?value(header.WFValue):undefined});result=p.WFHTTPMethod==='GET'?(url.includes('verifyStorage=1')?(typeof freshReceipt==='function'?freshReceipt(url):freshReceipt):catalog):(typeof receipt==='function'?receipt(url,value(p.WFRequestVariable)):receipt);break;}
    case 'notification':notifications.push(native(value(p.WFNotificationActionBody)));break;
    case 'exit':exited=true;break;
@@ -42,5 +45,5 @@ export function runIncomingWorkflow(workflow,{catalog,receipt,freshReceipt=recei
   }
   outputs.set(p.UUID,result);
  }}
- block(0,actions.length);return{exited,notifications,requests,deleted,uploaded:variables.get('BudgitUploaded')??[],receipt:variables.get('BudgitReceipt')};
+ block(0,actions.length);return{exited,notifications,requests,deleted,uploaded:variables.get('BudgitUploaded')??[],issues:variables.get('BudgitIssues')??[],receipt:variables.get('BudgitReceipt'),summary:outputs.get(actions.at(-1).WFWorkflowActionParameters.UUID)};
 }

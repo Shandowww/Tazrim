@@ -1,0 +1,36 @@
+{
+  "version": "v1.3.0",
+  "commit": "3b8ae10a7eb9760646532e3f5ef05e6d3203f5f2",
+  "build": "8271548e6a",
+  "verifiedAt": "2026-11-21 (Israel time)",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "One-page report review, direct finish without the redundant final save checkbox, automatic matching when opened, and continue/restart/delete for unfinished reports.",
+  "approval": "Tal approved the updated prototype and requested deployment in the referenced Simplify Report Import and Recovery thread.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/44953232005",
+  "validation": {
+    "regressions": 1473,
+    "coreChecks": 15,
+    "syntheticBrowserChecks": 20,
+    "runtimeFiles": 180,
+    "authoritativeTablesPreserved": 50,
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "candidateFinancialAccessRestore": "passed",
+    "rollbackFinancialAccess": "passed",
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "unchanged"
+  },
+  "candidateImage": "sha256:8840d3e64ebf15d7cd0bbf00071c8b1c316453b7420808861d252a94743edfb0",
+  "rollbackVersion": "v1.2.1",
+  "rollbackImage": "sha256:8e2466e49c810625930800bc067ffa7483c2b1e9316a1425bc20824fe614a67d",
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-3b8ae10a.ofLUVt/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-3b8ae10a.Q9u1U6/",
+  "limits": [
+    "No new physical iPhone acceptance.",
+    "Automatic matching begins when the user opens a report; this release adds no new background arrival automation.",
+    "Previously imported financial entries remain protected.",
+    "Unrelated unpublished prototypes and appearance changes were excluded.",
+    "Automatic deployment remains disabled."
+  ]
+}

@@ -4,6 +4,7 @@ import {useLocation} from 'react-router-dom'
 import {Check, ChevronLeft, FolderOpen, RefreshCw, Settings, Upload, UserRound, X} from 'lucide-react'
 import Link from './link'
 import {withViewQuery} from './navigation-query'
+import {navigationLabels} from './navigation-sections'
 import {SignOutForm} from './session-controls'
 import type {BudgetSpace} from './use-budget'
 
@@ -30,9 +31,9 @@ export function AccountMenu({spaces,budgetId,selectBudget,email,demo=false,refre
   },[])
   const initial=email?.trim().charAt(0).toLocaleUpperCase() || null
   const links=[
-    ['/incoming','מרכז הדוחות',FolderOpen],
-    ['/upload','העלאת דוחות',Upload],
-    ['/settings','הגדרות',Settings],
+    ['/incoming',navigationLabels.sync,FolderOpen],
+    ['/upload',navigationLabels.sources,Upload],
+    ['/settings',navigationLabels.settings,Settings],
   ] as const
   return <Dialog.Root modal={false} open={open} onOpenChange={setOpen}>
     <Dialog.Trigger className="household-account-trigger" aria-label={email?`תפריט חשבון: ${email}`:'תפריט חשבון'} title="תפריט חשבון">

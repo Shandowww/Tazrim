@@ -1,6 +1,7 @@
 import {AccessError,loadBudgetSnapshot,type BudgetSpace} from './budget-api.ts'
 import {isVault} from '../../../src/vault.js'
-import {reportFileEligibility} from './report-library-api.ts'
+import {reportFileEligibility,loadReportLibrary} from './report-library-api.ts'
+import {deleteStoredReportSource,loadStoredReport} from './report-review-api.ts'
 import {inboxHash} from '../../../src/report-inbox-model.js'
 import type {IncomingBinding,RoutingBudget} from './incoming-report-routing.ts'
 export interface IncomingReport {lifecycle?:'new'|'partial'|'digested';removalAt?:number|null;automaticRemovalEnabled?:boolean;retentionReason?:string|null;originalRemoved?:boolean;applied?:boolean;id:string;name:string;sourceHash:string;size:number;revision:number;createdAt:string;verificationState:'awaiting_verification'|'verified'|'routed';approvedAt:string|null;route:null|{budget:string;kind:string;target:string;reportId:string}}
@@ -22,6 +23,21 @@ export async function loadIncomingInbox(accountId:string,signal:AbortSignal,fetc
  return value
 }
 export async function updateIncoming(accountId:string,input:any,fetcher:typeof fetch=fetch){return request(accountId,'',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)},fetcher)}
+/** Remove an unfinished routed source before its private staging copy. A retry
+ * can finish the second deletion after the first one was already confirmed. */
+export async function deleteIncomingReport(accountId:string,report:IncomingReport,activeBudgetId:string,fetcher:typeof fetch=fetch){
+ if(report.route&&!report.applied){
+  const signal=new AbortController().signal,target=await loadBudgetSnapshot(report.route.budget,signal,fetcher,accountId,{backgroundRead:report.route.budget!==activeBudgetId}),library=await loadReportLibrary(report.route.budget,target.value,signal,fetcher)
+  if(library.reports.some(source=>source.id===report.route!.reportId)){
+   const source=await loadStoredReport(report.route.budget,target.value,report.route.reportId,signal,fetcher)
+   if(source.state==='committed')throw Error('הדוח כבר נקלט בתקציב. יש לבדוק את היסטוריית הקליטה לפני מחיקה.')
+   await deleteStoredReportSource(report.route.budget,target.value,source,false,fetcher)
+  }
+ }
+ const deleted=await updateIncoming(accountId,{action:'delete',id:report.id,sourceHash:report.sourceHash,revision:report.revision,confirm:true},fetcher)
+ if(deleted?.deleted!==true||deleted.id!==report.id)throw Error('לא ניתן לאמת את המחיקה. יש לבדוק שוב את אותה פעולה.')
+ return deleted
+}
 export function incomingConnectionDraft(label:string){const bytes=crypto.getRandomValues(new Uint8Array(32));return {action:'connect',id:crypto.randomUUID(),label,secret:btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','')}}
 export async function storeIncomingSource(accountId:string,file:File,fetcher:typeof fetch=fetch){
  reportFileEligibility(file.name,file.size);const bytes=new Uint8Array(await file.arrayBuffer()),hash=await inboxHash(bytes)
@@ -38,6 +54,10 @@ export async function incomingSource(accountId:string,report:IncomingReport,purp
  if(bytes.byteLength!==report.size||await inboxHash(bytes)!==report.sourceHash||response.headers.get('x-source-hash')!==report.sourceHash)throw Error('קובץ המקור אינו תואם לקבלה. הפענוח נעצר.')
  return bytes
 }
-export async function incomingRoutingBudgets(accountId:string,spaces:BudgetSpace[],signal:AbortSignal,fetcher:typeof fetch=fetch):Promise<RoutingBudget[]>{
- return Promise.all(spaces.map(async space=>{const snapshot=await loadBudgetSnapshot(space.id,signal,fetcher,accountId);return {id:space.id,name:space.name,role:snapshot.spaces.find(s=>s.id===space.id)!.role,revision:snapshot.value.revision,plan:snapshot.value.plan,locked:!snapshot.value.plan||isVault(snapshot.value.plan)}}))
+export async function incomingRoutingBudgets(accountId:string,activeBudgetId:string,spaces:BudgetSpace[],signal:AbortSignal,fetcher:typeof fetch=fetch):Promise<RoutingBudget[]>{
+ return Promise.all(spaces.map(async space=>{
+  const snapshot=await loadBudgetSnapshot(space.id,signal,fetcher,accountId,{backgroundRead:space.id!==activeBudgetId})
+  const current=snapshot.spaces.find(candidate=>candidate.id===space.id)!
+  return {id:current.id,name:current.name,role:current.role,revision:snapshot.value.revision,plan:snapshot.value.plan,locked:!snapshot.value.plan||isVault(snapshot.value.plan)}
+ }))
 }

@@ -1,3 +1,5 @@
+> **Start with the [current Budgit project instructions](AGENTS.md).** They record the live Hetzner version, active worktree, Git destinations, and deprecated OpenAI Sites copy. Release entries below describe their original checkpoints.
+
 ## Form drafts across navigation published — 2026-11-10
 
 Application `70a302a` is verified live. Ordinary recoverable forms retain exact unfinished input in encrypted actor/budget/editor-scoped device drafts before navigation. Financial Save stays explicit. Settings offers draft discovery, editor return, export and deliberate discard; legacy complete-plan recovery is retained. All 39 raw-form adapters and 19 justified guard exceptions are documented in `docs/ui-redesign/FORM-DRAFT-NAVIGATION-IMPLEMENTATION-2026-11-10.md`.
@@ -299,9 +301,9 @@ Tal retired Sites from the publication workflow. Budgit runs on the existing Het
 The authenticated React interface is live at https://budgit.duckdns.org/next from application commit1457bf0. The existing root interface stays available as a rollout fallback; Sites and hosting resources are unchanged. Fresh verified backup/isolated financial, stored-record, access, HTTP and encrypted-source checks passed; running hashes/health/login and unchanged budgets/revisions/sharing/access/key records were verified. Parking is unchanged. Exact final source passes1094 regressions, build/typecheck and15 core checks. See docs/tazrim-migration/release-2026-11-01.json and RESUME.md for evidence and real-device/platform/provider limitations. Historical preparation/SSH-blocked notes below are superseded.
 
 
-## One current source — 2026-10-11
+## Checkout relocation — historical, 2026-10-11
 
-The canonical checkout is `/Users/talshandor/Documents/personal-projects/monthly-flow`. `/Users/talshandor/Documents/ChatGPT/Monthly Flow Budget` now contains only a relocation notice, with no independent source checkout. Open the canonical project in Codex for all future work. Always work here, retain the Site ID in SOURCE-OF-TRUTH.json, and publish the same commit to Sites and the GitHub backup. Build refuses a different Site identity. The app menu displays a content-derived build identifier; refresh an already-open app to load published changes. HTML and budget responses use no-store.
+The October relocation moved the project into the outer `monthly-flow` checkout. The former `Documents/ChatGPT/Monthly Flow Budget` location holds a relocation notice. Follow the project instructions linked above for the current source.
 
 The former personal-projects checkout is preserved at `/Users/talshandor/Documents/personal-projects/monthly-flow-legacy-2026-10-11`. It includes unpublished Apple Pay integration work and the wife's old Site identity. It is an archive, not a source to edit or deploy. Do not merge its hosting identity or copy its source over this checkout. Reconcile any needed feature individually with tests.
 
@@ -310,15 +312,15 @@ The former personal-projects checkout is preserved at `/Users/talshandor/Documen
 
 The complete app source, package lockfile, database schema and migrations, local preview, verification script, and project instructions are in this folder. The current app uses Hebrew and RTL throughout, with an Apple-inspired design and light/dark appearance.
 
-This project is registered under the user's own account at https://monthly-flow-budget.t88s.chatgpt.site/ . Its identity is saved in `.openai/hosting.json`. The previous Site at https://monthly-flow-budget.linoylatsres1993.chatgpt.site/ belongs to the user's wife and has not been changed. The source was copied into this project on 2026-10-03; no live budgets were copied.
+The project used OpenAI Sites in October 2026. That deployment is deprecated. Its Site identity remains in `.openai/hosting.json` for build validation.
 
 ## Continue in Codex
 
-Add this folder as a local Codex project. Start a chat there and ask Codex to read this file and AGENTS.md. The original conversation contains design discussions, but the app source and these notes provide the durable implementation context.
+Open the active worktree listed in the project instructions linked above. Start with its `AGENTS.md`.
 
-## Import the existing budget
+## Original Sites migration — historical
 
-Export any entered budget from the previous app: הגדרות → ייצוא גיבוי. Import that file into the new app: הגדרות → ייבוא גיבוי, then שמירת התקציב. Verify the data before retiring the old Site. Source files are not a budget backup.
+The original migration required an explicit budget export and import. The deprecated Sites copy has separate data and is outside current Budgit work.
 
 ## Development
 

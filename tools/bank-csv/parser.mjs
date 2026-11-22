@@ -120,6 +120,7 @@ export function normalizeRows(inspection,options={}){
   }catch{throw Error('בחר טווח תאריכים תקין לבדיקה.');}
  }
  const seen=new Set();
+ const excelReversals=mode==='split'&&['xls','xlsx'].includes(inspection.format)&&mapping.balance>=0;
  const records=rows.slice(headerIndex+1).map(row=>{
   const record={line:row.line,raw:[...(row.sourceCells??row.cells)],date:null,description:clean(row.cells[mapping.description]),details:clean(row.cells[mapping.details]),valueDate:null,beneficiary:clean(row.cells[mapping.beneficiary]),purpose:clean(row.cells[mapping.purpose]),debitCents:null,creditCents:null,reference:clean((row.sourceCells??row.cells)[mapping.reference]),currency:null,amountCents:null,balanceCents:null,issues:[],warnings:[]};
   const get=field=>clean(row.cells[mapping[field]]);
@@ -132,10 +133,10 @@ export function normalizeRows(inspection,options={}){
    if(mode==='split'){
     const debit=getMoney('debit'),credit=getMoney('credit');
     if(debit===null&&credit===null)throw Error('חסר סכום');
-    if((debit<0||credit<0)&&inspection.format!=='pdf')throw Error('חובה וזכות צריכות להיות חיוביות; בדוק את מיפוי הסימנים');
+    if((debit<0||credit<0)&&inspection.format!=='pdf'&&!(excelReversals&&debit<0&&!(credit<0)))throw Error('חובה וזכות צריכות להיות חיוביות; בדוק את מיפוי הסימנים');
     if(debit&&credit)throw Error('גם חובה וגם זכות בשורה אחת');
     record.debitCents=debit;record.creditCents=credit;
-    record.amountCents=(credit??0)-(debit??0);if(inspection.format==='pdf'&&(debit<0||credit<0)){if(credit<0)throw Error('ביטול זיכוי דורש בירור לפני קליטה');record.reversal=true;}
+    record.amountCents=(credit??0)-(debit??0);if(debit<0||credit<0){if(credit<0)throw Error('ביטול זיכוי דורש בירור לפני קליטה');record.reversal=true;}
    }else{
     record.amountCents=getMoney('amount');if(record.amountCents===null)throw Error('חסר סכום');
     if(mapping.direction>=0){const direction=key(get('direction'));if(['חובה','חיוב','debit','d','dr','withdrawal'].includes(direction))record.amountCents=-Math.abs(record.amountCents);else if(['זכות','זיכוי','credit','c','cr','deposit'].includes(direction))record.amountCents=Math.abs(record.amountCents);else throw Error('סוג חובה/זכות לא מזוהה');}
@@ -157,6 +158,12 @@ export function normalizeRows(inspection,options={}){
   if(!record.issues.length){if(seen.has(signature))record.warnings.push('כפילות אפשרית; השורה לא הוסרה');seen.add(signature);}
   record.valid=record.issues.length===0;if(inspection.format==='pdf'&&inspection.pdfReconciliation?.verified)record.pdfOrder=row.line;return record;
  });
+ if(excelReversals&&records.some(r=>r.reversal)){
+  const reconciles=ordered=>!ordered[0].reversal&&ordered.every((row,index)=>row.valid&&row.currency==='ILS'&&row.balanceCents!==null&&(!index||ordered[index-1].date<=row.date&&row.balanceCents-ordered[index-1].balanceCents===row.amountCents));
+  if(reconciles(records)===reconciles([...records].reverse()))for(const row of records.filter(r=>r.reversal)){
+   row.issues.push('לא ניתן לאמת את ביטול החיוב מול רצף היתרות בדוח');row.valid=false;row.amountCents=null;row.debitCents=null;row.creditCents=null;delete row.reversal;
+  }
+ }
  const months=new Map();let creditCents=0,debitCents=0,count=0;
  for(const r of records)if(r.valid&&r.currency==='ILS'&&r.inPeriod){
   count++;const month=r.date.slice(0,7),item=months.get(month)??{month,count:0,creditCents:0,debitCents:0};item.count++;

@@ -35,6 +35,7 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
   try{
    if(!data.completion?.verified||!data.completion?.members?.length||data.review?.categories==='later'||data.activeDraft)return false;
    const access=accessFor(data);if(access.scope!==row.scope)return false;
+   if(data.completion.kind==='declared-duplicate')return data.completion.members.every(member=>{const current=source(row.scope,member.id);return current&&current.source_hash===member.hash&&current.revision===member.revision&&current.state!=='committed'&&current.original_removed_at===null;});
    return data.completion.members.every(member=>{
     const current=source(row.scope,member.id);
     return current&&current.source_hash===member.hash&&(current.original_removed_at!==null||current.revision===member.revision)&&(data.completion.kind==='duplicate'&&member.kind==='bank'&&member.bankProof?member.target===member.bankProof.target&&!access.plan.importMigrationGuards?.receipts?.includes(member.hash)&&bankDuplicateProofCurrent(access.plan,member.bankProof):fullReportReceipt(access.plan,{...member,hash:member.financialHash??member.hash}));
@@ -50,7 +51,8 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
   }
   let stored=record(id),data=read(stored);const complete=Number.isSafeInteger(stored?.completed_at)&&proofCurrent(row,data);
   if(stored?.completed_at!==null&&stored?.completed_at!==undefined&&!complete&&row.original_removed_at===null){write(row,{...data,retentionReason:'קבלת ההשלמה השתנתה; יש לבדוק שוב את הדוח.'},{completedAt:null});stored=record(id);data=read(stored);}
-  return{...reportLifecycleState({reviewed:!!stored?.reviewed_at,complete,deferred:data.review?.categories==='later',completedAt:stored?.completed_at??null,removedAt:row.original_removed_at??null,reason:data.retentionReason??(!complete&&stored?.completed_at?'קבלת ההשלמה השתנתה; הדוח נשמר לבדיקה.':null)}),review:data.review??null,reviewRevision:stored?.revision??0,completionKind:complete?data.completion.kind:null,applied:row.state==='committed'||!!data.completion,automaticRemovalEnabled:enabled};
+  const declared=complete&&data.completion?.kind==='declared-duplicate';
+  return{...reportLifecycleState({reviewed:!!stored?.reviewed_at,complete,deferred:data.review?.categories==='later',completedAt:stored?.completed_at??null,removedAt:row.original_removed_at??null,reason:data.retentionReason??(!complete&&stored?.completed_at?'קבלת ההשלמה השתנתה; הדוח נשמר לבדיקה.':null)}),...(declared?{removalAt:null,retentionReason:'הדוח סומן ככפול לפי בחירתך, ללא קליטה כספית. המקור נשמר ואפשר לפתוח אותו מחדש.'}:{}),review:data.review??null,reviewRevision:stored?.revision??0,completionKind:complete?data.completion.kind:null,applied:row.state==='committed'||!!data.completion,automaticRemovalEnabled:enabled};
  };
  const userProgress=(user,budget,ids)=>{
   const access=budgetAccess(db,user,budget,{isAllowed,write:true});
@@ -132,6 +134,7 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
  };
  const purge=(scope,id)=>{
   const root=source(scope,id),stored=record(id),data=read(stored);
+  if(data.completion?.kind==='declared-duplicate'){db.prepare('UPDATE report_lifecycle SET retry_after=? WHERE source_id=?').run(now()+REPORT_RETENTION_MS,id);return false;}
   if(!enabled||!root||root.original_removed_at!==null||!Number.isSafeInteger(stored?.completed_at)||now()<stored.completed_at+REPORT_RETENTION_MS)return false;
   db.exec('SAVEPOINT report_retention');
   try{
@@ -170,7 +173,26 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
   const url=new URL(request.url),budget=url.searchParams.get('budget')??'personal',access=budgetAccess(db,user,budget,{isAllowed,write:request.method!=='GET'}),id=url.searchParams.get('id'),row=source(access.scope,id);
   if(!row)throw serviceError('הדוח אינו זמין במרחב הזה.',404);
   if(request.method==='GET'){purge(access.scope,id);return serviceJSON({accountId:user.id,id,sourceHash:row.source_hash,revision:row.revision,...state(access.scope,id)});}
-  const input=await boundedJSON(request);if(['complete-duplicate','resolve-categories','save-review'].includes(input.action)&&input.budgetRevision!==access.revision)throw serviceError('התקציב השתנה מאז הסיכום. יש לפתוח מחדש ולבדוק.',409);if(input.sourceHash!==row.source_hash||input.revision!==row.revision||row.original_removed_at!==null)throw serviceError('המקור השתנה או הוסר. יש לפתוח את התוצאה השמורה.',409);
+  const input=await boundedJSON(request);if(['complete-duplicate','declare-duplicate','resolve-categories','save-review'].includes(input.action)&&input.budgetRevision!==access.revision)throw serviceError('התקציב השתנה מאז הסיכום. יש לפתוח מחדש ולבדוק.',409);if(input.sourceHash!==row.source_hash||input.revision!==row.revision||row.original_removed_at!==null)throw serviceError('המקור השתנה או הוסר. יש לפתוח את התוצאה השמורה.',409);
+  if(input.action==='declare-duplicate'){
+   if(input.confirm!==true||typeof input.actionId!=='string'||!/^[a-f0-9-]{36}$/.test(input.actionId)||!Array.isArray(input.sources)||!input.sources.length||input.sources.length>10||new Set(input.sources.map(member=>member.id)).size!==input.sources.length||!input.sources.some(member=>member.id===id))throw serviceError('יש לאשר במפורש את הדוחות שייסגרו ככפולים.',400);
+   if(!access.plan||isVault(access.plan))throw serviceError('יש לפתוח את התקציב לפני סיום הטיפול.',409);
+   const rows=input.sources.map(member=>{const current=source(access.scope,member.id);if(!current||current.source_hash!==member.sourceHash||current.revision!==member.revision||current.state==='committed'||current.state==='archived'||current.original_removed_at!==null)throw serviceError('אחד הדוחות השתנה או כבר נקלט. יש לפתוח מחדש את הבדיקה.',409);return current;});
+   const members=rows.map(current=>({id:current.id,hash:current.source_hash,revision:current.revision}));
+   for(const [index,current]of rows.entries()){
+    const old=read(record(current.id)),same=old.actorId===user.id&&old.completion?.kind==='declared-duplicate'&&old.completion.actionId===input.actionId;
+    if(same){if(JSON.stringify(old.completion.declaredSources)!==JSON.stringify(members))throw serviceError('פרטי הסיום השתנו. יש לפתוח מחדש.',409);continue;}
+    if(old.completion||input.sources[index].reviewRevision!==(record(current.id)?.revision??0))throw serviceError('הטיפול בדוח השתנה במכשיר אחר. יש לפתוח מחדש.',409);
+   }
+   db.exec('SAVEPOINT declare_duplicate');
+   try{
+    for(const current of rows){const old=read(record(current.id));if(old.completion?.kind==='declared-duplicate'&&old.completion.actionId===input.actionId)continue;
+     write(current,{...old,actorId:user.id,budget,activeDraft:null,review:{version:1,step:'summary',done:[],categories:'resolved',budgetRevision:access.revision},completion:{kind:'declared-duplicate',actionId:input.actionId,declaredSources:members,verified:true,members:members.filter(member=>member.id===current.id)},retentionReason:null},{reviewedAt:record(current.id)?.reviewed_at??now(),completedAt:now()});
+    }
+    db.exec('RELEASE declare_duplicate');
+   }catch(error){db.exec('ROLLBACK TO declare_duplicate');db.exec('RELEASE declare_duplicate');throw error;}
+   return serviceJSON({ok:true,...state(access.scope,id)});
+  }
   if(input.action==='save-review'){
    if(row.state!=='committed'||!input.draft||input.draft.version!==1||!validReportReview(input.draft.guided)||input.draft.guided.budgetRevision!==access.revision||!Array.isArray(input.draft.items)||input.draft.items.length!==1)throw serviceError('טיוטת הבדיקה אינה תואמת למקור שנקלט.',409);
    const item=input.draft.items[0],old=read(record(id));if(item.storedId!==id||item.hash!==row.source_hash||item.storedRevision!==row.revision||item.storedCommitted!==true)throw serviceError('עדות המקור השתנתה.',409);

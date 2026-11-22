@@ -2,6 +2,7 @@ import {createReportAutomation} from './report-automation.mjs';
 import {createSpaceMigrations} from './space-migrations.mjs';
 import {createPlanHistory} from './plan-history.mjs';
 import {createGmailImport} from './gmail-import.mjs';
+import {createPurchaseNotes} from './purchase-notes.mjs';
 import {createReportStore} from './report-store.mjs';
 import {createReportIntake} from './report-intake.mjs';
 import {createSpaceMigrationReview} from './space-migration-review.mjs';
@@ -29,16 +30,17 @@ const redirect=(url,setCookie)=>response(null,303,{Location:url,...(setCookie?{'
 const json=(body,status)=>response(JSON.stringify(body),status,{'Content-Type':'application/json; charset=utf-8'});
 const safeReturn=value=>value?.startsWith('/')&&!value.startsWith('//')&&!value.includes('\\')?value:'/';
 const loginPage=(message,returnTo='/')=>`<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Budgit · כניסה</title><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-v1.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon-v1.png"><link rel="manifest" href="/manifest.webmanifest"><style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:light-dark(#f8f5f0,#1b1e27);color:light-dark(#272735,#eee);font-family:-apple-system,BlinkMacSystemFont,system-ui}main{margin:20px;padding:32px;max-width:360px;border-radius:24px;background:light-dark(#fff,#282c38)}h1{font-size:28px}p{line-height:1.6}a{display:block;text-align:center;padding:14px;background:#7056b2;color:white;border-radius:16px;text-decoration:none;font-weight:600}.error{color:light-dark(#b52c25,#ffb3ae)}</style><main><h1>Budgit</h1><p>מתחברים כדי לפתוח את התקציב הפרטי, או תקציב משותף שהוזמנת אליו.</p>${message?'<p class="error" role="alert">'+message+'</p>':''}<a href="${returnTo==='/'?'/auth/google':'/auth/google?returnTo='+encodeURIComponent(safeReturn(returnTo))}">כניסה עם Google</a><p>הכניסה נותנת גישה לפרופיל ולאימייל בלבד, ללא גישה לבנק או לקבצי Google.</p></main></html>`;
-export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],adminEmails=[],rates,push,backup,oauth,gmailOAuthFactory,reactAssetArchiveRoot,reportOptions={},reportAutomationEnabled=false,reportRetentionEnabled=false,automationOptions={},now=()=>Date.now()}){
+export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],adminEmails=[],rates,push,backup,oauth,gmailOAuthFactory,purchaseNotesOAuthFactory,rowCategoriesSupported=true,reactAssetArchiveRoot,reportOptions={},reportAutomationEnabled=false,reportRetentionEnabled=false,automationOptions={},now=()=>Date.now()}){
  const base=new URL(origin);if(base.protocol!=='https:'||base.pathname!=='/'||base.search||base.hash)throw Error('APP_ORIGIN must be an HTTPS origin');
  const normalize=value=>(Array.isArray(value)?value:String(value).split(/[,\s]+/)).map(email=>email.trim().toLowerCase()).filter(Boolean);
  const admins=new Set(normalize(adminEmails));
  const seeds=new Set((Array.isArray(allowedEmails)?allowedEmails:String(allowedEmails).split(/[,\s]+/)).map(email=>email.trim().toLowerCase()).filter(Boolean));
  if(seeds.size&&!db.prepare('SELECT id FROM auth_access_state WHERE id=1').get()){db.exec('BEGIN IMMEDIATE');try{for(const email of seeds)db.prepare('INSERT OR IGNORE INTO auth_access VALUES (?,?)').run(email,now());db.prepare('INSERT INTO auth_access_state VALUES (1,0)').run();db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}}
  const isAllowed=email=>admins.has(email)||!!db.prepare('SELECT email FROM auth_access WHERE email=?').get(email);
- const reportStore=createReportStore(db,{...reportOptions,DB,origin:base.origin,isAllowed,now,retentionEnabled:reportRetentionEnabled,savePlan:(user,budget,plan,revision,storage)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(storage,user,budget,'report-import')})});
+ const reportStore=createReportStore(db,{...reportOptions,DB,origin:base.origin,isAllowed,now,supportsRowCategories:rowCategoriesSupported,retentionEnabled:reportRetentionEnabled,savePlan:(user,budget,plan,revision,storage)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(storage,user,budget,'report-import')})});
  const history=createPlanHistory(db,{isAllowed,secret:reportStore.secret,now,savePlan:(user,budget,plan,revision,kind)=>worker.fetch(new Request(base.origin+'/api/plan?budget='+encodeURIComponent(budget),{method:'PUT',headers:{origin:base.origin,'Content-Type':'application/json','oai-authenticated-user-id':user.id,'oai-authenticated-user-email':user.email},body:JSON.stringify({plan,revision})}),{DB:history.storage(DB,user,budget,kind)})});
  const gmail=createGmailImport(db,{origin:base.origin,clientId,clientSecret,isAllowed,reportStore,now,...(gmailOAuthFactory?{oauthFactory:gmailOAuthFactory}:{})});
+ const purchaseNotes=createPurchaseNotes(db,{origin:base.origin,clientId,clientSecret,isAllowed,secret:reportStore.secret,now,...(purchaseNotesOAuthFactory?{oauthFactory:purchaseNotesOAuthFactory}:{})});
  let reportAutomation;
  const reportIntake=createReportIntake(db,{reportStore,origin:base.origin,isAllowed,now,onStored:(user,id)=>reportAutomation?.deliver(user,id)});
  const migrations=createSpaceMigrations(db,{isAllowed,secret:reportStore.secret,now});
@@ -67,6 +69,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
   return redirect(oauth.generateAuthUrl({scope:['openid','email','profile'],state,nonce,code_challenge:pkce.codeChallenge,code_challenge_method:'S256',prompt:'select_account'}),cookie('__Host-mf_oauth',state,600));
  }
  if(path==='/auth/google/callback'&&u.searchParams.get('state')?.startsWith('gmi.'))return user?gmail.callback(request,user):json({error:'יש להתחבר מחדש לפני חיבור Gmail.'},401);
+ if(path==='/auth/google/callback'&&request.method==='GET'&&u.searchParams.get('state')?.startsWith('pno.'))return user?purchaseNotes.callback(request,user):json({error:'יש להתחבר מחדש לפני חיבור פתקי קנייה.'},401);
  if(backup&&path==='/auth/google/callback'&&request.method==='GET'&&u.searchParams.get('state')?.startsWith('dbk.'))return backup.callback(request,user&&isAllowed(user.email)?user:null);
  if(path==='/auth/google/callback'&&request.method==='GET'){
   const state=u.searchParams.get('state');if(!configured||!state||state!==jar['__Host-mf_oauth'])return response(loginPage('הכניסה לא אומתה. התחילו מחדש.'),400,{'Content-Type':'text/html; charset=utf-8'});
@@ -88,6 +91,8 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const ui=reactUiResponse(request,{assetArchiveRoot:reactAssetArchiveRoot});if(ui){const h=new Headers(ui.headers);for(const [k,v]of Object.entries(headers))if(k!=='Cache-Control')h.set(k,v);return new Response(ui.body,{status:ui.status,headers:h});}
  if(path==='/auth/gmail'&&request.method==='GET')return gmail.begin(request,user);
  if(path==='/api/gmail')return gmail.handle(request,user);
+ if(path==='/auth/purchase-notes'&&request.method==='GET')return purchaseNotes.begin(request,user);
+ if(path==='/api/purchase-notes')return purchaseNotes.handle(request,user);
  if(path==='/auth/backup-drive'&&request.method==='GET')return backup?backup.begin(user,request):json({error:'גיבוי חיצוני אינו מוגדר.'},503);
  if(path==='/api/admin/backup/files'&&request.method==='GET')return backup?backup.files(request,user):json({error:'גיבוי חיצוני אינו מוגדר.'},503);
  if(path==='/api/admin/backup')return backup?backup.handle(request,user):json({error:'גיבוי חיצוני אינו מוגדר.'},503);

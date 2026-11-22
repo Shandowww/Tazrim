@@ -17,7 +17,7 @@ const csv=Buffer.from('הפועלים\nמספר חשבון 999001\nתאריך,ת
 let publicKey;
 function recoveryKey(){return publicKey??=generateKeyPairSync('rsa',{modulusLength:3072,publicKeyEncoding:{type:'spki',format:'pem'}}).publicKey;}
 
-export async function startIncomingShortcutQA({mode='success',port=0,token:qaToken}={}){
+export async function startIncomingShortcutQA({mode='success',port=0,token:qaToken,distinctFiles=false}={}){
  if(!qaModes.includes(mode))throw Error('Unknown QA mode');
  if(!Number.isInteger(port)||port<0||port>65535)throw Error('Invalid port');
  if(qaToken!==undefined&&(typeof qaToken!=='string'||!/^[-\w]{43}$/.test(qaToken)))throw Error('Invalid disposable QA token');
@@ -25,7 +25,9 @@ export async function startIncomingShortcutQA({mode='success',port=0,token:qaTok
  const input=join(directory,'input'),uploaded=join(directory,'uploaded');
  mkdirSync(input);mkdirSync(uploaded);
  const filenames=['דוח בדיקה & 100%.CSV','collision.csv'];
- for(const name of filenames)writeFileSync(join(input,name),csv,{flag:'wx',mode:0o600});
+ const fixtures=new Map(filenames.map((name,index)=>[name,distinctFiles&&index?Buffer.from(csv.toString().replace('01/05/2026','02/05/2026')):csv]));
+ const originals=new Map([...fixtures.values()].map(bytes=>[reportHash(bytes),bytes]));
+ for(const [name,bytes] of fixtures)writeFileSync(join(input,name),bytes,{flag:'wx',mode:0o600});
  writeFileSync(join(uploaded,'collision.csv'),'BUDGIT SYNTHETIC EXISTING DESTINATION — DO NOT OVERWRITE\n',{flag:'wx',mode:0o600});
  const {db,DB}=openDatabase(':memory:');
  const user={id:'shortcut-qa-only',email:'shortcut-qa@example.test'};
@@ -51,7 +53,8 @@ export async function startIncomingShortcutQA({mode='success',port=0,token:qaTok
     for await(const chunk of req){size+=chunk.length;if(size>maxBytes)return respond(res,413,{error:'QA payload too large'});chunks.push(chunk);}
     bytes=Buffer.concat(chunks);
     // Even with the QA token, arbitrary real reports must not enter this sink.
-    if(!bytes.equals(csv)||!filenames.includes(url.searchParams.get('name'))){rejectedBodies++;return respond(res,422,{error:'Only generated synthetic fixtures are accepted'});}
+    const fixture=fixtures.get(url.searchParams.get('name'));
+    if(!fixture||!bytes.equals(fixture)){rejectedBodies++;return respond(res,422,{error:'Only generated synthetic fixtures are accepted'});}
    }
    requests++;events.push({method:req.method,kind:req.method==='POST'?'upload':url.searchParams.has('catalog')?'catalog':'receipt',mode});
    if(req.method==='POST'&&mode==='unauthorized')return respond(res,401,{error:'Synthetic revoked-token case'});
@@ -63,7 +66,7 @@ export async function startIncomingShortcutQA({mode='success',port=0,token:qaTok
     if(url.searchParams.get('verifyStorage')==='1'){
      if(mode==='proof-unavailable')return respond(res,503,{error:'Synthetic read-back failure'});
      if(mode==='proof-disconnect'){req.socket.destroy();return;}
-     if(mode==='proof-local-changed')for(const name of filenames){const path=join(input,name);if(existsSync(path)&&readFileSync(path).equals(csv))writeFileSync(path,Buffer.concat([csv,changedMarker]));}
+     if(mode==='proof-local-changed')for(const [name,bytes] of fixtures){const path=join(input,name);if(existsSync(path)&&readFileSync(path).equals(bytes))writeFileSync(path,Buffer.concat([bytes,changedMarker]));}
      if(mode==='proof-missing')delete receipt.deviceCopyRemovable;
      if(mode==='proof-false')receipt.storageVerified=false;
      if(mode==='proof-string')receipt.deviceCopyRemovable='true';
@@ -98,14 +101,16 @@ export async function startIncomingShortcutQA({mode='success',port=0,token:qaTok
   origin,endpoint:origin+'/api/imports/incoming',token,input,uploaded,filenames,mode,sourceHash:reportHash(csv),
   stats:()=>({requests,rejectedBodies,arrivals,unauthorizedRequests,events:[...events],sources:db.prepare('SELECT COUNT(*) AS n FROM report_sources').get().n,budgets:db.prepare('SELECT COUNT(*) AS n FROM plans').get().n}),
   resetFixtures:()=>{
-   for(const name of filenames){const path=join(input,name);if(existsSync(path)){const current=readFileSync(path);if(!current.equals(csv)&&!current.equals(Buffer.concat([csv,changedMarker])))throw Error('Refusing to overwrite unexpected fixture contents');}writeFileSync(path,csv,{mode:0o600});}
+   for(const [name,bytes] of fixtures){const path=join(input,name);if(existsSync(path)){const current=readFileSync(path);if(!current.equals(bytes)&&!current.equals(Buffer.concat([bytes,changedMarker])))throw Error('Refusing to overwrite unexpected fixture contents');}writeFileSync(path,bytes,{mode:0o600});}
   },
   verifyStoredOriginal:async()=>{
    const response=await app.qaCall('/api/report-intake'),snapshot=await response.json();
-   if(!response.ok||snapshot.reports.length!==1)return{verified:false,sources:snapshot.reports?.length??0};
-   const row=snapshot.reports[0],original=await app.qaCall('/api/report-intake?id='+row.id+'&purpose=original');
-   const bytes=Buffer.from(await original.arrayBuffer());
-   return{verified:original.ok&&bytes.equals(csv),sourceHashMatches:reportHash(bytes)===reportHash(csv),financialCommits:db.prepare('SELECT COUNT(*) n FROM report_commits').get().n,budgets:db.prepare('SELECT COUNT(*) n FROM plans').get().n};
+   if(!response.ok||snapshot.reports.length!==originals.size)return{verified:false,sources:snapshot.reports?.length??0};
+   const checks=await Promise.all(snapshot.reports.map(async row=>{
+    const original=await app.qaCall('/api/report-intake?id='+row.id+'&purpose=original'),bytes=Buffer.from(await original.arrayBuffer()),expected=originals.get(row.sourceHash);
+    return {verified:original.ok&&!!expected&&bytes.equals(expected),sourceHashMatches:!!expected&&reportHash(bytes)===row.sourceHash};
+   }));
+   return{verified:checks.every(check=>check.verified),sourceHashMatches:checks.every(check=>check.sourceHashMatches),financialCommits:db.prepare('SELECT COUNT(*) n FROM report_commits').get().n,budgets:db.prepare('SELECT COUNT(*) n FROM plans').get().n};
   },
   setMode:value=>{if(!qaModes.includes(value))throw Error('Unknown QA mode');mode=value;},
   completeSavedImport:async()=>{

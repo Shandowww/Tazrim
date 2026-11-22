@@ -17,14 +17,21 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          # Compatibility tests read the original implementations with git show.
+          fetch-depth: 0
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version: '24.22.1'
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
       - run: npm ci --ignore-scripts
+      - run: npm ci --prefix frontend --ignore-scripts
       - run: node build.mjs
       - run: node verify.mjs
-      - run: node --test test/*.test.mjs
+      - run: node --test test/*.test.mjs tools/bank-csv/*.test.mjs
       - name: Production dependencies
         run: npm audit --omit=dev --audit-level=high
       - name: Development dependencies

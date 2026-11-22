@@ -53,12 +53,76 @@ try{
  await page.getByRole('button',{name:'הבא',exact:true}).click();await page.getByRole('heading',{name:'סיכום ואישור',exact:true}).waitFor();
  check(await page.getByRole('button',{name:'סיום',exact:true}).isDisabled(),'final financial approval is still explicit');
  await open('card');
+ const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+ try{
+  await touch.addCookies([{name:'qa-case',value:'card',url:origin}]);
+  const phone=await touch.newPage();
+  await phone.goto(origin+'/next/upload/'+(await audit()).cases.card.id+'/review');
+  await phone.locator('#report-classification-0-0').getByRole('button',{name:/קטגוריה לבית העסק/}).tap();
+  const phonePicker=phone.getByRole('dialog',{name:'בחירת קטגוריה'});
+  check(await phonePicker.getByRole('searchbox').evaluate(node=>document.activeElement!==node),'phone touch opens browse without focusing the keyboard');
+ }finally{await touch.close()}
+ const categoryTrigger=page.locator('#report-classification-0-0').getByRole('button',{name:/קטגוריה לבית העסק/});
+ const picker=page.getByRole('dialog',{name:'בחירת קטגוריה'}),search=picker.getByRole('searchbox',{name:'חיפוש קטגוריה'});
+ for(const [width,theme] of [[390,'dark'],[767,'light'],[768,'dark'],[1440,'light']]){
+  await page.setViewportSize({width,height:844});
+  await page.emulateMedia({colorScheme:theme,reducedMotion:'reduce'});
+  await open('card');
+  await categoryTrigger.click();
+  await search.waitFor();
+  check(await search.evaluate(node=>document.activeElement===node), 'picker focuses the search at '+width+'px');
+  check(await picker.evaluate(node=>{
+   const bounds=node.getBoundingClientRect();
+   return bounds.left>=0&&bounds.right<=innerWidth&&bounds.top>=0&&bounds.bottom<=innerHeight&&document.documentElement.scrollWidth<=innerWidth;
+  }), 'picker fits the '+theme+' viewport at '+width+'px');
+  const parent=picker.getByRole('button',{name:'דיור',exact:true});
+  await parent.click();
+  const homeBills=picker.getByRole('button',{name:/חשבונות הבית/});
+  check(await homeBills.isVisible()&&await homeBills.evaluate(node=>node.getBoundingClientRect().height>=44),'housing expands to touch-sized choices at '+width+'px');
+  check(await parent.locator('.report-category-picker-dot').evaluate(node=>{
+   const expected=document.createElement('span');
+   expected.style.backgroundColor='var(--household-cat-rose)';
+   node.after(expected);
+   const matches=getComputedStyle(node).backgroundColor===getComputedStyle(expected).backgroundColor;
+   expected.remove();
+   return matches;
+  }),'housing uses the app category colour at '+width+'px');
+  await search.fill('דוגמה ללא תוצאה');
+  check(await picker.getByText('לא נמצאו קטגוריות. אפשר לנסות שם אחר.',{exact:true}).isVisible(),'empty search feedback at '+width+'px');
+  await search.fill(width===390?'אינטרנט':'ISP');
+  check(await homeBills.isVisible()&&await picker.locator('.report-category-picker-option').count()===1,'internet search finds only home bills at '+width+'px');
+  if(width===390||width===1440)await page.screenshot({path:'work/ui-redesign/category-picker-'+width+'.png'});
+  await search.press('Escape');
+  await picker.waitFor({state:'hidden'});
+  check(await categoryTrigger.evaluate(node=>document.activeElement===node),'Escape returns focus to the category at '+width+'px');
+ }
+ const cardOrder=()=>page.locator('[id^="report-classification-"]').evaluateAll(rows=>rows.map(row=>row.id));
+ check((await cardOrder()).join(',')==='report-classification-0-0,report-classification-0-1','uncategorized transactions retain report order');
+ await categoryTrigger.press('Enter');
+ await search.fill('סיבים');
+ await search.press('Enter');
+ await categoryTrigger.getByText('דיור / חשבונות הבית',{exact:true}).waitFor();
+ check(await page.locator('#report-classification-0-0').getByText('קטגוריה שבחרת',{exact:true}).isVisible(),'choosing a search result updates the draft classification');
+ check((await cardOrder()).join(',')==='report-classification-0-1,report-classification-0-0','uncategorized card transaction moves ahead of the categorized one');
+ await page.waitForFunction(()=>document.activeElement?.id==='report-classification-0-1');
+ check(true,'assigning a category continues keyboard focus at the next uncategorized transaction');
+ await page.getByRole('button',{name:'שמירת התקדמות',exact:true}).click();
+ await page.getByText('החלטות הקבוצה נשמרו. נתוני התקציב לא השתנו.',{exact:true}).waitFor();
+ await page.reload();
+ await categoryTrigger.getByText('דיור / חשבונות הבית',{exact:true}).waitFor();
+ check((await cardOrder())[0]==='report-classification-0-1','uncategorized-first order survives a saved review reload');
+ await categoryTrigger.click();
+ check(await picker.getByRole('button',{name:/חשבונות הבית/,pressed:true}).isVisible(),'saved category reopens in its parent with the selected state');
+ await picker.getByRole('button',{name:'ללא קטגוריה',exact:true}).click();
+ await categoryTrigger.getByText('ללא קטגוריה',{exact:true}).waitFor();
+ check((await cardOrder())[0]==='report-classification-0-0','clearing a category puts the transaction back in report order among uncategorized rows');
  check(await page.getByRole('button',{name:'המשך והשלם קטגוריות מאוחר יותר',exact:true}).isVisible(),'optional categories have an explicit defer action');
  check(await page.getByRole('button',{name:/להשאיר את .* ללא קטגוריה ולהמשיך/}).isVisible(),'leaving categories empty is a distinct explicit action');
  await page.getByRole('button',{name:'המשך והשלם קטגוריות מאוחר יותר',exact:true}).click();await page.getByRole('heading',{name:'סיכום ואישור',exact:true}).waitFor();
  check(await page.getByText('הסכומים יישמרו, והדוח יישאר נקלט חלקית להשלמת הסיווג.',{exact:true}).isVisible(),'deferred categories retain the existing partial lifecycle');
  await page.getByRole('button',{name:'סיווג עסקאות',exact:true}).click();await page.getByRole('button',{name:/להשאיר את .* ללא קטגוריה ולהמשיך/}).click();await page.getByRole('heading',{name:'סיכום ואישור',exact:true}).waitFor();
  check(await page.getByText('הסיווגים שבחרת יישמרו. תנועות שהשארת במפורש ללא קטגוריה לא יעכבו השלמה.',{exact:true}).isVisible(),'intentional uncategorized completion is preserved separately');
+
  const data=await audit();await page.context().clearCookies();await page.context().addCookies([{name:'qa-case',value:'fresh',url:origin},{name:'qa-user',value:'bob',url:origin}]);await page.goto(origin+'/next/upload/'+data.cases.fresh.id+'/group?budget='+data.shared);await page.getByText('המרחב פתוח לצפייה בלבד. קליטת דוחות דורשת הרשאת עריכה.',{exact:true}).waitFor();check(await page.locator('[id^="report-classification-"] select').count()===0,'shared viewer has no classification write controls');
  const final=await audit();check(Object.values(final.cases).every(value=>value.unchanged)&&final.financialWrites===0,'all financial records and history remain byte-identical with zero financial writes');check(errors.length===0,'no browser runtime errors');
  writeFileSync('work/ui-redesign/classification-browser-results.json',JSON.stringify({checks,errors,financialUnchanged:true,financialWrites:0},null,2));

@@ -1,8 +1,21 @@
-import {cashAccountList,creditCards} from '../../../src/budget.js'
+import {cashAccountList,cashCardAccount,creditCards} from '../../../src/budget.js'
 import {inboxCardLast4} from '../../../src/report-inbox-model.js'
 export interface IncomingBinding {identityKey:string;kind:string;budget:string;target:string;revision:number}
 export interface RoutingBudget {id:string;name:string;role:string;plan:any;locked:boolean;revision:number}
 export interface RoutingCandidate {budget:string;budgetName:string;kind:string;target:string;label:string;role:string;bindingRevision?:number;budgetRevision:number}
+export type RoutingKind='bank'|'card'
+export function incomingRoutingOptions(budgets:RoutingBudget[],kind:RoutingKind){
+ const targets:{value:string;label:string}[]=[],unavailable:{id:string;name:string;reason:'viewer'|'unconfigured'|'locked'|'no-targets'}[]=[]
+ for(const {id,name,role,locked,plan} of budgets){
+  const choices=role==='viewer'||locked||!plan?[]:kind==='bank'?cashAccountList(plan):creditCards(plan)
+  if(!choices.length){unavailable.push({id,name,reason:role==='viewer'?'viewer':!plan?'unconfigured':locked?'locked':'no-targets'});continue}
+  for(const target of choices){
+   const label=[name,target.label??target.name,...(kind==='card'?[target.alias,cashAccountList(plan).find((account:any)=>account.id===cashCardAccount(plan,target.id))?.label]:[])].filter(Boolean).join(' · ')
+   targets.push({value:JSON.stringify([id,target.id]),label})
+  }
+ }
+ return {targets,unavailable}
+}
 /** Routing is stricter than the interactive report editor: no sole-account or
  * bank-name fallback, and matching runs across every accessible budget. */
 export function matchIncomingReport(item:any,budgets:RoutingBudget[],bindings:IncomingBinding[]){
