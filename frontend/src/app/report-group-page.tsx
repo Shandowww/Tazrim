@@ -266,7 +266,7 @@ function GroupEditor({
     try{
       await finishDuplicateCompletion(budget.budgetId,base,command);
       if(!alive.current)return false;
-      setDuplicateCommand(null);setConfirmed(false);onDone('הדוח הכפול סומן כעוכל. לא בוצע שינוי כספי נוסף.');
+      setDuplicateCommand(null);setConfirmed(false);onDone('הדוח הכפול סומן כנקלט. לא בוצע שינוי כספי נוסף.');
       return true;
     }catch(error){if(alive.current){if(error instanceof AccessError)budget.invalidate(error.message);else setError(error instanceof Error?error.message:'השלמת הדוח לא אושרה. אפשר לבדוק שוב את אותה פעולה.');}return false}
     finally{flight.current=false;if(alive.current)setBusy(false)}
@@ -277,7 +277,7 @@ function GroupEditor({
     {review.items.map((item:any)=><section key={item.storedId} className="surface space-y-3 rounded-xl p-4"><h3 className="break-words font-semibold"><bdi>{item.name}</bdi></h3><p className="text-sm"><bdi>{base.budget?.name??'אישי'}</bdi> · <bdi>{item.kind==='bank'?accounts.find((account:any)=>account.id===item.target)?.label:cards.find((card:any)=>card.id===item.target)?.name}</bdi></p><p className="text-sm">תקופה: <bdi dir="ltr">{item.kind==='bank'?item.from+' — '+item.to:item.report?.dueDate}</bdi></p><button type="button" className={button} disabled={busy} onClick={()=>{const source=sources.find(source=>source.id===item.storedId);if(source)void downloadReportOriginal(budget.budgetId,base,source).catch(error=>setError(error.message))}}>הורדת המקור לבדיקה</button></section>)}
     <label className="flex min-h-11 items-start gap-3 text-sm"><input className="mt-1 h-5 w-5 shrink-0" type="checkbox" disabled={busy} checked={confirmed} onChange={event=>setConfirmed(event.target.checked)}/>בדקתי שהדוח כבר נקלט ושאין בו נתונים חדשים</label>
     {error&&<p role="alert" className="surface rounded-xl border border-destructive p-4 text-sm">{error}</p>}
-    <p className="text-xs text-muted-foreground">בסיום Budgit יוודא שהדוח כולו כבר נרשם, יסמן אותו כעוכל וישמור את המקור למשך 30 יום מהשלמת הטיפול.</p>
+    <p className="text-xs text-muted-foreground">בסיום Budgit יוודא שהדוח כולו כבר נרשם, יסמן אותו כנקלט וישמור את המקור למשך 30 יום מהשלמת הטיפול.</p>
     <div className="flex flex-wrap gap-3"><button type="button" className={button+' bg-primary text-primary-foreground'} disabled={busy||!confirmed} onClick={()=>void finishDuplicate()}>{busy?'מאמתים את השלמת הדוח…':duplicateCommand?'בדיקת תוצאת הסיום':'סיום טיפול בדוח כפול'}</button><button type="button" className={button} disabled={busy||!!duplicateCommand} onClick={()=>setShowDuplicateDetails(true)}>בדיקת התנועות ושינוי ההחלטות</button>{!committedOnly&&<button type="button" className={button} disabled={busy||!!duplicateCommand} onClick={()=>{setShowDuplicateDetails(true);setRestartConfirmation(true)}}>התחלה מחדש</button>}</div>
     {!committedOnly&&sources.map(source=><Link key={source.id} className="inline-flex min-h-11 items-center text-sm text-destructive underline" href={href(incomingId&&/^[a-f0-9-]{36}$/.test(incomingId)&&source.id===openedSourceId?'/incoming?sync=report&report='+encodeURIComponent(incomingId)+'&panel=delete':'/upload/'+encodeURIComponent(source.id)+'/delete')}>מחיקת דוח שלא נקלט · <bdi className="ms-1">{source.name}</bdi></Link>)}
     {duplicateCommand&&error&&<p className="text-sm">אפשר לנסות שוב את אותה השלמה. דוחות שהושלמו לא ייקלטו מחדש.</p>}

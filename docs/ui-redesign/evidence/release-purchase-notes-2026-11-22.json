@@ -73,5 +73,17 @@
     "No new physical-iPhone/Safari or installed-PWA acceptance.",
     "Unrelated appearance and forecast prototypes were excluded and preserved.",
     "Automatic deployment remains disabled."
-  ]
+  ],
+  "sourceBackups": {
+    "primaryRepository": "Shandowww/monthly-flow-budget",
+    "primaryBranch": "main",
+    "applicationCommit": "9adb73eadba1d7d105b7a877ce68c4e5367c77aa",
+    "releaseTag": "v1.5.0",
+    "forkRepository": "Shandowww/Tazrim",
+    "forkBranch": "codex/budgit-react-frontend",
+    "forkCommit": "69b0149b1fd712c483bb473554170832a6d2b344",
+    "exportedSourceCommit": "b0898654c2f8ad74f203f550169f9453cf15919a",
+    "trackedSourceFilesVerified": 1092,
+    "independentHistoryAndNoticesPreserved": true
+  }
 }

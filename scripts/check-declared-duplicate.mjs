@@ -35,7 +35,7 @@ try{
  await page.getByRole('button',{name:'בדיקת תוצאת הסיום',exact:true}).click();await page.getByRole('status').filter({hasText:'הדוח סומן ככפול והטיפול הסתיים'}).waitFor();
  check(requests.length===2&&requests[0]===requests[1],'lost-success retry uses identical witnesses and action ID');
  const after=await audit();check(after.financialWrites===0&&Object.values(after.cases).every(value=>value.unchanged),'closure leaves every synthetic budget unchanged with zero financial writes');
- await page.goto(origin+'/next/upload/'+id+'/group');await page.getByRole('heading',{name:/עוכל/}).waitFor();
+ await page.goto(origin+'/next/upload/'+id+'/group');await page.getByRole('heading',{name:/נקלט/}).waitFor();
  check(await page.getByText('הדוח סומן ככפול לפי בחירתך',{exact:false}).isVisible(),'saved completion explains the explicit decision and retained source');
  await page.getByRole('link',{name:'בדיקה מחודשת של המקור',exact:true}).click();await start.waitFor();check(true,'reopening restores the original review without re-upload');
  check(errors.length===0,'no browser runtime errors');

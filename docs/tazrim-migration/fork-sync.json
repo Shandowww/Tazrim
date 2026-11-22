@@ -1,20 +1,21 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "b0898654c2f8ad74f203f550169f9453cf15919a",
+  "sourceCommit": "385644c802b5555a3e9cfc4a5f15b4f1938c00eb",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "status": "Approved purchase notes are verified live on Budgit; the actual private sheet awaits user Google consent.",
+  "status": "Approved Hebrew report wording patch is verified live on Budgit.",
   "validation": {
     "applicationAndReaderTests": 1495,
     "coreChecks": 15,
-    "syntheticBrowserChecks": 25,
-    "existingDuplicateBrowserChecks": 20,
-    "production": "Fresh verified backups, exact-commit/image security, isolated financial/access/restore/compatible rollback gates, all 184 runtime files and all 50 pre-existing authoritative tables verified. Three private note tables added. Configuration, keys and adjacent services retained."
+    "focusedTests": 8,
+    "syntheticBrowserChecks": 20,
+    "prototypeBrowserChecks": 24,
+    "production": "Fresh verified backup, exact-commit/image security, isolated financial/access/restore/rollback gates, all 184 runtime files and all 53 authoritative tables verified. Configuration, keys and adjacent services retained."
   },
-  "productionApplicationCommit": "9adb73eadba1d7d105b7a877ce68c4e5367c77aa",
-  "productionVersion": "v1.5.0",
-  "productionBuild": "72cf69e8e9"
+  "productionApplicationCommit": "09964c352ba03948d4ec1f17dec5d26ad7f630a9",
+  "productionVersion": "v1.5.1",
+  "productionBuild": "f379517ac4"
 }

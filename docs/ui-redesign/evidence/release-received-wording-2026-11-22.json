@@ -1,0 +1,46 @@
+{
+  "version": "v1.5.1",
+  "commit": "09964c352ba03948d4ec1f17dec5d26ad7f630a9",
+  "build": "f379517ac4",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Replace all four user-visible Hebrew report-completion occurrences of עוכל with נקלט. Internal status values and financial behavior remain unchanged.",
+  "approval": "Tal approved the reviewed local prototype: החל את השינוי",
+  "previousVersion": "v1.5.0",
+  "previousCommit": "9adb73eadba1d7d105b7a877ce68c4e5367c77aa",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45051246741",
+  "validation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1495,
+    "coreChecks": 15,
+    "focusedTests": 8,
+    "prototypeBrowserChecks": 24,
+    "exactCommitBrowserChecks": 20,
+    "widths": [
+      375,
+      767,
+      768,
+      1440
+    ],
+    "browserFinancialWrites": 0,
+    "githubSecurity": "passed",
+    "immutableCandidateSecurity": "passed",
+    "freshVerifiedBackup": "passed",
+    "candidateFinancialAccessRestore": "passed",
+    "rollbackFinancialAccess": "passed",
+    "runtimeFilesMatched": 184,
+    "authoritativeTablesPreserved": 53,
+    "configurationKeysAdjacentServices": "unchanged",
+    "publicHealth": "passed",
+    "unauthenticatedPlan": 401,
+    "loginProtectedRoutes": "passed"
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-09964c35.pXrydU",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-09964c35.aokni4",
+  "candidateImage": "sha256:24466c965dcdd98787b9abeac3791a714b231e7fa5967c0fd804af097ed77a44",
+  "rollbackImage": "sha256:171e6802d6de8b2669ec1e7ac01ae978f810461385c8b1e76982896338c9e7ae",
+  "limits": [
+    "No new physical iPhone or installed-PWA acceptance.",
+    "Automatic deployment remains disabled.",
+    "Unrelated local work was excluded and preserved."
+  ]
+}

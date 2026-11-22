@@ -1,0 +1,16 @@
+{
+  "status": "local preview, awaiting specific approval before push or deployment",
+  "base": "9adb73eadba1d7d105b7a877ce68c4e5367c77aa",
+  "change": "Four user-facing occurrences of עוכל replaced with נקלט; browser locator updated.",
+  "build": "passed",
+  "browserChecks": 24,
+  "widths": [
+    375,
+    767,
+    768,
+    1440
+  ],
+  "financialWrites": 0,
+  "isolatedPreviewSource": "/private/tmp/budgit-received-wording-hbnth908",
+  "artifacts": "/Users/talshandor/Documents/personal-projects/monthly-flow/work/budgit-household-ui/work/platform-adaptive-ui/work/ui-redesign/received-wording-2026-11-22"
+}
