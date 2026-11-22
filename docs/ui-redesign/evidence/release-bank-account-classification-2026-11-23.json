@@ -1,0 +1,49 @@
+{
+  "version": "v1.6.0",
+  "commit": "9b46647b741b5876531a176b3ead404bc2ff8e11",
+  "build": "59590933a1",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Bank-account-scoped movement options, clearer private/shared investment labels, and rent/house-committee expenses offered only for explicitly shared receiving bank accounts. Existing money, stable investment keys, prior classifications and account ownership/access are not inferred or rewritten.",
+  "approval": "Tal approved the revised shared-only housing prototype with: publish it",
+  "previousVersion": "v1.5.1",
+  "previousCommit": "09964c352ba03948d4ec1f17dec5d26ad7f630a9",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45079184424",
+  "validation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1504,
+    "coreChecks": 15,
+    "dedicatedSyntheticBrowserChecks": 20,
+    "browserWidths": [390, 767, 768, 1440],
+    "syntheticFinancialWrites": 0,
+    "syntheticMetadataSave": "Only the selected bank classificationScope changed through the existing guarded editor; setup and assertions used disposable in-memory accounts.",
+    "githubSecurity": "passed",
+    "immutableCandidateSecurity": "passed",
+    "freshVerifiedBackup": "passed",
+    "candidateFinancialAccessRestore": "passed",
+    "compatibleRollbackFinancialAccess": "passed",
+    "runtimeFilesMatched": 184,
+    "authoritativeTablesPreservedOnFinalActivation": 53,
+    "configurationKeysAdjacentServices": "unchanged",
+    "publicHealth": "passed",
+    "unauthenticatedPlan": 401,
+    "loginProtectedRoutes": "passed"
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-9b46647b.INpzmo",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-9b46647b.mJJf2X",
+  "candidateImage": "sha256:894987f280a3a707b4e41161d3b05f827b9b86ea1cae8b96a024cd81a8347aef",
+  "compatibleRollbackImage": "sha256:df18dd0cb1d0a78f532f570926fd98f82fa1b45536aef8d36b413f50562aac6d",
+  "compatibleRollbackCommit": "a03835d21036340334a08a6169f1f6d162a17a4f",
+  "initialActivation": {
+    "privateEvidence": "/opt/budgit-releases/supervised-9b46647b.UQY8AR",
+    "result": "Strict preservation gate triggered the verified compatible rollback; the database was not restored or overwritten.",
+    "cause": "A pre-existing working report-preparation job advanced in the normal background timer during activation. Its state became attention, a prepared source/lifecycle/notice row was added and its intake routing approval advanced. Budget tables were unchanged and no existing report-source rows were replaced or removed.",
+    "recovery": "The queue settled with no working/queued jobs. Repeated fresh backup, candidate/security/restore/compatible-rollback and unchanged strict final preservation gates passed. No exclusion was added to hide report-table changes."
+  },
+  "limits": [
+    "Bank scopes must be explicitly configured in the guarded bank-account editor; no production account was configured by the agent.",
+    "No new physical iPhone or installed-PWA acceptance.",
+    "A legacy wider card-completion browser script timed out on an unrelated checkbox locator; no full broader-browser acceptance is claimed.",
+    "Automatic deployment remains disabled.",
+    "Unrelated local work was excluded and preserved."
+  ]
+}

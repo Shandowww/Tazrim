@@ -1,21 +1,21 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "385644c802b5555a3e9cfc4a5f15b4f1938c00eb",
+  "sourceCommit": "7a395886f778608db960fcc2d74c9b434e152eb9",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot; Budgit private Git history is not imported.",
-  "status": "Approved Hebrew report wording patch is verified live on Budgit.",
+  "status": "Approved bank-account-scoped classifications and shared-only housing types are verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1495,
+    "applicationAndReaderTests": 1504,
     "coreChecks": 15,
-    "focusedTests": 8,
+    "focusedTests": 9,
     "syntheticBrowserChecks": 20,
-    "prototypeBrowserChecks": 24,
-    "production": "Fresh verified backup, exact-commit/image security, isolated financial/access/restore/rollback gates, all 184 runtime files and all 53 authoritative tables verified. Configuration, keys and adjacent services retained."
+    "prototypeWidths": [390, 767, 768, 1440],
+    "production": "Fresh verified backup, exact-commit/image security, isolated financial/access/restore/compatible-rollback gates, all 184 runtime files and all 53 authoritative tables verified on final activation. Initial strict preservation rollback/retry is recorded in the release evidence. Configuration, keys and adjacent services retained."
   },
-  "productionApplicationCommit": "09964c352ba03948d4ec1f17dec5d26ad7f630a9",
-  "productionVersion": "v1.5.1",
-  "productionBuild": "f379517ac4"
+  "productionApplicationCommit": "9b46647b741b5876531a176b3ead404bc2ff8e11",
+  "productionVersion": "v1.6.0",
+  "productionBuild": "59590933a1"
 }

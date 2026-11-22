@@ -1,4 +1,4 @@
-import {budgetFields, creditCards} from '../../../src/budget.js'
+import {budgetFields, cashAccountList, cashCardAccount} from '../../../src/budget.js'
 import {inboxBankGroupKey,inboxCardRowCategoryKey} from '../../../src/report-inbox-controller.js'
 import {statementMerchant} from '../../../src/card-statement-model.js'
 import type {ReviewStep} from './report-guided-review'
@@ -8,9 +8,17 @@ export const classificationRowId=(item:number,row:number)=>`report-classificatio
 export const matchReviewId=(item:number,id:string|number)=>`report-match-${item}-${encodeURIComponent(String(id))}`
 export const exceptionId=(item:number,question:number)=>`report-check-${item}-${question}`
 export const categoryMissing=(value:unknown)=>!String(value??'').trim()||value==='לסיווג'
-export function bankClassificationOptions(plan:any,rows:any[]){
- const cards=creditCards(plan)
- return [...budgetFields(plan),['exclude','ללא השפעה על התקציב']].filter(([key]:string[])=>!key.startsWith('card')||cards.some((card:any)=>card.id===key)).filter(([key]:string[])=>rows.every(row=>['salary','otherIncome','incomingTransfers'].includes(key)?row.amountCents>0:key!=='outgoingTransfers'||row.amountCents<0))
+export function bankClassificationOptions(plan:any,rows:any[],accountId=''){
+ const accounts=new Set(rows.map(row=>row.accountId).filter(Boolean))
+ if(!accountId&&accounts.size===1)accountId=String([...accounts][0])
+ const account=accounts.size<=1&&(!accounts.size||accounts.has(accountId))?cashAccountList(plan).find((value:any)=>value.id===accountId):null
+ const scope=account?.classificationScope
+ return [...budgetFields(plan),['exclude','ללא השפעה על התקציב']]
+  .filter(([key]:string[])=>!key.startsWith('card')||!!account&&cashCardAccount(plan,key)===account.id)
+  .filter(([key]:string[])=>scope==='shared'||!['rent','houseCommittee'].includes(key))
+  .filter(([key]:string[])=>scope!=='personal'||!['sharedSaving','sharedInvest'].includes(key))
+  .filter(([key]:string[])=>scope!=='shared'||!['personalSaving','personalInvest'].includes(key))
+  .filter(([key]:string[])=>rows.every(row=>['salary','otherIncome','incomingTransfers'].includes(key)?row.amountCents>0:key!=='outgoingTransfers'||row.amountCents<0))
 }
 /** Read-only presentation of the original controller. Does not decide or apply any movement. */
 export function reportClassificationRows(review:any){

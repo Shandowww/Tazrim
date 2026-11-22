@@ -28,6 +28,8 @@ function AccountEditor({budget,base,id,create,onSaved}:{budget:BudgetState;base:
   <AdaptiveSections labels={['פרטי החשבון','יתרות ותכנון']} disabled={busy}>
   <fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">פרטי חשבון הבנק</h2>
    <label className="block text-sm">שם החשבון<input className={input} name="account-label" value={draft.label} maxLength={80} onChange={event=>update('label',event.target.value)} /></label>
+   <label className="block text-sm">סוג החשבון לסיווג תנועות<select className={input} name="account-classification-scope" value={draft.classificationScope??''} onChange={event=>update('classificationScope',event.target.value)}><option value="">טרם הוגדר · ללא סינון פרטי/משותף</option><option value="personal">חשבון פרטי</option><option value="shared">חשבון משותף</option></select></label>
+   <p className="text-sm text-muted-foreground">בדוחות המשויכים לחשבון פרטי יוצגו חיסכון והשקעות פרטיים; בחשבון משותף יוצגו חיסכון והשקעות משותפים. שכירות וועד בית יוצגו רק בחשבון שמוגדר משותף. הסינון אינו משנה סכומים, סיווגים שמורים או הרשאות גישה.</p>
    <label className="block text-sm">צבע החשבון<select className={input} value={draft.color} onChange={event=>update('color',event.target.value)}><option value="">לפי ברירת המחדל של החשבון</option>{accountColors.map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
   </fieldset>
   <fieldset disabled={busy} className="surface space-y-4 rounded-xl p-4 sm:p-6"><h2 className="font-semibold">יתרות ותכנון</h2>

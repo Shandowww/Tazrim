@@ -42,5 +42,17 @@
     "No new physical iPhone or installed-PWA acceptance.",
     "Automatic deployment remains disabled.",
     "Unrelated local work was excluded and preserved."
-  ]
+  ],
+  "sourceBackups": {
+    "primaryRepository": "Shandowww/monthly-flow-budget",
+    "primaryBranch": "main",
+    "applicationCommit": "09964c352ba03948d4ec1f17dec5d26ad7f630a9",
+    "releaseTag": "v1.5.1",
+    "forkRepository": "Shandowww/Tazrim",
+    "forkBranch": "codex/budgit-react-frontend",
+    "forkCommit": "2c04e367d85349ca1c2bd3f1053d6ebd7ef8b86c",
+    "exportedSourceCommit": "385644c802b5555a3e9cfc4a5f15b4f1938c00eb",
+    "trackedSourceFilesVerified": 1094,
+    "independentHistoryAndNoticesPreserved": true
+  }
 }

@@ -1,6 +1,6 @@
 import {saveCashAccount,cashAccountList,clone,validatePlan,accountColors,cashAssignedItem,cashCardAccount,creditCards,cents} from '../../../src/budget.js'
 import {moneyInputCents} from './monthly-report.ts'
-export interface AccountDraft { label:string; color:string; buffer:string; opening:string; openingMonth:string }
+export interface AccountDraft { label:string; color:string; buffer:string; opening:string; openingMonth:string; classificationScope?:string }
 export function manualAccountEligibility(plan:any,id:string){
  if(!validatePlan(plan))return 'התקציב אינו זמין לעריכה הזו.'
  if(!id)return null
@@ -9,18 +9,19 @@ export function manualAccountEligibility(plan:any,id:string){
 }
 export function initialAccountDraft(plan:any,id:string,month:string):AccountDraft{
  const a=cashAccountList(plan).find((row:any)=>row.id===id)
- return {label:a?.label??'',color:a?.color??'',buffer:String(a?.buffer??0),opening:a?.opening===undefined?'':String(a.opening),openingMonth:a?.openingMonth??plan.startMonth??month}
+ return {label:a?.label??'',color:a?.color??'',buffer:String(a?.buffer??0),opening:a?.opening===undefined?'':String(a.opening),openingMonth:a?.openingMonth??plan.startMonth??month,classificationScope:a?.classificationScope??''}
 }
 const signedCents=(text:string)=>text.trim().startsWith('-')?-moneyInputCents(text.trim().slice(1)):moneyInputCents(text)
-export function accountDraftFingerprint(d:AccountDraft){const amount=(text:string,signed=false)=>{try{return text.trim()===''&&signed?null:signed?signedCents(text):moneyInputCents(text)}catch{return {invalid:text}}};return JSON.stringify({label:d.label.trim(),color:d.color,buffer:amount(d.buffer),opening:amount(d.opening,true),openingMonth:d.opening.trim()===''?null:d.openingMonth})}
+export function accountDraftFingerprint(d:AccountDraft){const amount=(text:string,signed=false)=>{try{return text.trim()===''&&signed?null:signed?signedCents(text):moneyInputCents(text)}catch{return {invalid:text}}};return JSON.stringify({label:d.label.trim(),color:d.color,buffer:amount(d.buffer),opening:amount(d.opening,true),openingMonth:d.opening.trim()===''?null:d.openingMonth,classificationScope:d.classificationScope??''})}
 export function prepareManualAccount(plan:any,id:string,draft:AccountDraft,{create=false,asOf}:{create?:boolean;asOf:string}){
  const reason=manualAccountEligibility(plan,create?'':id);if(reason)throw Error(reason)
- if(typeof id!=='string'||!id||id.length>100||!draft||Object.keys(draft).length!==5||Object.keys(draft).some(key=>!['label','color','buffer','opening','openingMonth'].includes(key))||Object.values(draft).some(value=>typeof value!=='string'||value.length>100))throw Error('יש לבדוק את פרטי החשבון.')
+ if(typeof id!=='string'||!id||id.length>100||!draft||Object.keys(draft).length!==(draft.classificationScope===undefined?5:6)||Object.keys(draft).some(key=>!['label','color','buffer','opening','openingMonth','classificationScope'].includes(key))||Object.values(draft).some(value=>typeof value!=='string'||value.length>100)||!['','personal','shared'].includes(draft.classificationScope??''))throw Error('יש לבדוק את פרטי החשבון.')
  if(!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(asOf))throw Error('תאריך הבדיקה אינו תקין.')
  const existing=cashAccountList(plan).find((a:any)=>a.id===id)
  if(create&&cashAccountList(plan).some((a:any)=>a.id===id))throw Error('מזהה החשבון כבר קיים. אין לדרוס אותו.')
  if(!draft.label.trim()||draft.label.trim().length>80||draft.color&&!accountColors.some(([color]:string[])=>color===draft.color))throw Error('יש לבדוק את שם החשבון והצבע.')
  const account={...clone(existing??{}),id,label:draft.label.trim(),buffer:moneyInputCents(draft.buffer)/100}
+ if(draft.classificationScope!==undefined){if(draft.classificationScope)account.classificationScope=draft.classificationScope;else delete account.classificationScope}
  if(draft.color)account.color=draft.color;else delete account.color
  if(draft.opening.trim()!==''){
   if(!/^20\d{2}-(?:0[1-9]|1[0-2])$/.test(draft.openingMonth)||draft.openingMonth<plan.startMonth||draft.openingMonth>asOf)throw Error('יש לבחור חודש יתרת פתיחה מתקופת התקציב ועד החודש הנוכחי.')

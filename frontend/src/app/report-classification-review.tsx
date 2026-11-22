@@ -1,5 +1,5 @@
 import {useEffect,useLayoutEffect,useRef,useState} from 'react'
-import {budgetFields} from '../../../src/budget.js'
+import {budgetFields,cashAccountList} from '../../../src/budget.js'
 import {ReportCategoryPicker,reportCategoryGroups} from './report-category-picker'
 import {ReportTransactionDetails} from './report-transaction-details'
 import {bankClassificationOptions,categoryMissing,optionalCategoryCounts,reportClassificationRows,type ReviewCheck} from './report-classification-model'
@@ -48,17 +48,24 @@ function ReportRows({sections,review,plan,disabled,focusId,onBank,onCategory,onO
   ...(plan.details??[]).map((row:any)=>row.category),
   ...(review.cardGroups??[]).map((group:any)=>group.category)
  ]):[]
- return <section className="surface min-w-0 space-y-3 rounded-xl p-4"><h3 ref={heading} tabIndex={-1} className="break-words font-semibold">{sections.length===1?<><bdi>{item.name}</bdi> · {isCard?'עסקאות הכרטיס':'תנועות הבנק'}</>:'עסקאות הכרטיסים'} · <bdi>{rows.length}</bdi></h3>{!rows.length&&<p className="text-sm">{item.kind==='card'?'בדוח נשמר סכום חיוב ללא פירוט עסקאות לסיווג.':'פירוט התנועות אינו זמין עדיין. יש להשלים את בחירת המקור והחשבון.'}</p>}<ol className="min-w-0 space-y-3">{visibleRows.map(value=>{
+ const bankAccount=item.kind==='bank'?cashAccountList(plan).find((account:any)=>account.id===item.target):null
+ return <section className="surface min-w-0 space-y-3 rounded-xl p-4"><h3 ref={heading} tabIndex={-1} className="break-words font-semibold">{sections.length===1?<><bdi>{item.name}</bdi> · {isCard?'עסקאות הכרטיס':'תנועות הבנק'}</>:'עסקאות הכרטיסים'} · <bdi>{rows.length}</bdi></h3>
+ {bankAccount&&<p className="text-sm text-muted-foreground"><bdi>{bankAccount.label}</bdi> · {bankAccount.classificationScope==='personal'?'האפשרויות מסוננות לחשבון הפרטי.':bankAccount.classificationScope==='shared'?'האפשרויות מסוננות לחשבון המשותף.':'לסינון חיסכון והשקעות לפי פרטי/משותף, יש להגדיר את סוג החשבון.'} <Link className="inline-flex min-h-11 items-center underline" href={href('/accounts/'+encodeURIComponent(bankAccount.id)+'/edit')}>הגדרת סוג החשבון</Link></p>}
+ {!rows.length&&<p className="text-sm">{item.kind==='card'?'בדוח נשמר סכום חיוב ללא פירוט עסקאות לסיווג.':'פירוט התנועות אינו זמין עדיין. יש להשלים את בחירת המקור והחשבון.'}</p>}<ol className="min-w-0 space-y-3">{visibleRows.map(value=>{
  const {row,id,current,status,editable,group,groupIndex,key,checkId,sourceName}=value,label=item.kind==='bank'?fields.get(current)??current:current,existing=!!row.existing,individualCategory=group?.rows.length>1||!!noteSuggestions.get(id)?.length||review.categoryChoices.has(inboxCardRowCategoryKey(row))
+ const bankOptions=item.kind==='bank'&&group?bankClassificationOptions(plan,group.rows,item.target):[]
+ const outsideAccount=item.kind==='bank'&&!categoryMissing(current)&&!bankOptions.some(([key]:string[])=>key===current)
  return <li key={id} id={id} tabIndex={-1} className="min-w-0 scroll-my-24 space-y-3 rounded-xl border p-3 focus:outline focus:outline-2 focus:outline-primary"><ReportTransactionDetails rows={[row]} kind={item.kind==='bank'?'bank':'card'} sourceName={sourceName}/><PurchaseNoteHint matches={noteSuggestions.get(id)??[]} groupSize={group?.rows.length??1} kind={item.kind}/><p className="text-sm"><span className="font-medium">{item.kind==='bank'?row.state==='conflict'?'סיווג מוצע, טרם אושר':'סוג התנועה בתקציב':'קטגוריית הוצאה'}: </span><bdi>{categoryMissing(label)?item.kind==='bank'?'טרם נבחר סיווג':'ללא קטגוריה':label}</bdi></p><p className="text-xs text-muted-foreground">{status}</p>{editable&&(item.kind==='bank'?<details open={!row.reviewed} className="space-y-2">
   <summary className="min-h-11 cursor-pointer py-3 text-sm text-primary">שינוי סיווג</summary>
   {group.rows.length>1&&<p className="text-xs text-muted-foreground">הבחירה תחול על כל <bdi>{group.rows.length}</bdi> התנועות בקבוצה בעלת אותו תיאור וצד שני באותו כיוון. פרטי כל תנועה נשמרים בנפרד.</p>}
   <label className="block text-sm">איך התנועה נרשמת בתקציב?
    <select className={input} value={categoryMissing(current)?'':current??''} disabled={disabled} onChange={event=>onBank(groupIndex,event.target.value)}>
     <option value="" disabled>בחירת סוג תנועה</option>
-    {bankClassificationOptions(plan,group.rows).map(([value,label]:string[])=><option key={value} value={value}>{label}</option>)}
+    {outsideAccount&&<option value={current} disabled>{label} · סיווג נוכחי מחוץ לסינון</option>}
+    {bankOptions.map(([value,label]:string[])=><option key={value} value={value}>{label}</option>)}
    </select>
   </label>
+  {outsideAccount&&<p className="text-sm text-muted-foreground">הסיווג המוצג אינו ברשימה המסוננת של החשבון הזה ולא שונה אוטומטית. אפשר להשאיר אותו או לבחור סיווג מתאים מהרשימה.</p>}
  </details>:<div className="space-y-2">
   {individualCategory?<p className="text-xs text-muted-foreground">הקטגוריה שתיבחר תחול על הקנייה הזו בלבד.</p>:group.rows.length>1&&<p className="text-xs text-muted-foreground">הבחירה תחול על הקניות בקבוצה בעלת אותו תיאור, למעט קניות שנבחרה להן קטגוריה נפרדת. פרטי כל תנועה נשמרים בנפרד.</p>}
   <ReportCategoryPicker groups={categories} value={categoryMissing(current)?'':current} disabled={disabled} onChange={category=>{
