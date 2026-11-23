@@ -1,0 +1,46 @@
+{
+  "version": "v1.8.1",
+  "commit": "9ada2ed60539a877a577cefac8b0f6c1ed2c5b23",
+  "build": "f31b43c5da",
+  "verifiedAt": "2026-11-24T00:49:07+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Statement notices display the four digits printed in the source report and the saved card name when it matches. A bounded read of the retained original recovers digits from older scans.",
+  "approval": "Tal approved publishing the updated prototype with report-derived card identity.",
+  "previousVersion": "v1.8.0",
+  "previousCommit": "4ec31d3d251c2be7b7590e023bb571344625b613",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45282066181",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1517,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      375,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-9ada2ed6.AZsb13/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-9ada2ed6.x26lAK/",
+  "candidateImage": "sha256:ecdd2eea156552b1db1af4bc2100c10e013a813332d8a72a94e78edd923b3b55",
+  "rollbackImage": "sha256:69c7f6a8c20f53a4a0d7e08f13e19b5ef048c8f7f1221cdf46c4279c736810ec",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 187,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "syntheticLiveProbe": {
+      "build": "f31b43c5da",
+      "verifiedCardNotices": 2,
+      "legacyRecovery": true,
+      "readOnly": true
+    }
+  },
+  "limits": [
+    "Browser and runtime probes used synthetic reports."
+  ]
+}

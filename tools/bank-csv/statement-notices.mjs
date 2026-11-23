@@ -8,6 +8,12 @@ export function issuerNoticeIdentity(text){
  const account=normalized.match(/מספר\s*(?:ה)?חשבון\s*[:־-]?\s*([0-9-]{6,20})/);
  return{issuer,accountReference:account?'account:'+account[1].replaceAll('-',''):null};
 }
+const cardHeader=/^(?:הודעה\s+ל)?(?:(?:ה)?כרטיס(?:ך|\s+אשראי)?\s+(?:ה|ש)?מסתיים\s+(?:בספרות|ב)|(?:ארבע|4)\s+ספרות\s+אחרונות(?:\s+של\s+(?:ה)?כרטיס)?|(?:מספר|מס[׳']?)\s+(?:ה)?כרטיס|כרטיס(?:\s+אשראי)?|ויזה|מאסטרקארד|דיינרס)\s*[:;,־–-]?\s*(?:[*•xX-]\s*)*(\d{4})[\s"',;]*$/u;
+const cardExportHeader=/^פירוט\s+(?:כרטיס|עסקאות.{0,180}\sלכרטיס)\s+(?:מאסטרקארד|ויזה|דיינרס)\s+(\d{4})[\s"',;]*$/u;
+function statementCardSuffix(row){
+ const label=row.replace(/"\s*[,;]\s*"/g,' ').replace(/^[ "'״,]+|[ "'״,]+$/g,'');
+ return (cardHeader.exec(label)??cardExportHeader.exec(label))?.[1];
+}
 const changed=/שינוי|שינויים|עדכון|מעודכנ|מתעדכנ|עודכנ|עודכן|תעודכ|יתעדכ|הוגדל|הוקטנ|תוגדל|תוקטן|הופחת|עלתה|ירדה|החל מ|changes?|updated?|increased?|reduced?|effective/i;
 function category(text){
  if(/(?:יש|נדרש|עליך|עליכם) (?:להסדיר|לעדכן|ליצור קשר|לטפל)|חריגה ממסגרת|פיגור בתשלום|חשבון.*(?:חסום|מוגבל)|action required|overdue|account.*(?:blocked|suspended)/i.test(text))return 'account';
@@ -50,11 +56,13 @@ function explicitDates(text){
 export function extractStatementNotices(pages){
  if(!Array.isArray(pages)||pages.length>20||pages.some(page=>typeof page?.text!=='string'||!Number.isInteger(page.page)||page.page<1||page.page>20)||new Set(pages.map(page=>page.page)).size!==pages.length||pages.reduce((sum,page)=>sum+page.text.length,0)>200000)throw Error('טקסט הדוח אינו בגודל או במבנה נתמך.');
  const allText=pages.map(page=>normalizeNoticeText(page.text)).join(' '),{issuer,accountReference}=issuerNoticeIdentity(allText);
- const notices=[],seen=new Set();
+ const notices=[],seen=new Set(),cardSuffixes=new Set();
  for(const page of pages){
   const rows=page.text.split(/\r?\n/).map(normalizeNoticeText).filter(Boolean);let section=false,inTable=false,block=[];
   const flush=()=>{const text=block.join(' ').trim();block=[];if(text.length<12||seen.has(text)||transactionRow(text))return;seen.add(text);const kind=category(text);notices.push({category:kind,issuer,accountReference,text,page:page.page,dates:explicitDates(text),amounts:[...text.matchAll(/\d[\d,]*(?:\.\d{1,2})?\s*(?:₪|ש[״"]ח|ILS)/g)].map(match=>match[0]).slice(0,8),attention:attention(kind),needsReview:true})};
   for(const row of rows){
+   const suffix=statementCardSuffix(row);
+   if(suffix){cardSuffixes.add(suffix);flush();continue}
    if(heading.test(row)){flush();section=true;inTable=false;continue}
    if(table.test(row)||transactionRow(row)){flush();section=false;inTable=true;continue}
    if(inTable)continue;
@@ -68,7 +76,7 @@ export function extractStatementNotices(pages){
   flush();
  }
  if(notices.length>40)throw Error('נמצאו הודעות רבות מדי. יש לבדוק את המקור ידנית.');
- return{version:1,issuer,notices};
+ return{version:1,issuer,notices,cardLastFour:cardSuffixes.size===1?[...cardSuffixes][0]:''};
 }
 export function pdfNoticePages(pages){
  const cal=calPDFNoticePages(pages);if(cal)return cal;

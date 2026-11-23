@@ -1,6 +1,6 @@
 import {AccessError,loadBudgetSnapshot,type BudgetResponse} from './budget-api.ts'
 import {loadReportSource,type StoredReport} from './report-library-api.ts'
-export interface StatementNotice{id:string;category:string;issuer:string;text:string;page:number;attention:boolean;needsReview:boolean;sourceId:string;sourceName:string;sourceHash:string;target:string|null;evidence:string;dates:{date:string;wording:string}[];amounts:string[];sources:{id:string;name:string;page:number}[]}
+export interface StatementNotice{id:string;category:string;issuer:string;text:string;page:number;attention:boolean;needsReview:boolean;sourceId:string;sourceName:string;sourceHash:string;sourceKind?:string|null;cardLastFour?:string;target:string|null;evidence:string;dates:{date:string;wording:string}[];amounts:string[];sources:{id:string;name:string;page:number}[]}
 export interface StatementScan{source:StoredReport&{sourceHash:string};status:'pending'|'complete'|'unsupported'|'failed';revision:number;count:number}
 export interface StatementNoticeSnapshot{accountId:string;accountEmail:string;budgetId:string;noticeIdentityBound:true;notices:StatementNotice[];scans:StatementScan[]}
 const path=(budget:string)=>'/api/statement-notices?budget='+encodeURIComponent(budget)

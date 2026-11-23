@@ -94,10 +94,13 @@ export function calPDFNoticePages(pages){
   if(Math.abs(page.width-555.59)>2||Math.abs(page.height-833.39)>2)throw Error('מבנה הודעות דוח כאל אינו נתמך. יש לבדוק את המקור.');
   const rows=lines(page.items.filter(i=>clean(i.str)&&x(i)>=130&&y(i)>195)),headings=rows.filter(r=>/^הודעהלכרטיסהמסתייםב/.test(compact(r.items)));
   if(headings.length>1)throw Error('מדור ההודעות בדוח כאל אינו חד־משמעי.');
-  if(!headings.length)return{page:index+1,text:'כאל'};
+  const identityRows=rows.filter(row=>row.y>740||headings.includes(row));
+  const suffixes=[...new Set(identityRows.flatMap(row=>[...compact(row.items).matchAll(/המסתייםב-?(\d{4})(?!\d)/g)].map(match=>match[1])))];
+  const identity=['כאל',...suffixes.map(suffix=>'כרטיס המסתיים ב-'+suffix)].join('\n');
+  if(!headings.length)return{page:index+1,text:identity};
   const blocks=[];for(const row of rows.filter(r=>r.y<headings[0].y-2)){
    const value=lineText(row.items);if(/^•/.test(value))blocks.push(value);else if(blocks.length)blocks[blocks.length-1]+=' '+value;
   }
-  return{page:index+1,text:'כאל\nהודעות\n'+blocks.join('\n')};
+  return{page:index+1,text:identity+'\nהודעות\n'+blocks.join('\n')};
  });
 }

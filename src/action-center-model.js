@@ -1,11 +1,30 @@
 import {monthlyDataCoverage,monthAt,creditCards,cashAccountList} from './budget.js';
-import {cardDateValid,cardDiscountReminderOn} from './card-metadata.js';
+import {CARD_ISSUERS,cardDateValid,cardDiscountReminderOn} from './card-metadata.js';
+
+/** Prefer the issuer's printed suffix and attach the saved name when the identities agree. */
+export function statementNoticeCard(plan,notice){
+ if(notice.sourceKind==='bank')return null;
+ const receipt=notice.sourceHash&&plan?.reportInbox?.receipts?.find(entry=>entry.hash===notice.sourceHash);
+ const cardId=notice.sourceKind==='card'&&notice.target?notice.target:receipt?.kind==='card'?receipt.target:null;
+ const issuer=CARD_ISSUERS.find(([key])=>key===notice.issuer)?.[1];
+ const cards=plan?creditCards(plan):[],assigned=cards.find(entry=>entry.id===cardId);
+ const lastFour=/^\d{4}$/.test(notice.cardLastFour??'')?notice.cardLastFour:'';
+ if(lastFour){
+  const card=cards.find(entry=>entry.alias===lastFour);
+  const savedIssuer=card?.issuer??card?.provider;
+  const name=card&&(!issuer||!savedIssuer||savedIssuer==='bank'||savedIssuer===notice.issuer)?card.name:issuer?'כרטיס '+issuer:'כרטיס';
+  return {name,lastFour};
+ }
+ if(assigned)return {name:assigned.name,lastFour:/^\d{4}$/.test(assigned.alias)?assigned.alias:''};
+ if(!cardId&&notice.sourceKind!=='card'&&(!issuer||receipt?.kind==='bank'))return null;
+ return {name:issuer?'כרטיס '+issuer+' לא זוהה':'הכרטיס לא זוהה',lastFour:''};
+}
 
 // Facts are derived from their owning subsystem. Notification preferences never resolve them.
 export const ACTION_DISMISSED=-1;
 export function actionIssueDismissed(issue,preferences){const p=preferences?.[issue.key];return p?.evidence===issue.evidence&&p.until===ACTION_DISMISSED;}
 export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,locked=false,saveError='',reports=[],expectations=[],gmail=null,notices=[],statementNotices=[],incomingReports=null,day=asOf+'-01'}={}){
- const issues=[],add=(code,id,title,effect,action,target,evidence,severity='required')=>issues.push({key:scope+':'+code+':'+id,code,title,effect,action,target,evidence:JSON.stringify(evidence),severity});
+ const issues=[],add=(code,id,title,effect,action,target,evidence,severity='required',statementCard=null)=>issues.push({key:scope+':'+code+':'+id,code,title,effect,action,target,evidence:JSON.stringify(evidence),severity,...(statementCard?{statementCard}:{})});
  if(saveError)add('save.failed','device','השינויים במכשיר טרם נשמרו',saveError,'חזרה לשמירה',{screen:'save'},saveError);
  if(admin&&backup){
   if(backup.error)add('backup.failed','server','הגיבוי החיצוני לא הושלם',backup.error,'טיפול בגיבוי',{screen:'backup'},[backup.lastAttempt,backup.error]);
@@ -16,7 +35,7 @@ export function actionIssues(p,{scope='personal',asOf,backup=null,admin=false,lo
  for(const notice of statementNotices){
   const title={charge:'חיוב או עמלה צפויים',account:'נדרש טיפול בחשבון',promotion:'הטבה או מבצע',terms:'שינוי בתנאים',limit:'עדכון מסגרת אשראי',interest:'עדכון ריבית',points:'צבירת נקודות',club:'הטבות מועדון',update:'עדכון מהמנפיק'}[notice.category];
   if(!title||!/^[a-f0-9]{64}$/.test(notice.id??'')||typeof notice.text!=='string')continue;
-  add('statement.notice',notice.id,title,notice.text.slice(0,240),'קריאת ההודעה והמקור',{screen:'statement-notice',noticeId:notice.id},notice.evidence,notice.attention?'incomplete':'info');
+  add('statement.notice',notice.id,title,notice.text.slice(0,240),'קריאת ההודעה והמקור',{screen:'statement-notice',noticeId:notice.id},notice.evidence,notice.attention?'incomplete':'info',statementNoticeCard(p,notice));
  }
  for(const r of reports.filter(r=>!['committed','archived'].includes(r.state))){
   const failed=r.state==='failed',ready=r.state==='ready';

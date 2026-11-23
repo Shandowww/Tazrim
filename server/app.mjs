@@ -48,7 +48,7 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const transferMatches=createTransferMatches(db,{isAllowed,secret:reportStore.secret,now});
  const statementNotices=createStatementNotices(db,{isAllowed,secret:reportStore.secret,now});
  if(reportAutomationEnabled)reportAutomation=createReportAutomation(db,{origin:base.origin,isAllowed,reportStore,intake:reportIntake,notices:statementNotices,now,...automationOptions});
- const actions=createActions(db,{isAllowed,now,reports:reportStore.list,incomingReports:reportIntake.pending,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
+ const actions=createActions(db,{isAllowed,now,reports:reportStore.list,incomingReports:reportIntake.pending,prepareStatementNotices:statementNotices.recoverCardSuffixes,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
  origin=base.origin;const wallet=createApplePay(db,{origin,now,isAllowed});const configured=!!(clientId&&clientSecret);oauth??=new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback');
  const handle=async function handle(request,{ip='unknown'}={}){
  const u=new URL(request.url),path=u.pathname,time=now(),loginTarget=path==='/'&&u.search||path==='/next'||path.startsWith('/next/')?path+u.search:'/';const jar=cookies(request);
