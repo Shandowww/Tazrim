@@ -57,6 +57,7 @@ test('Changed card reports expose their original comparison action beside every 
 });
 
 import {bankMatchCandidates,reportMatchRows} from '../frontend/src/app/report-match-model.ts';
+import {bankMatchLink} from '../src/report-bank-match.js';
 test('Bank matching choices remain editable after New, Same, reset and original draft round-trip without changing financial records',async()=>{
  const initial=plan(),records=[record(1,-1000,'תשלום ראשון',''),record(2,-2000,'תשלום שני','')],original=ui([bank(records)]);
  for(const row of records)original.bankChoices.set(inboxBankGroupKey(original.items[0],row),{field:'variable',refund:false});await build(initial,original);assert.ok(original.build);
@@ -145,4 +146,44 @@ test('Two pending rows cannot claim the same saved bank movement and a stale or 
  await build(saved,next);
  assert.equal(next.items[0].preview.rows.every(row=>row.state==='migrated'),true);
  assert.equal(next.build,null);
+});
+
+test('A structured value-date suffix in an Excel bank description does not block a strongly evidenced PDF match',async()=>{
+ const initial=plan(),description='עמ\'הקצאת אשראי',valueDate='2026-02-01';
+ const excel={...record(1,-1200,description+' (תאריך ערך: 01/02)','synthetic-reference'),valueDate,balanceCents:339558};
+ const pdf={...record(2,-1200,description,''),date:excel.date,valueDate:null,balanceCents:excel.balanceCents};
+ const original=ui([bank([excel])]);
+ original.items[0].name='example.xlsx';
+ original.bankChoices.set(inboxBankGroupKey(original.items[0],excel),{field:'variable'});
+ await build(initial,original);
+ const saved=original.build,existing=saved.bankImport.entries[0],before=JSON.stringify(saved);
+ const review=ui([bank([pdf])]);
+ review.items[0].id='pdf-example';
+ review.items[0].hash='f'.repeat(64);
+ await build(saved,review);
+ const match=review.items[0].matchReviews[0];
+ assert.equal(match.canMatch,false);
+ const candidate=bankMatchCandidates(saved,review.items[0],match).find(option=>option.entry.key===existing.key);
+ assert.match(candidate.link,/^bank-match:/);
+ await changeReportInbox(saved,review,{dataset:{inboxDuplicate:'0',row:match.id},value:candidate.link});
+ await build(saved,review);
+ assert.equal(review.issues,0);
+ assert.equal(review.items[0].already,true);
+ assert.equal(review.readyRows,0);
+ assert.deepEqual(review.build.bankImport.entries,saved.bankImport.entries);
+ assert.equal(JSON.stringify(saved),before);
+
+ for(const changed of [
+  {...match.row,balanceCents:339559},
+  {...match.row,balanceCents:null},
+  {...match.row,amountCents:1200},
+  {...match.row,reference:'different-reference'},
+  {...match.row,valueDate:'2026-02-03'},
+  {...match.row,description:'עמלה אחרת'},
+ ])assert.equal(bankMatchLink(changed,existing,existing.accountId),'');
+ for(const source of [
+  {...existing.source,valueDate:null},
+  {...existing.source,valueDate:'2026-02-10'},
+  {...existing.source,description:description+' (תאריך ערך: 01/02/2025)'},
+ ])assert.equal(bankMatchLink(match.row,{...existing,source},existing.accountId),'');
 });

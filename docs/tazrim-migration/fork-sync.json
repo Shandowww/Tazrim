@@ -1,27 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "05090218d42137288043e7a2e4debed5b88f3192",
+  "sourceCommit": "32d6dec7948fce0554b39afc6eff7a4b1eb980e0",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "Approved iPhone duplicate review is verified live on Budgit.",
+  "status": "Approved bank value-date duplicate matching is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1506,
+    "applicationAndReaderTests": 1507,
     "coreChecks": 15,
-    "prototypeWidths": [
-      375,
-      390,
-      430,
-      667,
-      767,
-      768,
-      1440
-    ],
     "production": "Exact CI, image scan, verified backup, isolated financial/access/restore/rollback, 186 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "c413c34e35d5d3bc91c56493aa6d9d0ec3b725fc",
-  "productionVersion": "v1.7.0",
-  "productionBuild": "16447f2dd1"
+  "productionApplicationCommit": "71573e78c805993deecd5aa127933883fc64b9f7",
+  "productionVersion": "v1.7.1",
+  "productionBuild": "8d31a6f294"
 }

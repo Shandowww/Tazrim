@@ -1,0 +1,38 @@
+{
+  "version": "v1.7.1",
+  "commit": "71573e78c805993deecd5aa127933883fc64b9f7",
+  "build": "8d31a6f294",
+  "verifiedAt": "2026-11-23T20:12:45+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "An optional trailing value-date annotation that agrees with the structured source date no longer blocks a duplicate link when the base description and running balance agree. Existing account, booking-date, signed amount, currency, reference-conflict and one-to-one guards apply.",
+  "approval": "Tal approved publishing the exact desktop preview release 71573e78.",
+  "previousVersion": "v1.7.0",
+  "previousCommit": "c413c34e35d5d3bc91c56493aa6d9d0ec3b725fc",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45234422235",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1507,
+    "coreChecks": 15,
+    "desktopPreview": "Selecting the existing candidate completes the example without adding a movement.",
+    "mobileRegression": "Previous focused duplicate workflow and responsive checks passed.",
+    "realReportReplay": "The approved rule resolved the exact pending row as duplicate in a read-only replay after activation."
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-71573e78.uOJuP9/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-71573e78.sGHGxh/",
+  "candidateImage": "sha256:dcd3d89db4c69a937bfd424eae64e3d3ca16641cf6957f12d5a87f6951747833",
+  "rollbackImage": "sha256:782fae8cab6a788ac582e7d7b8098e1206c68ddc9ad3384acc7a01ee855a44a4",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 186,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "preserved"
+  },
+  "limits": [
+    "The production report replay made no writes or review decisions.",
+    "No new physical iPhone test."
+  ]
+}
