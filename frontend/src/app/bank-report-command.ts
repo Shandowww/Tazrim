@@ -1,7 +1,8 @@
-import {buildReportInbox,reportInboxDraftForWrite,inboxBankGroupKey} from '../../../src/report-inbox-controller.js'
+import {buildReportInbox,reportInboxDraftForWrite,inboxBankGroupKey,inboxLegacyBankGroupKey} from '../../../src/report-inbox-controller.js'
 import {cashAccountList,clone,validatePlan} from '../../../src/budget.js'
 import {bankIdentity,bankPreview,bankDefaultMonthModes,bankPlannedDirect} from '../../../src/bank-import-model.js'
 import {inboxHash,inboxReceiptPresent} from '../../../src/report-inbox-model.js'
+import {applyBankCardSettlementChoices} from '../../../src/bank-card-settlement.js'
 import {suggest} from '../../../tools/bank-csv/classifier.mjs'
 export interface BankReportSelection{accountId:string;scope:'complete'|'partial';choices:Record<string,{field:string;refund?:boolean}>;duplicates:Record<string,'same'|'new'>;skipMonths:string[];directIncluded:Record<string,boolean>}
 const object=(v:any)=>!!v&&typeof v==='object'&&!Array.isArray(v)
@@ -21,6 +22,7 @@ export async function previewNativeBankReport(plan:any,parsed:any,source:any,sel
  for(const row of preview.rows.filter((r:any)=>r.state==='conflict')){const decision=selection.duplicates[String(row.line)],previous=plan.bankImport?.entries.find((e:any)=>e.key===row.key);if(decision==='same'&&previous?.fingerprint===row.fingerprint)records=records.map((r:any)=>r.line===row.line?{...r,missingReference:false}:r);else if(decision==='new')records=await Promise.all(records.map(async(r:any)=>r.line===row.line?{...r,key:await inboxHash(parsed.hash+':'+r.line+':'+r.key),missingReference:false}:r));else questions.push({type:'duplicate',line:row.line,canMatch:previous?.fingerprint===row.fingerprint,previous:previous?clone(previous):null})}
  preview=bankPreview(plan,records,options);options.modes=bankDefaultMonthModes(plan,preview,asOf,selection.scope)
  for(const month of preview.months){if(selection.skipMonths.includes(month.month))options.modes[month.month]='skip';if(options.modes[month.month]==='skip'&&month.newCount&&!selection.skipMonths.includes(month.month))questions.push({type:'protected-month',month:month.month});if(options.modes[month.month]!=='skip'&&bankPlannedDirect(plan,month.month,account.id).length&&typeof selection.directIncluded[month.month]!=='boolean')questions.push({type:'direct',month:month.month})}
+ applyBankCardSettlementChoices(plan,preview.rows,options)
  preview=bankPreview(plan,records,options)
  if(preview.rows.some((r:any)=>['invalid','migrated'].includes(r.state)))questions.push({type:'blocked-source'})
  for(const row of preview.rows)if(options.modes[row.date?.slice(0,7)]!=='skip'&&!row.reviewed)questions.push({type:'classification',line:row.line})
@@ -37,18 +39,18 @@ export async function prepareNativeBankReport(plan:any,parsed:any,source:any,sel
  return{...review,...(ui.banks[0]?{records:ui.banks[0].records,options:ui.banks[0].options}:{}),plan:ui.build}
 }
 
-const groupKey=(accountId:string,row:any)=>inboxBankGroupKey({target:accountId},row)
+const groupKey=(accountId:string,hash:string,row:any)=>inboxBankGroupKey({target:accountId,hash},row)
 /** Serialize exactly the original inbox schema. Different decisions within one legacy group cannot be represented safely. */
 export async function nativeBankStoredDraft(plan:any,parsed:any,source:any,selection:BankReportSelection,groupId:string,asOf:string){
  await previewNativeBankReport(plan,parsed,source,selection,asOf)
  if(!/^[-\w]{16,100}$/.test(groupId))throw Error('מזהה קבוצת הדוח אינו תקין.')
- const groups=new Map<string,any>();for(const row of parsed.records){const chosen=selection.choices[String(row.line)];if(!chosen)continue;const key=groupKey(selection.accountId,row),value={field:chosen.field,refund:chosen.refund===true};if(groups.has(key)&&JSON.stringify(groups.get(key))!==JSON.stringify(value))throw Error('יש סיווגים שונים באותה קבוצת תנועות. יש לפתוח את קבוצת הדוחות כדי לבדוק את הסיווגים לפני שמירת התקדמות.');groups.set(key,value)}
- for(const row of parsed.records)if(groups.has(groupKey(selection.accountId,row))&&!Object.hasOwn(selection.choices,String(row.line)))throw Error('יש לאשר את כל שורות קבוצת התנועות לפני שמירת הסיווג שלה.')
+ const groups=new Map<string,any>();for(const row of parsed.records){const chosen=selection.choices[String(row.line)];if(!chosen)continue;const key=groupKey(selection.accountId,parsed.hash,row),value={field:chosen.field,refund:chosen.refund===true};if(groups.has(key)&&JSON.stringify(groups.get(key))!==JSON.stringify(value))throw Error('יש סיווגים שונים באותה קבוצת תנועות. יש לפתוח את קבוצת הדוחות כדי לבדוק את הסיווגים לפני שמירת התקדמות.');groups.set(key,value)}
+ for(const row of parsed.records)if(groups.has(groupKey(selection.accountId,parsed.hash,row))&&!Object.hasOwn(selection.choices,String(row.line)))throw Error('יש לאשר את כל שורות קבוצת התנועות לפני שמירת הסיווג שלה.')
  return reportInboxDraftForWrite({groupId,items:[{id:source.id,name:source.name,size:source.size??0,target:selection.accountId,payer:'',decisions:clone(selection.duplicates),directIncluded:clone(selection.directIncluded),monthDecisions:Object.fromEntries(selection.skipMonths.map(m=>[m,'skip'])),bankOptions:{scope:selection.scope},skip:false,hash:parsed.hash,identityKey:parsed.identityKey??'',kind:'bank',provider:parsed.provider??'',identity:parsed.identity??'',records:clone(parsed.records),from:parsed.from,to:parsed.to,...(parsed.inspection?{inspection:clone(parsed.inspection)}:{}),storedId:source.id,storedRevision:source.revision}],categoryChoices:new Map(),bankChoices:groups,newAccounts:[],newCards:[],startMonth:plan.startMonth},[{storedId:source.id}],'react-bank-review-v1')
 }
 export async function restoreNativeBankSelection(plan:any,parsed:any,source:any,asOf:string):Promise<BankReportSelection>{
  const draft=source.draft,item=draft?.items?.[0];if(!draft||draft.version!==1||draft.parserBuild!=='react-bank-review-v1'||!Array.isArray(draft.items)||draft.items.length!==1||item?.kind!=='bank'||item.storedId!==source.id||item.storedRevision!==source.revision||item.hash!==parsed.hash||item.from!==parsed.from||item.to!==parsed.to||JSON.stringify(item.records)!==JSON.stringify(parsed.records)||draft.startMonth!==plan.startMonth||!Array.isArray(draft.bankChoices)||draft.bankChoices.length>10000||['newAccounts','newCards','categoryChoices'].some(k=>!Array.isArray(draft[k])||draft[k].length)||!object(item.monthDecisions)||Object.values(item.monthDecisions).some(v=>v!=='skip'))throw Error('יש להמשיך דרך קבוצת הדוחות השמורה כדי לשמור את כל ההחלטות.')
  const groups=new Map<string,any>();for(const pair of draft.bankChoices){if(!Array.isArray(pair)||pair.length!==2||typeof pair[0]!=='string'||groups.has(pair[0])||!object(pair[1])||typeof pair[1].field!=='string'||typeof pair[1].refund!=='boolean')throw Error('סיווגים שמורים אינם תקינים. יש לפתוח את קבוצת הדוחות ולבדוק את הסיווגים השמורים.');groups.set(pair[0],pair[1])}
- const choices:BankReportSelection['choices']={},used=new Set();for(const row of parsed.records){const key=groupKey(item.target,row);if(groups.has(key)){choices[String(row.line)]=clone(groups.get(key));used.add(key)}}if(used.size!==groups.size)throw Error('הסיווגים אינם תואמים למקור הנוכחי.')
+ const choices:BankReportSelection['choices']={},used=new Set();for(const row of parsed.records){const current=groupKey(item.target,item.hash,row),key=groups.has(current)?current:inboxLegacyBankGroupKey(item,row);if(groups.has(key)){choices[String(row.line)]=clone(groups.get(key));used.add(key)}}if(used.size!==groups.size)throw Error('הסיווגים אינם תואמים למקור הנוכחי.')
  const selection:BankReportSelection={accountId:item.target,scope:item.bankOptions?.scope,choices,duplicates:clone(item.decisions),skipMonths:Object.keys(item.monthDecisions),directIncluded:clone(item.directIncluded)};await previewNativeBankReport(plan,parsed,{...source,draft:null},selection,asOf);return selection
 }

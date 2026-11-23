@@ -14,7 +14,7 @@ export function bankClassificationOptions(plan:any,rows:any[],accountId=''){
  const account=accounts.size<=1&&(!accounts.size||accounts.has(accountId))?cashAccountList(plan).find((value:any)=>value.id===accountId):null
  const scope=account?.classificationScope
  return [...budgetFields(plan),['exclude','ללא השפעה על התקציב']]
-  .filter(([key]:string[])=>!key.startsWith('card')||!!account&&cashCardAccount(plan,key)===account.id)
+  .filter(([key]:string[])=>!key.startsWith('card')||!!account&&(cashCardAccount(plan,key)===account.id||rows.length>0&&rows.every(row=>row.cardSettlement?.candidates.some((candidate:any)=>candidate.cardId===key))))
   .filter(([key]:string[])=>scope==='shared'||!['rent','houseCommittee'].includes(key))
   .filter(([key]:string[])=>scope!=='personal'||!['sharedSaving','sharedInvest'].includes(key))
   .filter(([key]:string[])=>scope!=='shared'||!['personalSaving','personalInvest'].includes(key))
@@ -37,7 +37,7 @@ export function reportClassificationRows(review:any){
    const checkIndex=questionIndex>=0?questionIndex:monthQuestion>=0?monthQuestion:contextQuestion
    const match=(item.matchReviews??[]).find((match:any)=>match.id===String(item.kind==='bank'?row.line:row.id))
    const editable=!item.skip&&!item.already&&(item.kind==='bank'?row.state==='new'&&groupIndex>=0:!row.existing&&!!group)
-   const status=item.skip?'מחוץ לקליטה':item.statementConflict?'נדרשת השוואה לדוח שכבר נשמר':row.state==='conflict'?'נדרשת בדיקת התאמה':row.state==='migrated'?'מקור ממעבר חשבון — הקליטה חסומה':row.state==='invalid'?'נדרשת בדיקת נתוני המקור':row.existing||['duplicate','duplicate-file'].includes(row.state)||item.already?'כבר קיים בתקציב':item.kind==='bank'?groupIndex<0?'החודש מחוץ לקליטה':review.bankChoices.has(key)?'סיווג שבחרת':row.reviewed?'סווג אוטומטית':current?'הצעה לאישור':'נדרש סיווג':review.categoryChoices.has(rowCategoryKey)||review.categoryChoices.has(key)?'קטגוריה שבחרת':categoryMissing(current)?'קטגוריה להשלמה':'קטגוריה מוצעת'
+   const status=item.skip?'מחוץ לקליטה':item.statementConflict?'נדרשת השוואה לדוח שכבר נשמר':row.state==='conflict'?'נדרשת בדיקת התאמה':row.state==='migrated'?'מקור ממעבר חשבון — הקליטה חסומה':row.state==='invalid'?'נדרשת בדיקת נתוני המקור':row.existing||['duplicate','duplicate-file'].includes(row.state)||item.already?'כבר קיים בתקציב':item.kind==='bank'?groupIndex<0?'החודש מחוץ לקליטה':row.manualClassification||review.bankChoices.has(key)?'סיווג שבחרת':row.cardSettlement?.matched?'שויך אוטומטית לדוח הכרטיס':row.reviewed?'סווג אוטומטית':current?'הצעה לאישור':'נדרש סיווג':review.categoryChoices.has(rowCategoryKey)||review.categoryChoices.has(key)?'קטגוריה שבחרת':categoryMissing(current)?'קטגוריה להשלמה':'קטגוריה מוצעת'
    return {row,rowIndex,id:classificationRowId(itemIndex,rowIndex),key,groupIndex,group,current,status,editable,checkId:match?matchReviewId(itemIndex,match.id):checkIndex>=0?exceptionId(itemIndex,checkIndex):null}
   })}
  })
@@ -52,7 +52,7 @@ export function reportReviewChecks(review:any):ReviewCheck[]{
   const index=review.items.findIndex((item:any)=>(item.preview?.rows??[]).some((row:any)=>row.state==='new'&&!row.reviewed&&inboxBankGroupKey(item,row)===group.key))
   if(index<0)continue
   const rowIndex=review.items[index].preview.rows.findIndex((row:any)=>row.state==='new'&&!row.reviewed&&inboxBankGroupKey(review.items[index],row)===group.key)
-  result.push({id:classificationRowId(index,rowIndex),step:'categories',label:'בחירת סוג תנועת הבנק',source:review.items[index].name,row:group.rows[0]})
+  result.push({id:classificationRowId(index,rowIndex),step:'categories',label:group.rows[0]?.cardSettlement?'בחירת כרטיס לחיוב הבנק':'בחירת סוג תנועת הבנק',source:review.items[index].name,row:group.rows[0]})
  }
  for(const [index,item]of (review?.items??[]).entries()){
   if(item.skip)continue

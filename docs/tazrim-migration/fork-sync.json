@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "32d6dec7948fce0554b39afc6eff7a4b1eb980e0",
+  "sourceCommit": "a9c64234c76d4da302bb5edb4ead71e412f64104",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "Approved bank value-date duplicate matching is verified live on Budgit.",
+  "status": "Approved automatic matching of bank card debits is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1507,
+    "applicationAndReaderTests": 1513,
     "coreChecks": 15,
-    "production": "Exact CI, image scan, verified backup, isolated financial/access/restore/rollback, 186 runtime files and 53 authoritative tables passed."
+    "production": "Exact CI, image scan, verified backup, isolated financial/access/restore/rollback, 187 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "71573e78c805993deecd5aa127933883fc64b9f7",
-  "productionVersion": "v1.7.1",
-  "productionBuild": "8d31a6f294"
+  "productionApplicationCommit": "4ec31d3d251c2be7b7590e023bb571344625b613",
+  "productionVersion": "v1.8.0",
+  "productionBuild": "83a6ac01ea"
 }

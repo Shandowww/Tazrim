@@ -1,0 +1,47 @@
+{
+  "version": "v1.8.0",
+  "commit": "4ec31d3d251c2be7b7590e023bb571344625b613",
+  "build": "83a6ac01ea",
+  "verifiedAt": "2026-11-24T00:30:58+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Report review assigns a recognized bank card debit when exactly one statement matches its exact amount, paying account and eligible date. Ambiguous, absent and previously claimed matches require review. Matched bank payments use the existing guarded import and manual choices are preserved.",
+  "approval": "Tal explicitly approved publishing the local prototype of this commit.",
+  "previousVersion": "v1.7.1",
+  "previousCommit": "71573e78c805993deecd5aa127933883fc64b9f7",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45279115070",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1513,
+    "coreChecks": 15,
+    "syntheticReportReviewWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateDryRunEvidence": "/opt/budgit-releases/dry-run-4ec31d3d.WnVrmJ/",
+  "privateActivationEvidence": "/opt/budgit-releases/supervised-4ec31d3d.Ge1ZyE/",
+  "candidateImage": "sha256:69c7f6a8c20f53a4a0d7e08f13e19b5ef048c8f7f1221cdf46c4279c736810ec",
+  "rollbackImage": "sha256:dcd3d89db4c69a937bfd424eae64e3d3ca16641cf6957f12d5a87f6951747833",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 187,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "syntheticLiveProbe": {
+      "build": "83a6ac01ea",
+      "uniqueDebitCount": 1,
+      "ambiguousCandidates": 2,
+      "ambiguousRequiresReview": true,
+      "financialWrites": 0
+    }
+  },
+  "limits": [
+    "Synthetic browser and runtime checks used sample records. No physical iPhone test."
+  ]
+}

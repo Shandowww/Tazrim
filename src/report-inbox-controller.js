@@ -1,3 +1,4 @@
+import {applyBankCardSettlementChoices,bankCardDebit} from './bank-card-settlement.js';
 import {clone,creditCards,cashAccountList,cashPlanningBase} from './budget.js';
 import {bankIdentity,bankPreview,bankDefaultMonthModes,bankPlannedDirect,bankRememberedRules,applyBankImport} from './bank-import-model.js';
 import {prepareCardStatement,statementMerchant,statementGroups,statementBatchGroups} from './card-statement-model.js';
@@ -7,7 +8,10 @@ import {bankMatchLink,bankMatchLinkKey} from './report-bank-match.js';
 // Extracted from the original report inbox. Both interfaces use this one workflow.
 // Only the supplied review state is updated; the saved financial plan is never mutated.
 export function reportInboxBase(plan,ui){const next=clone(plan);if(ui.blank){next.startMonth=ui.startMonth;next.setupCompleted=true;}const usedAccounts=ui.newAccounts.filter(a=>ui.items.some(i=>!i.skip&&!i.error&&(i.target===a.id||i.payer===a.id))),usedCards=ui.newCards.filter(c=>ui.items.some(i=>!i.skip&&!i.error&&i.target===c.id));if(usedAccounts.length){next.cashPlanning=cashPlanningBase(next);next.cashPlanning.accounts.push(...clone(usedAccounts));}if(usedCards.length){next.creditCards=clone(creditCards(next));next.creditCards.push(...clone(usedCards));for(const c of usedCards)next.defaults[c.id]=0;}return next;}
-export function inboxBankGroupKey(item,r){return JSON.stringify([item.target,statementMerchant(r.description),statementMerchant(r.beneficiary),r.amountCents<0?'out':'in']);}
+export function inboxLegacyBankGroupKey(item,r){return JSON.stringify([item.target,statementMerchant(r.description),statementMerchant(r.beneficiary),r.amountCents<0?'out':'in']);}
+export function inboxBankGroupKey(item,r){
+ return item.hash&&bankCardDebit(r)?JSON.stringify([item.target,item.hash,r.line]):inboxLegacyBankGroupKey(item,r);
+}
 // A one-purchase category uses the existing row-choice importer and version-1
 // choice map. Merchant group choices retain their original behavior.
 export function inboxCardRowCategoryKey(row){return 'transaction:'+row.id;}
@@ -15,7 +19,9 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
  const inboxAccounts=ui=>[...cashAccountList(plan),...ui.newAccounts],inboxCards=ui=>[...creditCards(plan),...ui.newCards];
  if(ui.blank)ui.startMonth=[plan.startMonth,...ui.items.filter(i=>!i.skip&&!i.error).map(i=>(i.from??i.report?.dueDate??i.activityCycle??plan.startMonth).slice(0,7))].sort()[0];
  let working=reportInboxBase(plan,ui),banks=[],cards=[],receipts=[],bindings=[],issues=0,bankGroups=new Map(),bankReviewGroups=new Map();ui.cardGroups=[];ui.skipped=ui.duplicates;ui.readyRows=0;ui.base=working;
- for(const item of ui.items){
+ // Prepare statement evidence before classifying bank debits, independently of file order.
+ const reviewOrder=[...ui.items.filter(item=>item.kind==='card'),...ui.items.filter(item=>item.kind!=='card')];
+ for(const item of reviewOrder){
   item.preview=null;item.questions=[];item.matchReviews=[];item.warning='';item.already=false;item.statementConflict=null;
   if(item.skip){ui.skipped++;continue;}
   if(item.activity){item.report=null;try{item.report=activityAPI.calActivityReport(item.activity,item.activityCycle,item.activityTotal,item.activityConfirmed);item.activityError='';}catch(error){item.activityError=error.message;}}
@@ -25,7 +31,7 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    if(ui.newAccounts.some(a=>a.id===item.target&&!a.bankName)){item.warning='בחרו את הבנק של החשבון החדש.';issues++;continue;}
    const stored=working.bankImport?.accounts.find(a=>a.id===item.target),rules=stored?.rules??[];
    let records=await Promise.all(item.records.map(r=>bankIdentity(r,item.target))),choices={};
-   for(const r of records){const key=inboxBankGroupKey(item,r),selected=ui.bankChoices.get(key),suggested=classifier.suggest(r,rules),personalRule=/מוטב שהגדרת|כלל אישי שהגדרת/.test(suggested.reason),auto=['clear','explicit'].includes(suggested.strength)&&(!personalRule||stored?.personal===true)&&!r.reversal;
+   for(const r of records){const key=inboxBankGroupKey(item,r),selected=ui.bankChoices.get(key)??ui.bankChoices.get(inboxLegacyBankGroupKey(item,r)),suggested=classifier.suggest(r,rules),personalRule=/מוטב שהגדרת|כלל אישי שהגדרת/.test(suggested.reason),auto=['clear','explicit'].includes(suggested.strength)&&(!personalRule||stored?.personal===true)&&!r.reversal;
     choices[r.line]=selected?{...selected,reviewed:true,manual:true}:{field:suggested.destination,reviewed:auto,refund:suggested.refund===true,reason:suggested.reason};
    }
    const options={id:item.id,accountId:item.target,label:account.label,bankName:(account.bankName??item.provider)||undefined,personal:stored?.personal===true,rules,from:item.from,to:item.to,fileName:item.name,choices,modes:{},reportScope:item.bankOptions.scope,directIncluded:item.directIncluded,asOf:month,coverageConfirmed:true,monthsConfirmed:true};
@@ -63,6 +69,7 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
    }
    preview=bankPreview(working,records,options);options.modes=bankDefaultMonthModes(working,preview,month,options.reportScope);
    for(const m of preview.months){if(item.monthDecisions[m.month]==='skip')options.modes[m.month]='skip';if(options.modes[m.month]==='skip'&&m.newCount&&item.monthDecisions[m.month]!=='skip')item.questions.push({type:'protected-month',month:m.month});if(options.modes[m.month]!=='skip'&&bankPlannedDirect(working,m.month,item.target).length&&typeof item.directIncluded[m.month]!=='boolean')item.questions.push({type:'direct',month:m.month});}
+   applyBankCardSettlementChoices(working,preview.rows,options,cards);
    preview=bankPreview(working,records,options);item.preview=preview;
    for(const r of preview.rows.filter(r=>r.state==='new'&&options.modes[r.date?.slice(0,7)]!=='skip')){const key=inboxBankGroupKey(item,r);if(!bankReviewGroups.has(key))bankReviewGroups.set(key,{key,rows:[]});bankReviewGroups.get(key).rows.push({...r,fileName:item.name});}
    for(const r of preview.rows.filter(r=>r.state==='new'&&!r.reviewed&&options.modes[r.date?.slice(0,7)]!=='skip')){const key=inboxBankGroupKey(item,r);if(!bankGroups.has(key))bankGroups.set(key,{key,merchant:[r.description,r.beneficiary].filter(Boolean).join(' · '),rows:[],category:choices[r.line]?.field??'',reason:choices[r.line]?.reason??''});bankGroups.get(key).rows.push({...r,fileName:item.name});}

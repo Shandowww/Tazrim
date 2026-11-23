@@ -1,3 +1,4 @@
+import {bankCardDebit} from './bank-card-settlement.js';
 import {clone,fields,creditCards,monthlyValues,forecast,confirmMonthlySavings,validatePlan,cents,paymentFor,monthAt,cashAccountList,cashAccountValues,cashAssignedItem,loanBankMatch,loanMatchText,loanRulesTextOverlap,indexMonth} from './budget.js';
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function bankMonthSources(p,month){
@@ -46,7 +47,7 @@ export function bankPreview(p,records,options){
   const original=choices[r.line]??{},match=loanBankMatch(p,accountId,r),c=original.manual?original:match.ambiguous?{field:'',reviewed:false}:match.loanId?{field:'loanRepayment',reviewed:true,refund:r.amountCents>0}:original,field=state==='duplicate'?previous.field:c.field;
   if(state!=='invalid'&&(migrationKeys.has(r.key)||migrationFingerprints.has(r.fingerprint)))state='migrated';
   const reviewed=['duplicate','duplicate-file'].includes(state)||state==='new'&&c.reviewed===true&&allowed.has(field)&&(field==='exclude'||(['salary','otherIncome','incomingTransfers'].includes(field)?r.amountCents>0:r.amountCents<0||field!=='outgoingTransfers'&&(r.reversal===true||c.refund===true)&&r.amountCents>0));
-  const row={...r,state,field,reviewed,accountId};rows.push(row);if(!seen.has(r.key)&&!['invalid','conflict'].includes(state))seen.set(r.key,{fingerprint:r.fingerprint,field});
+  const row={...r,state,field,reviewed,accountId,...(state==='new'&&c.cardSettlement?{cardSettlement:c.cardSettlement,manualClassification:c.manual===true}:{})};rows.push(row);if(!seen.has(r.key)&&!['invalid','conflict'].includes(state))seen.set(r.key,{fingerprint:r.fingerprint,field});
  }
  const conflicts=new Set(rows.filter(r=>r.state==='conflict').map(r=>r.key));for(const r of rows)if(conflicts.has(r.key)&&r.state==='new'){r.state='conflict';r.reviewed=false;}
  const months=[...new Set(rows.filter(r=>r.date&&r.date>=from&&r.date<=to).map(r=>r.date.slice(0,7)))].sort().map(month=>{
@@ -69,7 +70,7 @@ export function bankReviewGroups(rows){
  for(const r of rows){
   if(r.state!=='new')continue;
   const action=normalize(r.description),beneficiary=normalize(r.beneficiary),direction=r.amountCents<0?'out':r.amountCents>0?'in':'zero';
-  const key=JSON.stringify([action,beneficiary,direction,action||beneficiary?null:r.line]);
+  const key=JSON.stringify([action,beneficiary,direction,r.cardSettlement||!(action||beneficiary)?r.line:null]);
   if(!groups.has(key))groups.set(key,{action:r.description||'פעולה ללא תיאור',beneficiary:r.beneficiary||'',direction,rows:[]});
   groups.get(key).rows.push(r);
  }
@@ -81,7 +82,7 @@ export function bankReviewGroups(rows){
 export function bankRememberedRules(rules,records,choices,enabled=true){
  const result=clone(rules);if(!enabled)return result;
  const normalize=s=>String(s??'').normalize('NFKC').replace(/[״׳"']/g,'').replace(/\s+/g,' ').trim().toLowerCase(),groups=new Map();
- for(const r of records){const c=choices[r.line];if(!c?.reviewed||!c.field||r.reversal)continue;const action=normalize(r.description),beneficiary=normalize(r.beneficiary),direction=r.amountCents<0?'out':'in';if(!(action||beneficiary)||action.length>160||beneficiary.length>160)continue;const key=JSON.stringify([action,beneficiary,direction]);if(!groups.has(key))groups.set(key,{action,beneficiary,direction,choices:[]});groups.get(key).choices.push(c);}
+ for(const r of records){const c=choices[r.line];if(!c?.reviewed||!c.field||r.reversal||bankCardDebit(r))continue;const action=normalize(r.description),beneficiary=normalize(r.beneficiary),direction=r.amountCents<0?'out':'in';if(!(action||beneficiary)||action.length>160||beneficiary.length>160)continue;const key=JSON.stringify([action,beneficiary,direction]);if(!groups.has(key))groups.set(key,{action,beneficiary,direction,choices:[]});groups.get(key).choices.push(c);}
  for(const g of groups.values()){if(!g.choices.some(c=>c.manual))continue;const destinations=new Set(g.choices.map(c=>JSON.stringify([c.field,!!c.refund]))),old=result.findIndex(r=>r.action!==undefined&&normalize(r.action)===g.action&&normalize(r.beneficiary)===g.beneficiary&&r.direction===g.direction);if(destinations.size!==1){if(old>=0)result.splice(old,1);continue;}const c=g.choices[0],rule={text:g.beneficiary||g.action,action:g.action,beneficiary:g.beneficiary,direction:g.direction,destination:c.field,refund:!!c.refund};if(old>=0)result[old]=rule;else if(result.length<100)result.push(rule);}
  return result;
 }
