@@ -1,0 +1,44 @@
+{
+  "version": "v1.9.4",
+  "commit": "d54f1809a56d5b03525f3af402d0ba138901fd82",
+  "build": "229fb2745a",
+  "previousCommit": "cc151be977c553b915aa21761ae8cae29bfdf698",
+  "verifiedAt": "2026-11-26T00:57:21+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Report Sync recognizes the ONE ZERO Platinum Mastercard title in the existing Isracard spreadsheet layout and reads the printed card and billing date. Existing issuer workbook, single-card and signed-sum checks still apply.",
+  "approval": "The documented policy permits validated corrective fixes to existing behavior.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45716346224",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1529,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-d54f1809.vVmeJl/",
+  "candidateImage": "sha256:fdc7c437291c63155d109d3ca31eee21b0c18d06a2b4e50e8744004c8a48b578",
+  "rollbackImage": "sha256:ba00580c697a8b9dd720b7b336d22e49e326c1e934360a46c5799a170075ba25",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 188,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "syntheticLiveProbe": {
+      "synthetic": true,
+      "cardRecognized": true,
+      "reconciledRows": 3
+    }
+  },
+  "limits": [
+    "The supplied workbook was verified locally and in a read-only replay from the inbox. Responsive verification used a synthetic statement."
+  ]
+}

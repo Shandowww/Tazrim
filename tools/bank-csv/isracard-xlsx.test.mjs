@@ -7,8 +7,8 @@ import {isracardWorkbookFixture} from './isracard-xlsx-fixture.mjs';
 import {zero} from '../../src/budget.js';
 import {applyBillingBatch,prepareCardStatement} from '../../src/card-statement-model.js';
 
-function inspection(){
- const workbook=readXlsx(isracardWorkbookFixture(),XLSX);
+function inspection(options){
+ const workbook=readXlsx(isracardWorkbookFixture(options),XLSX);
  return inspectSheet(workbook,workbook.SheetNames[0],XLSX);
 }
 
@@ -57,4 +57,18 @@ test('American Express detection refuses incomplete, ambiguous and inconsistent 
  }
  const source=inspection();
  assert.throws(()=>inspectIntake([source,source]),/כרטיס ומועד חיוב אחד/);
+});
+
+test('ONE ZERO Platinum Mastercard reads only the printed card suffix in the issuer workbook',()=>{
+ const cardHeader='\u202bפלטינה מסטרקארד\u202c - 4567';
+ const source=inspection({cardHeader}),parsed=inspectIntake([source]);
+ assert.equal(parsed.identity,'isracard:4567');
+ assert.equal(parsed.report.dueDate,'2026-10-10');
+ assert.equal(parsed.report.amount,137.25);
+ assert.deepEqual(parsed.report.entries.map(row=>row.amountCents),[10025,4500,-800]);
+
+ const duplicate=inspection({cardHeader});
+ duplicate.rows.find(row=>row.line===4).cells[0]='פלטינה מסטרקארד - 1234';
+ assert.throws(()=>inspectIntake([duplicate]),/ארבע ספרות של כרטיס אחד/);
+ assert.throws(()=>inspectIntake([inspection({cardHeader:'מספר חשבון - 4567'})]),/ארבע ספרות של כרטיס אחד/);
 });

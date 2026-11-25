@@ -4,7 +4,7 @@ const clean=value=>String(value??'').normalize('NFKC')
  .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim();
 const months=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 const headers=['תאריך רכישה','שם בית עסק','סכום עסקה','מטבע עסקה','סכום חיוב','מטבע חיוב',"מס' שובר",'פירוט נוסף'];
-const cardHeader=/^(?:אמריקן אקספרס|american express|ישראכרט|isracard)(?: [^\d]{1,60}?)?\s*[-–־]\s*(\d{4})$/i;
+const cardHeader=/^(?:אמריקן אקספרס|american express|ישראכרט|isracard|פלטינה מסטרקארד)(?: [^\d]{1,60}?)?\s*[-–־]\s*(\d{4})$/i;
 const totalLabel=/^סה["״]כ לחיוב החודש בכרטיס בש["״]ח$/;
 const currencies=new Map([['₪','ILS'],['ש"ח','ILS'],['ש״ח','ILS'],['ILS','ILS'],['NIS','ILS'],['$','USD'],['USD','USD'],['€','EUR'],['EUR','EUR'],['£','GBP'],['GBP','GBP']]);
 const currency=value=>currencies.get(value?.toUpperCase());

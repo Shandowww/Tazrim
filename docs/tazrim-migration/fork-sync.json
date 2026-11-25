@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "86fd934c95a7394b19a3a24d2b0a5bf305f49fc8",
+  "sourceCommit": "fa215b80368823344262bfbff07f4a84faf709f2",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "The approved card merchant category suggestion fix is verified live on Budgit.",
+  "status": "The approved ONE ZERO Platinum Mastercard workbook reader fix is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1528,
+    "applicationAndReaderTests": 1529,
     "coreChecks": 15,
     "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 188 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "cc151be977c553b915aa21761ae8cae29bfdf698",
-  "productionVersion": "v1.9.3",
-  "productionBuild": "e8c8ced224"
+  "productionApplicationCommit": "d54f1809a56d5b03525f3af402d0ba138901fd82",
+  "productionVersion": "v1.9.4",
+  "productionBuild": "229fb2745a"
 }

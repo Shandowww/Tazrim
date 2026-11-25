@@ -1,11 +1,11 @@
 import XLSX from './vendor/xlsx-full.cjs';
 
 // A synthetic workbook with the same separate month, charge day and totals.
-export function isracardWorkbookFixture(){
+export function isracardWorkbookFixture({cardHeader="\u202bאמריקן אקספרס זהב\u202c - 7234"}={}){
  const sheet=XLSX.utils.aoa_to_sheet([
   ['פירוט עסקאות',null,'אוקטובר 2026'],
   [],
-  ['\u202bאמריקן אקספרס זהב\u202c - 7234',null,null,null,null,null,null,'₪ 137.25'],
+  [cardHeader,null,null,null,null,null,null,'₪ 137.25'],
   ['כרטיס בדיקה',null,null,null,null,null,null,'לחיוב ב-10.10'],
   [],
   ['עסקאות למועד חיוב'],
