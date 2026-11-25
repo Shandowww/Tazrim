@@ -4,6 +4,7 @@ import {createHash,randomBytes,generateKeyPairSync,randomUUID} from 'node:crypto
 import {openDatabase} from '../server/database.mjs';
 import {createApp} from '../server/app.mjs';
 import {zero} from '../src/budget.js';
+import {loadIncomingInbox,verifyIncomingApproval} from '../frontend/src/app/report-intake-api.ts';
 const origin='https://incoming.test',digest=v=>createHash('sha256').update(v).digest('hex');
 const pair=generateKeyPairSync('rsa',{modulusLength:3072,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});
 const plan=()=>({startMonth:'2026-01',opening:1000,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false,cashPlanning:{accounts:[{id:'bank-a',label:'חשבון בדיקה',buffer:0}],months:{},cardAccounts:{},transfers:[]}});
@@ -30,6 +31,38 @@ test('Private intake stores only original bytes; parsing, routing and budgets st
  const alice=await(await c.call('alice','/api/report-intake')).json(),bob=await(await c.call('bob','/api/report-intake')).json();assert.equal(alice.reports.length,1);assert.equal(bob.reports.length,0);assert.equal(alice.reports[0].verificationState,'verified');
  }finally{c.db.close()}
 });
+test('Approval survives a lost response only when the stored inbox proves the exact source',async()=>{
+ const c=await setup();
+ try{
+  const connection=await c.connect();
+  const receipt=await(await c.receive(connection.secret)).json();
+  const fetcher=(path,init)=>c.call('alice',path,init?.body?JSON.parse(init.body):undefined,init?.method);
+  const signal=new AbortController().signal;
+  const report=(await loadIncomingInbox('alice',signal,fetcher)).reports.find(row=>row.id===receipt.receiptId);
+  const before=c.db.prepare('SELECT * FROM plans ORDER BY user_id').all();
+  assert.equal(report.verificationState,'awaiting_verification');
+  const interrupted=async(path,init)=>init?.method==='POST'?new Response('temporarily unavailable',{status:502}):fetcher(path,init);
+  await assert.rejects(verifyIncomingApproval('alice',report,signal,interrupted),/לא ניתן לאמת/);
+  assert.equal(c.db.prepare('SELECT COUNT(*) n FROM report_intake_approvals').get().n,0);
+
+  let writes=0;
+  const lost=async(path,init)=>{
+   const response=await fetcher(path,init);
+   if(init?.method!=='POST')return response;
+   assert.equal(response.status,200);
+   writes++;
+   return new Response('temporarily unavailable',{status:502});
+  };
+  const approved=await verifyIncomingApproval('alice',report,signal,lost);
+  assert.equal(approved.report.verificationState,'verified');
+  await verifyIncomingApproval('alice',approved.report,signal,lost);
+  assert.equal(writes,1);
+  assert.equal(c.db.prepare('SELECT COUNT(*) n FROM report_intake_approvals').get().n,1);
+  await assert.rejects(verifyIncomingApproval('alice',{...approved.report,sourceHash:'a'.repeat(64)},signal,lost),/הקובץ השתנה/);
+  assert.deepEqual(c.db.prepare('SELECT * FROM plans ORDER BY user_id').all(),before);
+ }finally{c.db.close()}
+});
+
 test('Receipt tokens see only their own deliveries; duplicates, revocation and actor binding are enforced',async()=>{
  const c=await setup();try{
  const a=await c.connect(),other=await c.connect(),b=await c.connect('bob'),r=await(await c.receive(a.secret)).json();assert.equal((await(await c.receive(a.secret)).json()).receiptId,r.receiptId);

@@ -1,0 +1,46 @@
+{
+  "version": "v1.9.1",
+  "commit": "e21f1fea143cf97cc48724dc4c98ab2792854530",
+  "build": "6feb1b19af",
+  "previousCommit": "94148597ed89e6ed32cbca81c7234380abbca6b2",
+  "verifiedAt": "2026-11-26T00:01:37+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "The Cal PDF reader includes the last transaction on a continuation page above the legal footer and reconciles the full printed total. Report Sync verifies the exact saved source after a lost approval response and scopes save messages to the return screen.",
+  "approval": "Tal approved publication of the local Cal PDF continuation and approval recovery preview.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45702679343",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1523,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-e21f1fea.0j81sF/",
+  "candidateImage": "sha256:82a806b3ddc07936a8afe552638228591246ba4700a70fc40ed08bfb3448d5f4",
+  "rollbackImage": "sha256:bd4acf9d2aba8666c183c09bf8e98f8ccd187a532f976d81a83b4e3b8d83d298",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 188,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "verifiedReaderAssets": 1,
+    "syntheticLiveProbe": {
+      "synthetic": true,
+      "cardRecognized": true,
+      "billingDate": "2026-10-15",
+      "reconciledRows": 3
+    }
+  },
+  "limits": [
+    "The supplied report was tested locally only. The end-to-end approval recovery, commit and responsive review used synthetic data."
+  ]
+}

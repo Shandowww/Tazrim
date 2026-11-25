@@ -8,6 +8,8 @@ function lines(items){const rows=[];for(const i of [...items].sort((a,b)=>y(b)-y
 function lineText(items){const runs=[];for(const i of [...items].sort((a,b)=>x(b)-x(a))){const rtl=i.dir==='rtl'||/[א-ת]/.test(i.str),last=runs.at(-1),gap=last?last.left-right(i):0;if(last&&last.rtl===rtl&&gap<12){last.items.push(i);last.left=x(i);}else runs.push({rtl,left:x(i),items:[i]});}return runs.map(r=>r.items.sort((a,b)=>r.rtl?x(b)-x(a):x(a)-x(b)).map((i,n,a)=>(n&&(r.rtl?x(a[n-1])-right(i):x(i)-right(a[n-1]))>=1.8?' ':'')+clean(i.str)).join('')).join(' ');}
 const text=items=>lines(items).map(r=>lineText(r.items)).join(' ');
 const compact=items=>text(items).replace(/\s/g,'');
+// The continuation table can extend below y=195. The legal footer occupies a separate band below y=185.
+const continuationBottom=185;
 const bounds=[[500,545],[420,500],[380,420],[280,380],[250,280],[190,250],[130,190]];
 const cells=(items,columns=bounds)=>columns.map(([lo,hi])=>items.filter(i=>x(i)>=lo-.5&&right(i)<=hi+.5));
 const futureBounds=[[500,545],[420,500],[380,420],[305,380],[280,305],[220,280],[185,220],[130,185]];
@@ -48,7 +50,7 @@ export function inspectCalPDF(pages){
  if(!Array.isArray(pages)||!pages.length||pages.length>20)fail();
  const all=pages.flatMap(p=>p.items.filter(i=>clean(i.str)));
  if(!all.some(i=>/cal-online\.co\.il/i.test(i.str)))return null;
- if(all.length>100000||all.some(i=>x(i)>=130&&y(i)>195&&(Math.abs(i.transform[1])>.01||Math.abs(i.transform[2])>.01)))fail();
+ if(all.length>100000||all.some(i=>x(i)>=130&&y(i)>continuationBottom&&(Math.abs(i.transform[1])>.01||Math.abs(i.transform[2])>.01)))fail();
  const title=all.filter(i=>/דף חיוב חודשי/.test(i.str));if(title.length!==1)fail();
  const dateMatch=/דף חיוב חודשי ל-(\d{2}\/\d{2}\/\d{2}(?:\d{2})?)$/.exec(clean(title[0].str));if(!dateMatch)fail();const dueDate=parseDate(dateMatch[1]);
  const ids=new Set(),entries=[];let declaredTotal=null,summaries=0;
@@ -70,7 +72,7 @@ export function inspectCalPDF(pages){
   if(summaryRows.length>1||index===pages.length-1&&!summaryRows.length)fail();
   const summary=summaryRows[0];if(summary){const label=summary.items.find(i=>/סה"כ לתאריך/.test(i.str)),m=/^סה"כ לתאריך (\d{2}\/\d{2}\/\d{2}(?:\d{2})?)$/.exec(clean(label.str));if(!m||parseDate(m[1])!==dueDate)fail();declaredTotal=money(cells(summary.items)[6],true).cents;summaries++;}
   if(summary&&index<pages.length-1&&rows.some(row=>row.y<summary.y&&printedDate.test(compact(cells(row.items)[0]))))fail();
-  const bottom=summary?.y??195,table=items.filter(i=>y(i)<second.y-2&&y(i)>bottom+2&&x(i)>=130),tableRows=lines(table),anchors=tableRows.filter(r=>cells(r.items)[0].length);
+  const bottom=summary?.y??continuationBottom,table=items.filter(i=>y(i)<second.y-2&&y(i)>bottom+2&&x(i)>=130),tableRows=lines(table),anchors=tableRows.filter(r=>cells(r.items)[0].length);
   if(!anchors.length)fail();const used=new Set();
   for(const [j,anchor]of anchors.entries()){
    const c=cells(anchor.items),dateString=text(c[0]);if(!fullDate.test(dateString))fail();const date=parseDate(dateString),billed=money(c[6],true),original=money(c[5]);

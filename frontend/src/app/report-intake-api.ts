@@ -23,6 +23,27 @@ export async function loadIncomingInbox(accountId:string,signal:AbortSignal,fetc
  return value
 }
 export async function updateIncoming(accountId:string,input:any,fetcher:typeof fetch=fetch){return request(accountId,'',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)},fetcher)}
+/** A reply can be lost after approval. Recover only from the exact source in the saved inbox. */
+export async function verifyIncomingApproval(accountId:string,report:IncomingReport,signal:AbortSignal,fetcher:typeof fetch=fetch){
+ let uncertain:unknown
+ if(report.verificationState==='awaiting_verification'){
+  try{
+   await updateIncoming(accountId,{action:'approve',id:report.id,sourceHash:report.sourceHash,revision:report.revision,confirm:true},fetcher)
+  }catch(error){
+   if(signal.aborted||error instanceof AccessError||error instanceof IncomingRequestError&&error.status<500)throw error
+   uncertain=error
+  }
+ }
+ const snapshot=await loadIncomingInbox(accountId,signal,fetcher)
+ const current=snapshot.reports.find(item=>item.id===report.id)
+ if(!current||current.sourceHash!==report.sourceHash||current.revision!==report.revision||current.size!==report.size)
+  throw Error('הקובץ השתנה או הוסר. יש לפתוח את הדוח מחדש מתוך תיבת הסנכרון.')
+ if(current.verificationState==='awaiting_verification'){
+  if(uncertain instanceof Error)throw uncertain
+  throw Error('אישור הפענוח טרם נשמר. אפשר לנסות שוב.')
+ }
+ return {snapshot,report:current}
+}
 /** Remove an unfinished routed source before its private staging copy. A retry
  * can finish the second deletion after the first one was already confirmed. */
 export async function deleteIncomingReport(accountId:string,report:IncomingReport,activeBudgetId:string,fetcher:typeof fetch=fetch){

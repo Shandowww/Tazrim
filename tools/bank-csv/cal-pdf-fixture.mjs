@@ -11,6 +11,15 @@ export function calTextFixture(){return [0,1].map((index)=>{const h=index?763:51
  if(index)items.push(item('הודעה לכרטיס המסתיים ב-1234',300,560,230),item('• עדכון יתרת ההטבה בתכנית הבדיקה: 0 ש״ח.',280,540,255),item('• לידיעתך, מסגרת הכרטיס מתעדכנת מדי רבעון.',280,515,255));
  return{width:555.59,height:833.39,items};});}
 
+export function calLowContinuationTextFixture(){
+ const pages=calTextFixture(),bottom=193.74;
+ pages[0].items.push(...glyphs('02/09/2026',538,bottom),item('חנות נוספת',450,bottom,48),
+  item('₪ 12.34',200,bottom,46),item('₪ 12.34',140,bottom,42),
+  item('ט.ל.ח | מידע נוסף',400,173.92,136));
+ pages[1].items.find(entry=>entry.str==='₪ 50.00'&&entry.transform[5]<740).str='₪ 62.34';
+ return pages;
+}
+
 export function calFutureTextFixture(){
  const [monthly,appendix]=calTextFixture();
  monthly.items.push(item('סה"כ לתאריך 15/10/26',350,485,140),item('₪ 100.00',145,485,37));

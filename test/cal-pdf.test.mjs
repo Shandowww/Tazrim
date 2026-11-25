@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readReportPDF} from '../tools/bank-csv/pdf-reader.mjs';
-import {calTextFixture as fixture,calFutureTextFixture,calPDFFixture,item,glyphs} from '../tools/bank-csv/cal-pdf-fixture.mjs';
+import {calTextFixture as fixture,calFutureTextFixture,calLowContinuationTextFixture,calPDFFixture,item,glyphs} from '../tools/bank-csv/cal-pdf-fixture.mjs';
 import {extractStatementNotices,pdfNoticePages} from '../tools/bank-csv/statement-notices.mjs';
 import {readPDFPages} from '../tools/bank-csv/pdf-reader.mjs';
 import {inspectCalPDF} from '../tools/bank-csv/cal-pdf.mjs';
@@ -11,6 +11,19 @@ test('Cal PDF refuses missing/reordered pages, mismatched suffixes, totals, extr
 test('Unrelated PDF remains available to existing bank/Isracard readers',()=>{const p=fixture();for(const page of p)page.items=page.items.filter(i=>!i.str.includes('cal-online'));assert.equal(inspectCalPDF(p),null);});
 
 test('Actual synthetic Cal PDF bytes pass the shared reader with a card routing identity',async()=>{const result=await readReportPDF(calPDFFixture());assert.equal(result.intake.kind,'card');assert.equal(result.intake.identity,'cal:1234');assert.equal(result.intake.report.amount,50);assert.equal(result.intake.report.count,2);});
+
+test('Cal monthly continuation retains the last dated row above the disclaimer',async()=>{
+ const pages=calLowContinuationTextFixture();
+ const {intake}=await readReportPDF(calPDFFixture(structuredClone(pages)));
+ assert.equal(intake.report.amount,62.34);
+ assert.deepEqual(intake.report.entries.map(row=>[row.page,row.amountCents]),[[1,10000],[1,1234],[2,-5000]]);
+ const rotated=structuredClone(pages);
+ rotated[0].items.find(entry=>entry.transform[5]===193.74).transform[1]=1;
+ assert.throws(()=>inspectCalPDF(rotated),/אין קליטה חלקית/);
+ const mismatch=structuredClone(pages);
+ mismatch[1].items.find(entry=>entry.str==='₪ 62.34').str='₪ 62.35';
+ assert.throws(()=>inspectCalPDF(mismatch),/אין קליטה חלקית/);
+});
 
 test('Cal PDF with a future-charge appendix imports only the complete reconciled monthly bill',async()=>{
  const bytes=calPDFFixture(calFutureTextFixture());

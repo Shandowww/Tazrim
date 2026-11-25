@@ -18,7 +18,7 @@ import {withViewQuery} from './navigation-query'
 import {navigationLabels} from './navigation-sections'
 import {readReportContent} from './report-reader'
 import {incomingRoutingOptions,matchIncomingReport,type RoutingBudget,type RoutingKind} from './incoming-report-routing'
-import {loadIncomingInbox,updateIncoming,deleteIncomingReport,incomingConnectionDraft,storeIncomingSource,incomingSource,incomingRoutingBudgets,IncomingRequestError,type IncomingSnapshot,type IncomingReport} from './report-intake-api'
+import {loadIncomingInbox,updateIncoming,verifyIncomingApproval,deleteIncomingReport,incomingConnectionDraft,storeIncomingSource,incomingSource,incomingRoutingBudgets,IncomingRequestError,type IncomingSnapshot,type IncomingReport} from './report-intake-api'
 
 const button='min-h-11 rounded-xl border px-4 py-2 text-sm disabled:opacity-50',input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-sm'
 function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
@@ -37,7 +37,8 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  useCreatedEditorRoute(nextHref,message,accountId+'/'+budget.budgetId)
  useEffect(()=>{if(nextHref&&location.pathname+search===nextHref)setNextHref(null)},[nextHref,location.pathname,search])
  useEffect(()=>{if(navigationType!=='POP'){heading.current?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'})}},[view,panel,reportId])
- useEffect(()=>{if(typeof location.state?.setupSavedMessage==='string')setMessage(location.state.setupSavedMessage)},[location.key])
+ const returnedMessage=typeof location.state?.setupSavedMessage==='string'?location.state.setupSavedMessage:''
+ const visibleMessage=message||(!error&&panel!=='approve'?returnedMessage:'')
  useEffect(()=>{const abort=new AbortController();setAutomationError('');loadAutomation(accountId,abort.signal).then(value=>{if(!abort.signal.aborted)setAutomation(value)}).catch(error=>{if(!abort.signal.aborted){if(error instanceof AccessError)budget.invalidate(error.message);else setAutomationError(error.message)}});return()=>abort.abort()},[accountId,tick,view])
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;controller.current?.abort()}},[])
  useEffect(()=>{const abort=new AbortController();setLoading(true);setError('');loadIncomingInbox(accountId,abort.signal).then(value=>{if(!abort.signal.aborted)setSnapshot(value)}).catch(e=>{if(abort.signal.aborted)return;if(e instanceof AccessError)budget.invalidate(e.message);else setError(e.message)}).finally(()=>{if(!abort.signal.aborted)setLoading(false)});return()=>abort.abort()},[accountId,tick,view,panel,reportId])
@@ -61,10 +62,12 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  }
  const verify=()=>run(async()=>{
   if(!selected)return
-  const report=selected,abort=new AbortController();controller.current=abort
-  await updateIncoming(accountId,{action:'approve',id:report.id,sourceHash:report.sourceHash,revision:report.revision,confirm:true})
+  setMessage('')
+  const abort=new AbortController();controller.current=abort
+  const {report,snapshot:approved}=await verifyIncomingApproval(accountId,selected,abort.signal)
   if(!alive.current)return
-  setSnapshot(await loadIncomingInbox(accountId,abort.signal))
+  setSnapshot(approved)
+  if(report.route){clearReview();setNextHref(reportHref(report));return}
   const bytes=await incomingSource(accountId,report,'parse',abort.signal),content=await readReportContent(report.name,bytes,abort.signal,{includeAccountIdentity:true}),budgets=await incomingRoutingBudgets(accountId,budget.budgetId,budget.spaces,abort.signal),fresh=await loadIncomingInbox(accountId,abort.signal)
   if(!alive.current)return
   setSnapshot(fresh);const match=matchIncomingReport(content,budgets,fresh.bindings);setKind(['bank','card'].includes(content.kind)?content.kind:'bank');setAnalysis({report,content,budgets,reason:match.reason})
@@ -117,7 +120,7 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   <h2 ref={heading} tabIndex={-1} className="scroll-mt-24 text-lg font-semibold outline-none">{titles[view]}</h2>
   {loading&&<p role="status">טוען תיבת סנכרון…</p>}
   {error&&(!selected||!!analysis)&&<div className="surface space-y-2 rounded-xl border border-destructive p-4"><p role="alert" className="text-sm">{error}</p><button className={button} disabled={busy||!!file||!!selected||!!connection||!!deleting} onClick={refresh}>ניסיון נוסף</button></div>}
-  {message&&<p role="status" className="surface rounded-xl p-4 text-sm">{message}</p>}
+  {visibleMessage&&<p role="status" className="surface rounded-xl p-4 text-sm">{visibleMessage}</p>}
   {view==='missing'&&<SyncCoverage budget={budget} href={href} tick={tick} change={values=>center('missing',values)}/>}
   {(view==='attention'||view==='reports')&&<>
    <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm text-muted-foreground">{view==='attention'?(query.get('syncWaiting')==='1'?'הדוחות בהכנה. אין צורך באישור נוסף כרגע.':'דוחות חדשים וטיפול שעוד לא הושלם.'):'חיפוש דוחות, מצב טיפול ומקורות שמורים.'}</p><Link className={button+' inline-flex items-center gap-2'} href={center('add',{syncFrom:view})}><Plus size={17} aria-hidden="true"/>הוספת דוח</Link></div>

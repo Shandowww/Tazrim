@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "94148597ed89e6ed32cbca81c7234380abbca6b2",
+  "sourceCommit": "a7f2cd6efcee31e13eec2061bc9c0529d851cf8a",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "The approved American Express Excel reader is verified live on Budgit.",
+  "status": "The approved Cal PDF continuation and approval recovery fix is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1521,
+    "applicationAndReaderTests": 1523,
     "coreChecks": 15,
     "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 188 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "a093b51a5f7e5c0bc76426765d8d6397456416a2",
-  "productionVersion": "v1.9.0",
-  "productionBuild": "eaec56793e"
+  "productionApplicationCommit": "e21f1fea143cf97cc48724dc4c98ab2792854530",
+  "productionVersion": "v1.9.1",
+  "productionBuild": "6feb1b19af"
 }
