@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "8f779b0fd78da4d229bd133101a54b8c4a1b0d3f",
+  "sourceCommit": "86fd934c95a7394b19a3a24d2b0a5bf305f49fc8",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "The approved overlapping report reconciliation fix is verified live on Budgit.",
+  "status": "The approved card merchant category suggestion fix is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1526,
+    "applicationAndReaderTests": 1528,
     "coreChecks": 15,
     "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 188 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "e448b24538d5c55b0664b61dbb1f27e03fc56983",
-  "productionVersion": "v1.9.2",
-  "productionBuild": "7a4569fed6"
+  "productionApplicationCommit": "cc151be977c553b915aa21761ae8cae29bfdf698",
+  "productionVersion": "v1.9.3",
+  "productionBuild": "e8c8ced224"
 }

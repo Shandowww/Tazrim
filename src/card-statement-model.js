@@ -1,5 +1,5 @@
 import {saveBillingReport} from './card-billing-model.js';
-import {cents,clone,validatePlan,detailCategories,creditCards,analyticalExpenseDetails} from './budget.js';
+import {cents,clone,validatePlan,detailCategories,creditCards,analyticalExpenseDetails,merchantDisplayName} from './budget.js';
 export const statementMerchant=s=>String(s??'').normalize('NFKC').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase();
 async function statementDigest(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
 export function statementCycleExists(p,cardId,month){return (p.details??[]).some(e=>e.method===cardId&&e.month===month&&['cal','isracard'].includes(e.statement?.issuer));}
@@ -63,30 +63,62 @@ function fillStatementNotes(saved,incoming){
  const notes=old.trim()?[old,...additions].join('\n'):incoming;
  if(notes.length<=2000)saved.notes=notes;
 }
+// Category suggestions may recognize statement formatting. Transaction identities
+// and comparisons still use the original merchant descriptor.
+const spotifyReference=/^spotify(?: p[0-9a-f]{9})?$/;
+const calHebrewMerchant=/^[א-ת]+(?: [א-ת]+){2,}$/;
+function cardCategorySuggestions(plan,merchantRules,issuer){
+ const names=new Map(),spotify=new Set();
+ const add=(name,category)=>{
+  if(!category||category==='לסיווג')return;
+  const key=statementMerchant(merchantDisplayName(plan,name));
+  if(!names.has(key))names.set(key,new Set());
+  names.get(key).add(category);
+  if(spotifyReference.test(key))spotify.add(category);
+ };
+ for(const row of analyticalExpenseDetails(plan))add(row.name,row.category);
+ for(const rule of merchantRules)add(rule.merchant,rule.category);
+ const completed=new Map();
+ if(issuer==='cal')for(const name of names.keys()){
+  if(name.length!==26||!calHebrewMerchant.test(name))continue;
+  const short=name.slice(0,-1);
+  if(!calHebrewMerchant.test(short))continue;
+  // More than one possible full name leaves the category open.
+  completed.set(short,completed.has(short)?null:names.get(name));
+ }
+ const unique=values=>values?.size===1?[...values][0]:'';
+ return entry=>{
+  const key=statementMerchant(merchantDisplayName(plan,entry.merchant));
+  if(names.has(key))return unique(names.get(key));
+  if(issuer!=='cal')return '';
+  if(spotifyReference.test(key))return unique(spotify);
+  // Cal's PDF can truncate a long printed Hebrew descriptor. Only complete
+  // a single missing final letter from one established name in this budget.
+  return entry.page?unique(completed.get(key)):'';
+ };
+}
 export async function prepareCardStatement(p,report,cardId,merchantRules=[],{replacementToken,allowReplacement=true}={}){
  if(!['cal','isracard'].includes(report?.issuer)||!Array.isArray(report.entries)||!report.entries.length||report.entries.length>5000||report.entries.reduce((n,r)=>n+r.amountCents,0)!==cents(report.amount)||!creditCards(p).some(c=>c.id===cardId))throw Error('פירוט הדוח אינו תקין.');
  const saved=(p.details??[]).filter(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate),savedById=new Map(saved.map(row=>[row.id,row]));
- const seen=new Map(),rows=[],categories=new Map(),add=(name,category)=>{if(!category||category==='לסיווג')return;const k=statementMerchant(name);if(!categories.has(k))categories.set(k,new Set());categories.get(k).add(category);};
- for(const e of analyticalExpenseDetails(p))add(e.name,e.category);
- for(const r of merchantRules)add(r.merchant,r.category);
+ const seen=new Map(),rows=[],suggest=cardCategorySuggestions(p,merchantRules,report.issuer);
  for(const entry of report.entries){
   const identity=JSON.stringify([cardId,report.dueDate,entry.date,statementMerchant(entry.merchant),entry.amountCents,entry.originalCents,entry.notes,...(report.issuer==='isracard'?[entry.originalCurrency??'',entry.foreignCents??null]:[])]),occurrence=(seen.get(identity)??0)+1;seen.set(identity,occurrence);
   const key=await statementDigest(identity+'#'+occurrence),id=report.issuer+'-'+key,found=savedById.get(id),existing=found&&found.date===entry.date&&cents(found.amount)===entry.amountCents&&compatibleEvidence(found,entry,report.issuer)?found:null;
   const candidates=existing?[]:(p.details??[]).filter(e=>!e.statement&&e.accounting==='included'&&e.status!=='cancelled'&&e.method===cardId&&e.month===report.dueDate.slice(0,7)&&e.date===entry.date&&statementMerchant(e.name)===statementMerchant(entry.merchant));
-  const known=categories.get(statementMerchant(entry.merchant)),category=existing?.category??(known?.size===1?[...known][0]:'');
+  const category=existing?.category??suggest(entry);
   rows.push({id,key,entry,category,existing:existing?clone(existing):null,candidates:clone(candidates)});
  }
  matchStatementEvidence(saved,rows,report.issuer);
  const matched=new Set(rows.filter(r=>r.existing).map(r=>r.id)),removed=saved.filter(e=>!matched.has(e.id));
- let replacement=null;
+ const preview={cardId,dueDate:report.dueDate,amount:report.amount,rows,issuer:report.issuer};
  if(removed.length){
   if(!allowReplacement)throw Error('מקור הפעילות אינו כולל את כל העסקאות שכבר נשמרו. יש להעלות דוח חיוב חודשי מלא כדי לבדוק תיקון.');
   const billing=(p.cardBilling?.reports??[]).filter(r=>r.cardId===cardId&&r.dueDate===report.dueDate),token=await statementDigest(JSON.stringify({cardId,report,saved,billing}));
   const conflict={token,cardId,dueDate:report.dueDate,savedTotal:billing.length===1?billing[0].amount:null,incomingTotal:report.amount,savedOnly:clone(removed),incomingOnly:clone(rows.filter(r=>!r.existing)),unchanged:rows.filter(r=>r.existing).length};
-  if(replacementToken!==token)throw Object.assign(Error('כבר נשמר דוח שונה לאותו חיוב. יש לבדוק את השורות שיוסרו ויתווספו ולבחור איזה דוח לשמור.'),{statementConflict:conflict});
-  replacement=conflict;
+  if(replacementToken!==token)throw Object.assign(Error('כבר נשמר דוח שונה לאותו חיוב. יש לבדוק את השורות שיוסרו ויתווספו ולבחור איזה דוח לשמור.'),{statementConflict:conflict,statementPreview:preview});
+  return {...preview,replacement:conflict};
  }
- return {cardId,dueDate:report.dueDate,amount:report.amount,rows,issuer:report.issuer,...(replacement?{replacement}:{})};
+ return preview;
 }
 export function applyCardStatement(p,preview,choices,{deferCategories=false}={}){
  const next=clone(p),used=new Set(),allowed=new Set([...(deferCategories?['לסיווג']:[]),...detailCategories,...(p.details??[]).map(e=>e.category),...Object.keys(p.categoryGoals??{}),...preview.rows.map(r=>r.category).filter(c=>typeof c==='string'&&c.trim()&&c.length<=60)]);next.details??=[];

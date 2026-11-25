@@ -93,3 +93,48 @@ test('Cal activity cannot replace saved rows that are absent from its export',as
  assert.match(ui.items[0].warning,/דוח חיוב חודשי מלא/);
  assert.equal(p.details.length,2);
 });
+
+test('Cal descriptor formatting and explicit aliases reuse unambiguous merchant categories without changing row identities',async()=>{
+ const known=await savedReport([
+  entry({merchant:'Spotify P12AB34CD5'}),
+  entry({merchant:'מאפיה ביתית בשדרות התמריםן'}),
+  entry({merchant:'סניף א'}),
+ ]);
+ const [spotify,hebrew,alias]=known.details;
+ spotify.category='בילויים';
+ hebrew.category='מזון';
+ alias.category='קניות';
+ known.merchantRegistry=[{id:'merchant_'+crypto.randomUUID(),label:'החנות',aliases:['סניף א','סניף ב']}];
+ assert.equal(hebrew.name.length,26);
+ const incoming=[
+  entry({merchant:'Spotify P98FE76DC5'}),
+  entry({merchant:hebrew.name.slice(0,-1),page:1}),
+  entry({merchant:'סניף ב'}),
+  entry({merchant:'Spotify Family P98FE76DC5'}),
+ ];
+ const input={...report(incoming),dueDate:'2026-11-15'};
+ const before=clone(known),preview=await prepareCardStatement(known,input,'card1');
+ assert.deepEqual(preview.rows.map(row=>row.category),['בילויים','מזון','קניות','']);
+ assert.deepEqual(preview.rows.map(row=>row.entry.merchant),incoming.map(row=>row.merchant));
+ assert.deepEqual(preview.rows.map(row=>row.id),(await prepareCardStatement(base(),input,'card1')).rows.map(row=>row.id));
+ assert.deepEqual(known,before);
+ const conflicting=[{merchant:'Spotify P111111111',category:'אחר'},{merchant:hebrew.name.slice(0,-1)+'ת',category:'מזון'}];
+ const conflict=await prepareCardStatement(known,input,'card1',conflicting);
+ assert.deepEqual(conflict.rows.map(row=>row.category),['','','קניות','']);
+ const spreadsheet={...input,entries:input.entries.map(({page,...row})=>row)};
+ assert.equal((await prepareCardStatement(known,spreadsheet,'card1')).rows[1].category,'');
+});
+
+test('Review retains category suggestions while a genuinely changed statement awaits approval',async()=>{
+ const prior=await savedReport([entry({merchant:'Known Merchant'})]);
+ prior.details[0].category='מזון';
+ const incoming=report([entry({merchant:'Known Merchant',amountCents:11000})]);
+ const ui=uiFor(incoming),before=clone(prior);
+ await build(prior,ui);
+ assert.equal(ui.issues,1);
+ assert.equal(ui.build,null);
+ assert.equal(ui.items[0].questions[0].type,'statement-conflict');
+ assert.equal(ui.items[0].preview.rows[0].category,'מזון');
+ assert.equal(ui.items[0].preview.replacement,undefined);
+ assert.deepEqual(prior,before);
+});

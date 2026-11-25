@@ -90,7 +90,7 @@ export async function buildReportInbox(plan,ui,{month,today,classifier,activityA
     for(const row of preview.rows)if(!row.existing&&ui.categoryChoices.has(inboxCardRowCategoryKey(row)))row.category=ui.categoryChoices.get(inboxCardRowCategoryKey(row));
     for(const r of preview.rows)if(r.candidates.length){const chosen=item.decisions[r.id],decision=chosen==='new'||r.candidates.some(c=>c.id===chosen)?chosen:'';item.matchReviews.push({type:'card-match',id:r.id,row:r,candidates:r.candidates,decision,storedDecision:chosen??''});if(!decision){issues++;item.questions.push({type:'card-match',row:r});}}
     cards.push({cardId:item.target,dueDate:preview.dueDate,amount:preview.amount,accountId:item.payer,statement:preview,item});receipts.push({hash:receiptHash,kind:'card',target:item.target,reference:preview.dueDate});ui.readyRows+=preview.rows.filter(r=>!r.existing).length;
-   }catch(error){item.warning=error.message;if(error.statementConflict){item.statementConflict=error.statementConflict;item.questions.push({type:'statement-conflict'});}issues++;}
+   }catch(error){item.warning=error.message;if(error.statementConflict){item.preview=error.statementPreview;item.statementConflict=error.statementConflict;item.questions.push({type:'statement-conflict'});}issues++;}
   }
   if(item.identityKey)bindings.push({key:item.identityKey,kind:item.kind,target:item.target});
  }

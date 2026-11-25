@@ -1,0 +1,40 @@
+{
+  "version": "v1.9.3",
+  "commit": "cc151be977c553b915aa21761ae8cae29bfdf698",
+  "build": "e8c8ced224",
+  "previousCommit": "8f779b0fd78da4d229bd133101a54b8c4a1b0d3f",
+  "verifiedAt": "2026-11-26T00:45:58+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Card report review retains saved category suggestions during statement comparison and recognizes unambiguous Cal descriptor variants and saved aliases. Source rows and transaction identities are preserved.",
+  "approval": "The documented policy permits validated corrective fixes to existing behavior.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45714848615",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1528,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-cc151be9.NAV7jL/",
+  "candidateImage": "sha256:ba00580c697a8b9dd720b7b336d22e49e326c1e934360a46c5799a170075ba25",
+  "rollbackImage": "sha256:48acdea21ca236af1a02c38457d434ee4aa4776af2acf0cb9dd91d342974681b",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 188,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "scopedReadOnlyLiveReplay": "passed"
+  },
+  "limits": [
+    "The scoped live replay used read-only verification. Responsive review used a synthetic statement comparison."
+  ]
+}
