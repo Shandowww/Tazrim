@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "a7f2cd6efcee31e13eec2061bc9c0529d851cf8a",
+  "sourceCommit": "8f779b0fd78da4d229bd133101a54b8c4a1b0d3f",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "The approved Cal PDF continuation and approval recovery fix is verified live on Budgit.",
+  "status": "The approved overlapping report reconciliation fix is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1523,
+    "applicationAndReaderTests": 1526,
     "coreChecks": 15,
     "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 188 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "e21f1fea143cf97cc48724dc4c98ab2792854530",
-  "productionVersion": "v1.9.1",
-  "productionBuild": "6feb1b19af"
+  "productionApplicationCommit": "e448b24538d5c55b0664b61dbb1f27e03fc56983",
+  "productionVersion": "v1.9.2",
+  "productionBuild": "7a4569fed6"
 }

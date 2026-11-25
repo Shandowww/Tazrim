@@ -5,10 +5,13 @@ async function statementDigest(s){return [...new Uint8Array(await crypto.subtle.
 export function statementCycleExists(p,cardId,month){return (p.details??[]).some(e=>e.method===cardId&&e.month===month&&['cal','isracard'].includes(e.statement?.issuer));}
 // Cross-format evidence supplements the persisted fingerprint; existing IDs stay stable.
 const evidenceMerchant=value=>statementMerchant(value).replace(/[()]/g,'').replace(/[״“”]/g,'"').replace(/[׳‘’]/g,"'").replace(/[–—−]/g,'-').replace(/\s*([.\-"'])\s*/g,'$1').replace(/\s+/g,' ').trim();
-const installment=notes=>{const match=String(notes??'').match(/תשלום\s*(\d+)\s*(?:מתוך|מ)\s*(\d+)/);return match?match[1]+':'+match[2]:'';};
-const transactionReference=notes=>String(notes??'').match(/(?:אסמכת[אה]|מספר\s*עסקה|transaction\s*(?:id|ref(?:erence)?))\s*[:#-]?\s*([a-z0-9][a-z0-9/-]{2,})/i)?.[1]?.toLowerCase()??'';
+const cardInstallmentNote=notes=>String(notes??'').match(/תשלום\s*(\d+)\s*(?:מתוך|מ)\s*(\d+)/);
+const cardReferenceNote=notes=>String(notes??'').match(/(?:אסמכת[אה]|מספר\s*עסקה|transaction\s*(?:id|ref(?:erence)?))\s*[:#-]?\s*([a-z0-9][a-z0-9/-]{2,})/i);
+const installment=notes=>{const match=cardInstallmentNote(notes);return match?match[1]+':'+match[2]:'';};
+const transactionReference=notes=>cardReferenceNote(notes)?.[1].toLowerCase()??'';
 const evidenceKey=(date,merchant,amount)=>JSON.stringify([date,evidenceMerchant(merchant),amount]);
-const savedEvidence=row=>JSON.stringify([row.statement.originalCents,row.statement.originalCurrency??'',row.statement.foreignCents??null,installment(row.statement.notes),transactionReference(row.statement.notes)]);
+const currencyEvidence=row=>JSON.stringify([row.originalCurrency??'',row.foreignCents??null]);
+const savedEvidence=row=>JSON.stringify([row.statement.originalCents,currencyEvidence(row.statement),installment(row.statement.notes),transactionReference(row.statement.notes)]);
 function compatibleEvidence(saved,entry,issuer){
  const previous=saved.statement;
  if(previous.issuer!==issuer||installment(previous.notes)!==installment(entry.notes)||transactionReference(previous.notes)!==transactionReference(entry.notes))return false;
@@ -19,35 +22,65 @@ function compatibleEvidence(saved,entry,issuer){
  // before currency/foreignCents were retained separately. Require exact evidence.
  return issuer==='cal'&&!previous.originalCurrency&&previous.foreignCents===undefined&&entry.originalCurrency&&entry.originalCurrency!=='ILS'&&Number.isSafeInteger(entry.foreignCents)&&previous.originalCents===entry.foreignCents&&entry.originalCents===entry.amountCents;
 }
+function compatibleSparseEvidence(previous,entry,issuer){
+ if(previous.issuer!==issuer||previous.originalCents!==entry.originalCents||currencyEvidence(previous)!==currencyEvidence(entry))return false;
+ const fields=[installment,transactionReference];
+ return fields.every(read=>{
+  const old=read(previous.notes),current=read(entry.notes);
+  return !old||!current||old===current;
+ });
+}
 function matchStatementEvidence(saved,rows,issuer){
- const used=new Set(rows.filter(row=>row.existing).map(row=>row.id)),groups=new Map();
+ const used=new Set(rows.filter(row=>row.existing).map(row=>row.id)),groups=new Map(),unmatched=new Map();
+ const link=(row,existing)=>{
+  used.add(existing.id);row.parsedId=row.id;row.id=existing.id;row.key=existing.statement.key;row.existing=clone(existing);
+  row.category=existing.category;row.candidates=[];row.matchedBy='statement-evidence';
+ };
  for(const row of saved){const key=evidenceKey(row.date,row.name,cents(row.amount));if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
  for(const row of rows){
   if(row.existing)continue;
-  const entry=row.entry,candidates=(groups.get(evidenceKey(entry.date,entry.merchant,entry.amountCents))??[]).filter(old=>!used.has(old.id)&&compatibleEvidence(old,entry,issuer));
-  // Indistinguishable repeats are a multiset, never one transaction. Different
-  // original/currency/installment evidence remains a question instead of a guess.
-  if(!candidates.length||new Set(candidates.map(savedEvidence)).size!==1)continue;
-  const existing=candidates[0];used.add(existing.id);row.parsedId=row.id;row.id=existing.id;row.key=existing.statement.key;row.existing=clone(existing);row.category=existing.category;row.candidates=[];row.matchedBy='statement-evidence';
+  const entry=row.entry,key=evidenceKey(entry.date,entry.merchant,entry.amountCents);
+  const candidates=(groups.get(key)??[]).filter(old=>!used.has(old.id)&&compatibleEvidence(old,entry,issuer));
+  // Exact evidence can match repeated purchases one-to-one.
+  if(candidates.length&&new Set(candidates.map(savedEvidence)).size===1){link(row,candidates[0]);continue;}
+  if(!unmatched.has(key))unmatched.set(key,[]);
+  unmatched.get(key).push(row);
+ }
+ // Missing installment or reference evidence can match a single remaining pair.
+ // Keep lookalikes with competing occurrences in the existing conflict review.
+ for(const [key,incoming] of unmatched){
+  if(incoming.length!==1)continue;
+  const remaining=(groups.get(key)??[]).filter(old=>!used.has(old.id));
+  if(remaining.length===1&&compatibleSparseEvidence(remaining[0].statement,incoming[0].entry,issuer))link(incoming[0],remaining[0]);
  }
 }
-export async function prepareCardStatement(p,report,cardId,merchantRules=[],{replacementToken}={}){
+function fillStatementNotes(saved,incoming){
+ const old=saved.notes??'', additions=[
+  !installment(old)&&cardInstallmentNote(incoming)?.[0],
+  !transactionReference(old)&&cardReferenceNote(incoming)?.[0],
+ ].filter(Boolean);
+ if(!additions.length)return;
+ const notes=old.trim()?[old,...additions].join('\n'):incoming;
+ if(notes.length<=2000)saved.notes=notes;
+}
+export async function prepareCardStatement(p,report,cardId,merchantRules=[],{replacementToken,allowReplacement=true}={}){
  if(!['cal','isracard'].includes(report?.issuer)||!Array.isArray(report.entries)||!report.entries.length||report.entries.length>5000||report.entries.reduce((n,r)=>n+r.amountCents,0)!==cents(report.amount)||!creditCards(p).some(c=>c.id===cardId))throw Error('פירוט הדוח אינו תקין.');
+ const saved=(p.details??[]).filter(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate),savedById=new Map(saved.map(row=>[row.id,row]));
  const seen=new Map(),rows=[],categories=new Map(),add=(name,category)=>{if(!category||category==='לסיווג')return;const k=statementMerchant(name);if(!categories.has(k))categories.set(k,new Set());categories.get(k).add(category);};
  for(const e of analyticalExpenseDetails(p))add(e.name,e.category);
  for(const r of merchantRules)add(r.merchant,r.category);
  for(const entry of report.entries){
   const identity=JSON.stringify([cardId,report.dueDate,entry.date,statementMerchant(entry.merchant),entry.amountCents,entry.originalCents,entry.notes,...(report.issuer==='isracard'?[entry.originalCurrency??'',entry.foreignCents??null]:[])]),occurrence=(seen.get(identity)??0)+1;seen.set(identity,occurrence);
-  const key=await statementDigest(identity+'#'+occurrence),id=report.issuer+'-'+key,found=(p.details??[]).find(e=>e.id===id),existing=found&&compatibleEvidence(found,entry,report.issuer)?found:null;
+  const key=await statementDigest(identity+'#'+occurrence),id=report.issuer+'-'+key,found=savedById.get(id),existing=found&&found.date===entry.date&&cents(found.amount)===entry.amountCents&&compatibleEvidence(found,entry,report.issuer)?found:null;
   const candidates=existing?[]:(p.details??[]).filter(e=>!e.statement&&e.accounting==='included'&&e.status!=='cancelled'&&e.method===cardId&&e.month===report.dueDate.slice(0,7)&&e.date===entry.date&&statementMerchant(e.name)===statementMerchant(entry.merchant));
   const known=categories.get(statementMerchant(entry.merchant)),category=existing?.category??(known?.size===1?[...known][0]:'');
   rows.push({id,key,entry,category,existing:existing?clone(existing):null,candidates:clone(candidates)});
  }
- const saved=(p.details??[]).filter(e=>e.method===cardId&&e.statement?.dueDate===report.dueDate);
  matchStatementEvidence(saved,rows,report.issuer);
  const matched=new Set(rows.filter(r=>r.existing).map(r=>r.id)),removed=saved.filter(e=>!matched.has(e.id));
  let replacement=null;
  if(removed.length){
+  if(!allowReplacement)throw Error('מקור הפעילות אינו כולל את כל העסקאות שכבר נשמרו. יש להעלות דוח חיוב חודשי מלא כדי לבדוק תיקון.');
   const billing=(p.cardBilling?.reports??[]).filter(r=>r.cardId===cardId&&r.dueDate===report.dueDate),token=await statementDigest(JSON.stringify({cardId,report,saved,billing}));
   const conflict={token,cardId,dueDate:report.dueDate,savedTotal:billing.length===1?billing[0].amount:null,incomingTotal:report.amount,savedOnly:clone(removed),incomingOnly:clone(rows.filter(r=>!r.existing)),unchanged:rows.filter(r=>r.existing).length};
   if(replacementToken!==token)throw Object.assign(Error('כבר נשמר דוח שונה לאותו חיוב. יש לבדוק את השורות שיוסרו ויתווספו ולבחור איזה דוח לשמור.'),{statementConflict:conflict});
@@ -66,7 +99,7 @@ export function applyCardStatement(p,preview,choices,{deferCategories=false}={})
  }
  for(const row of preview.rows){
   const choice=choices[row.id],category=(choice?.category??row.category)||(deferCategories?'לסיווג':'');
-  if(row.existing){const existing=next.details.find(e=>e.id===row.id);if(JSON.stringify(existing)!==JSON.stringify(row.existing))throw Error('הפירוט השתנה בזמן הבדיקה. יש לטעון את הדוח מחדש.');continue;}
+  if(row.existing){const existing=next.details.find(e=>e.id===row.id);if(JSON.stringify(existing)!==JSON.stringify(row.existing))throw Error('הפירוט השתנה בזמן הבדיקה. יש לטעון את הדוח מחדש.');fillStatementNotes(existing.statement,row.entry.notes);continue;}
   if(!allowed.has(category))throw Error('יש לבחור קטגוריה לכל בית עסק חדש.');
   if(row.candidates.length&&!['new',...row.candidates.map(e=>e.id)].includes(choice?.match))throw Error('יש לבדוק את הפעולות הדומות לפני שמירה.');
   const match=choice?.match&&choice.match!=='new'?row.candidates.find(e=>e.id===choice.match):null;
@@ -96,7 +129,11 @@ export function applyBillingBatch(p,entries,today){
   if(!entry.statement&&statementCycleExists(p,entry.cardId,entry.dueDate.slice(0,7)))throw Error('כבר נשמר פירוט דוח לכרטיס ולחודש הזה. יש להעלות דוח מפורט כדי לשמור על ההתאמה.');
   if(entry.statement&&(entry.statement.cardId!==entry.cardId||entry.statement.dueDate!==entry.dueDate||entry.statement.amount!==entry.amount))throw Error('פרטי הדוח השתנו. יש לטעון אותו מחדש.');
   next=saveBillingReport(next,{cardId:entry.cardId,accountId:entry.accountId,dueDate:entry.dueDate,amount:entry.amount,source:'file'},today);
-  if(entry.statement)next=applyCardStatement(next,entry.statement,entry.choices??{},{deferCategories:entry.deferCategories===true});
+  if(entry.statement){
+   next=applyCardStatement(next,entry.statement,entry.choices??{},{deferCategories:entry.deferCategories===true});
+   const billed=(next.details??[]).filter(row=>row.method===entry.cardId&&row.statement?.dueDate===entry.dueDate);
+   if(billed.reduce((sum,row)=>sum+cents(row.amount),0)!==cents(entry.amount))throw Error('סכום העסקאות לאחר הבדיקה אינו תואם לסך החיוב בדוח.');
+  }
  }
  if(!validatePlan(next)||JSON.stringify(next).length>2000000)throw Error('לא ניתן לשמור את כל הדוחות; בדקו את תקופת התקציב ומגבלת הפירוט.');
  return next;

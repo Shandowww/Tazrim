@@ -33,3 +33,63 @@ test('Changed amounts, installment numbers, foreign currencies, missing rows and
  const referenced=await savedReport([entry({notes:'אסמכתה 123456'})]);await assert.rejects(prepareCardStatement(referenced,report([entry({notes:'אסמכתה 654321'})]),'card1'),e=>!!e.statementConflict);
  assert.equal(validatePlan(p),true);
 });
+
+test('A complete statement keeps three legacy installments, adds 28 rows, and reconciles the bill once',async()=>{
+ const legacy=Array.from({length:3},(_,i)=>entry({
+  date:['2026-04-14','2026-06-27','2026-10-13'][i],
+  merchant:'בדיקת תשלומים '+i,amountCents:[30000,14000,11000][i],originalCents:[300000,112000,33000][i],notes:'',
+ }));
+ const saved=await savedReport(legacy);
+ for(const row of saved.details){delete row.statement.notes;row.category='קניות';}
+ const before=clone(saved), installments=legacy.map((row,i)=>({...row,notes:['תשלום 7 מ 10 -','תשלום 5 מ 8 -','תשלום 2 מ 3 -'][i]}));
+ const additions=Array.from({length:28},(_,i)=>entry({merchant:'בית עסק חדש '+i,amountCents:10000,originalCents:10000,notes:''}));
+ const r=report([...installments,...additions]),ui=uiFor(r);
+ await build(saved,ui);
+ assert.equal(ui.issues,0);
+ assert.equal(ui.readyRows,28);
+ assert.equal(ui.items[0].statementConflict,null);
+ assert.deepEqual(ui.items[0].preview.rows.filter(r=>r.existing).map(r=>r.id),saved.details.map(r=>r.id));
+ assert.equal(ui.build.cardBilling.reports.length,1);
+ assert.equal(ui.build.cardBilling.reports[0].amount,3350);
+ assert.equal(ui.build.details.length,31);
+ assert.equal(ui.build.details.reduce((sum,row)=>sum+Math.round(row.amount*100),0),335000);
+ assert.deepEqual(ui.build.details.slice(0,3),before.details.map((row,i)=>({...row,statement:{...row.statement,notes:installments[i].notes}})));
+ assert.deepEqual(saved,before);
+ const retry=uiFor(report([...r.entries].reverse()));
+ await build(ui.build,retry);
+ assert.equal(retry.items[0].already,true);
+ assert.equal(retry.readyRows,0);
+ assert.deepEqual(retry.build.details,ui.build.details);
+});
+
+test('Missing installment evidence never resolves competing occurrences and keeps the exact match first',async()=>{
+ const unknown=entry({notes:''}),first=entry(),second=entry({notes:'תשלום 2 מ 3'});
+ const one=await savedReport([unknown]);
+ await assert.rejects(prepareCardStatement(one,report([first,second]),'card1'),error=>error.statementConflict?.savedOnly.length===1&&error.statementConflict?.incomingOnly.length===2);
+ const conflictingReference=await savedReport([entry({notes:'אסמכתה 123456'})]);
+ await assert.rejects(prepareCardStatement(conflictingReference,report([entry({notes:'תשלום 1 מתוך 3 · אסמכתה 987654'})]),'card1'),error=>!!error.statementConflict);
+ const both=await savedReport([unknown,first]),reversed=report([second,first]),preview=await prepareCardStatement(both,reversed,'card1');
+ assert.deepEqual(preview.rows.map(row=>row.id),both.details.map(row=>row.id));
+ const savedWithReference=await savedReport([entry({notes:'אסמכתה 123456'})]);
+ const rich=report([entry({notes:'תשלום 1 מתוך 3 · אסמכתה 123456'})]);
+ const enriched=applyCardStatement(savedWithReference,await prepareCardStatement(savedWithReference,rich,'card1'),{});
+ assert.equal(enriched.details[0].id,savedWithReference.details[0].id);
+ assert.equal(enriched.details[0].statement.notes,'אסמכתה 123456\nתשלום 1 מתוך 3');
+});
+
+test('Cal activity cannot replace saved rows that are absent from its export',async()=>{
+ const p=await savedReport([entry({notes:''}),entry({merchant:'נוסף',notes:''})]),r=report([entry({notes:''})]);
+ let token;
+ try{await prepareCardStatement(p,r,'card1');}catch(error){token=error.statementConflict?.token;}
+ assert.ok(token);
+ await assert.rejects(prepareCardStatement(p,r,'card1',[],{replacementToken:token,allowReplacement:false}),/דוח חיוב חודשי מלא/);
+ const complete=await prepareCardStatement(p,r,'card1',[],{replacementToken:token});
+ assert.equal(complete.replacement.savedOnly.length,1);
+ const ui=uiFor(r);
+ Object.assign(ui.items[0],{activity:{},decisions:{statementReplacement:token}});
+ await buildReportInbox(p,ui,{month:'2026-11',today:'2026-11-07',classifier,activityAPI:{calActivityReport:()=>r}});
+ assert.equal(ui.issues,1);
+ assert.equal(ui.build,null);
+ assert.match(ui.items[0].warning,/דוח חיוב חודשי מלא/);
+ assert.equal(p.details.length,2);
+});

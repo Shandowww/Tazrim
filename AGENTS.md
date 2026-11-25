@@ -2,7 +2,9 @@
 
 ## Current source and live release — verified 2026-11-26 (Israel time)
 
-- **Latest production:** approved v1.9.1 runs application commit `e21f1fea143cf97cc48724dc4c98ab2792854530`, build `6feb1b19af`. Cal PDF continuation pages include the final row above the disclaimer, and Report Sync verifies saved approval after an interrupted reply. Build/typecheck, 1,523 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 188 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-cal-pdf-continuation-2026-11-26.json`. Save drafts and use guarded refresh.
+- **Latest production:** approved v1.9.2 runs application commit `e448b24538d5c55b0664b61dbb1f27e03fc56983`, build `7a4569fed6`. When a fuller statement extends a saved one, confirmed charges retain their IDs and annotations and only new rows are added. The final review shows kept, added and removed rows, and incomplete activity cannot replace missing charges. Build/typecheck, 1,526 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 188 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-report-reconciliation-2026-11-26.json`. Save drafts and use guarded refresh.
+
+- **Previous production checkpoint:** approved v1.9.1 runs application commit `e21f1fea143cf97cc48724dc4c98ab2792854530`, build `6feb1b19af`. Cal PDF continuation pages include the final row above the disclaimer, and Report Sync verifies saved approval after an interrupted reply. Build/typecheck, 1,523 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 188 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-cal-pdf-continuation-2026-11-26.json`. Save drafts and use guarded refresh.
 
 - **Previous production checkpoint:** approved v1.9.0 runs application commit `a093b51a5f7e5c0bc76426765d8d6397456416a2`, build `eaec56793e`. Report Sync recognizes American Express and Isracard Group Excel card exports and verifies the printed date and totals. Build/typecheck, 1,521 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 188 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-isracard-excel-2026-11-25.json`. Save drafts and use guarded refresh.
 
@@ -55,6 +57,10 @@
 | Sibling `monthly-flow-legacy-2026-10-11`; former `Documents/ChatGPT/Monthly Flow Budget` location | Local archive with older unpublished work; relocation notice, respectively. |
 
 Use release notes below as dated evidence. Earlier references to a current source, pending preview, or publishing workflow describe their original checkpoints. Update the production commit, runtime build ID, and evidence reference in this section after verifying an approved deployment.
+
+## Report reconciliation
+
+Read [Reconciling overlapping reports](docs/ui-redesign/REPORT-RECONCILIATION.md) before changing bank or card imports, duplicate detection, or statement replacement.
 
 ## Project workflow and responsive design — 2026-11-17
 

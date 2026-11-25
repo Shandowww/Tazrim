@@ -1,0 +1,40 @@
+{
+  "version": "v1.9.2",
+  "commit": "e448b24538d5c55b0664b61dbb1f27e03fc56983",
+  "build": "7a4569fed6",
+  "previousCommit": "a7f2cd6efcee31e13eec2061bc9c0529d851cf8a",
+  "verifiedAt": "2026-11-26T00:28:07+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "The shared card review preserves confirmed existing rows when a complete statement adds new charges. Missing evidence is distinguished from conflicting evidence, scoped partial activity cannot propose removals, and saved detail reconciles in signed cents to the approved bill.",
+  "approval": "Tal approved implementation and publication of the proposed overlapping-report reconciliation rules.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45712193112",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1526,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-e448b245.cUh12l/",
+  "candidateImage": "sha256:48acdea21ca236af1a02c38457d434ee4aa4776af2acf0cb9dd91d342974681b",
+  "rollbackImage": "sha256:82a806b3ddc07936a8afe552638228591246ba4700a70fc40ed08bfb3448d5f4",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 188,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "scopedReadOnlyLiveReplay": "passed"
+  },
+  "limits": [
+    "The scoped live replay used read-only verification. Explicit approval, commit and responsive review were tested with synthetic data."
+  ]
+}
