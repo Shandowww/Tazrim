@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "537b6c55b04e25e5613bb0d267c961c48e5e04ec",
+  "sourceCommit": "181c2001e76a877c037906f3835489a7fd8eb1ce",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "Approved report-derived card labels on statement notices are verified live on Budgit.",
+  "status": "The approved partial-bank-month income fix is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1517,
+    "applicationAndReaderTests": 1519,
     "coreChecks": 15,
-    "production": "Exact CI, image scan, verified backup, isolated financial/access/restore/rollback, 187 runtime files and 53 authoritative tables passed."
+    "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 187 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "9ada2ed60539a877a577cefac8b0f6c1ed2c5b23",
-  "productionVersion": "v1.8.1",
-  "productionBuild": "f31b43c5da"
+  "productionApplicationCommit": "02b6e3735f8353979394e714fb5a21487fca4f2a",
+  "productionVersion": "v1.8.2",
+  "productionBuild": "f8327eeef5"
 }

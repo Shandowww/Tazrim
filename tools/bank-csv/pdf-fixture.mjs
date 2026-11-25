@@ -20,7 +20,7 @@ export function pdfFixture(pages=pdfTextFixture()){
  const stream=s=>`<< /Length ${s.length} >>\nstream\n${s}\nendstream`;add(stream(cmap));
  for(const [index,page]of pages.entries()){
   if(index)add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${page.width??595} ${page.height??842}] /Resources << /Font << /F1 4 0 R >> >> /Contents ${7+index*2} 0 R >>`);
-  const commands=page.items.map(i=>`BT /F1 ${i.transform[0]} Tf 1 0 0 1 ${i.transform[4]} ${i.transform[5]} Tm <${[...(/[א-ת]/.test(i.str)?[...i.str].reverse().join(''):i.str)].map(c=>c.charCodeAt(0).toString(16).padStart(4,'0')).join('')}> Tj ET`).join('\n');add(stream(commands));
+  const commands=page.items.map(i=>`BT /F1 ${i.transform[0]} Tf 1 0 0 1 ${i.transform[4]} ${i.transform[5]} Tm <${[...(/[א-ת]/.test(i.str)?[...i.str].reverse().join(''):i.str)].map(c=>c.charCodeAt(0).toString(16).padStart(4,'0')).join('')}> Tj ET`).join('\n');const grid=(page.printedRows??[]).flatMap(row=>row.cells.map(cell=>[cell.left,row.bottom,cell.right-cell.left,row.top-row.bottom,'re f'].join(' '))).join('\n');add(stream(grid+'\n'+commands));
  }
  let out='%PDF-1.7\n',offsets=[0];for(let i=0;i<objects.length;i++){offsets.push(out.length);out+=`${i+1} 0 obj\n${objects[i]}\nendobj\n`;}const start=out.length;out+=`xref\n0 ${objects.length+1}\n0000000000 65535 f \n`+offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objects.length+1} /Root 1 0 R >>\nstartxref\n${start}\n%%EOF`;
  return new TextEncoder().encode(out);

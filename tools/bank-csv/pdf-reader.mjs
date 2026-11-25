@@ -8,14 +8,46 @@ const money=s=>{const raw=String(s).replace(/[א-ת״”"׳'₪\s]/g,'');if(!/^[
 const x=i=>i.transform[4],y=i=>i.transform[5],right=i=>x(i)+i.width;
 function lines(items){const result=[];for(const i of [...items].sort((a,b)=>y(b)-y(a)||x(b)-x(a))){let line=result.find(l=>Math.abs(l.y-y(i))<1.5);if(!line){line={y:y(i),items:[]};result.push(line);}line.items.push(i);}return result.sort((a,b)=>b.y-a.y);}
 function cellText(items){return lines(items).map(l=>l.items.sort((a,b)=>x(b)-x(a)).map(i=>i.str.trim()).join(' ')).join(' ').trim();}
+// This One Zero export paints each table row as six adjacent filled rectangles.
+async function printedRows(page,pdfjs){
+ const {fnArray,argsArray}=await page.getOperatorList({annotationMode:pdfjs.AnnotationMode.DISABLE});
+ const ops=pdfjs.OPS,stack=[],bands=new Map();let transformed=false;
+ for(let i=0;i<fnArray.length;i++){
+  const op=fnArray[i];
+  if(op===ops.save||op===ops.paintFormXObjectBegin){stack.push(transformed);if(op===ops.paintFormXObjectBegin)transformed=true;}
+  else if(op===ops.restore||op===ops.paintFormXObjectEnd)transformed=stack.pop();
+  else if(op===ops.transform)transformed=true;
+  else if(op===ops.constructPath&&!transformed){
+   const [paint,paths,box]=argsArray[i],path=paths?.[0];
+   if(paint!==ops.fill||!box||paths.length!==1||path?.length!==13)continue;
+   const [left,bottom,right,top]=box;
+   // PDF.js packed moveTo, three lineTo calls and closePath in page coordinates.
+   const rectangle=[0,left,bottom,1,right,bottom,1,right,top,1,left,top,4];
+   if(!rectangle.every((value,j)=>path[j]===value))continue;
+   const key=bottom+','+top;
+   if(!bands.has(key))bands.set(key,{bottom,top,cells:[]});
+   bands.get(key).cells.push({left,right});
+  }
+ }
+ const rows=[];
+ for(const band of bands.values()){
+  const cells=band.cells.sort((a,b)=>a.left-b.left).filter((cell,i,all)=>!i||cell.left!==all[i-1].left||cell.right!==all[i-1].right);
+  if(cells.length===6&&cells.every((cell,i)=>cell.right>cell.left&&(!i||Math.abs(cell.left-cells[i-1].right)<0.1)))rows.push({...band,cells});
+ }
+ return rows.sort((a,b)=>b.top-a.top);
+}
 export function inspectOneZeroPDF(pages,{includeAccountIdentity=false}={}){
  if(!pages.length||pages.length>20)throw Error('אפשר לקרוא דוח PDF עם 1–20 עמודים.');
- let columns=null,summary=null,declared=null,all=[],count=0,accountHint='',routingHints={};
+ let gridColumns=null,columns=null,summary=null,declared=null,all=[],count=0,accountHint='',routingHints={};
  for(let pageIndex=0;pageIndex<pages.length;pageIndex++){
  const page=pages[pageIndex],items=page.items.filter(i=>typeof i.str==='string'&&i.str.trim());count+=items.length;if(count>100000)throw Error('דוח PDF גדול מדי לאחר פתיחה.');
  if(items.some(i=>Math.abs(i.transform[1])>0.01||Math.abs(i.transform[2])>0.01))throw Error('PDF עם טקסט מסובב אינו נתמך.');
  const header=lines(items).find(l=>headerNames.every(name=>l.items.some(i=>norm(i.str)===name)));
- if(header){const headers=headerNames.map(name=>header.items.find(i=>norm(i.str)===name));if(headers.some((i,j)=>j&&x(i)<=x(headers[j-1])))throw Error('סדר העמודות בדוח PDF אינו נתמך.');columns=headers.map(i=>right(i)+3.6);}
+ if(header){const headers=headerNames.map(name=>header.items.find(i=>norm(i.str)===name));if(headers.some((i,j)=>j&&x(i)<=x(headers[j-1])))throw Error('סדר העמודות בדוח PDF אינו נתמך.');columns=headers.map(i=>right(i)+3.6);
+  const printed=page.printedRows?.filter(row=>row.bottom<header.y&&header.y<row.top&&headers.every((item,j)=>x(item)>=row.cells[j].left&&right(item)<=row.cells[j].right));
+  if(printed?.length>1)throw Error('טבלת PDF אינה חד־משמעית.');
+  gridColumns=printed?.[0]?.cells;
+  if(gridColumns)columns=gridColumns.map(cell=>cell.right);}
  if(!columns)throw Error('לא נמצאה טבלת תנועות של וואן זירו. PDF סרוק אינו נתמך; בחר דוח מקורי מהבנק.');
  if(pageIndex===0){
  const top=items.filter(i=>!header||y(i)>header.y+3),text=top.map(i=>i.str).join(' ');if(!/ONE\s*ZERO/i.test(text)||!/שקליות/.test(text))throw Error('קורא PDF זה תומך בדוח התנועות המלא של וואן זירו בלבד.');
@@ -28,13 +60,32 @@ export function inspectOneZeroPDF(pages,{includeAccountIdentity=false}={}){
  const dateItems=items.filter(i=>y(i)<(header?.y??page.height-30)&&y(i)>55&&x(i)>columns[4]&&x(i)<columns[5]&&/\d/.test(i.str)),dateLines=lines(dateItems),firstY=dateLines[0]?.y,nextY=dateLines[1]?.y,lastY=dateLines.at(-1)?.y,previousY=dateLines.at(-2)?.y,bottom=lastY===undefined?55:lastY-(previousY===undefined?20:(previousY-lastY)/2);
  // Continuation pages need not repeat column headings. Bound their table by
  // dated row centres, excluding page chrome and signature text from column checks.
- const top=header?.y??(firstY===undefined?page.height-30:firstY+(nextY===undefined?20:(firstY-nextY)/2));
- const table=items.filter(i=>y(i)<top&&y(i)>bottom),byColumn=Array.from({length:6},()=>[]);
- for(const i of table){const c=columns.findIndex(end=>x(i)<end-1);if(c>=0){if(right(i)>columns[c]+4)throw Error('תא PDF חוצה עמודות; אין לקלוט דוח לא ברור.');byColumn[c].push(i);}}
+ const grid=gridColumns?(page.printedRows??[]).filter(row=>{
+  if(header&&row.top>=header.y)return false;
+  return row.cells.every((cell,j)=>Math.abs(cell.left-gridColumns[j].left)<0.1&&Math.abs(cell.right-gridColumns[j].right)<0.1);
+ }):null;
+ const rowBoundaries=new Set();
+ if(grid){
+  if(grid.length!==dateLines.length)throw Error('שורות טבלת PDF אינן חד־משמעיות.');
+  for(const [j,row] of grid.entries()){
+   if(dateLines[j].y<=row.bottom||dateLines[j].y>=row.top||(j&&Math.abs(row.top-grid[j-1].bottom)>0.1))throw Error('שורות טבלת PDF אינן חד־משמעיות.');
+   rowBoundaries.add(row.top);rowBoundaries.add(row.bottom);
+  }
+ }
+ const top=grid?.[0]?.top??header?.y??(firstY===undefined?page.height-30:firstY+(nextY===undefined?20:(firstY-nextY)/2));
+ const table=items.filter(i=>y(i)<top&&y(i)>(grid?.at(-1)?.bottom??bottom)),byColumn=Array.from({length:6},()=>[]);
+ for(const i of table){
+ if(grid){
+  if(rowBoundaries.has(y(i)))throw Error('שורות טבלת PDF אינן חד־משמעיות.');
+  const c=gridColumns.findIndex(cell=>x(i)>=cell.left&&right(i)<=cell.right);
+  if(c<0)throw Error('תא PDF חוצה עמודות; אין לקלוט דוח לא ברור.');
+  byColumn[c].push(i);continue;
+ }
+ const c=columns.findIndex(end=>x(i)<end-1);if(c>=0){if(right(i)>columns[c]+4)throw Error('תא PDF חוצה עמודות; אין לקלוט דוח לא ברור.');byColumn[c].push(i);}}
  const anchors=lines(byColumn[5]).filter(l=>/\d/.test(cellText(l.items))).map(l=>{const text=cellText(l.items);try{return {y:l.y,date:parseDate(text),raw:text};}catch{throw Error('תאריך תנועה לא קריא בטבלת PDF.');}});
  if(!anchors.length)throw Error('עמוד PDF ללא תנועות קריאות; לא ניתן לוודא שהדוח מלא.');
  for(let j=0;j<anchors.length;j++){
- const a=anchors[j],upper=j?(anchors[j-1].y+a.y)/2:top,lower=j+1<anchors.length?(a.y+anchors[j+1].y)/2:bottom;
+ const a=anchors[j],upper=grid?.[j].top??(j?(anchors[j-1].y+a.y)/2:top),lower=grid?.[j].bottom??(j+1<anchors.length?(a.y+anchors[j+1].y)/2:bottom);
  const cells=byColumn.map(col=>cellText(col.filter(i=>y(i)<upper&&y(i)>lower)));const [balance,credit,debit,description,valueDate]=cells;
  if(!description||description.length>LIMITS.cell)throw Error('פרטי פעולה חסרים או גדולים מדי בדוח PDF');
  const r={date:a.date,valueDate:parseDate(valueDate),description,balance:money(balance),debit:money(debit),credit:money(credit),page:pageIndex+1};
@@ -44,8 +95,19 @@ export function inspectOneZeroPDF(pages,{includeAccountIdentity=false}={}){
  if(all.length>LIMITS.rows)throw Error('דוח PDF כולל יותר מדי תנועות.');
  const debits=all.reduce((n,r)=>n+r.debit,0),credits=all.reduce((n,r)=>n+r.credit,0);
  if(debits!==summary.debitCents||credits!==summary.creditCents||summary.openingCents+credits-debits!==summary.closingCents)throw Error('סכומי התנועות אינם תואמים לסיכומי דוח ה־PDF. הקליטה נעצרה; שום נתון לא נשמר.');
- let balance=summary.openingCents;for(const r of all){balance+=r.credit-r.debit;if(balance!==r.balance)throw Error('יתרת שורה אינה תואמת לתנועות שקדמו לה. דוח PDF זה דורש בירור לפני קליטה.');}
- if(balance!==summary.closingCents)throw Error('יתרת הסיום אינה תואמת לדוח PDF.');
+ const balancesMatch=rows=>{
+  let balance=summary.openingCents;
+  for(const row of rows){
+   balance+=row.credit-row.debit;
+   if(balance!==row.balance)return false;
+  }
+  return balance===summary.closingCents;
+ };
+ // A printed grid may be newest first, including multiple entries on one day.
+ // Only reverse the entire sequence; every printed balance must still match.
+ if(gridColumns&&all.every((row,j)=>!j||row.date<=all[j-1].date)&&
+    (all[0].date>all.at(-1).date||!balancesMatch(all)))all.reverse();
+ if(!balancesMatch(all))throw Error('יתרת שורה אינה תואמת לתנועות שקדמו לה. דוח PDF זה דורש בירור לפני קליטה.');
  const dates=all.map(r=>r.date).sort(),from=declared.from<dates[0]?declared.from:dates[0],to=declared.to>dates.at(-1)?declared.to:dates.at(-1),periodMismatch=dates[0]<declared.from||dates.at(-1)>declared.to;
  const headers=['תאריך תנועה','תאריך ערך','פרטי הפעולה','חיובים','זיכויים','יתרה'];
  return {format:'pdf',rows:[{line:1,cells:headers},...all.map((r,i)=>({line:i+2,cells:[r.date,r.valueDate,r.description,(r.debit/100).toFixed(2),(r.credit/100).toFixed(2),(r.balance/100).toFixed(2)],page:r.page}))],headerIndex:0,mapping:guessMapping(headers),pdfReconciliation:{...summary,...(accountHint?{accountHint}:{}),...routingHints,count:all.length,verified:true,declared,from,to,periodMismatch,reversals:all.filter(r=>r.debit<0||r.credit<0).length}};
@@ -101,15 +163,17 @@ export function inspectHapoalimPDF(pages,{includeAccountIdentity=false}={}){
  return {format:'pdf',rows:[{line:1,cells:headers},...chronological.map((r,i)=>({line:i+2,page:r.page,cells:[r.date,r.description,r.debit?(r.debit/100).toFixed(2):'',r.credit?(r.credit/100).toFixed(2):'',(r.balance/100).toFixed(2)]}))],headerIndex:0,mapping:guessMapping(headers),pdfReconciliation:{...(includeAccountIdentity?{accountHint:accountSignature,branchHint:branchSignature,identityAmbiguous}:{}),provider:'hapoalim',method:'running-balances',verified:true,count:all.length,declared,...declared,periodMismatch:false,openingCents:oldest.balance-oldest.credit+oldest.debit,closingCents:all[0].balance,debitCents:all.reduce((s,r)=>s+r.debit,0),creditCents:all.reduce((s,r)=>s+r.credit,0),reversals:all.filter(r=>r.debit<0).length}};
 }
 
-export async function readPDFPages(bytes){
+export async function readPDFPages(bytes,{inspectBankGrid=false}={}){
  if(bytes.byteLength>LIMITS.bytes)throw Error('אפשר לקרוא PDF עד 5MB.');if(new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-')throw Error('זה אינו קובץ PDF תקין.');
  const pdfjs=await import('./vendor/pdfjs/pdf.mjs');globalThis.pdfjsWorker??=await import('./vendor/pdfjs/pdf.worker.mjs');pdfjs.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdfjs/pdf.worker.mjs',import.meta.url).href;
  const task=pdfjs.getDocument({data:bytes,isEvalSupported:false,enableXfa:false,useSystemFonts:false,disableFontFace:true,useWasm:false,stopAtErrors:true,verbosity:0});
- try{const doc=await task.promise;if(doc.numPages>20)throw Error('אפשר לקרוא PDF עד 20 עמודים.');const pages=[];let total=0;
- for(let n=1;n<=doc.numPages;n++){const page=await doc.getPage(n),text=await page.getTextContent(),viewport=page.getViewport({scale:1});total+=text.items.length;if(total>100000)throw Error('דוח PDF גדול מדי לאחר פתיחה.');pages.push({items:text.items,width:viewport.width,height:viewport.height});page.cleanup();}
+ try{const doc=await task.promise;if(doc.numPages>20)throw Error('אפשר לקרוא PDF עד 20 עמודים.');const pages=[];let total=0,oneZero=false;
+ for(let n=1;n<=doc.numPages;n++){const page=await doc.getPage(n),text=await page.getTextContent(),viewport=page.getViewport({scale:1});total+=text.items.length;if(total>100000)throw Error('דוח PDF גדול מדי לאחר פתיחה.');if(inspectBankGrid&&!oneZero&&n===1)oneZero=headerNames.every(name=>text.items.some(i=>norm(i.str)===name));
+ const grid=oneZero?await printedRows(page,pdfjs):undefined;
+ pages.push({items:text.items,width:viewport.width,height:viewport.height,printedRows:grid});page.cleanup();}
  return pages;
  }catch(e){if(e.name==='PasswordException')throw Error('PDF מוגן בסיסמה אינו נתמך.');throw e;}finally{await task.destroy();}
 }
 
-export async function readOneZeroPDF(bytes){return inspectOneZeroPDF(await readPDFPages(bytes));}
-export async function readReportPDF(bytes,options={}){const pages=await readPDFPages(bytes);if(pages.some(page=>lines(page.items).some(row=>['תאריך','פעולה','חובה','זכות','יתרהבשח'].every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectHapoalimPDF(pages,options)};if(pages.some(page=>lines(page.items).some(row=>headerNames.every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectOneZeroPDF(pages,options)};const cal=inspectCalPDF(pages);if(cal)return{intake:{kind:'card',provider:'cal',identity:'cal:'+cal.last4,report:cal}};const report=inspectIsracardPDF(pages);if(report)return{intake:{kind:'card',provider:'isracard',identity:report.last4?'isracard:'+report.last4:'',report}};throw Error('מבנה דוח PDF לא נתמך. בחרו דוח תנועות מקורי של הפועלים או וואן זירו, דוח חיוב חודשי של כאל או ישראכרט, או יצוא Excel מהבנק או מחברת האשראי.');}
+export async function readOneZeroPDF(bytes){return inspectOneZeroPDF(await readPDFPages(bytes,{inspectBankGrid:true}));}
+export async function readReportPDF(bytes,options={}){const pages=await readPDFPages(bytes,{inspectBankGrid:true});if(pages.some(page=>lines(page.items).some(row=>['תאריך','פעולה','חובה','זכות','יתרהבשח'].every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectHapoalimPDF(pages,options)};if(pages.some(page=>lines(page.items).some(row=>headerNames.every(name=>row.items.some(item=>norm(item.str)===name)))))return{inspection:inspectOneZeroPDF(pages,options)};const cal=inspectCalPDF(pages);if(cal)return{intake:{kind:'card',provider:'cal',identity:'cal:'+cal.last4,report:cal}};const report=inspectIsracardPDF(pages);if(report)return{intake:{kind:'card',provider:'isracard',identity:report.last4?'isracard:'+report.last4:'',report}};throw Error('מבנה דוח PDF לא נתמך. בחרו דוח תנועות מקורי של הפועלים או וואן זירו, דוח חיוב חודשי של כאל או ישראכרט, או יצוא Excel מהבנק או מחברת האשראי.');}

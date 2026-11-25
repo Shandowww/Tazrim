@@ -35,3 +35,30 @@ test('Approved One Zero routing includes a printed branch while legacy metadata 
  const approved=inspectOneZeroPDF(pages,{includeAccountIdentity:true});assert.equal(inspectIntake([approved]).identity,'bank:one-zero:012:123456');assert.deepEqual(approved.rows,legacy.rows);
  pages[0].items.push(item('סניף 13',650));assert.equal(inspectIntake([inspectOneZeroPDF(pages,{includeAccountIdentity:true})]).identity,'');
 })
+
+test('Printed One Zero cells retain wrapped descriptions and reconcile newest-first rows',async()=>{
+ globalThis.DOMMatrix??=class{};
+ const [page]=pdfTextFixture(),edges=[40,135,223,307,391,464,538];
+ const cells=edges.slice(1).map((right,j)=>({left:edges[j],right}));
+ page.printedRows=[{top:527,bottom:512},{top:512,bottom:482},{top:482,bottom:457},{top:457,bottom:420}].map(row=>({...row,cells}));
+ for(const item of page.items){
+  if(item.transform[5]===520){
+   const c=cells.find(cell=>item.transform[4]+item.width===cell.right-5);
+   item.transform[4]=(c.left+c.right-item.width)/2;
+  }else if(item.transform[5]===495)item.transform[5]=445;
+  else if(item.transform[5]===445)item.transform[5]=495;
+ }
+ page.items.push({str:'המשך תיאור',dir:'rtl',transform:[10,0,0,10,325,426],width:50,height:10});
+ const read=()=>readOneZeroPDF(pdfFixture([page]));
+ const result=await read();
+ assert.equal(result.pdfReconciliation.count,3);
+ assert.match(result.rows[1].cells[2],/עמלה לדוגמה המשך תיאור/);
+ assert.deepEqual(normalizeRows(result).records.map(row=>row.amountCents),[-1000,1000,120025]);
+ for(const item of page.items.filter(item=>item.transform[5]<510&&item.transform[4]>464))item.str='01/01/2026';
+ assert.deepEqual(normalizeRows(await read()).records.map(row=>row.amountCents),[-1000,1000,120025]);
+ page.items.at(-1).transform[4]=380;
+ await assert.rejects(read,/חוצה עמודות/);
+ page.items.pop();
+ page.printedRows.splice(2,1);
+ await assert.rejects(read,/שורות טבלת/);
+});

@@ -1286,13 +1286,18 @@ export function cashPlanningValid(p){
  return true;
 }
 export function cashPlanningBase(p){return clone(p.cashPlanning??{accounts:[],months:{},cardAccounts:{},transfers:[]});}
-export function cashSourceRecords(p,id){
+export function cashSourceRecords(p,id,{reportedOnly=false}={}){
  const result={};
  for(const batch of p.bankImport?.batches??[])if(batch.accountId===id)for(const h of batch.months){const c=h.after?.bankCoverage;if(!c)continue;
  const balance=Object.hasOwn(c,'sourceBalanceCents')?c.sourceBalanceCents:h.after.cashReport?cents(h.after.cashReport.balance):null;
  result[h.month]={values:zero(),actual:c.accountComplete??c.complete,includesPlannedCard:h.after.includesPlannedCard,includesPlannedDirect:h.after.includesPlannedDirect??false,...(balance!==null?{balance:balance/100,date:c.date}:{}),fromBank:true};}
  for(const e of p.bankImport?.entries??[])if(e.accountId===id&&e.field!=='exclude'&&result[e.month]){const v=result[e.month].values;v[e.field]=(cents(v[e.field]??0)+(['salary','otherIncome','incomingTransfers'].includes(e.field)?e.cents:-e.cents))/100;}
- for(const [m,records]of Object.entries(p.cashPlanning?.months??{}))if(records[id])result[m]={...clone(records[id]),date:records[id].date??monthAt(m,1)+'-01',fromBank:records[id].bankImported===true};
+ // For summaries of reported amounts, keep bank-backed values when the account
+ // record can still contain unconfirmed estimates.
+ for(const [m,records]of Object.entries(p.cashPlanning?.months??{})){
+  const record=records[id];
+  if(record&&(!reportedOnly||record.actual))result[m]={...clone(record),date:record.date??monthAt(m,1)+'-01',fromBank:record.bankImported===true};
+ }
  return result;
 }
 // Resolve saved identity evidence, never display names or the sole visible bank.

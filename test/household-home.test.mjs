@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {clone,demoPlan,zero} from '../src/budget.js'
+import {applyBankImport,bankIdentity} from '../src/bank-import-model.js'
 import {householdHistory,returnDestination,householdTrail,householdLinkState,householdReplaceState,householdFallback,householdSpaceHref} from '../frontend/src/app/household-model.js'
 test('Reported six-month window crosses years, preserves gaps and signed cents, excludes forecasts',()=>{
  const p=clone(demoPlan);p.startMonth='2025-10';p.expenses=[]
@@ -62,6 +63,34 @@ test('Partial bank coverage stays explicit and separate plan calls never retain 
  const other=clone(p);other.cashPlanning.months['2025-12'].a.values.salary=456.78
  assert.equal(householdHistory(other,'2026-01').rows.at(-1).income,456.78)
  assert.equal(householdHistory(p,'2026-01').rows.at(-1).income,123.45)
+})
+
+test('Overview counts the salary already imported for a partial account month once',async()=>{
+ const month='2026-10',asOf='2026-11'
+ const plan={startMonth:'2026-01',opening:0,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false}
+ const record=(values,actual)=>({values:{...zero(),...values},actual,includesPlannedCard:false,includesPlannedDirect:false})
+ plan.cashPlanning={
+  accounts:[{id:'salary-bank',label:'Salary account',buffer:0},{id:'other-bank',label:'Other account',buffer:0}],
+  months:{[month]:{
+   'salary-bank':record({salary:9000,otherIncome:777,variable:500},false),
+   'other-bank':record({otherIncome:0.48},true),
+  }},
+  cardAccounts:{},transfers:[],
+ }
+ const salary=await bankIdentity({line:1,date:month+'-08',reference:'payroll',amountCents:1200000,
+  description:'משכורת',currency:'ILS',valid:true,balanceCents:null},'salary-bank')
+ const imported=applyBankImport(plan,[salary],{
+  id:'october-report',accountId:'salary-bank',label:'Salary account',fileName:'bank.csv',
+  from:month+'-01',to:month+'-15',asOf,coverageConfirmed:true,monthsConfirmed:true,
+  modes:{[month]:'partial'},choices:{1:{field:'salary',reviewed:true}},
+ })
+ const before=JSON.stringify(imported)
+ const summary=householdHistory(imported,asOf,month)
+ assert.equal(summary.selected.income,12000.48)
+ assert.equal(summary.selected.spending,0)
+ assert.equal(summary.selected.partial,true)
+ assert.equal(summary.rows.find(row=>row.month===month).income,12000.48)
+ assert.equal(JSON.stringify(imported),before)
 })
 
 test('Nested screen back links consume the trail without bouncing back into an editor',()=>{

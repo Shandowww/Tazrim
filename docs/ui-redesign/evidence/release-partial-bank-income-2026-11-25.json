@@ -1,0 +1,39 @@
+{
+  "version": "v1.8.2",
+  "commit": "02b6e3735f8353979394e714fb5a21487fca4f2a",
+  "build": "f8327eeef5",
+  "previousCommit": "b1bfc40bde69af368250f70c7721ca06194b1a78",
+  "verifiedAt": "2026-11-25T22:03:18+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "The overview and its chart include reported movements from partial bank months. Saved estimates are excluded, and the coverage label still reflects incomplete reporting.",
+  "approval": "Tal approved publication of the local salary overview preview.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45689744004",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1519,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-02b6e373.lRIz4R/",
+  "candidateImage": "sha256:601370c1d931656ab811d56f4b2d7294ba40973b13ed3263ff23cca34feea8a5",
+  "rollbackImage": "sha256:eda6b8853b1b073adcae0b982cadbff8cecb278a9d36d53693be88fc218e5a5b",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 187,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved"
+  },
+  "limits": [
+    "The salary regression and responsive review used synthetic data."
+  ]
+}
