@@ -2,7 +2,9 @@
 
 ## Current source and live release — verified 2026-11-25 (Israel time)
 
-- **Latest production:** approved v1.8.2 runs application commit `02b6e3735f8353979394e714fb5a21487fca4f2a`, build `f8327eeef5`. The Overview includes saved bank movements from partial months and excludes estimates. The partial-report label still reflects incomplete coverage. Build/typecheck, 1,519 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 187 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-partial-bank-income-2026-11-25.json`. Save drafts and use guarded refresh.
+- **Latest production:** approved v1.9.0 runs application commit `a093b51a5f7e5c0bc76426765d8d6397456416a2`, build `eaec56793e`. Report Sync recognizes American Express and Isracard Group Excel card exports and verifies the printed date and totals. Build/typecheck, 1,521 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 188 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-isracard-excel-2026-11-25.json`. Save drafts and use guarded refresh.
+
+- **Previous production checkpoint:** approved v1.8.2 runs application commit `02b6e3735f8353979394e714fb5a21487fca4f2a`, build `f8327eeef5`. The Overview includes saved bank movements from partial months and excludes estimates. The partial-report label still reflects incomplete coverage. Build/typecheck, 1,519 regressions, 15 core checks, responsive browser checks, exact-commit CI, image security, fresh verified backups, financial/access/restore/rollback gates, 187 runtime files and all 53 authoritative tables passed. Evidence: `docs/ui-redesign/evidence/release-partial-bank-income-2026-11-25.json`. Save drafts and use guarded refresh.
 
 - **Hosting workflow:** Hetzner's release runner follows GitHub main and requires passing validation for the exact commit. The local prototype approval rule applies before every proposed change is pushed.
 

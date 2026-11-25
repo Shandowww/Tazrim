@@ -1,0 +1,46 @@
+{
+  "version": "v1.9.0",
+  "commit": "a093b51a5f7e5c0bc76426765d8d6397456416a2",
+  "build": "eaec56793e",
+  "previousCommit": "181c2001e76a877c037906f3835489a7fd8eb1ce",
+  "verifiedAt": "2026-11-25T22:34:24+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Report Sync classifies American Express and Isracard Group billing spreadsheets as card reports. The reader uses the printed card and date and reconciles the billed ILS rows with the printed totals.",
+  "approval": "Tal approved publication of the local American Express Excel report preview.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45694904867",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1521,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ]
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-a093b51a.SQippW/",
+  "candidateImage": "sha256:bd4acf9d2aba8666c183c09bf8e98f8ccd187a532f976d81a83b4e3b8d83d298",
+  "rollbackImage": "sha256:601370c1d931656ab811d56f4b2d7294ba40973b13ed3263ff23cca34feea8a5",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 188,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "verifiedReaderAssets": 3,
+    "syntheticLiveProbe": {
+      "synthetic": true,
+      "cardRecognized": true,
+      "billingDate": "2026-10-10",
+      "reconciledRows": 3
+    }
+  },
+  "limits": [
+    "The supplied report was tested locally only. The end-to-end commit and responsive review used synthetic data."
+  ]
+}
