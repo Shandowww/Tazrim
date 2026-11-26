@@ -1,4 +1,4 @@
-import {cashAccountList,cashSourceRecords,indexMonth,monthAt} from '../../../src/budget.js'
+import {cashAccountList,cashSourceRecords,indexMonth,monthAt,monthlyDataCoverage} from '../../../src/budget.js'
 import {tazrimDisplaySnapshot} from '../../../src/tazrim-display-model.js'
 import {withViewQuery} from './navigation-query.js'
 export const mainPages=['/','/accounts','/savings','/more']
@@ -49,7 +49,9 @@ export function householdHistory(plan,asOf,requested){
  const chartEnd=selected<recentStart?monthAt(selected,5):last
  const byMonth=new Map(rows.map(r=>[r.month,r]))
  const rowFor=month=>byMonth.get(month)??{month,reported:false,partial:false,income:null,spending:null,incomingTransfers:null,cardTotal:null}
- return {latest,selected:{...rowFor(selected),hasSavedData:evidenceMonths.has(selected)},months:Array.from({length:indexMonth(last)-indexMonth(first)+1},(_,i)=>monthAt(first,i)),
+ const selectedRow=rowFor(selected)
+ const bankReportEnds=selectedRow.partial?monthlyDataCoverage(plan,selected,asOf).accounts.filter(account=>account.reportThrough):[]
+ return {latest,selected:{...selectedRow,hasSavedData:evidenceMonths.has(selected),bankReportEnds,multipleBankAccounts:accounts.length>1},months:Array.from({length:indexMonth(last)-indexMonth(first)+1},(_,i)=>monthAt(first,i)),
   rows:Array.from({length:6},(_,i)=>rowFor(monthAt(chartEnd,i-5))),
   checks:(plan.details??[]).filter(r=>r.method==='checks'&&r.status==='pending').length,
   loans:(plan.loans??[]).filter(l=>l.from<=asOf&&monthAt(l.from,l.months-1)>=asOf).length}

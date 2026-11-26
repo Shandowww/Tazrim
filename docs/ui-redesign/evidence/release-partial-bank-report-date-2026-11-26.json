@@ -1,0 +1,45 @@
+{
+  "version": "v1.11.0",
+  "commit": "6898c224504b7a9423aaf7b14b2a562ead2f177d",
+  "build": "5a33d8b0d4",
+  "previousCommit": "f8e22dd06bffb3e85746d6468f2d9652c7400d20",
+  "verifiedAt": "2026-11-26T12:40:43+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Overview and Report Sync show the saved date range end for partial bank reports per account and month. The display uses קיים מידע עד with a DD/MM/YYYY date.",
+  "approval": "Tal approved the revised Hebrew prototype and requested publication.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45802181659",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1532,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ],
+    "syntheticOverviewAndBankCoverageCutoffs": "passed"
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-6898c224.rm0GZi/",
+  "candidateImage": "sha256:5f98336e28419e1de99a40dd1c4126a2838177ccdb423ecb3e826810df482e56",
+  "rollbackImage": "sha256:9e4ad7c76b12dbd75e0a614e7a758e6f513a031cf15e2c202c6571d517a4a10e",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 189,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "syntheticLiveProbe": {
+      "synthetic": true,
+      "accountCutoffsValidated": true,
+      "approvedHebrewLabelBundled": true
+    }
+  },
+  "limits": [
+    "Browser and live verification used synthetic bank data. A filtered report can contain gaps before its saved end date."
+  ]
+}

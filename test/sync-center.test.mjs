@@ -40,3 +40,25 @@ test('Pending grouped references match exact kind/account/month and expired orig
 test('Missing-source and overdue facts are distinct and use original expectation/grace/exception decisions',()=>{
  const plan=sample(),rules=[{kind:'card',target:'card1',enabled:true,startMonth:'2026-09',dueDay:15,graceDays:3,exceptions:['2026-08']}];const before=syncCoverage(plan,'2026-09','2026-10-18',[],rules).find(row=>row.id==='card1').months.at(-1),after=syncCoverage(plan,'2026-09','2026-10-19',[],rules).find(row=>row.id==='card1').months.at(-1);assert.equal(before.state,'missing');assert.equal(before.overdue,false);assert.equal(after.overdue,true);assert.equal(actionIssues(plan,{asOf:'2026-10',day:'2026-10-19',expectations:rules}).some(issue=>issue.code==='report.overdue'&&issue.target.month==='2026-09'),after.overdue);assert.equal(syncCoverage(plan,'2026-09','2026-10-19',[],rules).find(row=>row.id==='card1').months.find(cell=>cell.month==='2026-08').state,'not-required');assert.equal(syncCoverage(plan,'2026-10','2026-10-19').find(row=>row.id==='card1').months.at(-1).state,'open');
 });
+
+test('Partial bank cells show the furthest saved report end for this account and month, even when a newer report is pending',()=>{
+ const plan=sample()
+ plan.cashPlanning.accounts.push({id:'joint',label:'חשבון משותף',buffer:0})
+ const batch=(accountId,from,to,month='2026-11')=>({accountId,from,to,months:[{month,after:{}}]})
+ plan.bankImport={version:1,accounts:[],entries:[],batches:[
+  batch('bank','2026-11-01','2026-11-15'),
+  batch('bank','2026-11-01','2026-11-09'),
+  batch('joint','2026-11-17','2026-11-20'),
+  batch('bank','2026-10-25','2026-11-03','2026-10'),
+ ]}
+ const pending=[{id:'new-bank-file',kind:'bank',target:'joint',month:'2026-11',state:'ready'}]
+ const rows=syncCoverage(plan,'2026-11','2026-11-26',pending)
+ const bank=rows.find(row=>row.id==='bank').months
+ assert.equal(bank.at(-1).state,'open')
+ assert.equal(bank.at(-1).reportThrough,'2026-11-15')
+ assert.equal(bank.at(-2).reportThrough,'2026-10-31')
+ const joint=rows.find(row=>row.id==='joint').months.at(-1)
+ assert.equal(joint.state,'pending')
+ assert.equal(joint.reportThrough,'2026-11-20')
+ assert.equal(rows.find(row=>row.kind==='card').months.at(-1).reportThrough,undefined)
+})

@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "f8e22dd06bffb3e85746d6468f2d9652c7400d20",
+  "sourceCommit": "30920f9243144f4b5659f31fd7712a9989f4067b",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "The approved guided manual report mapping is verified live on Budgit.",
+  "status": "The approved partial bank report end date is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1531,
+    "applicationAndReaderTests": 1532,
     "coreChecks": 15,
     "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 189 runtime files and 53 authoritative tables passed."
   },
-  "productionApplicationCommit": "5ea02ae0b5c62f7700cb106f67b91a6db43e48e8",
-  "productionVersion": "v1.10.0",
-  "productionBuild": "2f3c74bac2"
+  "productionApplicationCommit": "6898c224504b7a9423aaf7b14b2a562ead2f177d",
+  "productionVersion": "v1.11.0",
+  "productionBuild": "5a33d8b0d4"
 }

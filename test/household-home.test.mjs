@@ -89,6 +89,8 @@ test('Overview counts the salary already imported for a partial account month on
  assert.equal(summary.selected.income,12000.48)
  assert.equal(summary.selected.spending,0)
  assert.equal(summary.selected.partial,true)
+ assert.deepEqual(summary.selected.bankReportEnds.map(account=>[account.id,account.reportThrough]),[['salary-bank',month+'-15']])
+ assert.equal(summary.selected.multipleBankAccounts,true)
  assert.equal(summary.rows.find(row=>row.month===month).income,12000.48)
  assert.equal(JSON.stringify(imported),before)
 })

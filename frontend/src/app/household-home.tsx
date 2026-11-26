@@ -1,5 +1,6 @@
 import {HouseholdOutlook} from './household-outlook'
 import {MoneyAmount} from './money-amount'
+import {ReportEndDate} from './report-end-date'
 import {useEffect,useMemo} from 'react'
 import {MobileMonthPicker} from './mobile-month-picker'
 import {useNavigate,useLocation} from 'react-router-dom'
@@ -52,7 +53,7 @@ export function HouseholdHome({plan,asOf,personal}:{plan:any;asOf:string;persona
   <section className="home-summary" aria-label={'סיכום '+label(selected.month)}>
    {metrics.map(({title,value,Icon,tone,note})=><div className="home-metric" data-tone={tone} key={title}><div className="home-metric-label"><span>{title}</span><Icon size={17} aria-hidden/></div><strong data-missing={value===null}><MoneyAmount value={value}/></strong><span className="home-metric-note">{note}</span></div>)}
   </section>
-  <p className="home-data-note">{selected.partial?'דיווח חלקי לחודש הזה':selected.reported?'מבוסס על נתונים מדווחים':selected.cardTotal!==null?'דווחו כרטיסים; חסר דיווח בנק.':selected.hasSavedData?'יש נתונים לחודש הזה, אך חסר דיווח חודשי מלא.':'עדיין אין דיווח לחודש הזה.'}{(selected.incomingTransfers??0)!==0&&<> · {personal?'בהכנסות':'בכניסות'} נכללות העברות בסך <MoneyAmount value={selected.incomingTransfers}/></>}</p>
+  <p className="home-data-note">{selected.partial?'דיווח חלקי לחודש הזה':selected.reported?'מבוסס על נתונים מדווחים':selected.cardTotal!==null?'דווחו כרטיסים; חסר דיווח בנק.':selected.hasSavedData?'יש נתונים לחודש הזה, אך חסר דיווח חודשי מלא.':'עדיין אין דיווח לחודש הזה.'}{selected.bankReportEnds.map(account=><span key={account.id}>{' · '}<ReportEndDate date={account.reportThrough!}/>{selected.multipleBankAccounts&&<> (<bdi>{account.label}</bdi>)</>}</span>)}{(selected.incomingTransfers??0)!==0&&<> · {personal?'בהכנסות':'בכניסות'} נכללות העברות בסך <MoneyAmount value={selected.incomingTransfers}/></>}</p>
   <div className="home-workspace">
    <section className="home-panel home-history" aria-labelledby="home-history-heading">
     <div className="home-panel-heading"><div><h2 id="home-history-heading">תזרים לאורך זמן</h2><p>שישה חודשים · נתונים מדווחים</p></div><div className="home-chart-legend"><span><i data-tone="income"/>{incomeLabel}</span><span><i data-tone="expense"/>הוצאות</span><span><i data-tone="cards"/>{cardsLabel}</span></div></div>

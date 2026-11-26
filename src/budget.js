@@ -1024,7 +1024,18 @@ export function monthlyDataCoverage(p,month,asOf,excludeMonth=''){
   const latest=batches.at(-1)?.months.find(row=>row.month===month)?.after?.bankCoverage;
   const full=latest?.accountId===account.id&&(latest.accountComplete??latest.complete)===true&&latest.from<=first&&latest.to>=last;
   const manuallyReported=p.cashPlanning?.months?.[month]?.[account.id]?.actual===true;
-  return {id:account.id,label:account.label,status:full&&closed?'file':batches.length?'partial':manuallyReported?'manual':'missing'};
+  const status=full&&closed?'file':batches.length?'partial':manuallyReported?'manual':'missing';
+  let reportThrough=null;
+  if(status==='partial')for(const batch of batches){
+   const coverage=batch.months.find(row=>row.month===month)?.after?.bankCoverage;
+   const scoped=coverage?.accountId===account.id;
+   const from=scoped&&dateOk(coverage.from)?coverage.from:batch.from;
+   const to=scoped&&dateOk(coverage.to)?coverage.to:batch.to;
+   if(!dateOk(from)||!dateOk(to)||from>to||from>last||to<first)continue;
+   const end=to>last?last:to;
+   if(!reportThrough||end>reportThrough)reportThrough=end;
+  }
+  return {id:account.id,label:account.label,status,reportThrough};
  });
  const cards=creditCards(p).filter(card=>!card.removedFrom||month<card.removedFrom).map(card=>{
   const reports=(p.cardBilling?.reports??[]).filter(report=>report.cardId===card.id&&report.dueDate.slice(0,7)===month);

@@ -32,7 +32,7 @@ export function syncReportPage(reports:IncomingReport[],options:{view:'attention
 }
 
 export type CoverageState='file'|'no-transactions'|'pending'|'missing'|'partial'|'open'|'not-required'
-export interface CoverageCell {month:string;state:CoverageState;evidence:string;overdue:boolean;reportId?:string;failed?:boolean}
+export interface CoverageCell {month:string;state:CoverageState;evidence:string;overdue:boolean;reportId?:string;failed?:boolean;reportThrough?:string}
 export interface CoverageRow {id:string;kind:'bank'|'card';label:string;alias:string;months:CoverageCell[]}
 export interface CoverageReport {id:string;kind:string|null;target:string|null;month:string|null;state:string}
 export function syncCoverage(plan:any,endMonth:string,day:string,reports:CoverageReport[]=[],rules:ExpectationRule[]=[]):CoverageRow[]{
@@ -42,8 +42,8 @@ export function syncCoverage(plan:any,endMonth:string,day:string,reports:Coverag
  const bankCoverage=new Map(months.map(month=>[month,monthlyDataCoverage(plan,month,asOf)]))
  const cardCoverage=[...new Set(months.map(month=>Number(month.slice(0,4))))].flatMap(year=>cardStatementCoverage(plan,year,asOf))
  const overdue=actionIssues(plan,{asOf,day,reports,expectations:rules} as any).filter(issue=>issue.code==='report.overdue')
- const cell=(kind:'bank'|'card',id:string,month:string,evidence:string):CoverageCell=>{
-  const base={month,evidence,overdue:overdue.some(issue=>issue.target.kind===kind&&issue.target.target===id&&issue.target.month===month)}
+ const cell=(kind:'bank'|'card',id:string,month:string,evidence:string,reportThrough?:string|null):CoverageCell=>{
+  const base={month,evidence,...(reportThrough?{reportThrough}:{}),overdue:overdue.some(issue=>issue.target.kind===kind&&issue.target.target===id&&issue.target.month===month)}
   if(evidence==='file'||evidence==='no-transactions')return {...base,state:evidence}
   const staged=reports.filter(report=>report.kind===kind&&report.target===id&&report.month===month&&!['committed','archived'].includes(report.state)).sort((first,second)=>Number(first.state==='failed')-Number(second.state==='failed'))[0]
   if(staged)return {...base,state:'pending',reportId:staged.id,failed:staged.state==='failed'}
@@ -51,7 +51,10 @@ export function syncCoverage(plan:any,endMonth:string,day:string,reports:Coverag
   if(rule?.exceptions.includes(month))return {...base,state:'not-required'}
   return {...base,state:month>=asOf?'open':evidence==='partial'?'partial':'missing'}
  }
- const banks:CoverageRow[]=cashAccountList(plan).map((account:any)=>({id:account.id,kind:'bank',label:account.label,alias:'',months:months.map(month=>cell('bank',account.id,month,bankCoverage.get(month)!.accounts.find((row:any)=>row.id===account.id)!.status))}))
+ const banks:CoverageRow[]=cashAccountList(plan).map((account:any)=>({id:account.id,kind:'bank',label:account.label,alias:'',months:months.map(month=>{
+  const evidence=bankCoverage.get(month)!.accounts.find(row=>row.id===account.id)!
+  return cell('bank',account.id,month,evidence.status,evidence.reportThrough)
+ })}))
  const cards:CoverageRow[]=[]
  for(const row of cardCoverage){
   let card=cards.find(card=>card.id===row.card.id)
