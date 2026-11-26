@@ -16,7 +16,9 @@ import {PageHeading} from './page-heading'
 import Link from './link'
 import {withViewQuery} from './navigation-query'
 import {navigationLabels} from './navigation-sections'
-import {readReportContent} from './report-reader'
+import {readMappingSource,readReportContent} from './report-reader'
+import {mappingOptions,type MappedReport,type MappingChoice} from './report-manual-mapping'
+import {ReportManualMapping} from './report-manual-mapping-panel'
 import {incomingRoutingOptions,matchIncomingReport,type RoutingBudget,type RoutingKind} from './incoming-report-routing'
 import {loadIncomingInbox,updateIncoming,verifyIncomingApproval,deleteIncomingReport,incomingConnectionDraft,storeIncomingSource,incomingSource,incomingRoutingBudgets,IncomingRequestError,type IncomingSnapshot,type IncomingReport} from './report-intake-api'
 
@@ -31,7 +33,8 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  const [snapshot,setSnapshot]=useState<IncomingSnapshot|null>(null),[tick,setTick]=useState(0),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState('')
  const [consent,setConsent]=useState(false),[file,setFile]=useState<File|null>(null),[selected,setSelected]=useState<IncomingReport|null>(null)
  const [connectionName,setConnectionName]=useState('האייפון שלי'),[connection,setConnection]=useState<ReturnType<typeof incomingConnectionDraft>|null>(null),[connectionReady,setConnectionReady]=useState(false),[showSecret,setShowSecret]=useState(false)
- const [analysis,setAnalysis]=useState<{report:IncomingReport;content:any;budgets:RoutingBudget[];reason:string}|null>(null),[destination,setDestination]=useState(''),[kind,setKind]=useState<RoutingKind>('bank'),[remember,setRemember]=useState(true),[routeAttempt,setRouteAttempt]=useState<any>(null),[result,setResult]=useState<any>(null),[deleting,setDeleting]=useState<IncomingReport|null>(null),[deleteConfirmed,setDeleteConfirmed]=useState(false)
+ const [analysis,setAnalysis]=useState<{report:IncomingReport;content:any;budgets:RoutingBudget[];reason:string;manualChoice?:MappingChoice}|null>(null),[destination,setDestination]=useState(''),[kind,setKind]=useState<RoutingKind>('bank'),[remember,setRemember]=useState(true),[routeAttempt,setRouteAttempt]=useState<any>(null),[result,setResult]=useState<any>(null),[deleting,setDeleting]=useState<IncomingReport|null>(null),[deleteConfirmed,setDeleteConfirmed]=useState(false)
+ const [manual,setManual]=useState<{report:IncomingReport;inspection:any;ambiguous?:any}|null>(null)
  const alive=useRef(true),flight=useRef(false),controller=useRef<AbortController|null>(null),autoVerify=useRef<string|null>(null)
  const href=(path:string,route?:any)=>{if(route){const [pathname,query='']=path.split('?'),q=new URLSearchParams(query);q.set('budget',route.budget);q.set('kind',route.kind);q.set('target',route.target);return withViewQuery(pathname+'?'+q,search,import.meta.env.DEV)}return withViewQuery(path,search,import.meta.env.DEV)}
  useCreatedEditorRoute(nextHref,message,accountId+'/'+budget.budgetId)
@@ -43,7 +46,7 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;controller.current?.abort()}},[])
  useEffect(()=>{const abort=new AbortController();setLoading(true);setError('');loadIncomingInbox(accountId,abort.signal).then(value=>{if(!abort.signal.aborted)setSnapshot(value)}).catch(e=>{if(abort.signal.aborted)return;if(e instanceof AccessError)budget.invalidate(e.message);else setError(e.message)}).finally(()=>{if(!abort.signal.aborted)setLoading(false)});return()=>abort.abort()},[accountId,tick,view,panel,reportId])
  const run=async(work:()=>Promise<void>)=>{if(flight.current)return false;flight.current=true;setBusy(true);setError('');try{await work();return true}catch(e){if(alive.current){if(e instanceof AccessError)budget.invalidate(e.message);else setError(e instanceof Error?e.message:'הפעולה לא אושרה. אפשר לנסות שוב.')}return false}finally{flight.current=false;if(alive.current)setBusy(false)}}
- const clearReview=()=>{setSelected(null);setAnalysis(null);setDestination('');setRouteAttempt(null);autoVerify.current=null}
+ const clearReview=()=>{setManual(null);setSelected(null);setAnalysis(null);setDestination('');setRouteAttempt(null);autoVerify.current=null}
  const discard=()=>{setFile(null);setConsent(false);clearReview();setConnection(null);setConnectionReady(false);setShowSecret(false);setDeleting(null);setDeleteConfirmed(false)}
  useFinancialDraft({kind:'detail',dirty:!!file||consent||!!selected||!!analysis||!!connection||!!deleting,busy,discard})
  const refresh=()=>setTick(v=>v+1)
@@ -53,7 +56,7 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  const download=(report:IncomingReport)=>run(async()=>{const abort=new AbortController();controller.current=abort;const bytes=await incomingSource(accountId,report,'original',abort.signal);if(!alive.current)return;const url=URL.createObjectURL(new Blob([bytes as BlobPart],{type:'application/octet-stream'})),a=document.createElement('a');a.href=url;a.download=report.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setMessage('קובץ המקור נשלח לדפדפן להורדה. אפשר לפתוח ולבדוק אותו לפני האישור.')})
  const routed=async(payload:any)=>{
   let saved;try{saved=await updateIncoming(accountId,payload)}catch(error){if(error instanceof IncomingRequestError&&error.status<500)setRouteAttempt(null);throw error}if(!alive.current)return
-  setResult(saved);clearReview();setNextHref(href('/upload/'+encodeURIComponent(saved.reportId)+'/group?'+new URLSearchParams({syncReturn:returnList,intakeId:payload.id}),{budget:saved.budget,kind:saved.kind,target:saved.target}));setMessage('הדוח שויך לחשבון. בודקים גם הודעות מהמנפיק…')
+  setResult(saved);clearReview();setNextHref(href('/upload/'+encodeURIComponent(saved.reportId)+'/group?'+new URLSearchParams({syncReturn:returnList,intakeId:payload.id,...(analysis?.manualChoice?{manualMap:JSON.stringify(analysis.manualChoice)}:{})}),{budget:saved.budget,kind:saved.kind,target:saved.target}));setMessage('הדוח שויך לחשבון. בודקים גם הודעות מהמנפיק…')
   const abort=new AbortController();controller.current=abort
   let noticeMessage=''
   try{const status=await scanNewStatement(saved.budget,budget.value,saved.reportId,undefined,abort.signal);noticeMessage=status==='complete'?' הודעות הדוח זמינות במרכז העדכונים ובפעמון.':' בדיקת הודעות הדוח לא הושלמה. אפשר לנסות שוב במרכז העדכונים.'}catch{noticeMessage=' בדיקת הודעות הדוח לא הושלמה. המקור נשמר ואפשר לנסות שוב במרכז העדכונים.'}
@@ -62,13 +65,27 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  }
  const verify=()=>run(async()=>{
   if(!selected)return
-  setMessage('')
+  setMessage('');setManual(null)
   const abort=new AbortController();controller.current=abort
   const {report,snapshot:approved}=await verifyIncomingApproval(accountId,selected,abort.signal)
   if(!alive.current)return
   setSnapshot(approved)
   if(report.route){clearReview();setNextHref(reportHref(report));return}
-  const bytes=await incomingSource(accountId,report,'parse',abort.signal),content=await readReportContent(report.name,bytes,abort.signal,{includeAccountIdentity:true}),budgets=await incomingRoutingBudgets(accountId,budget.budgetId,budget.spaces,abort.signal),fresh=await loadIncomingInbox(accountId,abort.signal)
+  const bytes=await incomingSource(accountId,report,'parse',abort.signal)
+  let content
+  try{
+   content=await readReportContent(report.name,bytes,abort.signal,{includeAccountIdentity:true})
+   if(content.kind==='ambiguous')throw Error('מבנה הדוח דורש התאמה ידנית.')
+  }catch(error){
+   let inspection
+   try{inspection=await readMappingSource(report.name,bytes,abort.signal)}catch{}
+   if(inspection&&mappingOptions(inspection)){
+    if(alive.current&&!abort.signal.aborted)setManual({report,inspection,ambiguous:content?.kind==='ambiguous'?content:undefined})
+    return
+   }
+   if(content?.kind!=='ambiguous')throw error
+  }
+  const budgets=await incomingRoutingBudgets(accountId,budget.budgetId,budget.spaces,abort.signal),fresh=await loadIncomingInbox(accountId,abort.signal)
   if(!alive.current)return
   setSnapshot(fresh);const match=matchIncomingReport(content,budgets,fresh.bindings);setKind(['bank','card'].includes(content.kind)?content.kind:'bank');setAnalysis({report,content,budgets,reason:match.reason})
   if(match.state==='matched'){
@@ -77,8 +94,26 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   }else setMessage('הפענוח אושר. יש לבחור את החשבון שאליו שייך הדוח.')
  })
  useEffect(()=>{if(view!=='report'||panel!=='approve'||!selected||analysis||autoVerify.current===selected.id)return;autoVerify.current=selected.id;void verify()},[view,panel,selected?.id,analysis])
+ const acceptMapping=(content:MappedReport,manualChoice?:MappingChoice)=>run(async()=>{
+  if(!manual||content.hash!==manual.report.sourceHash)return
+  const abort=new AbortController();controller.current=abort
+  const [budgets,fresh]=await Promise.all([incomingRoutingBudgets(accountId,budget.budgetId,budget.spaces,abort.signal),loadIncomingInbox(accountId,abort.signal)])
+  if(!alive.current||abort.signal.aborted)return
+  const match=matchIncomingReport(content,budgets,fresh.bindings)
+  setSnapshot(fresh);setKind(manualChoice?content.kind:'bank');setRemember(false)
+  setAnalysis({report:manual.report,content,budgets,reason:manualChoice?'המיפוי אומת. אשרו את יעד הדוח לפני המעבר לבדיקה.':'בחרו סוג ויעד כדי להמשיך לבדיקה.',manualChoice})
+  const candidate=match.state==='matched'?match.candidates[0]:null
+  setDestination(candidate?JSON.stringify([candidate.budget,candidate.target]):'')
+  setManual(null)
+ })
  const route=()=>run(async()=>{
-  if(!analysis||!destination)return;const [budgetId,target]=JSON.parse(destination),binding=snapshot?.bindings.find(b=>b.identityKey===analysis.content.identityKey)
+  if(!analysis||!destination)return;const [budgetId,target]=JSON.parse(destination)
+  if(analysis.manualChoice&&kind==='card'){
+   const last4=analysis.content.report?.last4,plan=analysis.budgets.find(b=>b.id===budgetId)?.plan
+   const card=plan&&creditCards(plan).find((card:any)=>card.id===target)
+   if(card&&/^\d{4}$/.test(card.alias)&&card.alias!==last4)throw Error('ארבע הספרות בדוח אינן תואמות לכרטיס שנבחר.')
+  }
+  const binding=snapshot?.bindings.find(b=>b.identityKey===analysis.content.identityKey)
   const payload=routeAttempt??{action:'route',id:analysis.report.id,sourceHash:analysis.report.sourceHash,revision:analysis.report.revision,confirm:true,budget:budgetId,budgetRevision:analysis.budgets.find(b=>b.id===budgetId)?.revision,kind,target,identityKey:analysis.content.identityKey??'',remember:remember&&!!analysis.content.identityKey,bindingRevision:binding?.revision??0}
   setRouteAttempt(payload);await routed(payload)
  })
@@ -164,12 +199,17 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
     {panel==='original'&&<><p className="text-xs text-muted-foreground"><bdi>{activeReport.size.toLocaleString('he-IL')}</bdi> בתים · <bdi>{new Date(activeReport.createdAt).toLocaleString('he-IL')}</bdi></p><ReportRetentionNotice report={activeReport}/><button className={button} disabled={busy} onClick={()=>void download(activeReport)}>הורדת המקור</button><Link className={button+' inline-flex items-center text-destructive'} href={center('report',{report:activeReport.id,panel:'delete'})}>{activeReport.applied?'מחיקת העותק מהתיבה הפרטית':'מחיקת הדוח'}</Link></>}
    </section>}
    {activeReport&&!panel&&<section className="surface divide-y rounded-xl px-4"><Link className="flex min-h-14 items-center justify-between text-sm" href={center('report',{report:activeReport.id,panel:'original'})}>קובץ המקור ושמירתו<ChevronLeft size={18}/></Link><Link className="flex min-h-14 items-center justify-between text-sm" href={center('report',{report:activeReport.id,panel:'proposal'})}>מצב ההכנה והצעת השינויים<ChevronLeft size={18}/></Link></section>}
-  {panel==='approve'&&selected&&!analysis&&<section className="surface space-y-3 rounded-xl border border-primary p-4"><h2 className="break-words font-semibold">מזהים את הדוח · <bdi>{selected.name}</bdi></h2><p className="text-sm">Budgit קורא את המקור ומחפש חשבון או כרטיס מתאים. אם הזיהוי אינו חד־משמעי, תופיע כאן בחירה לאישור. נתוני התקציב יישמרו רק בסיום הבדיקה.</p>{busy&&<p role="status">קוראים את הדוח ומזהים את החשבון…</p>}{error&&<><p role="alert" className="rounded-xl border border-destructive p-3 text-sm">{error}</p><button className={button} disabled={busy} onClick={()=>void verify()}>ניסיון זיהוי נוסף</button></>}<button className={button} disabled={busy} onClick={()=>void download(selected)}>הורדת המקור לבדיקה</button><button className={button} disabled={busy} onClick={()=>{clearReview();setNextHref(center('report',{report:reportId}))}}>חזרה לפרטי הדוח</button></section>}
+  {panel==='approve'&&selected&&!analysis&&!manual&&<section className="surface space-y-3 rounded-xl border border-primary p-4"><h2 className="break-words font-semibold">מזהים את הדוח · <bdi>{selected.name}</bdi></h2><p className="text-sm">Budgit קורא את המקור ומחפש חשבון או כרטיס מתאים. אם הזיהוי אינו חד־משמעי, תופיע כאן בחירה לאישור. נתוני התקציב יישמרו רק בסיום הבדיקה.</p>{busy&&<p role="status">קוראים את הדוח ומזהים את החשבון…</p>}{error&&<><p role="alert" className="rounded-xl border border-destructive p-3 text-sm">{error}</p><button className={button} disabled={busy} onClick={()=>void verify()}>ניסיון זיהוי נוסף</button></>}<button className={button} disabled={busy} onClick={()=>void download(selected)}>הורדת המקור לבדיקה</button><button className={button} disabled={busy} onClick={()=>{clearReview();setNextHref(center('report',{report:reportId}))}}>חזרה לפרטי הדוח</button></section>}
+  {panel==='approve'&&manual&&<>
+   {error&&<p role="alert">{error}</p>}
+   <ReportManualMapping key={manual.report.id} inspection={manual.inspection} hash={manual.report.sourceHash} disabled={busy} onAccept={(content,choice)=>void acceptMapping(content,choice)} onCancel={()=>{clearReview();setNextHref(center('report',{report:reportId}))}}/>
+   {manual.ambiguous&&<button type="button" className={button} disabled={busy} onClick={()=>void acceptMapping(manual.ambiguous)}>בחירת סוג דוח ויעד</button>}
+  </>}
   {panel==='approve'&&analysis&&<section className="surface space-y-3 rounded-xl border border-primary p-4">
    <h2 className="font-semibold">שיוך החשבון</h2><p className="text-sm">{analysis.reason}</p>
    <p className="break-words text-sm"><bdi>{analysis.report.name}</bdi>{analysis.content.identity&&<> · מזהה בדוח: <bdi dir="ltr">{analysis.content.identity}</bdi></>}</p>
    <fieldset disabled={busy||!!routeAttempt} className="space-y-3">
-    <label className="block text-sm">סוג חשבון<select className={input} value={kind} onChange={e=>{setKind(e.target.value==='card'?'card':'bank');setDestination('')}}><option value="bank">חשבון בנק</option><option value="card">כרטיס אשראי</option></select></label>
+    <label className="block text-sm">סוג חשבון<select className={input} value={kind} disabled={!!analysis.manualChoice} onChange={e=>{setKind(e.target.value==='card'?'card':'bank');setDestination('')}}><option value="bank">חשבון בנק</option><option value="card">כרטיס אשראי</option></select></label>
     <label className="block text-sm">חשבון היעד<select className={input} value={destination} disabled={!targets.length} aria-describedby={unavailable.length?'routing-unavailable':undefined} onChange={e=>setDestination(e.target.value)}><option value="">{targets.length?'בחירת חשבון':'אין יעדים זמינים'}</option>{targets.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}</select></label>
     {analysis.content.identityKey&&<label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" className="h-5 w-5" checked={remember} onChange={e=>setRemember(e.target.checked)}/>לזכור את שיוך המזהה הזה לדוחות הבאים</label>}
    </fieldset>

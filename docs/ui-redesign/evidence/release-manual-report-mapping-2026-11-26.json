@@ -1,0 +1,49 @@
+{
+  "version": "v1.10.0",
+  "commit": "5ea02ae0b5c62f7700cb106f67b91a6db43e48e8",
+  "build": "2f3c74bac2",
+  "previousCommit": "fa215b80368823344262bfbff07f4a84faf709f2",
+  "verifiedAt": "2026-11-26T09:08:59+02:00",
+  "production": "https://budgit.duckdns.org/next",
+  "scope": "Report Sync offers a guided field mapping fallback for readable bank CSV and spreadsheets, and for card spreadsheets with a supported transaction table. Only source fields can be selected. Reconciliation, destination confirmation, duplicate and category review, and explicit financial save still apply.",
+  "approval": "Tal approved the guided mapping prototype and requested deployment.",
+  "ci": "https://github.com/Shandowww/monthly-flow-budget/actions/runs/45771989670",
+  "localValidation": {
+    "buildTypecheck": "passed",
+    "applicationAndReaderTests": 1531,
+    "coreChecks": 15,
+    "syntheticBrowserWidths": [
+      390,
+      767,
+      768,
+      1440
+    ],
+    "syntheticBankAndCardReviewResumeAndFinalSaveWidths": [
+      390,
+      1440
+    ],
+    "suggestedBankClassificationConfirmation": "passed"
+  },
+  "privateActivationEvidence": "/opt/budgit-releases/auto-5ea02ae0.nOwnNY/",
+  "candidateImage": "sha256:9e4ad7c76b12dbd75e0a614e7a758e6f513a031cf15e2c202c6571d517a4a10e",
+  "rollbackImage": "sha256:fdc7c437291c63155d109d3ca31eee21b0c18d06a2b4e50e8744004c8a48b578",
+  "validation": {
+    "imageSecurity": "passed",
+    "backupIntegrity": "passed",
+    "financialAccessRestoreAndRollback": "passed",
+    "runtimeFiles": 189,
+    "authoritativeTablesPreserved": 53,
+    "health": "passed",
+    "unauthenticatedPlan": 401,
+    "unauthenticatedActions": 401,
+    "configurationAndAdjacentServices": "preserved",
+    "syntheticLiveProbe": {
+      "synthetic": true,
+      "cardValidated": true,
+      "bankValidated": true
+    }
+  },
+  "limits": [
+    "Browser and live verification used only synthetic bank and card sources. Bank mappings retain partial coverage."
+  ]
+}

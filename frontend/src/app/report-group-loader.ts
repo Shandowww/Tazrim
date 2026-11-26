@@ -4,9 +4,10 @@ import {inboxHash,inboxTarget,inboxHintTarget} from '../../../src/report-inbox-m
 import {reportInboxPayer} from '../../../src/report-inbox-controller.js'
 import {loadReportLibrary,loadReportSource} from './report-library-api.ts'
 import {loadStoredReport,loadReportMerchantRules,type StoredReportDetail} from './report-review-api.ts'
-import {inspectReportSource} from './report-reader.ts'
+import {inspectReportSource,readMappingSource} from './report-reader.ts'
+import {mappingOptions,mapReportSource,parseMappingChoice} from './report-manual-mapping.ts'
 import type {BudgetResponse} from './budget-api.ts'
-export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:string[],signal:AbortSignal,fetcher:typeof fetch=fetch,reimport=false,hint:{kind?:string;target?:string}={},restart=false){
+export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:string[],signal:AbortSignal,fetcher:typeof fetch=fetch,reimport=false,hint:{kind?:string;target?:string;manualMap?:string}={},restart=false){
  if(!base.plan||base.plan.format||!ids.length||ids.length>10||new Set(ids).size!==ids.length)throw Error('יש לפתוח תקציב גלוי ולבחור עד עשרה דוחות שונים.')
  const library=await loadReportLibrary(budgetId,base,signal,fetcher),roots=await Promise.all(ids.map(id=>loadStoredReport(budgetId,base,id,signal,fetcher))),drafts=roots.filter(source=>source.state!=='committed').map(source=>source.draft).filter(Boolean)
  const activityFollowup=roots.length===1&&roots[0].state==='committed'&&roots[0].lifecycle==='partial'&&roots[0].draft?.items?.find((item:any)=>item.storedId===roots[0].id)?.activity&&roots[0].review?.categories!=='later'
@@ -30,10 +31,39 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
   const saved=draft?.items.find((item:any)=>item.storedId===source.id)
   if(saved&&(saved.storedRevision!==source.revision||saved.hash!==source.sourceHash))throw Error('קבוצת הדוחות השתנתה; החלטות שמורות לא הוחלפו.')
   let item:any=saved?clone(saved):{id:source.id,name:source.name,size:bytes.length,target:'',payer:'',decisions:{},directIncluded:{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false,storedId:source.id,storedRevision:source.revision,storedCommitted:source.state==='committed'}
-  if(!saved||saved.error||saved.skip&&saved.reason==='המקור כבר נקלט ונמצא בתקציב.'&&!saved.records&&!saved.report){try{Object.assign(item,await inspectReportSource(base.plan,source.name,bytes,signal,{reviewRecordedSource:true}));delete item.error;item.target||=inboxTarget(base.plan,item);if(!saved&&!item.recordedSource&&item.kind===hint.kind)item.target=inboxHintTarget(base.plan,item,{cardId:hint.target,accountId:hint.target});item.payer||=reportInboxPayer(base.plan,item.target)}catch(e){item.error=e instanceof Error?e.message:'לא ניתן לפענח את המקור.'}}
+  if(!saved||saved.error||saved.manualMapping||saved.skip&&saved.reason==='המקור כבר נקלט ונמצא בתקציב.'&&!saved.records&&!saved.report){
+   const choice=parseMappingChoice(saved?.manualMapping??(source.id===ids[0]?hint.manualMap:null))
+   try{
+    if(saved?.manualMapping)throw Error('יש לאמת מחדש את התאמת השדות שנשמרה.')
+    const parsed=await inspectReportSource(base.plan,source.name,bytes,signal,{reviewRecordedSource:true})
+    Object.assign(item,parsed)
+    delete item.error
+    if(parsed.kind==='ambiguous'){
+     if(choice)throw Error('מבנה הדוח דורש התאמה ידנית.')
+     const inspection=await readMappingSource(source.name,bytes,signal).catch(()=>null)
+     if(inspection&&mappingOptions(inspection))item.mappingInspection=inspection
+    }
+   }catch(error){
+    item.error=error instanceof Error?error.message:'לא ניתן לפענח את המקור.'
+    let inspection
+    try{inspection=await readMappingSource(source.name,bytes,signal)}catch{}
+    if(inspection&&mappingOptions(inspection)){
+     item.mappingInspection=inspection
+     if(choice)try{
+      Object.assign(item,await mapReportSource(inspection,choice,source.sourceHash),{manualMapping:JSON.stringify(choice)})
+      delete item.error
+     }catch(e){item.error=e instanceof Error?e.message:item.error}
+    }
+   }
+   if(!item.error){
+    item.target||=inboxTarget(base.plan,item)
+    if(!saved&&!item.recordedSource&&item.kind===hint.kind)item.target=inboxHintTarget(base.plan,item,{cardId:hint.target,accountId:hint.target})
+    item.payer||=reportInboxPayer(base.plan,item.target)
+   }
+  }
   ui.items.push(item)
  }
- if(ui.items.some((item:any)=>item.kind==='card'))ui.merchantRules=await loadReportMerchantRules(budgetId,base,signal,fetcher)
+ if(ui.items.some((item:any)=>item.kind==='card'||item.mappingInspection&&mappingOptions(item.mappingInspection)?.kind==='card'))ui.merchantRules=await loadReportMerchantRules(budgetId,base,signal,fetcher)
  if(signal.aborted)throw Error('פתיחת הקבוצה בוטלה.')
  return{ui,sources,resultOnly:false,activitySupported:library.activityCycleReceipts===true,storageAllowed:reimport||!library.encrypted||library.storageConsented}
 }

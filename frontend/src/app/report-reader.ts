@@ -18,9 +18,22 @@ export async function readReportContent(name:string,bytes:Uint8Array,signal:Abor
  reportFileEligibility(name,bytes.byteLength);if(signal.aborted)throw Error('קריאת הדוח בוטלה.');const hash=await inboxHash(bytes)
  let parsed:any
  if(/\.csv$/i.test(name))parsed=inspectIntake([inspectCSV(decodeCSV(bytes).text)])
- else{if(signal.aborted)throw Error('קריאת הדוח בוטלה.');const worker=(options.workerFactory??(url=>new Worker(url)))('/bank-import/xlsx-worker.js');let timer:ReturnType<typeof setTimeout>|undefined,abort:()=>void=()=>{}
-  try{const data:any=await new Promise((resolve,reject)=>{const id=crypto.randomUUID();abort=()=>reject(Error('קריאת הדוח בוטלה.'));signal.addEventListener('abort',abort,{once:true});timer=setTimeout(()=>reject(Error('קריאת הדוח ארכה מדי. אפשר לנסות קובץ קטן יותר.')),Math.min(20000,Math.max(1,options.timeoutMs??20000)));worker.onmessage=event=>{if(event.data?.id!==id)return;event.data.error?reject(Error(String(event.data.error))):resolve(event.data)};worker.onerror=()=>reject(Error('לא ניתן לקרוא את הדוח. המקור והתקציב נשארו ללא שינוי.'));const copy=bytes.slice();worker.postMessage({id,includeAccountIdentity:options.includeAccountIdentity===true,action:/\.pdf$/i.test(name)?'pdf':'intake',bytes:copy.buffer,format:/\.xls$/i.test(name)?'xls':'xlsx'})});parsed=data.intake??inspectIntake([data.inspection])}finally{clearTimeout(timer);signal.removeEventListener('abort',abort);worker.terminate()}
- }
+ else{const data=await runReportWorker(name,bytes,signal,options,/\.pdf$/i.test(name)?'pdf':'intake');parsed=data.intake??inspectIntake([data.inspection])}
  if(signal.aborted)throw Error('קריאת הדוח בוטלה.');if(!parsed||!['bank','card','ambiguous','sheets'].includes(parsed.kind))throw Error('לא ניתן לזהות את מבנה הדוח.');if(parsed.kind==='bank'&&(!Array.isArray(parsed.records)||parsed.records.some((r:any)=>!r.valid||r.currency!=='ILS')))throw Error('בדוח הבנק יש שורות שלא ניתן לקרוא או מטבע לא נתמך. אין קליטה חלקית של הדוח.')
  return{...parsed,hash,identityKey:parsed.identity?await inboxHash(parsed.identity):'',skip:false}
+}
+
+async function runReportWorker(name:string,bytes:Uint8Array,signal:AbortSignal,options:ReportReaderOptions,action:string){
+ if(signal.aborted)throw Error('קריאת הדוח בוטלה.');const worker=(options.workerFactory??(url=>new Worker(url)))('/bank-import/xlsx-worker.js');let timer:ReturnType<typeof setTimeout>|undefined,abort:()=>void=()=>{}
+  try{return await new Promise<any>((resolve,reject)=>{const id=crypto.randomUUID();abort=()=>reject(Error('קריאת הדוח בוטלה.'));signal.addEventListener('abort',abort,{once:true});timer=setTimeout(()=>reject(Error('קריאת הדוח ארכה מדי. אפשר לנסות קובץ קטן יותר.')),Math.min(20000,Math.max(1,options.timeoutMs??20000)));worker.onmessage=event=>{if(event.data?.id!==id)return;event.data.error?reject(Error(String(event.data.error))):resolve(event.data)};worker.onerror=()=>reject(Error('לא ניתן לקרוא את הדוח. המקור והתקציב נשארו ללא שינוי.'));const copy=bytes.slice();worker.postMessage({id,includeAccountIdentity:options.includeAccountIdentity===true,action,bytes:copy.buffer,format:/\.xls$/i.test(name)?'xls':'xlsx'})})}finally{clearTimeout(timer);signal.removeEventListener('abort',abort);worker.terminate()}
+}
+
+export async function readMappingSource(name:string,bytes:Uint8Array,signal:AbortSignal,options:ReportReaderOptions={}){
+ if(!/\.(csv|xlsx?)$/i.test(name))return null
+ reportFileEligibility(name,bytes.byteLength)
+ if(signal.aborted)throw Error('קריאת הדוח בוטלה.')
+ if(/\.csv$/i.test(name))return inspectCSV(decodeCSV(bytes).text)
+ const loaded=await runReportWorker(name,bytes,signal,options,'load')
+ const populated=loaded.sheets?.filter((sheet:any)=>!sheet.empty)??[]
+ return populated.length===1&&!populated[0].hidden?loaded.inspection??null:null
 }

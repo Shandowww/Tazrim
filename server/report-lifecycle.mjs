@@ -77,7 +77,7 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
    try{
     const saved=data.activeDraft??draft(row),item=saved?.items?.find(i=>i.storedId===id&&i.hash===row.source_hash);if(!item)throw serviceError('חסרה עדות מלאה לחלקי המקור; הקובץ נשמר.',409);
     const bytes=openReport(secret(),row.source,row.scope+'|'+id+'|source');if(reportHash(bytes)!==row.source_hash)throw serviceError('עדות המקור השתנתה; הקובץ נשמר.',409);
-    const {parsed}=await readAutomaticSource(metadata(row).name,bytes);
+    const {parsed}=await readAutomaticSource(metadata(row).name,bytes,{manualMapping:item.manualMapping});
     if(parsed.activity&&item.activity){
      if(JSON.stringify(parsed.activity)!==JSON.stringify(item.activity)||item.skip||item.error||parsed.sheets||parsed.activity.entries.some(r=>r.pending||r.installment||!r.dueDate))throw serviceError('נשארו מחזורים או שורות שטרם הושלמו. המקור נשמר.',409);
      const cycles=[...new Set(parsed.activity.entries.map(r=>r.dueDate))].sort(),members=[];
@@ -103,11 +103,11 @@ export function createReportLifecycle(db,{secret,isAllowed,now=()=>Date.now(),en
   if(!choice||choice.skip||choice.activity||choice.sheets||saved.guided?.categories==='later'||!reuseRemoved&&saved.guided?.categories!=='resolved')throw serviceError('לא הוכח דוח כפול שלם ללא עבודה שנותרה.',409);
   const {readAutomaticSource}=await import('./report-automation.mjs'),bytes=openReport(secret(),row.source,row.scope+'|'+id+'|source');
   if(reportHash(bytes)!==row.source_hash)throw serviceError('חתימת המקור השתנתה.',409);
-  const {parsed}=await readAutomaticSource(metadata(row).name,bytes);
+  const {parsed}=await readAutomaticSource(metadata(row).name,bytes,{manualMapping:reuseRemoved?undefined:choice.manualMapping});
   if(parsed.skip||parsed.activity||parsed.sheets||!['bank','card'].includes(parsed.kind)||parsed.kind!==choice.kind)throw serviceError('מבנה המקור דורש בדיקה ידנית.',409);
   access=budgetAccess(db,user,budget,{isAllowed,write:true});const current=source(access.scope,id);if(!current||current.revision!==revision||current.source_hash!==row.source_hash)throw serviceError('המקור השתנה בזמן הבדיקה.',409);
   const decisions=parsed.kind==='bank'&&!reuseRemoved?choice.decisions??{}:{};
-  const item={...parsed,id,hash:row.source_hash,storedId:id,storedRevision:revision,name:metadata(row).name,target:choice.target,payer:choice.payer,decisions,directIncluded:choice.directIncluded??{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false};
+  const item={...parsed,id,hash:row.source_hash,storedId:id,storedRevision:revision,name:metadata(row).name,target:choice.target,payer:choice.payer,decisions,directIncluded:choice.directIncluded??{},monthDecisions:{},bankOptions:{scope:choice.manualMapping?'partial':'complete'},skip:false};
   const ui={blank:false,startMonth:access.plan.startMonth,items:[item],newAccounts:[],newCards:[],categoryChoices:new Map(),bankChoices:new Map(saved.bankChoices??[]),duplicates:0,merchantRules:[]};
   await buildReportInbox(access.plan,ui,{month:new Date(now()).toISOString().slice(0,7),today:new Date(now()).toISOString().slice(0,10),classifier,activityAPI});
   if(ui.issues||!item.already||item.preview?.replacement)throw serviceError('נמצאו שינויים או בדיקות נדרשות; יש להמשיך בסקירה לפני שמירה.',409);

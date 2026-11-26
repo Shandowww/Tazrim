@@ -18,9 +18,31 @@ const amount=value=>{
 };
 const amountAt=(row,column)=>parseMoney(amount(row.values[column]),row.numericColumns?.includes(column)?'dot':'auto');
 
+const cardTotalLabel=/^₪\s*.+$|^.+\s*₪$/;
+const metadataCardSuffix=value=>cardHeader.exec(value)?.[1]??(/(?:כרטיס|מאסטרקארד|מסטרקארד|mastercard|ויזה|visa)/i.test(value)?/[-–־]\s*(\d{4})$/.exec(value)?.[1]:undefined);
+function mappedCell(rows,key){
+ const match=/^(\d{1,4}):(\d{1,3})$/.exec(key??'');
+ const row=match&&rows.find(row=>row.line===Number(match[1])),value=row&&row.values[Number(match[2])];
+ if(!row||!value)throw Error('בחרו ערך קיים מכותרת הדוח.');
+ return {row,value};
+}
+export function isracardMetadataOptions(inspection){
+ if(!['xls','xlsx'].includes(inspection.format))return null;
+ const index=inspection.rows.findIndex(row=>headers.every(label=>row.cells.map(clean).includes(label)));
+ if(index<1||index>35||!inspection.rows.slice(0,index).some(row=>row.cells.map(clean).includes('עסקאות למועד חיוב')))return null;
+ const options={card:[],date:[],total:[]};
+ for(const row of inspection.rows.slice(0,index))for(const [column,raw] of row.cells.entries()){
+  const label=clean(raw),value=row.line+':'+column,choice={value,label};
+  if(metadataCardSuffix(label))options.card.push(choice);
+  if(/^(?:לחיוב ב\s*[-–־]\s*)?\d{1,2}[./-]\d{1,2}(?:[./-](?:20\d{2}|\d{2}))?$/.test(label))options.date.push(choice);
+  if(cardTotalLabel.test(label))options.total.push(choice);
+ }
+ return Object.values(options).every(items=>items.length&&items.length<=30)?options:null;
+}
+
 // Isracard Group's card-site export prints the billing month and debit day
 // separately. The two printed totals and the billed ILS column must agree.
-export function parseIsracardSpreadsheet(inspections){
+export function parseIsracardSpreadsheet(inspections,metadataChoices){
  const workbook=inspections.find(inspection=>['xls','xlsx'].includes(inspection.format)&&
   inspection.rows.some(row=>row.cells.some(cell=>clean(cell)==='עסקאות למועד חיוב'))&&
   inspection.rows.some(row=>row.cells.some(cell=>clean(cell)==='תאריך רכישה')));
@@ -38,16 +60,30 @@ export function parseIsracardSpreadsheet(inspections){
  const [,monthName,year]=single(title.values.map(value=>/^([א-ת]+) (20\d{2})$/.exec(value))
   .filter(match=>match&&months.includes(match[1])),'לא זוהה חודש הדוח.');
  const billedMonth=months.indexOf(monthName)+1;
- const dateLabel=single(metadataValues.filter(value=>/^לחיוב ב\s*[-–־]/.test(value)),'לא זוהה תאריך חיוב יחיד בדוח.');
- const dateMatch=/^לחיוב ב\s*[-–־]\s*(\d{1,2})[./](\d{1,2})(?:[./](20\d{2}|\d{2}))?$/.exec(dateLabel);
+ const dateLabels=metadataValues.filter(value=>/^לחיוב ב\s*[-–־]/.test(value));
+ const printedDatePattern=/^(\d{1,2})[./-](\d{1,2})(?:[./-](20\d{2}|\d{2}))?$/;
+ const dateText=metadataChoices?mappedCell(metadata,metadataChoices.date).value:single(dateLabels,'לא זוהה תאריך חיוב יחיד בדוח.');
+ if(metadataChoices&&(dateLabels.length>1||dateLabels.length===1&&dateLabels[0]!==dateText))throw Error('יש לבחור את מועד החיוב המסומן בכותרת.');
+ const dateMatch=printedDatePattern.exec(dateText.replace(/^לחיוב ב\s*[-–־]\s*/,''));
  if(!dateMatch)throw Error('תאריך החיוב בדוח הכרטיס אינו קריא.');
  const [,day,month,printedYear]=dateMatch;
  if(Number(month)!==billedMonth||printedYear&&Number(printedYear)!==Number(printedYear.length===2?year.slice(2):year))throw Error('תאריך החיוב אינו תואם לחודש הדוח.');
  const dueDate=parseDate(`${day}/${month}/${year}`);
  const cards=metadata.filter(row=>row.values.some(value=>cardHeader.test(value)));
- const card=single(cards,'לא זוהו ארבע ספרות של כרטיס אחד בדוח.');
- const [,last4]=single(card.values.map(value=>cardHeader.exec(value)).filter(Boolean),'נמצא יותר מכרטיס אחד בדוח.');
- const printedTotal=single(card.values.filter(value=>/^₪\s*.+$|^.+\s*₪$/.test(value)),'חסר סכום החיוב בכותרת הכרטיס.');
+ let last4,printedTotal;
+ if(metadataChoices){
+  const card=mappedCell(metadata,metadataChoices.card),total=mappedCell(metadata,metadataChoices.total);
+  const known=cards.flatMap(row=>row.values.map(value=>cardHeader.exec(value)).filter(Boolean));
+  const suffix=metadataCardSuffix(card.value);
+  if(!suffix||card.row!==total.row||!cardTotalLabel.test(total.value)||known.length>1||known.length===1&&known[0][1]!==suffix)throw Error('בחרו מספר כרטיס וסכום חיוב מאותה כותרת.');
+  const possibleCards=metadata.filter(row=>row.values.some(value=>metadataCardSuffix(value))&&row.values.some(value=>cardTotalLabel.test(value)));
+  if(possibleCards.length!==1||possibleCards[0]!==card.row||card.row.values.filter(metadataCardSuffix).length!==1||card.row.values.filter(value=>cardTotalLabel.test(value)).length!==1)throw Error('לא זוהתה כותרת יחידה של כרטיס וסכום.');
+  last4=suffix;printedTotal=total.value;
+ }else{
+  const card=single(cards,'לא זוהו ארבע ספרות של כרטיס אחד בדוח.');
+  last4=single(card.values.map(value=>cardHeader.exec(value)).filter(Boolean),'נמצא יותר מכרטיס אחד בדוח.')[1];
+  printedTotal=single(card.values.filter(value=>cardTotalLabel.test(value)),'חסר סכום החיוב בכותרת הכרטיס.');
+ }
 
  const total=single(rows.filter(row=>row.values.some(value=>totalLabel.test(value))),'חסר סיכום שקלי יחיד בדוח הכרטיס.');
  const totalIndex=rows.indexOf(total);

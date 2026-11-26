@@ -66,7 +66,7 @@ function ReportRows({sections,review,plan,disabled,focusId,onBank,onCategory,onO
   <summary className="min-h-11 cursor-pointer py-3 text-sm text-primary">שינוי סיווג</summary>
   {group.rows.length>1&&<p className="text-xs text-muted-foreground">הבחירה תחול על כל <bdi>{group.rows.length}</bdi> התנועות בקבוצה בעלת אותו תיאור וצד שני באותו כיוון. פרטי כל תנועה נשמרים בנפרד.</p>}
   <label className="block text-sm">איך התנועה נרשמת בתקציב?
-   <select className={input} value={categoryMissing(current)?'':current??''} disabled={disabled} onChange={event=>onBank(groupIndex,event.target.value)}>
+   <select className={input} value={row.reviewed&&!categoryMissing(current)?current:''} disabled={disabled} onChange={event=>onBank(groupIndex,event.target.value)}>
     <option value="" disabled>בחירת סוג תנועה</option>
     {outsideAccount&&<option value={current} disabled>{label} · סיווג נוכחי מחוץ לסינון</option>}
     {suggestedCards.length>0&&<optgroup label="כרטיסים עם חיוב תואם">{suggestedCards.map(([value,label]:string[])=><option key={value} value={value}>{maskedCardNames.get(value)??label}</option>)}</optgroup>}

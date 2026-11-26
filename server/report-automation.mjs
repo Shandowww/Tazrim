@@ -9,8 +9,8 @@ import * as classifier from '../dist/import-readers/classifier.mjs';
 import * as activityAPI from '../dist/import-readers/cal-activity.mjs';
 import {parserVersion} from '../dist/server/report-parser-version.mjs';
 
-export function readAutomaticSource(name,bytes,{timeoutMs=20000,noticeIdentityOnly=false}={}){
- return new Promise((resolve,reject)=>{const worker=new Worker(new URL('./report-automation-worker.mjs',import.meta.url),{workerData:{name,bytes,noticeIdentityOnly},resourceLimits:{maxOldGenerationSizeMb:128}});let settled=false;const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);void worker.terminate();error?reject(error):resolve(value);},timer=setTimeout(()=>finish(Error('פענוח הדוח ארך מדי. אפשר לפתוח לבדיקה ידנית.')),timeoutMs);worker.on('message',m=>m.error?finish(Error(m.error)):finish(null,m));worker.on('error',()=>finish(Error('פענוח הדוח לא הושלם. המקור נשמר.')));worker.on('exit',()=>{if(!settled)finish(Error('פענוח הדוח הופסק. המקור נשמר.'));});});
+export function readAutomaticSource(name,bytes,{timeoutMs=20000,noticeIdentityOnly=false,manualMapping}={}){
+ return new Promise((resolve,reject)=>{const worker=new Worker(new URL('./report-automation-worker.mjs',import.meta.url),{workerData:{name,bytes,noticeIdentityOnly,manualMapping},resourceLimits:{maxOldGenerationSizeMb:128}});let settled=false;const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);void worker.terminate();error?reject(error):resolve(value);},timer=setTimeout(()=>finish(Error('פענוח הדוח ארך מדי. אפשר לפתוח לבדיקה ידנית.')),timeoutMs);worker.on('message',m=>m.error?finish(Error(m.error)):finish(null,m));worker.on('error',()=>finish(Error('פענוח הדוח לא הושלם. המקור נשמר.')));worker.on('exit',()=>{if(!settled)finish(Error('פענוח הדוח הופסק. המקור נשמר.'));});});
 }
 const states=new Set(['queued','working','review','attention','rejected','imported']);
 const normalize=v=>v&&typeof v==='object'?Array.isArray(v)?v.map(normalize):Object.fromEntries(Object.keys(v).sort().map(k=>[k,normalize(v[k])])):v;
