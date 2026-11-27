@@ -48,7 +48,7 @@ test('Goal browser escapes labels, marks stale/viewer scope and reports savings 
  const {entries}=fixture();entries.get('house').status='stale';entries.get('house').meta.name='<img src=x>';
  entries.get('house').summary.savings.goals[0].name='<script>bad</script>';
  const c=vm.createContext({window:{addEventListener(){}},overviewGoalSelection,esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'),money:n=>String(n),monthLabel:s=>s});
- vm.runInContext(readFileSync('src/space-overview-client.js','utf8'),c);
+ vm.runInContext(readFileSync('test/fixtures/retired-interface/space-overview-client.js','utf8'),c);
  const html=c.spaceOverviewGoalsView({entries,goalSpace:'house',goalFunding:''});
  assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>|<img/);
  assert.match(html,/צפייה בלבד/);assert.match(html,/נתונים מהטעינה הקודמת/);assert.match(html,/2026-01/);

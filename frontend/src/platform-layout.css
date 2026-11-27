@@ -408,3 +408,7 @@ button.household-account-space:focus-visible{outline:2px solid hsl(var(--ring));
 .appearance-select svg{position:absolute;inset-inline-end:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:hsl(var(--muted-foreground))}
 @media(max-width:359px){.household-settings-appearance .household-settings-icon{display:none}}
 .household-appearance-fields select:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+
+.overview-breakdown-trigger { min-height: 44px; cursor: pointer; }
+.overview-breakdown-trigger .home-metric-label span { text-decoration: underline; text-underline-offset: .18em; }
+.overview-breakdown-trigger:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 4px; border-radius: 8px; }

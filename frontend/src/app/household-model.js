@@ -48,7 +48,7 @@ export function householdHistory(plan,asOf,requested){
  const selected=/^\d{4}-(?:0[1-9]|1[0-2])$/.test(requested??'')&&requested>=first&&requested<=last?requested:latest??last
  const chartEnd=selected<recentStart?monthAt(selected,5):last
  const byMonth=new Map(rows.map(r=>[r.month,r]))
- const rowFor=month=>byMonth.get(month)??{month,reported:false,partial:false,income:null,spending:null,incomingTransfers:null,cardTotal:null}
+ const rowFor=month=>byMonth.get(month)??{month,reported:false,partial:false,income:null,spending:null,incomingTransfers:null,cardTotal:null,cards:[]}
  const selectedRow=rowFor(selected)
  const bankReportEnds=selectedRow.partial?monthlyDataCoverage(plan,selected,asOf).accounts.filter(account=>account.reportThrough):[]
  return {latest,selected:{...selectedRow,hasSavedData:evidenceMonths.has(selected),bankReportEnds,multipleBankAccounts:accounts.length>1},months:Array.from({length:indexMonth(last)-indexMonth(first)+1},(_,i)=>monthAt(first,i)),

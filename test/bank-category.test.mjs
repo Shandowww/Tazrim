@@ -89,7 +89,7 @@ test('Bank matching UI requires confirmation, escapes merchant labels and expose
  const p=plan();p.details=[{id:'same',name:'<script>bad</script>',category:'מזון',method:'variable',amount:200,month:'2026-04',date:'2026-04-10',number:'',status:'cleared',accounting:'included'}];
  let click,confirm,mutations=0;
  const c=vm.createContext({...model,plan:p,demoPreview:false,esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'),currency:String,app:{addEventListener(type,fn){click=fn;}},confirmAction:(title,text,fn)=>confirm=fn,mutate:next=>{c.plan=next;mutations++;},notify:()=>assert.fail('unexpected error')});
- const source=readFileSync('src/reports.js','utf8');vm.runInContext(source.slice(source.indexOf('function staleBankDetailLinksView('),source.indexOf('function dataCoverageView(')),c);
+ const source=readFileSync('test/fixtures/retired-interface/reports.js','utf8');vm.runInContext(source.slice(source.indexOf('function staleBankDetailLinksView('),source.indexOf('function dataCoverageView(')),c);
  const html=vm.runInContext('bankDetailLinkControls(plan.bankImport.entries[0],possibleBankDetailMatches(plan,plan.bankImport.entries[0]))',c);
  assert.ok(!html.includes('<script>'));assert.match(html,/&lt;script&gt;/);
  click({target:{closest:()=>({dataset:{bankLinkKey:'a'.repeat(64),bankLinkDetail:'same'}})}});assert.equal(mutations,0);assert.equal(typeof confirm,'function');

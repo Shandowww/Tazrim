@@ -1,0 +1,10 @@
+[Unit]
+Description=Check GitHub main for a new Budgit release every five minutes
+
+[Timer]
+OnBootSec=10min
+OnUnitInactiveSec=5min
+RandomizedDelaySec=30s
+
+[Install]
+WantedBy=timers.target

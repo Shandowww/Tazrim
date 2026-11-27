@@ -5,7 +5,7 @@ import {reportInboxPayer} from '../../../src/report-inbox-controller.js'
 import {loadReportLibrary,loadReportSource} from './report-library-api.ts'
 import {loadStoredReport,loadReportMerchantRules,type StoredReportDetail} from './report-review-api.ts'
 import {inspectReportSource,readMappingSource} from './report-reader.ts'
-import {mappingOptions,mapReportSource,parseMappingChoice} from './report-manual-mapping.ts'
+import {mappingOptions,parseMappingChoice} from './report-manual-mapping.ts'
 import type {BudgetResponse} from './budget-api.ts'
 export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:string[],signal:AbortSignal,fetcher:typeof fetch=fetch,reimport=false,hint:{kind?:string;target?:string;manualMap?:string}={},restart=false){
  if(!base.plan||base.plan.format||!ids.length||ids.length>10||new Set(ids).size!==ids.length)throw Error('יש לפתוח תקציב גלוי ולבחור עד עשרה דוחות שונים.')
@@ -32,14 +32,14 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
   if(saved&&(saved.storedRevision!==source.revision||saved.hash!==source.sourceHash))throw Error('קבוצת הדוחות השתנתה; החלטות שמורות לא הוחלפו.')
   let item:any=saved?clone(saved):{id:source.id,name:source.name,size:bytes.length,target:'',payer:'',decisions:{},directIncluded:{},monthDecisions:{},bankOptions:{scope:'complete'},skip:false,storedId:source.id,storedRevision:source.revision,storedCommitted:source.state==='committed'}
   if(!saved||saved.error||saved.manualMapping||saved.skip&&saved.reason==='המקור כבר נקלט ונמצא בתקציב.'&&!saved.records&&!saved.report){
-   const choice=parseMappingChoice(saved?.manualMapping??(source.id===ids[0]?hint.manualMap:null))
+   const rawChoice=saved?.manualMapping??(source.id===ids[0]?hint.manualMap:null),choice=parseMappingChoice(rawChoice)
    try{
-    if(saved?.manualMapping)throw Error('יש לאמת מחדש את התאמת השדות שנשמרה.')
-    const parsed=await inspectReportSource(base.plan,source.name,bytes,signal,{reviewRecordedSource:true})
+    if(rawChoice&&!choice)throw Error('המיפוי אינו תקין. בחרו שוב את השדות מתוך הדוח.')
+    const parsed=await inspectReportSource(base.plan,source.name,bytes,signal,{reviewRecordedSource:true,manualMapping:choice??undefined})
     Object.assign(item,parsed)
     delete item.error
+    if(choice&&!parsed.skip)item.manualMapping=JSON.stringify(choice)
     if(parsed.kind==='ambiguous'){
-     if(choice)throw Error('מבנה הדוח דורש התאמה ידנית.')
      const inspection=await readMappingSource(source.name,bytes,signal).catch(()=>null)
      if(inspection&&mappingOptions(inspection))item.mappingInspection=inspection
     }
@@ -47,13 +47,7 @@ export async function loadReportGroup(budgetId:string,base:BudgetResponse,ids:st
     item.error=error instanceof Error?error.message:'לא ניתן לפענח את המקור.'
     let inspection
     try{inspection=await readMappingSource(source.name,bytes,signal)}catch{}
-    if(inspection&&mappingOptions(inspection)){
-     item.mappingInspection=inspection
-     if(choice)try{
-      Object.assign(item,await mapReportSource(inspection,choice,source.sourceHash),{manualMapping:JSON.stringify(choice)})
-      delete item.error
-     }catch(e){item.error=e instanceof Error?e.message:item.error}
-    }
+    if(inspection&&mappingOptions(inspection))item.mappingInspection=inspection
    }
    if(!item.error){
     item.target||=inboxTarget(base.plan,item)

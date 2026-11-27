@@ -1,4 +1,4 @@
-import {Inbox,CalendarDays,Files,Settings2,Plus,ChevronLeft,ChevronRight,Clock} from 'lucide-react'
+import {Inbox,CalendarDays,Files,Settings2,Plus,CreditCard,ChevronLeft,ChevronRight,Clock} from 'lucide-react'
 import {SyncCoverage} from './sync-coverage'
 import {syncView,syncHref,syncReportPage,syncWaiting,type SyncView} from './sync-center-model'
 import {loadAutomation,type AutomationSnapshot} from './report-automation-api'
@@ -9,12 +9,17 @@ import {scanNewStatement} from './statement-notice-api'
 import {useEffect,useRef,useState} from 'react'
 import {useLocation,useNavigate,useNavigationType} from 'react-router-dom'
 import {cashAccountList,creditCards} from '../../../src/budget.js'
-import {AccessError} from './budget-api'
+import {inboxCardLast4} from '../../../src/report-inbox-model.js'
+import {AccessError,type BudgetResponse} from './budget-api'
 import type {BudgetState} from './use-budget'
 import {useFinancialDraft} from './draft-guard'
 import {PageHeading} from './page-heading'
 import Link from './link'
 import {withViewQuery} from './navigation-query'
+import {useInterfaceMode} from './interface-mode'
+import {modeAllows} from './interface-mode-model'
+import {CardEditor} from './card-page'
+import {reportCardSeed,type CardDraft} from './card-command'
 import {navigationLabels} from './navigation-sections'
 import {readMappingSource,readReportContent} from './report-reader'
 import {mappingOptions,type MappedReport,type MappingChoice} from './report-manual-mapping'
@@ -24,6 +29,7 @@ import {loadIncomingInbox,updateIncoming,verifyIncomingApproval,deleteIncomingRe
 
 const button='min-h-11 rounded-xl border px-4 py-2 text-sm disabled:opacity-50',input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-sm'
 function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
+ const {mode}=useInterfaceMode()
  const accountId=budget.value.accountId,location=useLocation(),{search}=location,navigate=useNavigate(),navigationType=useNavigationType(),query=new URLSearchParams(search),view=syncView(query.get('sync')),reportId=query.get('report'),panel=query.get('panel')??'',heading=useRef<HTMLHeadingElement>(null)
  const [automation,setAutomation]=useState<AutomationSnapshot|null>(null),[automationError,setAutomationError]=useState(''),[nextHref,setNextHref]=useState<string|null>(null)
  const center=(next:SyncView,changes:Record<string,string|null>={})=>syncHref(search,next,changes)
@@ -33,8 +39,8 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  const [snapshot,setSnapshot]=useState<IncomingSnapshot|null>(null),[tick,setTick]=useState(0),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState('')
  const [consent,setConsent]=useState(false),[file,setFile]=useState<File|null>(null),[selected,setSelected]=useState<IncomingReport|null>(null)
  const [connectionName,setConnectionName]=useState('האייפון שלי'),[connection,setConnection]=useState<ReturnType<typeof incomingConnectionDraft>|null>(null),[connectionReady,setConnectionReady]=useState(false),[showSecret,setShowSecret]=useState(false)
- const [analysis,setAnalysis]=useState<{report:IncomingReport;content:any;budgets:RoutingBudget[];reason:string;manualChoice?:MappingChoice}|null>(null),[destination,setDestination]=useState(''),[kind,setKind]=useState<RoutingKind>('bank'),[remember,setRemember]=useState(true),[routeAttempt,setRouteAttempt]=useState<any>(null),[result,setResult]=useState<any>(null),[deleting,setDeleting]=useState<IncomingReport|null>(null),[deleteConfirmed,setDeleteConfirmed]=useState(false)
- const [manual,setManual]=useState<{report:IncomingReport;inspection:any;ambiguous?:any}|null>(null)
+ const [analysis,setAnalysis]=useState<{report:IncomingReport;content:any;budgets:RoutingBudget[];reason:string;manualChoice?:MappingChoice;existingCard?:boolean}|null>(null),[destination,setDestination]=useState(''),[kind,setKind]=useState<RoutingKind>('bank'),[remember,setRemember]=useState(true),[routeAttempt,setRouteAttempt]=useState<any>(null),[result,setResult]=useState<any>(null),[deleting,setDeleting]=useState<IncomingReport|null>(null),[deleteConfirmed,setDeleteConfirmed]=useState(false)
+ const [manual,setManual]=useState<{report:IncomingReport;inspection:any;ambiguous?:any;existingCard?:boolean}|null>(null)
  const alive=useRef(true),flight=useRef(false),controller=useRef<AbortController|null>(null),autoVerify=useRef<string|null>(null)
  const href=(path:string,route?:any)=>{if(route){const [pathname,query='']=path.split('?'),q=new URLSearchParams(query);q.set('budget',route.budget);q.set('kind',route.kind);q.set('target',route.target);return withViewQuery(pathname+'?'+q,search,import.meta.env.DEV)}return withViewQuery(path,search,import.meta.env.DEV)}
  useCreatedEditorRoute(nextHref,message,accountId+'/'+budget.budgetId)
@@ -46,7 +52,20 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;controller.current?.abort()}},[])
  useEffect(()=>{const abort=new AbortController();setLoading(true);setError('');loadIncomingInbox(accountId,abort.signal).then(value=>{if(!abort.signal.aborted)setSnapshot(value)}).catch(e=>{if(abort.signal.aborted)return;if(e instanceof AccessError)budget.invalidate(e.message);else setError(e.message)}).finally(()=>{if(!abort.signal.aborted)setLoading(false)});return()=>abort.abort()},[accountId,tick,view,panel,reportId])
  const run=async(work:()=>Promise<void>)=>{if(flight.current)return false;flight.current=true;setBusy(true);setError('');try{await work();return true}catch(e){if(alive.current){if(e instanceof AccessError)budget.invalidate(e.message);else setError(e instanceof Error?e.message:'הפעולה לא אושרה. אפשר לנסות שוב.')}return false}finally{flight.current=false;if(alive.current)setBusy(false)}}
- const clearReview=()=>{setManual(null);setSelected(null);setAnalysis(null);setDestination('');setRouteAttempt(null);autoVerify.current=null}
+ const [creating,setCreating]=useState<{id:string;base:BudgetResponse;seed:Partial<CardDraft>}|null>(null)
+ const correctionButton=useRef<HTMLButtonElement>(null),cardHeading=useRef<HTMLHeadingElement>(null),destinationField=useRef<HTMLSelectElement>(null),createCardButton=useRef<HTMLButtonElement>(null)
+ const focusAfterCard=useRef<'offer'|'destination'|null>(null)
+ useEffect(()=>{
+  if(creating){
+   cardHeading.current?.focus({preventScroll:true})
+   cardHeading.current?.scrollIntoView({block:'start',behavior:'instant'})
+   return
+  }
+  if(focusAfterCard.current==='offer')createCardButton.current?.focus()
+  if(focusAfterCard.current==='destination')destinationField.current?.focus()
+  focusAfterCard.current=null
+ },[creating])
+ const clearReview=()=>{setCreating(null);setManual(null);setSelected(null);setAnalysis(null);setDestination('');setRouteAttempt(null);autoVerify.current=null}
  const discard=()=>{setFile(null);setConsent(false);clearReview();setConnection(null);setConnectionReady(false);setShowSecret(false);setDeleting(null);setDeleteConfirmed(false)}
  useFinancialDraft({kind:'detail',dirty:!!file||consent||!!selected||!!analysis||!!connection||!!deleting,busy,discard})
  const refresh=()=>setTick(v=>v+1)
@@ -88,12 +107,26 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   const budgets=await incomingRoutingBudgets(accountId,budget.budgetId,budget.spaces,abort.signal),fresh=await loadIncomingInbox(accountId,abort.signal)
   if(!alive.current)return
   setSnapshot(fresh);const match=matchIncomingReport(content,budgets,fresh.bindings);setKind(['bank','card'].includes(content.kind)?content.kind:'bank');setAnalysis({report,content,budgets,reason:match.reason})
-  if(match.state==='matched'){
+  if(match.state==='matched'&&content.kind==='card'){
+   const target=match.candidates[0]
+   setDestination(JSON.stringify([target.budget,target.target]));setRemember(false)
+   setMessage('בדקו את הכרטיס שזוהה ואשרו את השיוך, או תקנו את שדות הדוח.')
+  }else if(match.state==='matched'){
    const target=match.candidates[0],binding=fresh.bindings.find(b=>b.identityKey===content.identityKey),payload={action:'route',id:report.id,sourceHash:report.sourceHash,revision:report.revision,confirm:true,budget:target.budget,budgetRevision:target.budgetRevision,kind:target.kind,target:target.target,identityKey:content.identityKey,automatic:target.bindingRevision!==undefined,bindingRevision:binding?.revision??0,remember:false}
    setDestination(JSON.stringify([target.budget,target.target]));setRouteAttempt(payload);await routed(payload)
   }else setMessage('הפענוח אושר. יש לבחור את החשבון שאליו שייך הדוח.')
  })
  useEffect(()=>{if(view!=='report'||panel!=='approve'||!selected||analysis||autoVerify.current===selected.id)return;autoVerify.current=selected.id;void verify()},[view,panel,selected?.id,analysis])
+ const correctCardFields=()=>run(async()=>{
+  if(!analysis||kind!=='card'||routeAttempt)return
+  const abort=new AbortController();controller.current=abort
+  const report=analysis.report,bytes=await incomingSource(accountId,report,'parse',abort.signal)
+  const inspection=await readMappingSource(report.name,bytes,abort.signal)
+  if(!inspection||mappingOptions(inspection)?.kind!=='card')throw Error('מיפוי ידני של שדות כרטיס זמין כרגע לדוחות Excel נתמכים. בדקו את המקור או העלו דוח מתוקן.')
+  if(!alive.current||abort.signal.aborted)return
+  setManual({report,inspection,existingCard:true})
+  setMessage('')
+ })
  const acceptMapping=(content:MappedReport,manualChoice?:MappingChoice)=>run(async()=>{
   if(!manual||content.hash!==manual.report.sourceHash)return
   const abort=new AbortController();controller.current=abort
@@ -101,17 +134,18 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   if(!alive.current||abort.signal.aborted)return
   const match=matchIncomingReport(content,budgets,fresh.bindings)
   setSnapshot(fresh);setKind(manualChoice?content.kind:'bank');setRemember(false)
-  setAnalysis({report:manual.report,content,budgets,reason:manualChoice?'המיפוי אומת. אשרו את יעד הדוח לפני המעבר לבדיקה.':'בחרו סוג ויעד כדי להמשיך לבדיקה.',manualChoice})
+  setAnalysis({report:manual.report,content,budgets,reason:manual.existingCard?'השדות אומתו מול המקור. בחרו את הכרטיס הקיים ואשרו את השיוך.':manualChoice?'המיפוי אומת. אשרו את יעד הדוח לפני המעבר לבדיקה.':'בחרו סוג ויעד כדי להמשיך לבדיקה.',manualChoice,existingCard:manual.existingCard})
   const candidate=match.state==='matched'?match.candidates[0]:null
   setDestination(candidate?JSON.stringify([candidate.budget,candidate.target]):'')
   setManual(null)
+  if(manual.existingCard)requestAnimationFrame(()=>destinationField.current?.focus())
  })
  const route=()=>run(async()=>{
   if(!analysis||!destination)return;const [budgetId,target]=JSON.parse(destination)
-  if(analysis.manualChoice&&kind==='card'){
-   const last4=analysis.content.report?.last4,plan=analysis.budgets.find(b=>b.id===budgetId)?.plan
+  if(kind==='card'&&analysis.content.kind==='card'){
+   const last4=analysis.content.report?.last4||inboxCardLast4(analysis.content),plan=analysis.budgets.find(b=>b.id===budgetId)?.plan
    const card=plan&&creditCards(plan).find((card:any)=>card.id===target)
-   if(card&&/^\d{4}$/.test(card.alias)&&card.alias!==last4)throw Error('ארבע הספרות בדוח אינן תואמות לכרטיס שנבחר.')
+   if(last4&&card&&/^\d{4}$/.test(card.alias)&&card.alias!==last4)throw Error('ארבע הספרות אינן תואמות לכרטיס שנבחר. בדקו את הכרטיס או תקנו את שדות הדוח.')
   }
   const binding=snapshot?.bindings.find(b=>b.identityKey===analysis.content.identityKey)
   const payload=routeAttempt??{action:'route',id:analysis.report.id,sourceHash:analysis.report.sourceHash,revision:analysis.report.revision,confirm:true,budget:budgetId,budgetRevision:analysis.budgets.find(b=>b.id===budgetId)?.revision,kind,target,identityKey:analysis.content.identityKey??'',remember:remember&&!!analysis.content.identityKey,bindingRevision:binding?.revision??0}
@@ -122,6 +156,14 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   const report=deleting;await deleteIncomingReport(accountId,report,budget.budgetId)
   if(!alive.current)return;setDeleting(null);setDeleteConfirmed(false);setResult(null);setMessage(report.route&&!report.applied?'הדוח והתקדמות הבדיקה שלא נקלטו נמחקו. נתוני התקציב נשמרו.':'העותק הוסר מהתיבה הפרטית. דוחות ורשומות בתקציבים נשמרו.');setNextHref(returnList);refresh()
  })
+ const currentSpace=budget.spaces.find(space=>space.id===budget.budgetId)
+ const routingSpace=analysis?.budgets.find(space=>space.id===budget.budgetId)
+ const bindings=snapshot?.bindings??[]
+ const seed=analysis&&!analysis.existingCard&&kind==='card'&&budget.value.writeIdentityBound===true&&currentSpace&&currentSpace.role!=='viewer'&&routingSpace&&!routingSpace.locked&&routingSpace.role!=='viewer'
+  &&!bindings.some(binding=>binding.identityKey===analysis.content.identityKey)
+  &&!matchIncomingReport(analysis.content,analysis.budgets,bindings).candidates.length
+  ?reportCardSeed(budget.value.plan,analysis.content):null
+ const canCreateCard=seed&&!analysis?.budgets.some(space=>!space.locked&&creditCards(space.plan).some((card:any)=>card.alias===seed.alias))
  const {targets,unavailable}=incomingRoutingOptions(analysis?.budgets??[],kind)
  const setupTarget=kind==='bank'?{path:'/accounts/new',label:'הוספת חשבון בנק'}:{path:'/card-setup/new',label:'הוספת כרטיס אשראי'}
  const unavailableDetails={viewer:{message:'המרחב פתוח לצפייה בלבד.'},unconfigured:{message:kind==='bank'?'עדיין אין תקציב שמור במרחב הזה. יש להגדיר תקציב ולהוסיף בו חשבון בנק.':'עדיין אין תקציב שמור במרחב הזה. יש להגדיר תקציב ולהוסיף בו כרטיס אשראי.',action:{path:'/start',label:'הגדרת התקציב'}},locked:{message:'התקציב נעול במכשיר הזה.',action:{path:'/settings/security',label:'פתיחת התקציב'}},'no-targets':{message:kind==='bank'?'אין חשבון בנק במרחב הזה.':'אין כרטיס אשראי במרחב הזה.',action:setupTarget}}
@@ -154,8 +196,8 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   {['connections','setup','policy'].includes(view)&&<Link className="inline-flex min-h-11 items-center gap-1 text-sm" href={center(view==='setup'?'connections':'settings')}><ChevronRight size={18} aria-hidden="true"/>חזרה {view==='setup'?'לחיבורים':'להגדרות'}</Link>}
   <h2 ref={heading} tabIndex={-1} className="scroll-mt-24 text-lg font-semibold outline-none">{titles[view]}</h2>
   {loading&&<p role="status">טוען תיבת סנכרון…</p>}
-  {error&&(!selected||!!analysis)&&<div className="surface space-y-2 rounded-xl border border-destructive p-4"><p role="alert" className="text-sm">{error}</p><button className={button} disabled={busy||!!file||!!selected||!!connection||!!deleting} onClick={refresh}>ניסיון נוסף</button></div>}
-  {visibleMessage&&<p role="status" className="surface rounded-xl p-4 text-sm">{visibleMessage}</p>}
+  {error&&!manual&&(!selected||!!analysis)&&<div className="surface space-y-2 rounded-xl border border-destructive p-4"><p role="alert" className="text-sm">{error}</p><button className={button} disabled={busy||!!file||!!selected||!!connection||!!deleting} onClick={refresh}>ניסיון נוסף</button></div>}
+  {visibleMessage&&!creating&&<p role="status" className="surface rounded-xl p-4 text-sm">{visibleMessage}</p>}
   {view==='missing'&&<SyncCoverage budget={budget} href={href} tick={tick} change={values=>center('missing',values)}/>}
   {(view==='attention'||view==='reports')&&<>
    <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm text-muted-foreground">{view==='attention'?(query.get('syncWaiting')==='1'?'הדוחות בהכנה. אין צורך באישור נוסף כרגע.':'דוחות חדשים וטיפול שעוד לא הושלם.'):'חיפוש דוחות, מצב טיפול ומקורות שמורים.'}</p><Link className={button+' inline-flex items-center gap-2'} href={center('add',{syncFrom:view})}><Plus size={17} aria-hidden="true"/>הוספת דוח</Link></div>
@@ -167,6 +209,11 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
     <ul className="space-y-2" aria-label={view==='attention'?'דוחות לטיפול':'רשימת הדוחות'}>{listing.reports.map(report=><li key={report.id}><Link href={listReportHref(report)} className="surface flex min-h-20 items-center gap-2 rounded-xl p-4"><div className="min-w-0 flex-1 space-y-1"><h3 className="truncate text-sm font-semibold" title={report.name}><bdi>{report.name}</bdi></h3><p className="truncate text-xs text-muted-foreground"><bdi>{reportScope(report)}</bdi>{targetLabel(report)&&<> · <bdi>{targetLabel(report)}</bdi></>} · <bdi>{new Date(report.createdAt).toLocaleDateString('he-IL')}</bdi></p><p className="text-xs">{nextLabel(report)}</p></div><span className="shrink-0 rounded-lg bg-muted px-2 py-1 text-xs">{lifecycleLabels[report.lifecycle??'new']}</span><ChevronLeft size={17} className="shrink-0" aria-hidden="true"/></Link></li>)}</ul>
     {listing.pages>1&&<nav aria-label="עמודי דוחות" className="flex items-center justify-between gap-2">{listing.page>1?<Link className={button+' inline-flex items-center'} href={center(view,{syncPage:String(listing.page-1)})}>הקודם</Link>:<span/>}<span className="text-sm"><bdi>{listing.page}</bdi> מתוך <bdi>{listing.pages}</bdi></span>{listing.page<listing.pages?<Link className={button+' inline-flex items-center'} href={center(view,{syncPage:String(listing.page+1)})}>הבא</Link>:<span/>}</nav>}
    </>}
+   <nav aria-label="דוחות בתקציב הנבחר" className="space-y-1 border-t pt-2">
+    <h3 className="text-sm font-semibold">דוחות בתקציב · <bdi>{budget.spaces.find(space=>space.id===budget.budgetId)?.name}</bdi></h3>
+    <Link className="flex min-h-11 items-center justify-between text-sm" href={href('/upload')}>{navigationLabels.sources}<ChevronLeft size={17} aria-hidden="true"/></Link>
+    {modeAllows(mode,'/upload/history')&&<Link className="flex min-h-11 items-center justify-between text-sm" href={href('/upload/history')}>היסטוריית ייבוא בנק<ChevronLeft size={17} aria-hidden="true"/></Link>}
+   </nav>
    {view==='attention'&&<div className="space-y-1 border-t pt-2">{waitingCount>0&&query.get('syncWaiting')!=='1'&&<Link className="flex min-h-11 items-center gap-2 text-sm" href={center('attention',{syncWaiting:'1',syncPage:null})}><Clock size={17} aria-hidden="true"/><bdi>{waitingCount}</bdi> דוחות בהכנה · אין צורך לפעול כרגע<ChevronLeft size={16}/></Link>}{query.get('syncWaiting')==='1'&&<Link className="flex min-h-11 items-center text-sm underline" href={center('attention',{syncWaiting:null,syncPage:null})}>חזרה לדוחות לטיפול</Link>}<Link className="flex min-h-11 items-center justify-between text-sm" href={center('missing')}>אילו דוחות עוד צריך להוריד?<ChevronLeft size={17}/></Link><Link className="flex min-h-11 items-center justify-between text-sm" href={center('reports')}>כל הדוחות וההיסטוריה<ChevronLeft size={17}/></Link></div>}
   </>}
   {view==='add'&&<>
@@ -202,15 +249,42 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
   {panel==='approve'&&selected&&!analysis&&!manual&&<section className="surface space-y-3 rounded-xl border border-primary p-4"><h2 className="break-words font-semibold">מזהים את הדוח · <bdi>{selected.name}</bdi></h2><p className="text-sm">Budgit קורא את המקור ומחפש חשבון או כרטיס מתאים. אם הזיהוי אינו חד־משמעי, תופיע כאן בחירה לאישור. נתוני התקציב יישמרו רק בסיום הבדיקה.</p>{busy&&<p role="status">קוראים את הדוח ומזהים את החשבון…</p>}{error&&<><p role="alert" className="rounded-xl border border-destructive p-3 text-sm">{error}</p><button className={button} disabled={busy} onClick={()=>void verify()}>ניסיון זיהוי נוסף</button></>}<button className={button} disabled={busy} onClick={()=>void download(selected)}>הורדת המקור לבדיקה</button><button className={button} disabled={busy} onClick={()=>{clearReview();setNextHref(center('report',{report:reportId}))}}>חזרה לפרטי הדוח</button></section>}
   {panel==='approve'&&manual&&<>
    {error&&<p role="alert">{error}</p>}
-   <ReportManualMapping key={manual.report.id} inspection={manual.inspection} hash={manual.report.sourceHash} disabled={busy} onAccept={(content,choice)=>void acceptMapping(content,choice)} onCancel={()=>{clearReview();setNextHref(center('report',{report:reportId}))}}/>
+   <ReportManualMapping key={manual.report.id} inspection={manual.inspection} hash={manual.report.sourceHash} disabled={busy} onAccept={(content,choice)=>void acceptMapping(content,choice)}
+    focusOnOpen={manual.existingCard} cancelLabel={manual.existingCard?'חזרה לשיוך הדוח':undefined}
+    onCancel={()=>{setError('');if(manual.existingCard){setManual(null);requestAnimationFrame(()=>correctionButton.current?.focus());return}clearReview();setNextHref(center('report',{report:reportId}))}}/>
    {manual.ambiguous&&<button type="button" className={button} disabled={busy} onClick={()=>void acceptMapping(manual.ambiguous)}>בחירת סוג דוח ויעד</button>}
   </>}
-  {panel==='approve'&&analysis&&<section className="surface space-y-3 rounded-xl border border-primary p-4">
-   <h2 className="font-semibold">שיוך החשבון</h2><p className="text-sm">{analysis.reason}</p>
+  {panel==='approve'&&analysis&&!manual&&<section className="surface space-y-3 rounded-xl border border-primary p-4">
+   <h2 className="font-semibold">שיוך החשבון</h2>{!creating&&<p className="text-sm">{analysis.reason}</p>}
    <p className="break-words text-sm"><bdi>{analysis.report.name}</bdi>{analysis.content.identity&&<> · מזהה בדוח: <bdi dir="ltr">{analysis.content.identity}</bdi></>}</p>
+   {creating?<div className="adaptive-editor space-y-3">
+    <h3 ref={cardHeading} tabIndex={-1} className="scroll-mt-32 font-semibold">הוספת כרטיס לתקציב <bdi>{currentSpace?.name}</bdi></h3>
+    <p className="text-sm">בדקו את הפרטים שמולאו מהדוח. אם הוגדרו חשבונות בנק, בחרו את החשבון המשלם.</p>
+    <CardEditor key={creating.id} budget={budget} base={creating.base} id={creating.id} create report={{id:analysis.report.id,seed:creating.seed,onBack:()=>{focusAfterCard.current='offer';setCreating(null)}}} onSaved={(message,saved)=>{
+     if(!saved)return
+     setAnalysis({...analysis,reason:'הכרטיס החדש נבחר כיעד. אשרו את השיוך כדי להמשיך לסיווג.',budgets:analysis.budgets.map(space=>space.id===budget.budgetId?{...space,plan:saved.plan,revision:saved.revision}:space)})
+     setDestination(JSON.stringify([budget.budgetId,creating.id]))
+     setMessage(message)
+     focusAfterCard.current='destination'
+     setCreating(null)
+    }}/>
+   </div>:<>
+   {kind==='card'&&<div className={canCreateCard?'space-y-4 rounded-xl border border-primary/30 bg-primary/5 p-4':undefined}>
+    {canCreateCard&&<div className="flex items-start gap-3">
+     <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><CreditCard size={20} aria-hidden="true"/></div>
+     <div className="min-w-0 space-y-1">
+      <h3 className="font-semibold">זוהה כרטיס לא מוכר</h3>
+      <p className="text-sm text-muted-foreground">ארבע הספרות בדוח: <bdi dir="ltr" className="font-medium text-foreground">{seed.alias}</bdi>. בדקו אם להוסיף את הכרטיס לתקציב <bdi>{currentSpace?.name}</bdi> או לתקן את הזיהוי.</p>
+     </div>
+    </div>}
+    <div className={canCreateCard?'flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-center':undefined}>
+     {canCreateCard&&<button ref={createCardButton} type="button" className={button+' border-transparent bg-primary font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'} disabled={busy||!!routeAttempt} onClick={()=>setCreating({id:'card_'+analysis.report.id,base:budget.value,seed})}>הוספת כרטיס</button>}
+     <button ref={correctionButton} type="button" className={button+(canCreateCard?' bg-card/70 hover:bg-card':'')} disabled={busy||!!routeAttempt} onClick={()=>void correctCardFields()}>כרטיס קיים · תיקון שדות הדוח</button>
+    </div>
+   </div>}
    <fieldset disabled={busy||!!routeAttempt} className="space-y-3">
     <label className="block text-sm">סוג חשבון<select className={input} value={kind} disabled={!!analysis.manualChoice} onChange={e=>{setKind(e.target.value==='card'?'card':'bank');setDestination('')}}><option value="bank">חשבון בנק</option><option value="card">כרטיס אשראי</option></select></label>
-    <label className="block text-sm">חשבון היעד<select className={input} value={destination} disabled={!targets.length} aria-describedby={unavailable.length?'routing-unavailable':undefined} onChange={e=>setDestination(e.target.value)}><option value="">{targets.length?'בחירת חשבון':'אין יעדים זמינים'}</option>{targets.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}</select></label>
+    <label className="block text-sm">חשבון היעד<select ref={destinationField} className={input} value={destination} disabled={!targets.length} aria-describedby={unavailable.length?'routing-unavailable':undefined} onChange={e=>setDestination(e.target.value)}><option value="">{targets.length?'בחירת חשבון':'אין יעדים זמינים'}</option>{targets.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}</select></label>
     {analysis.content.identityKey&&<label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" className="h-5 w-5" checked={remember} onChange={e=>setRemember(e.target.checked)}/>לזכור את שיוך המזהה הזה לדוחות הבאים</label>}
    </fieldset>
    {unavailable.length>0&&<div className="space-y-2 rounded-xl border p-3 text-sm" id="routing-unavailable">
@@ -220,6 +294,7 @@ function IncomingInbox({budget}:{budget:Extract<BudgetState,{status:'ready'}>}){
    </div>}
    <div className="flex flex-wrap gap-2"><button className={button} disabled={busy||!destination} onClick={()=>void route()}>{routeAttempt?'בדיקת אותו שיוך שוב':'אישור השיוך והמשך לסיווג'}</button><button className={button} disabled={busy||!!routeAttempt} onClick={()=>{clearReview();setNextHref(center('report',{report:reportId}))}}>סגירת השיוך</button></div>
    {!unavailable.length&&<Link className="inline-flex min-h-11 items-center text-sm underline" href={href('/accounts')}>פתיחת החשבונות</Link>}
+   </>}
   </section>}
   {panel==='delete'&&deleting&&<section className="surface space-y-3 rounded-xl border border-destructive p-4"><h2 className="font-semibold">{deleting.applied?'מחיקת העותק מהתיבה הפרטית':'מחיקת הדוח שלא נקלט'}</h2><p className="break-words text-sm"><bdi>{deleting.name}</bdi></p><p className="text-sm">{deleting.applied?'הנתונים שכבר נקלטו בתקציב יישמרו. רק העותק שבתיבה הפרטית יוסר.':'המקור והתקדמות הבדיקה יוסרו מהתיבה הפרטית ומהתקציב המשויך. נתונים שכבר נקלטו אינם ניתנים למחיקה מכאן.'} אם הקובץ נמחק מהמכשיר אחרי העלאה, הורידו עותק לפני המחיקה אם תרצו לשמור אותו. גיבויים קודמים עשויים עדיין להכיל עותק.</p><button className={button} disabled={busy} onClick={()=>void download(deleting)}>הורדת המקור</button><label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" className="h-5 w-5" checked={deleteConfirmed} disabled={busy} onChange={e=>setDeleteConfirmed(e.target.checked)}/>אני מאשר/ת למחוק את {deleting.applied?'העותק הפרטי':'הדוח והתקדמות הבדיקה'}</label><button className={button} disabled={busy||!deleteConfirmed} onClick={()=>void removePrivateCopy()}>{busy?'מוחקים ובודקים…':'מחיקת הדוח'}</button><button className={button} disabled={busy} onClick={()=>{setDeleting(null);setDeleteConfirmed(false);setNextHref(center('report',{report:reportId}))}}>ביטול המחיקה</button></section>}
   {result&&<Link className="inline-flex min-h-11 items-center text-sm underline" href={href('/notices',result)}>הודעות הדוח · מרכז העדכונים</Link>}

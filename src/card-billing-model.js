@@ -45,14 +45,85 @@ export function cardReportReminderRows(p,asOf){
  });
 }
 export function saveBillingReport(p,input,asOf){const next=clone(p),card=creditCards(p).find(c=>c.id===input.cardId);if(!card||!billingDateOk(input.dueDate)||(input.source==='file'?input.dueDate.slice(0,7)<p.startMonth||input.dueDate.slice(0,7)>monthAt(p.startMonth,119):input.dueDate.slice(0,7)!==asOf.slice(0,7)&&!billingWindow(input.dueDate,asOf)))throw Error('בחר חיוב של החודש הנוכחי או חיוב קרוב.');const mapped=p.cashPlanning?.cardAccounts[card.id];if(mapped&&mapped!==input.accountId)throw Error('בחר את החשבון שמשלם את הכרטיס.');next.cardBilling??={version:1,reports:[]};next.cardBilling.reports=next.cardBilling.reports.filter(r=>!(r.cardId===input.cardId&&(r.dueDate===input.dueDate||r.source==='no-transactions'&&r.dueDate.slice(0,7)===input.dueDate.slice(0,7))));next.cardBilling.reports.push({...input,updatedOn:asOf,status:'pending'});if(!cardBillingValid(next))throw Error('יש לבדוק את סכום החיוב והחשבון המשלם.');return next;}
-// Reconciled card debits or confirmed manual reports avoid a second charge. Estimates need only
-// the difference from any card amount already present in that month's forecast.
-export function billingForecastAdjustment(p,id,month,record,values){let amount=0;for(const r of p.cardBilling?.reports??[]){if(r.accountId!==id||r.dueDate.slice(0,7)!==month||r.status==='included'||r.source==='no-transactions'&&!cardNoTransactionsConfirmed(p,r.cardId,month))continue;if(record?.date&&record.date>=r.dueDate){const charged=(p.bankImport?.entries??[]).filter(e=>e.accountId===id&&e.field===r.cardId&&e.month===month&&e.cents<0).reduce((n,e)=>n-e.cents,0);if(charged>=cents(r.amount)||!record.fromBank&&record.actual)continue;}amount+=cents(r.amount)-(record?.balance!==undefined?0:cents(values[r.cardId]??0));}return amount/100;}
+function monthlyBillingReports(p,month,select){
+ return (p.cardBilling?.reports??[]).filter(r=>select(r)&&r.dueDate.slice(0,7)===month&&
+  (r.source!=='no-transactions'||cardNoTransactionsConfirmed(p,r.cardId,month)));
+}
+
+// Consume a saved debit at most once. Prefer exact transaction/value dates
+// before matching a uniquely eligible later posting or an older undated entry.
+function settledBillingReports(reports,entries,record){
+ const settled=new Set(),unmatched=[];
+ const anchored=record.balance!==undefined;
+ for(const entry of entries){
+  const date=entry.source?.date;
+  if(date&&anchored&&(!record.date||date>record.date))continue;
+  const candidates=date?reports.filter(r=>!settled.has(r)&&cents(r.amount)===-entry.cents&&
+   (r.dueDate===date||r.dueDate===entry.source.valueDate&&r.dueDate<=date)):[];
+  if(candidates.length===1)settled.add(candidates[0]);
+  if(candidates.length===0)unmatched.push(entry);
+ }
+ for(const entry of unmatched){
+  const date=entry.source?.date;
+  if(!date)continue;
+  const candidates=reports.filter(r=>!settled.has(r)&&r.dueDate<=date&&cents(r.amount)===-entry.cents);
+  if(candidates.length===1)settled.add(candidates[0]);
+ }
+ for(const entry of unmatched){
+  if(entry.source?.date)continue;
+  const candidates=reports.filter(r=>!settled.has(r)&&cents(r.amount)===-entry.cents&&
+   (!anchored||record.date&&r.dueDate<=record.date));
+  // An undated debit may already belong to a bill marked included.
+  const report=candidates.find(r=>r.status==='included')??candidates[0];
+  if(report)settled.add(report);
+ }
+ return settled;
+}
+
+export function billingForecastAdjustment(p,id,month,record,values){
+ const byCard=new Map();
+ for(const report of monthlyBillingReports(p,month,r=>r.accountId===id)){
+  if(!byCard.has(report.cardId))byCard.set(report.cardId,[]);
+  byCard.get(report.cardId).push(report);
+ }
+ let amount=0;
+ for(const [cardId,reports] of byCard){
+  const pending=reports.filter(r=>r.status!=='included');
+  if(!pending.length)continue;
+  const manualActual=record?.actual&&!record.fromBank;
+  const storedDate=p.cashPlanning?.months?.[month]?.[id]?.date;
+  // cashSourceRecords uses the next month as a fallback date for manual
+  // records. Without a saved date, the reported amount is the only coverage.
+  const undatedActual=manualActual&&(!record.date||!storedDate&&record.date===monthAt(month,1)+'-01');
+  if(undatedActual){
+   const total=reports.reduce((sum,report)=>sum+cents(report.amount),0);
+   const unconfirmed=pending.reduce((sum,report)=>sum+cents(report.amount),0);
+   amount+=Math.min(unconfirmed,Math.max(0,total-cents(values[cardId]??0)));
+   continue;
+  }
+  const entries=(p.bankImport?.entries??[]).filter(e=>e.accountId===id&&e.field===cardId&&e.month===month&&e.cents<0);
+  const settled=record?.fromBank?settledBillingReports(reports,entries,record):new Set();
+  for(const report of pending){
+   const covered=manualActual&&report.dueDate<=record.date;
+   if(!covered&&!settled.has(report))amount+=cents(report.amount);
+  }
+  // Monthly estimates are already deducted in the base projection. Actuals
+  // are retained, and an account balance replaces that month's base net.
+  if(record?.balance===undefined&&!record?.actual&&!record?.fromBank)amount-=cents(values[cardId]??0);
+ }
+ return amount/100;
+}
 
 // Charge snapshots are read-only; unknown history is never filled from estimates.
 export function cardChargeSnapshot(p,cardId,month,allowEstimate=false){
- const report=(p.cardBilling?.reports??[]).filter(r=>r.cardId===cardId&&r.dueDate.slice(0,7)===month&&(r.source!=='no-transactions'||cardNoTransactionsConfirmed(p,cardId,month))).sort((a,b)=>b.dueDate.localeCompare(a.dueDate))[0];
- if(report)return {amount:report.amount,kind:'updated',date:report.updatedOn,dueDate:report.dueDate,accountId:report.accountId};
+ const reports=monthlyBillingReports(p,month,r=>r.cardId===cardId);
+ if(reports.length){
+  const latest=reports.reduce((a,b)=>a.dueDate>b.dueDate?a:b);
+  const amount=reports.reduce((sum,r)=>sum+cents(r.amount),0)/100;
+  const date=reports.reduce((latest,r)=>r.updatedOn>latest?r.updatedOn:latest,latest.updatedOn);
+  const accountId=reports.every(r=>r.accountId===latest.accountId)?latest.accountId:null;
+  return {amount,kind:'updated',date,dueDate:latest.dueDate,accountId};
+ }
  const accountId=p.cashPlanning?.cardAccounts[cardId]??(cashAccountList(p).length===1?cashAccountList(p)[0].id:null),record=accountId?cashSourceRecords(p,accountId)[month]:null;
  const imported=(p.bankImport?.entries??[]).some(e=>e.accountId===accountId&&e.month===month&&e.field===cardId);
  if(record&&Object.hasOwn(record.values,cardId)&&(!record.fromBank||imported))return {amount:record.values[cardId],kind:record.fromBank?'bank':record.actual?'reported':'estimate',date:record.date??null,accountId};

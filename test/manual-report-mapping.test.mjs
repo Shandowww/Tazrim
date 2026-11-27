@@ -7,6 +7,8 @@ import {isracardWorkbookFixture} from '../tools/bank-csv/isracard-xlsx-fixture.m
 import {inspectIntake} from '../tools/bank-csv/intake-reader.mjs';
 import {mapReportSource,mappingOptions,parseMappingChoice} from '../tools/bank-csv/manual-report-mapping.mjs';
 import {readAutomaticSource} from '../server/report-automation.mjs';
+import {inspectReportSource} from '../frontend/src/app/report-reader.ts';
+import {zero} from '../src/budget.js';
 
 const csv='יום בדוח,הערה,תנועה,יתרה\n04/11/2026,משכורת,7800,9050\n08/11/2026,חשבון,-235,8815\n10/11/2026,תשלום,-1250,7565';
 const bankChoice={kind:'bank',fields:{mode:'signed',date:'0',description:'1',amount:'2',balance:'3'}};
@@ -52,4 +54,40 @@ test('Manual card mapping reuses the original rows and totals and refuses a wron
  duplicate.rows.find(row=>row.line===4).cells[1]='₪ 137.25';
  assert.throws(()=>mapReportSource(duplicate,choice),/כותרת יחידה/);
  assert.equal(mappingOptions({...source,format:'pdf'}),null);
+});
+
+test('Manual and automatic bank intake preserve explicit foreign-currency evidence and reject conflicts',async()=>{
+ const foreign='Date,Description,Amount (USD),Balance (USD)\n04/11/2026,Example,-25,75';
+ const source=inspectCSV(foreign);
+ const automatic=inspectIntake([source]);
+ assert.equal(automatic.kind,'bank');
+ assert.equal(automatic.records[0].currency,'USD');
+ assert.throws(()=>mapReportSource(source,bankChoice),/שורת מקור 2.*USD/);
+ await assert.rejects(readAutomaticSource('foreign.csv',Buffer.from(foreign),{manualMapping:JSON.stringify(bankChoice)}),/שורת מקור 2.*USD/);
+
+ const conflict=foreign.replace('Balance (USD)','Balance (EUR)');
+ assert.equal(inspectIntake([inspectCSV(conflict)]).records[0].valid,false);
+ assert.throws(()=>mapReportSource(inspectCSV(conflict),bankChoice),/המטבע.*אינו תואם/);
+});
+
+test('Mapping evidence identifies header and sample lines for sparse debit and credit columns',()=>{
+ const source=inspectCSV('Bank statement\nDate,Description,Debit,Credit,Balance\n04/11/2026,Example,25,,75\n05/11/2026,Example,,30,105');
+ const {headerLine,columns}=mappingOptions(source);
+ assert.equal(headerLine,2);
+ assert.deepEqual(columns.slice(2,4).map(({sample,sampleLine})=>[sample,sampleLine]),[['25',3],['30',4]]);
+});
+
+test('An explicit field mapping takes precedence over a successful automatic interpretation',async()=>{
+ const plan={startMonth:'2026-01',opening:0,horizon:12,buffer:0,defaults:zero(),demo:false,months:{},expenses:[]};
+ const bytes=Buffer.from('Date,Description,Amount,Balance\n04/11/2026,Example,-25,75\n05/11/2026,Example,-20,55');
+ const signal=new AbortController().signal;
+ const automatic=await inspectReportSource(plan,'sample.csv',bytes,signal);
+ assert.equal(automatic.kind,'bank');
+ assert.equal(automatic.bankOptions,undefined);
+ const mapped=await inspectReportSource(plan,'sample.csv',bytes,signal,{manualMapping:bankChoice});
+ assert.equal(mapped.kind,'bank');
+ assert.equal(mapped.hash,automatic.hash);
+ assert.equal(mapped.bankOptions.scope,'partial');
+ assert.deepEqual(mapped.records.map(row=>row.amountCents),[-2500,-2000]);
+ await assert.rejects(inspectReportSource(plan,'sample.csv',bytes,signal,{manualMapping:{...bankChoice,fields:{...bankChoice.fields,amount:'3'}}}));
 });

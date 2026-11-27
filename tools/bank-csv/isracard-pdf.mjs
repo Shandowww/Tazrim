@@ -30,7 +30,11 @@ export function inspectIsracardPDF(pages){
  for(const [pageIndex,page]of pages.entries()){
   const items=page.items.filter(i=>i.str?.trim()),rows=lines(items),headers=rows.filter(row=>/שםבית(?:ה)?עסק/.test(norm(text(row.items)))&&row.items.some(i=>norm(i.str)==='תאריך'));
   if(!headers.length){
-   const content=norm(text(items)),informational=/מסגרתהכרטיסותנאיהאשראי|הסכומיםושיעוריהריביותנכוניםלמועדהפקתדףריכוזחיובים|דיווחעמלותחצישנתי.*לידיעהבלבד.*לאלתשלום/.test(content);
+   // Fee-change letters accompany some statements. They describe future terms,
+   // not another bill: require the exact subject and the statement's card identity.
+   const feeCards=[...text(items).matchAll(/עבור\s+כרטיס\s+(\d{4})(?!\d)/g)].map(match=>match[1]);
+   const feeNotice=rows.some(row=>norm(text(row.items))==='הנדוןעדכוןבדמיכרטיס')&&feeCards.length===1&&identifiers.includes(feeCards[0]);
+   const content=norm(text(items)),informational=feeNotice||/מסגרתהכרטיסותנאיהאשראי|הסכומיםושיעוריהריביותנכוניםלמועדהפקתדףריכוזחיובים|דיווחעמלותחצישנתי.*לידיעהבלבד.*לאלתשלום/.test(content);
    if(!informational||/שםבית(?:ה)?עסק|סהכחיובלתאריך|רכישותבחול|עסקותשחויבו/.test(content)||items.some(i=>right(i)>510&&datePattern.test(clean(i.str))))throw Error('לא זוהתה טבלת חיובים נתמכת בכל עמוד של דוח ישראכרט.');
    continue;
   }

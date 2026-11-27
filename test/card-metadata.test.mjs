@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 import {zero,clone,validatePlan,forecast} from '../src/budget.js'
 import {cardDateValid,cardDiscountReminderOn,cardMetadataValid} from '../src/card-metadata.js'
-import {initialCardDraft,prepareCardConfig} from '../frontend/src/app/card-command.ts'
+import {initialCardDraft,prepareCardConfig,reportCardSeed} from '../frontend/src/app/card-command.ts'
 import {actionIssues,actionIssueVisible,validActionTarget} from '../src/action-center-model.js'
 import {reportActionDestination} from '../frontend/src/app/action-center-api.ts'
 import {savedCardProvider,savedCardIssuer,savedCardNetwork} from '../frontend/src/app/budget-adapter.js'
@@ -20,6 +20,22 @@ test('Optional metadata round-trips, clears deliberately and preserves every exi
  const changed=prepareCardConfig(next,'card1',{...initialCardDraft(next,'card1'),issuer:'max'});assert.equal(savedCardProvider(changed,changed.creditCards[0]),'max');assert.equal(changed.creditCards[0].provider,'cal')
  const cleared=prepareCardConfig(next,'card1',{...initialCardDraft(next,'card1'),issuer:'',club:'',network:'',discountEndsOn:'',feeAfterDiscount:'',issuerPhone:''});assert.deepEqual(cleared,p)
  const free=prepareCardConfig(p,'card1',{...draft(p),feeAfterDiscount:'0'});assert.equal(free.creditCards[0].feeAfterDiscount,0)
+})
+test('Recognized unfamiliar statement prefills metadata without creating a bill or assigning a payer',()=>{
+ const p=base(),before=clone(p)
+ const report={kind:'card',provider:'isracard',identity:'isracard:7234',report:{last4:'7234',dueDate:'2026-10-10',cardName:'אמריקן אקספרס זהב',network:'amex'}}
+ const seed=reportCardSeed(p,report)
+ assert.deepEqual(seed,{issuer:'isracard',alias:'7234',name:'אמריקן אקספרס זהב',billingDay:'10',network:'amex'})
+ const next=prepareCardConfig(p,'card_report',{...initialCardDraft(p,''),...seed},true)
+ assert.deepEqual(next.creditCards.at(-1),{id:'card_report',name:seed.name,alias:'7234',billingDay:10,issuer:'isracard',network:'amex'})
+ assert.equal(next.defaults.card_report,0)
+ for(const key of ['months','expenses','cardBilling','reportInbox','cashPlanning'])assert.deepEqual(next[key],p[key])
+ assert.deepEqual(p,before)
+ const cal={kind:'card',identity:'cal:0021',provider:'cal',report:{dueDate:'2026-02-31'}}
+ assert.deepEqual(reportCardSeed(p,cal),{issuer:'cal',alias:'0021',name:'כאל 0021',billingDay:''})
+ for(const item of [{...report,kind:'bank'},{...report,identity:''},{...report,provider:'cal'},{...report,report:{last4:'1234'}},{...cal,identity:'cal:0394'}])assert.equal(reportCardSeed(p,item),null)
+ assert.equal(reportCardSeed(next,report),null)
+ assert.equal(reportCardSeed(null,report),null)
 })
 test('Malformed optional data is refused by commands and the shared server/import validator',()=>{
  const p=base(),d=draft(p)

@@ -10,6 +10,7 @@ import {createTransferMatches} from './transfer-matches.mjs';
 import {createActions} from './actions.mjs';
 import {createStatementNotices} from './statement-notices.mjs';
 import {reactUiResponse} from './react-ui.mjs';
+import {appEntryDestination} from './app-entry.mjs';
 import {randomBytes,createHash,randomUUID} from 'node:crypto';
 import {queryFinancialTransactions} from './financial-data.mjs';
 import {createApplePay} from './apple-pay.mjs';
@@ -29,7 +30,24 @@ const response=(body,status=200,extra={})=>new Response(body,{status,headers:{..
 const redirect=(url,setCookie)=>response(null,303,{Location:url,...(setCookie?{'Set-Cookie':setCookie}:{})});
 const json=(body,status)=>response(JSON.stringify(body),status,{'Content-Type':'application/json; charset=utf-8'});
 const safeReturn=value=>value?.startsWith('/')&&!value.startsWith('//')&&!value.includes('\\')?value:'/';
-const loginPage=(message,returnTo='/')=>`<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Budgit · כניסה</title><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-v1.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon-v1.png"><link rel="manifest" href="/manifest.webmanifest"><style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:light-dark(#f8f5f0,#1b1e27);color:light-dark(#272735,#eee);font-family:-apple-system,BlinkMacSystemFont,system-ui}main{margin:20px;padding:32px;max-width:360px;border-radius:24px;background:light-dark(#fff,#282c38)}h1{font-size:28px}p{line-height:1.6}a{display:block;text-align:center;padding:14px;background:#7056b2;color:white;border-radius:16px;text-decoration:none;font-weight:600}.error{color:light-dark(#b52c25,#ffb3ae)}</style><main><h1>Budgit</h1><p>מתחברים כדי לפתוח את התקציב הפרטי, או תקציב משותף שהוזמנת אליו.</p>${message?'<p class="error" role="alert">'+message+'</p>':''}<a href="${returnTo==='/'?'/auth/google':'/auth/google?returnTo='+encodeURIComponent(safeReturn(returnTo))}">כניסה עם Google</a><p>הכניסה נותנת גישה לפרופיל ולאימייל בלבד, ללא גישה לבנק או לקבצי Google.</p></main></html>`;
+// Keep the invitation in this tab while signing in, outside URLs sent to the server.
+const invitationLoginScript=String.raw`<script>
+  const invite = new URLSearchParams(location.hash.slice(1)).get('invite') || '';
+  if (/^[a-f0-9]{64}$/.test(invite)) {
+    document.querySelector('main a').addEventListener('click', event => {
+      const link = event.currentTarget;
+      const auth = new URL(link.href);
+      const destination = new URL(auth.searchParams.get('returnTo') || '/next', location.origin);
+      destination.pathname = '/next/settings/spaces';
+      try {
+        sessionStorage.setItem('budgit-pending-space-invite', invite);
+        auth.searchParams.set('returnTo', destination.pathname + destination.search);
+        link.href = auth.href;
+      } catch {}
+    });
+  }
+</script>`;
+const loginPage=(message,returnTo='/')=>`<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Budgit · כניסה</title><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-v1.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon-v1.png"><link rel="manifest" href="/manifest.webmanifest"><style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:light-dark(#f8f5f0,#1b1e27);color:light-dark(#272735,#eee);font-family:-apple-system,BlinkMacSystemFont,system-ui}main{margin:20px;padding:32px;max-width:360px;border-radius:24px;background:light-dark(#fff,#282c38)}h1{font-size:28px}p{line-height:1.6}a{display:block;text-align:center;padding:14px;background:#7056b2;color:white;border-radius:16px;text-decoration:none;font-weight:600}.error{color:light-dark(#b52c25,#ffb3ae)}</style><main><h1>Budgit</h1><p>מתחברים כדי לפתוח את התקציב הפרטי, או תקציב משותף שהוזמנת אליו.</p>${message?'<p class="error" role="alert">'+message+'</p>':''}<a href="${returnTo==='/'?'/auth/google':'/auth/google?returnTo='+encodeURIComponent(safeReturn(returnTo))}">כניסה עם Google</a><p>הכניסה נותנת גישה לפרופיל ולאימייל בלבד, ללא גישה לבנק או לקבצי Google.</p></main>${invitationLoginScript}</html>`;
 export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],adminEmails=[],rates,push,backup,oauth,gmailOAuthFactory,purchaseNotesOAuthFactory,rowCategoriesSupported=true,reactAssetArchiveRoot,reportOptions={},reportAutomationEnabled=false,reportRetentionEnabled=false,automationOptions={},now=()=>Date.now()}){
  const base=new URL(origin);if(base.protocol!=='https:'||base.pathname!=='/'||base.search||base.hash)throw Error('APP_ORIGIN must be an HTTPS origin');
  const normalize=value=>(Array.isArray(value)?value:String(value).split(/[,\s]+/)).map(email=>email.trim().toLowerCase()).filter(Boolean);
@@ -51,9 +69,8 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  const actions=createActions(db,{isAllowed,now,reports:reportStore.list,incomingReports:reportIntake.pending,prepareStatementNotices:statementNotices.recoverCardSuffixes,statementNotices:scope=>statementNotices.snapshot(scope).notices,isAdmin:user=>admins.has(user.email.toLowerCase())});
  origin=base.origin;const wallet=createApplePay(db,{origin,now,isAllowed});const configured=!!(clientId&&clientSecret);oauth??=new OAuth2Client(clientId,clientSecret,origin+'/auth/google/callback');
  const handle=async function handle(request,{ip='unknown'}={}){
- const u=new URL(request.url),path=u.pathname,time=now(),loginTarget=path==='/'&&u.search||path==='/next'||path.startsWith('/next/')?path+u.search:'/';const jar=cookies(request);
- // Existing installed icons launch the bare root; explicit legacy bridges retain their query.
- if(path==='/'&&!u.search&&['GET','HEAD'].includes(request.method))return redirect(jar['budgit-interface']==='original'?'/?mf-view=home':'/next');
+ const u=new URL(request.url),path=u.pathname,time=now(),loginTarget=path==='/next'||path.startsWith('/next/')?path+u.search:'/next';const jar=cookies(request);
+ if(path==='/'&&['GET','HEAD'].includes(request.method))return redirect(appEntryDestination(u.searchParams));
  const session=jar['__Host-mf_session'],user=session?db.prepare('SELECT u.id,u.email FROM auth_sessions s JOIN auth_users u ON u.id=s.user_id WHERE s.hash=? AND s.expires_at>?').get(digest(session),time):null;
  const cleanup=()=>{for(const table of ['auth_pending','auth_sessions','auth_limits'])db.prepare(`DELETE FROM ${table} WHERE expires_at<=?`).run(time)};
  if((path==='/shortcuts/budgit-incoming.shortcut'||path==='/shortcuts/install'||path==='/shortcuts/budgit-apple-pay-ios27.shortcut'||path==='/shortcuts/budgit-apple-pay.shortcut'||path==='/manifest.webmanifest'||path==='/sw.js'||/^\/icons\/[a-zA-Z0-9.-]+\.(png|ico)$/.test(path)||path==='/favicon.ico')&&['GET','HEAD'].includes(request.method)){const assetRequest=new Request(origin+(path==='/favicon.ico'?'/icons/favicon-v1.png':path),{method:request.method});const r=await worker.fetch(assetRequest,{DB});const h=new Headers(r.headers);for(const [k,v]of Object.entries(headers))if(k!=='Cache-Control')h.set(k,v);if(path==='/sw.js')h.set('Service-Worker-Allowed','/');if(path==='/shortcuts/install'&&request.method==='GET'&&r.ok){const html=await r.text();h.set('Content-Security-Policy',scriptReportPolicy(html));return new Response(html,{status:r.status,headers:h});}return new Response(r.body,{status:r.status,headers:h});}
@@ -148,7 +165,6 @@ export function createApp({db,DB,origin,clientId,clientSecret,allowedEmails=[],a
  clean.set('oai-authenticated-user-id',user.id);clean.set('oai-authenticated-user-email',user.email);
  const r=await worker.fetch(new Request(origin+u.pathname+u.search,{method:request.method,headers:clean,body:['GET','HEAD'].includes(request.method)?undefined:await request.arrayBuffer()}),{DB:path==='/api/plan'&&request.method==='PUT'?history.storage(DB,user,u.searchParams.get('budget')||'personal'):DB});
  const h=new Headers(r.headers);for(const [k,v]of Object.entries(headers))h.set(k,v);
- if(path==='/'&&r.ok){h.set('Content-Type','text/html; charset=utf-8');const html=(await r.text()).replace('<head>','<head><script>window.monthlyFlowStandalone=true;window.monthlyFlowAdmin='+JSON.stringify(admins.has(user.email))+';</script>');h.set('Content-Security-Policy',scriptReportPolicy(html));return new Response(html,{status:r.status,headers:h});}
  return new Response(r.body,{status:r.status,headers:h});
  };
  return Object.assign(handle,{tickGmail:gmail.tick,tickReportAutomation:async()=>{await reportAutomation?.tick();await reportStore.lifecycle.sweep();}});

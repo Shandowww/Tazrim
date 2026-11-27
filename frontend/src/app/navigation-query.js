@@ -1,4 +1,3 @@
-import {legacyInterfaceHref} from '../../../src/interface-destination.js'
 export function scrollRouteSearch(pathname,search){const query=new URLSearchParams(search);if(pathname==='/accounts')query.delete('walletCard');query.sort();return query.toString()}
 /** Keep the selected budget space and display period across internal routes. */
 export function withViewQuery(href, search, development = false) {
@@ -10,11 +9,6 @@ export function withViewQuery(href, search, development = false) {
   }
   if (development && !next.has('demo') && current.get('demo') === '1') next.set('demo', '1')
   return `${path}${next.size ? `?${next}` : ''}`
-}
-
-/** Existing editor bridge keeps the explicitly selected space, never a prior device selection. */
-export function legacyBudgetHref(search,view='home',reportId='') {
-  return legacyInterfaceHref(search,view,/^[a-f0-9-]{36}$/.test(reportId)?reportId:'')
 }
 
 /** Detail links carry only presentation filters; identity always stays in the URL. */

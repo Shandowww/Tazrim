@@ -137,3 +137,47 @@ test('CSV decoding and delimiter detection retain mixed locale debit/credit amou
   assert.deepEqual(result.records.map(r=>r.balanceCents),[-100025,1134542]);
  }
 });
+
+test('Mapped currency headers and labeled report currency take precedence over the shekel fallback',()=>{
+ for(const [heading,currency] of [['Amount (USD)','USD'],['Amount in EUR','EUR'],['Amount [GBP]','GBP'],['סכום עסקה ₪','ILS'],['Amount (CHF)','CHF']]){
+  const inspection=inspectCSV(`Date,Description,${heading}\n04/11/2026,Example,-45.25`);
+  assert.equal(inspection.mapping.amount,2);
+  const result=normalizeRows(inspection,{defaultCurrency:'ILS'});
+  assert.equal(result.records[0].currency,currency);
+  assert.equal(result.records[0].amountCents,-4525);
+  assert.equal(result.summary.count,currency==='ILS'?1:0);
+ }
+ const preamble=inspectCSV('Statement currency: EUR\nDate,Description,Amount,Balance\n04/11/2026,Example,-45.25,108');
+ assert.equal(normalizeRows(preamble,{defaultCurrency:'ILS'}).records[0].currency,'EUR');
+ const incidental=inspectCSV('USD Investments\nDate,Description,Amount,Balance\n04/11/2026,EUR merchant,-45.25,108');
+ assert.equal(normalizeRows(incidental,{defaultCurrency:'ILS'}).records[0].currency,'ILS');
+});
+
+test('Conflicting mapped financial headers and explicit row currency evidence invalidate the row',()=>{
+ for(const [header,row] of [
+  ['Debit (USD),Credit (EUR),Balance (USD),Currency','10,,90,USD'],
+  ['Amount (USD),Balance (USD),Currency','-10,90,ILS'],
+  ['Amount (USD),Balance (USD),Currency','-10,₪90,USD'],
+  ['Amount (ILS),Balance (EUR),Currency','-10,90,'],
+ ]){
+  const inspection=inspectCSV(`Date,Description,${header}\n04/11/2026,Example,${row}`);
+  const result=normalizeRows(inspection,{defaultCurrency:'ILS'});
+  assert.equal(result.records[0].valid,false);
+  assert.match(result.records[0].issues.join(' '),/המטבע.*אינו תואם/);
+  assert.equal(result.summary.count,0);
+ }
+});
+
+test('Currency evidence is scoped to mapped financial columns and each row’s explicit currency',()=>{
+ const csv='Date,Description,Amount (ILS),Amount (USD),Balance (ILS)\n04/11/2026,Example,-25,-7,75';
+ const inspection=inspectCSV(csv);
+ assert.equal(inspection.mapping.amount,-1);
+ const result=normalizeRows(inspection,{mapping:{...inspection.mapping,amount:2},defaultCurrency:'ILS'});
+ assert.equal(result.records[0].currency,'ILS');
+ assert.equal(result.records[0].valid,true);
+ assert.equal(result.summary.netCents,-2500);
+
+ const mixed=normalizeRows(inspectCSV('Date,Description,Amount,Currency\n04/11/2026,A,-25,ILS\n05/11/2026,B,-7,USD'));
+ assert.deepEqual(mixed.records.map(record=>record.currency),['ILS','USD']);
+ assert.equal(mixed.summary.netCents,-2500);
+});

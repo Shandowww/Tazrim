@@ -11,13 +11,13 @@ function render(plan,search='?year=2026&month=10&budget=family',personal=false){
  return renderToStaticMarkup(React.createElement(module.exports.HouseholdHome,{plan,asOf:'2026-11',personal}))
 }
 function plan(){const p=clone(demoPlan);p.startMonth='2026-01';p.expenses=[];p.months={'2026-10':{actual:true,includesPlannedCard:true,values:{...zero(),salary:0,card1:-12.34}}};return p}
-test('Overview renders reported zero and signed refunds, keeps subset wording and never mutates the budget',()=>{
+test('Overview renders reported zero and signed refunds, identifies card evidence and never mutates the budget',()=>{
  const p=plan(),before=JSON.stringify(p),markup=render(p)
- assert.ok(markup.includes('-12.34'));assert.match(markup,/כלול בסך ההוצאות/);assert.match(markup,/<span>כניסות<\/span>/);assert.match(markup,/<span>מתוכן בכרטיסים<\/span>/);assert.equal((markup.match(/data-missing="true"/g)??[]).length,0);assert.equal(JSON.stringify(p),before)
+ assert.ok(markup.includes('-12.34'));assert.match(markup,/לפי דיווחי הכרטיסים וחיובי הבנק/);assert.match(markup,/<span>כניסות<\/span>/);assert.match(markup,/<span>חיובי כרטיסים<\/span>/);assert.equal((markup.match(/data-missing="true"/g)??[]).length,0);assert.equal(JSON.stringify(p),before)
  const personalMarkup=render(p,'?year=2026&month=10',true)
  assert.match(personalMarkup,/<span>הכנסות<\/span>/)
  assert.match(personalMarkup,/<span>הוצאות בכרטיס<\/span>/)
- assert.match(personalMarkup,/כלול בסך ההוצאות/)
+ assert.match(personalMarkup,/לפי דיווחי הכרטיסים וחיובי הבנק/)
  assert.equal(JSON.stringify(p),before)
 })
 test('A missing historical month is explicitly missing rather than displayed as zero',()=>{

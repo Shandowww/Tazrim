@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { clone, demoPlan, zero, validatePlan } from '../src/budget.js'
 import { budgetAccountOverview, budgetDashboard, budgetNavigation, summarizeBankBalances } from '../frontend/src/app/budget-adapter.js'
-import { withViewQuery, legacyBudgetHref, scrollRouteSearch } from '../frontend/src/app/navigation-query.js'
+import { withViewQuery, scrollRouteSearch } from '../frontend/src/app/navigation-query.js'
 test('Wallet card switches share the account-page scroll position, never another period, space, filter or route',()=>{
  const selected='?walletCard=card1&year=2026&month=10&budget=family'
  assert.equal(scrollRouteSearch('/accounts',selected),scrollRouteSearch('/accounts','?budget=family&month=10&year=2026&walletCard=card2'))
@@ -78,11 +78,7 @@ test('React navigation keeps the selected budget and period across account pages
   assert.equal(withViewQuery('/cards?budget=other', '?budget=shared&year=2026'), '/cards?budget=other&year=2026')
 })
 
-test('Existing-editor bridges explicitly retain personal/shared identity and discard unrelated navigation parameters', () => {
-  assert.equal(legacyBudgetHref(''), '/?budget=personal')
-  assert.equal(legacyBudgetHref('?budget=house','reports','invalid-route-id'), '/?budget=house&mf-view=reports')
-  assert.equal(legacyBudgetHref('?budget=house&year=2026&month=10'), '/?budget=house&year=2026&month=10')
-  assert.equal(legacyBudgetHref('?budget=a%26b&demo=1'), '/?budget=a%26b')
+test('React links retain explicit scope and development-only demo context', () => {
   assert.equal(withViewQuery('/cards/card1', '?budget=house&year=2026&month=10&demo=1', true), '/cards/card1?year=2026&month=10&budget=house&demo=1')
   assert.equal(withViewQuery('/cards/card1', '?demo=1', false), '/cards/card1')
 })

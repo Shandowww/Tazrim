@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {demoPlan,clone,forecast,validatePlan,indexMonth,defaultBudgetMonth,latestExpenseDataMonth} from '../src/budget.js';
-const source=fs.readFileSync(new URL('../src/client.js',import.meta.url),'utf8');
+const source=fs.readFileSync(new URL('./fixtures/retired-interface/client.js',import.meta.url),'utf8');
 function gesture(){
  const handlers={},indicator={hidden:true,style:{setProperty(){}}};let refreshes=0,prevented=0;
  const document={scrollingElement:{scrollTop:0},querySelector:()=>null,getElementById:()=>indicator,addEventListener:(k,fn)=>handlers[k]=fn};

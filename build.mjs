@@ -1,7 +1,7 @@
 import {verifyVendors} from './scripts/verify-vendor.mjs';
 verifyVendors();
 import {createHash} from 'node:crypto';
-import {readFileSync,writeFileSync,mkdirSync,copyFileSync,readdirSync,cpSync,statSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,copyFileSync,readdirSync,cpSync,statSync,rmSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 const authority=JSON.parse(readFileSync('SOURCE-OF-TRUTH.json','utf8'));
 const hosting=JSON.parse(readFileSync('.openai/hosting.json','utf8'));
@@ -9,25 +9,6 @@ if(hosting.project_id!==authority.project_id)throw Error('Wrong Site identity: u
 const frontendSources=(folder)=>readdirSync(folder).sort().flatMap(name=>{const path=folder+'/'+name;if(name==='node_modules'||name==='dist')return[];return statSync(path).isDirectory()?frontendSources(path):[path]});
 const buildId=createHash('sha256').update(readdirSync('src').sort().map(name=>name+'\n'+readFileSync('src/'+name,'utf8')).join('\n')).update(readdirSync('tools/bank-csv').filter(name=>/\.(?:mjs|js)$/.test(name)&&!/(?:test|fixture|serve)/.test(name)).sort().map(name=>name+'\n'+readFileSync('tools/bank-csv/'+name,'utf8')).join('\n')).update(frontendSources('frontend/src').map(name=>name+'\n'+readFileSync(name)).join('\n')).digest('hex').slice(0,10);
 execFileSync('npm',['run','build'],{cwd:'frontend',stdio:'inherit'});
-let html=readFileSync('src/index.html','utf8').replace('/*STYLE*/',readFileSync('src/style.css','utf8')+'\n'+readFileSync('src/details.css','utf8')+'\n'+readFileSync('src/spaces.css','utf8')+'\n'+readFileSync('src/savings.css','utf8')+'\n'+readFileSync('src/savings-art.css','utf8')+'\n'+readFileSync('src/design.css','utf8')+'\n'+readFileSync('src/wallet-design.css','utf8')+'\n'+readFileSync('src/action-center.css','utf8')+'\n'+readFileSync('src/tazrim-theme.css','utf8'));
-html=html.replace('/*THEME*/',()=>readFileSync('src/theme.js','utf8'));
-const model=readFileSync('src/card-metadata.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/reconciliation-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/card-billing-model.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/budget.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/investment-model.js','utf8').replaceAll(/^export /gm,'');
-const growth=readFileSync('src/savings-growth.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'');
-const vault=readFileSync('src/vault.js','utf8').replaceAll(/^export /gm,'');
-const bankCardSettlement=readFileSync('src/bank-card-settlement.js','utf8').replace(/^import .*;\n/,'').replaceAll(/^export /gm,'');
-const bankModel=readFileSync('src/bank-import-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const statusModel=readFileSync('src/status-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const statementModel=readFileSync('src/card-statement-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const planningModel=readFileSync('src/planning-insights-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const actionModel=readFileSync('src/action-center-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const inboxModel=readFileSync('src/report-inbox-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const inboxController=readFileSync('src/report-bank-match.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/report-inbox-controller.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const interfaceDestination=readFileSync('src/interface-destination.js','utf8').replaceAll(/^export /gm,'');
-const transferCrypto=readFileSync('src/transfer-match-crypto.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const transferModel=readFileSync('src/transfer-matching-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const savingsOwnershipModel=readFileSync('src/space-savings-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'');
-const client=readFileSync('src/space-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+savingsOwnershipModel+'\n'+readFileSync('src/savings-migration-controller.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/space-savings-client.js','utf8')+'\n'+readFileSync('src/merchant-categories.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/amount-inputs.js','utf8')+'\n'+readFileSync('src/client.js','utf8')+'\n'+readFileSync('src/planner.js','utf8')+'\n'+readFileSync('src/details.js','utf8')+'\n'+readFileSync('src/space-overview-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+transferModel+'\n'+transferCrypto+'\n'+readFileSync('src/transfer-match-commands.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/migration-controller.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/space-migration-execution-client.js','utf8')+'\n'+readFileSync('src/space-migration-client.js','utf8')+'\n'+readFileSync('src/space-transfer-vaults-client.js','utf8')+'\n'+readFileSync('src/space-transfers-client.js','utf8')+'\n'+readFileSync('src/spaces.js','utf8')+'\n'+readFileSync('src/space-overview-client.js','utf8')+'\n'+readFileSync('src/security.js','utf8')+'\n'+readFileSync('src/navigation.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/savings-art.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/savings.js','utf8')+'\n'+readFileSync('src/savings-accounts.js','utf8')+'\n'+readFileSync('src/savings-growth-client.js','utf8')+'\n'+readFileSync('src/wallet-installation-view.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/wallet-ui-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/apple-pay-client.js','utf8')+'\n'+readFileSync('src/onboarding.js','utf8')+'\n'+readFileSync('src/wallet-design.js','utf8')+'\n'+readFileSync('src/cards.js','utf8')+'\n'+readFileSync('src/drive-backup-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/drive-backup-client.js','utf8')+'\n'+readFileSync('src/investment.js','utf8')+'\n'+readFileSync('src/device-drafts.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/drafts.js','utf8')+'\n'+readFileSync('src/expense-annotations-client.js','utf8')+'\n'+readFileSync('src/reports.js','utf8')+'\n'+readFileSync('src/source-allocation-ui.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/consumption-client.js','utf8')+'\n'+readFileSync('src/analysis-view-commands.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/analysis-filters-client.js','utf8')+'\n'+readFileSync('src/periodic-ui-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/periodic-links-client.js','utf8')+'\n'+readFileSync('src/household-review-client.js','utf8')+'\n'+readFileSync('src/insight-ui-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/insight-scenarios-client.js','utf8')+'\n'+readFileSync('src/loans.js','utf8')+'\n'+readFileSync('src/home.js','utf8')+'\n'+readFileSync('src/save-dock.js','utf8')+'\n'+readFileSync('src/bank-import-client.js','utf8')+'\n'+readFileSync('src/cash-accounts.js','utf8')+'\n'+readFileSync('src/card-billing-client.js','utf8')+'\n'+readFileSync('src/report-inbox-client.js','utf8')+'\n'+readFileSync('src/stored-reports-client.js','utf8')+'\n'+readFileSync('src/action-center-client.js','utf8')+'\n'+readFileSync('src/category-disclosure-client.js','utf8')+'\n'+readFileSync('src/planning-insights-client.js','utf8')+'\n'+readFileSync('src/gmail-ui-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+readFileSync('src/gmail-client.js','utf8')+'\n'+readFileSync('src/plan-history-client.js','utf8');
-html=html.replace('/*SCRIPT*/',()=>model+'\n'+planningModel+'\n'+actionModel+'\n'+statementModel+'\n'+statusModel+'\n'+bankCardSettlement+'\n'+bankModel+'\n'+inboxModel+'\n'+inboxController+'\n'+interfaceDestination+'\n'+growth+'\n'+vault+'\n'+readFileSync('src/vault-device.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,'')+'\n'+client.replaceAll('__BUILD_ID__',buildId));
 mkdirSync('dist/server',{recursive:true});
 
 // Stage 2 reuses the same pure controller graph and bounded document readers.
@@ -43,7 +24,6 @@ copyFileSync('tools/bank-csv/parser.mjs','dist/server/parser.mjs');
 copyFileSync('tools/bank-csv/cal-pdf.mjs','dist/server/cal-pdf.mjs');
 copyFileSync('tools/bank-csv/statement-notices.mjs','dist/server/statement-notices.mjs');
 cpSync('frontend/dist','dist/frontend',{recursive:true,force:true});
-writeFileSync('dist/server/page.js','export const html = '+JSON.stringify(html)+';\n');
 copyFileSync('src/worker.js','dist/server/index.js');
 copyFileSync('src/budget.js','dist/server/budget.js');
 copyFileSync('src/reconciliation-model.js','dist/server/reconciliation-model.js');
@@ -61,7 +41,8 @@ copyFileSync('src/manual-account-migration.js','dist/server/manual-account-migra
 copyFileSync('src/card-account-migration.js','dist/server/card-account-migration.js');
 copyFileSync('src/transfer-matching-model.js','dist/server/transfer-matching-model.js');
 copyFileSync('src/vault.js','dist/server/vault.js');
-writeFileSync('dist/index.html',html);
+rmSync('dist/index.html',{force:true});
+rmSync('dist/server/page.js',{force:true});
 const assets={'/sw.js':{type:'text/javascript; charset=utf-8',data:readFileSync('public/sw.js').toString('base64')}};
 for(const name of readdirSync('public/icons')){if(!name.endsWith('.png'))continue;assets['/icons/'+name]={type:'image/png',data:readFileSync('public/icons/'+name).toString('base64')};}
 assets['/shortcuts/install']={type:'text/html; charset=utf-8',data:Buffer.from(readFileSync('public/shortcut-install.html','utf8').replace('/*THEME*/',()=>readFileSync('src/theme.js','utf8'))).toString('base64')};

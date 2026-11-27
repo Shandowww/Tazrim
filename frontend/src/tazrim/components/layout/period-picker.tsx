@@ -10,16 +10,16 @@ import { stepPeriod, type Period } from '@/lib/period'
 const MONTHS = monthsArray()
 
 const ARROW =
-  'flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  'flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40'
 const CELL =
-  'h-10 rounded-[10px] text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  'h-10 rounded-[10px] text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40'
 const PICKED = 'bg-primary font-semibold text-primary-foreground'
 const IDLE = 'border border-foreground/[0.06] bg-foreground/[0.04] hover:bg-foreground/[0.08]'
-// Months that haven't happened yet: still pickable, drawn as empty slots
+// Future months are drawn as empty slots; only next month can be picked.
 const LATER = 'border border-dashed border-foreground/[0.12] text-muted-foreground/70 hover:bg-foreground/[0.04]'
 
 /** Desktop sidebar periods step across years and open a month grid beside the controls. */
-export function PeriodPicker({ period, onChange }: { period: Period; onChange: (next: Period) => void }) {
+export function PeriodPicker({ period, latestYear, canSelect, onChange }: { period: Period; latestYear: number; canSelect: (period: Period) => boolean; onChange: (next: Period) => void }) {
   const [open, setOpen] = useState(false)
   const [viewYear, setViewYear] = useState(period.year)
   const [anchor, setAnchor] = useState({ edge: 0, left: 0, above: true })
@@ -32,7 +32,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
 
   function openChange(next: boolean) {
     if (next) {
-      setViewYear(period.year)
+      setViewYear(Math.min(period.year,latestYear))
       const r = trigger.current?.getBoundingClientRect()
       if (r) {
         const below = window.innerHeight - r.bottom
@@ -48,13 +48,14 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
   }
 
   function pick(next: Period) {
+    if (!canSelect(next)) return
     onChange(next)
     setOpen(false)
   }
 
   return (
     <div className="flex h-9 items-center gap-0.5 rounded-xl border border-border bg-muted/70 p-0.5">
-      <button type="button" aria-label="התקופה הקודמת" onClick={() => onChange(stepPeriod(period, -1))} className={ARROW}>
+      <button type="button" aria-label="התקופה הקודמת" disabled={!canSelect(stepPeriod(period, -1))} onClick={() => onChange(stepPeriod(period, -1))} className={ARROW}>
         <ChevronRight className="h-4 w-4" aria-hidden />
       </button>
 
@@ -76,7 +77,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
             aria-describedby={undefined}
             // Focus starts on the picked month (or "כל השנה")
             onOpenAutoFocus={e => {
-              const picked = (e.currentTarget as HTMLElement).querySelector<HTMLElement>('[aria-pressed="true"]')
+              const picked = (e.currentTarget as HTMLElement).querySelector<HTMLElement>('[aria-pressed="true"]:not(:disabled)')
               if (!picked) return
               e.preventDefault()
               picked.focus()
@@ -90,11 +91,11 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
           >
             <Dialog.Title className="sr-only">בחירת תקופה</Dialog.Title>
             <div className="flex shrink-0 items-center justify-between">
-              <button type="button" aria-label="השנה הקודמת" onClick={() => setViewYear(y => y - 1)} className={ARROW}>
+              <button type="button" aria-label="השנה הקודמת" disabled={viewYear<=2000} onClick={() => setViewYear(y => y - 1)} className={ARROW}>
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </button>
               <span className="text-base font-semibold tabular-nums" aria-live="polite">{viewYear}</span>
-              <button type="button" aria-label="השנה הבאה" onClick={() => setViewYear(y => y + 1)} className={ARROW}>
+              <button type="button" aria-label="השנה הבאה" disabled={viewYear>=latestYear} onClick={() => setViewYear(y => y + 1)} className={ARROW}>
                 <ChevronLeft className="h-4 w-4" aria-hidden />
               </button>
             </div>
@@ -107,6 +108,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
                     key={m.value}
                     type="button"
                     aria-pressed={picked}
+                    disabled={!canSelect({year:viewYear,month:m.value})}
                     onClick={() => pick({ year: viewYear, month: m.value })}
                     className={cn(CELL, picked ? PICKED : later ? LATER : IDLE)}
                   >
@@ -118,6 +120,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
             <button
               type="button"
               aria-pressed={period.year === viewYear && !period.month}
+              disabled={!canSelect({year:viewYear})}
               onClick={() => pick({ year: viewYear })}
               className={cn(
                 CELL, 'shrink-0',
@@ -130,7 +133,7 @@ export function PeriodPicker({ period, onChange }: { period: Period; onChange: (
         </Dialog.Portal>
       </Dialog.Root>
 
-      <button type="button" aria-label="התקופה הבאה" onClick={() => onChange(stepPeriod(period, 1))} className={ARROW}>
+      <button type="button" aria-label="התקופה הבאה" disabled={!canSelect(stepPeriod(period, 1))} onClick={() => onChange(stepPeriod(period, 1))} className={ARROW}>
         <ChevronLeft className="h-4 w-4" aria-hidden />
       </button>
     </div>

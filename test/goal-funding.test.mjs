@@ -44,7 +44,7 @@ test('Calculator cannot use another space or a rich sibling account to cover the
 
 function client(){
  const c=vm.createContext({...budget,...art,plan:fixture(),activeBudget:'personal',demoPreview:false,loaded:true,loading:false,saving:false,crypto,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>null},todayMonth:()=> '2026-10',esc:String,notify(){},render(){},budgetMeta:()=>({role:'owner'}),mutate(next){c.plan=next;c.dirty=true;return true;}});
- vm.runInContext(readFileSync('src/savings.js','utf8'),c);return{c,run:s=>vm.runInContext(s,c)};
+ vm.runInContext(readFileSync('test/fixtures/retired-interface/savings.js','utf8'),c);return{c,run:s=>vm.runInContext(s,c)};
 }
 test('Funding UI lists only local bank labels and leaves legacy goals unassigned',()=>{
  const {c}=client();const fields=c.savingsFundingFields(c.plan.savingsGoals.items[0]);assert.match(fields,/חשבון ראשון/);assert.match(fields,/חשבון שני/);assert.doesNotMatch(fields,/checked/);assert.match(c.savingsFundingView(c.plan.savingsGoals.items[0]),/ללא שיוך/);

@@ -1,7 +1,7 @@
 import {modeAllows} from './interface-mode-model.js'
 
 export const navigationLabels={
- overview:'תמונה כללית',accounts:'חשבונות',sync:'סנכרון דוחות',sources:'מקורות והעלאה',
+ overview:'תמונה כללית',accounts:'חשבונות',sync:'סנכרון דוחות',sources:'מקורות והעלאה',analysis:'השוואות וניתוח מקורות',
  spending:'הוצאות',planning:'תכנון',savings:'חיסכון',settings:'הגדרות',
 }
 
@@ -9,8 +9,8 @@ export const navigationLabels={
 export const navigationSections=[
  {key:'overview',label:navigationLabels.overview,description:'המצב החודשי במבט אחד',items:[['/',navigationLabels.overview]]},
  {key:'accounts',label:navigationLabels.accounts,description:'בנקים, כרטיסים והעברות',items:[['/accounts','בנקים וכרטיסים'],['/accounts/transfers','העברות בין חשבונות']]},
- {key:'reports',label:navigationLabels.sync,description:'תיבת כניסה, מקורות והיסטוריה',items:[['/incoming',navigationLabels.sync],['/upload',navigationLabels.sources],['/upload/history','היסטוריית קליטה']]},
- {key:'spending',label:navigationLabels.spending,description:'קטגוריות, השוואות וחיובים קבועים',items:[['/categories','קטגוריות ופירוט'],['/analysis','השוואות'],['/recurring','חיובים קבועים']]},
+ {key:'reports',label:navigationLabels.sync,description:'תיבת כניסה, מקורות והיסטוריה',items:[['/incoming',navigationLabels.sync]]},
+ {key:'spending',label:navigationLabels.spending,description:'קטגוריות, השוואות וחיובים קבועים',items:[['/categories','קטגוריות ופירוט'],['/analysis',navigationLabels.analysis],['/recurring','חיובים קבועים']]},
  {key:'planning',label:navigationLabels.planning,description:'רכישות, הכנסות, הלוואות וצ׳קים',items:[['/plans','רכישות ותשלומים'],['/income','הכנסות'],['/loans','הלוואות'],['/checks','צ׳קים']]},
  {key:'savings',label:navigationLabels.savings,description:'מטרות והפקדות',items:[['/savings','מטרות ויתרות'],['/savings/transfers','הפקדות']]},
  {key:'settings',label:navigationLabels.settings,description:'מראה, פרטיות, גיבוי ושיתוף',items:[['/settings',navigationLabels.settings]]},
@@ -35,4 +35,4 @@ export function navigationSection(pathname){
  if(pathname==='/about')return 'help'
  return null
 }
-export function currentNavigationItem(pathname,section){const aliases={'/outlook':'/','/search':'/categories','/categories/manage':'/categories','/categories/limits':'/categories','/details/manage':'/categories','/plans/scenario':'/plans','/savings/schedule':'/savings/transfers','/savings/accounts':'/savings','/savings/allocation':'/savings'};pathname=aliases[pathname]??pathname;return [...section.items,...(section.tools??[])].filter(([path])=>path==='/'?pathname==='/':pathname===path||pathname.startsWith(path+'/')).sort(([a],[b])=>b.length-a.length)[0]?.[0]??null}
+export function currentNavigationItem(pathname,section){const aliases={'/upload':'/incoming','/upload/history':'/incoming','/outlook':'/','/search':'/categories','/categories/manage':'/categories','/categories/limits':'/categories','/details/manage':'/categories','/plans/scenario':'/plans','/savings/schedule':'/savings/transfers','/savings/accounts':'/savings','/savings/allocation':'/savings'};pathname=aliases[pathname]??pathname;return [...section.items,...(section.tools??[])].filter(([path])=>path==='/'?pathname==='/':pathname===path||pathname.startsWith(path+'/')).sort(([a],[b])=>b.length-a.length)[0]?.[0]??null}

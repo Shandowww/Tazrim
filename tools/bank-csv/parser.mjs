@@ -3,6 +3,22 @@ export const LIMITS={bytes:5*1024*1024,rows:30000,columns:100,cell:50000};
 const clean=s=>String(s??'').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').trim();
 const key=s=>clean(s).toLowerCase().replace(/["'׳״\s._:/()\-]/g,'');
 const aliases={date:['תאריך','תאריך רישום','תאריך פעולה','תאריך תנועה','תאריך עסקה','transaction date','date','booking date'],description:['הפעולה','פרטי הפעולה','פעולה','תיאור','תיאור פעולה','תיאור תנועה','תיאור עסקה','שם בית עסק','description','details','merchant'],details:['פרטים','סוג פעולה','פרטים נוספים','additional details'],valueDate:['תאריך ערך','value date'],beneficiary:['לטובת','beneficiary'],purpose:['עבור','for'],debit:['חובה','חיובים','סכום חובה','חיוב','סכום חיוב','debit','withdrawal'],credit:['זכות','זיכויים','סכום זכות','זיכוי','סכום זיכוי','credit','deposit'],amount:['סכום','סכום פעולה','סכום תנועה','סכום עסקה','amount','transaction amount'],balance:['יתרה','יתרה בשח','יתרה לאחר פעולה','יתרה לאחר תנועה','balance','running balance'],reference:['אסמכתא','מספר אסמכתא','reference','reference number'],currency:['מטבע','currency'],direction:['סוג תנועה','חיוב/זיכוי','חובה/זכות','סוג פעולה','debit/credit','direction']};
+const commonCurrencyCodes='ILS USD EUR GBP CHF JPY CAD AUD NZD CNY HKD SGD INR KRW SEK NOK DKK PLN CZK HUF RON TRY RUB UAH AED SAR THB ZAR BRL MXN TWD PHP IDR MYR VND'.split(' ');
+const currencyCodes=[...new Set([...(Intl.supportedValuesOf?.('currency')??[]),...commonCurrencyCodes,'NIS'])].join('|');
+const currencyWords={
+ ILS:/^(?:₪|ILS|NIS|ב?ש[״"'׳]?ח|שקלים|שקל)$/iu,
+ USD:/^(?:USD|\$|(?:U\.?S\.? )?DOLLARS?|ב?דולר(?:ים)?)$/iu,
+ EUR:/^(?:EUR|€|EUROS?|ב?אירו)$/iu,
+};
+const currencyMarker=new RegExp(`(?<![a-z])(?:${currencyCodes}|(?:U\\.?S\\.? )?DOLLARS?|EUROS?)(?![a-z])|₪|€|£|¥|₹|₩|\\$|(?<![\\p{L}])(?:ב?ש[״"'׳]?ח|שקלים|שקל|ב?דולר(?:ים)?|ב?אירו)(?![\\p{L}])`,'giu');
+const currencyOf=value=>{
+ const code=clean(value).toUpperCase();
+ return Object.entries(currencyWords).find(([,pattern])=>pattern.test(code))?.[0]
+  ?? ({'£':'GBP','¥':'JPY','₹':'INR','₩':'KRW'}[code]??(code||null));
+};
+const currencyMarkers=value=>[...clean(value).matchAll(currencyMarker)].map(match=>currencyOf(match[0]));
+const moneyFields=['amount','balance','debit','credit'];
+const withoutHeaderCurrency=value=>clean(value).replace(currencyMarker,' ').replace(/[\[\]{}]/g,' ').replace(/\s+(?:in|ב)\s*$/i,'');
 export function decodeCSV(bytes,encoding='auto'){
  if(bytes.byteLength>LIMITS.bytes)throw Error('הקובץ גדול מדי. אפשר לבדוק קובץ עד 5MB.');
  let chosen=encoding;
@@ -36,7 +52,7 @@ export function parseCSV(text,delimiter=','){
 }
 export function guessMapping(headers){
  const mapping=Object.fromEntries(Object.keys(aliases).map(k=>[k,-1]));
- for(const [field,names]of Object.entries(aliases)){const matches=headers.map((h,i)=>names.map(key).includes(key(h))?i:-1).filter(i=>i>=0);if(matches.length===1)mapping[field]=matches[0];}
+ for(const [field,names]of Object.entries(aliases)){const matches=headers.map((h,i)=>names.map(key).includes(key(moneyFields.includes(field)?withoutHeaderCurrency(h):h))?i:-1).filter(i=>i>=0);if(matches.length===1)mapping[field]=matches[0];}
  const explicitDirections=headers.map((h,i)=>['חיוב/זיכוי','חובה/זכות','debit/credit','direction'].map(key).includes(key(h))?i:-1).filter(i=>i>=0);
  if(explicitDirections.length===1)mapping.direction=explicitDirections[0];
  if(mapping.description<0&&mapping.details>=0){mapping.description=mapping.details;mapping.details=-1;}
@@ -94,7 +110,6 @@ export function parseDate(value,format='day-first'){
  if(y<1900||y>2099||date.getUTCFullYear()!==y||date.getUTCMonth()!==m-1||date.getUTCDate()!==d)throw Error('תאריך לא תקין');
  return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 }
-const currencyOf=s=>{const v=clean(s).toUpperCase();if(['₪','ILS','NIS','שח','ש״ח','ש"ח'].includes(v))return 'ILS';if(['$','USD'].includes(v))return 'USD';if(['€','EUR'].includes(v))return 'EUR';return v||null;};
 export function normalizeRows(inspection,options={}){
  const {rows}=inspection,headerIndex=options.headerIndex??inspection.headerIndex,headers=rows[headerIndex]?.cells;
  if(!headers)throw Error('בחר שורת כותרות קיימת.');
@@ -104,6 +119,15 @@ export function normalizeRows(inspection,options={}){
  if(new Set(used.map(([,i])=>i)).size!==used.length)throw Error('אותה עמודה מופתה לשני שדות. בחר עמודה נפרדת לכל שדה.');
  if(mapping.date<0)throw Error('בחר עמודת תאריך.');
  if(mode==='split'&&mapping.debit<0&&mapping.credit<0||mode==='signed'&&mapping.amount<0)throw Error('בחר עמודת סכום או עמודות חובה וזכות.');
+ const financialFields=(mode==='split'?['debit','credit','balance']:['amount','balance']).filter(field=>mapping[field]>=0);
+ const headerCurrencies=financialFields.flatMap(field=>currencyMarkers(headers[mapping[field]]));
+ const reportCurrencies=rows.slice(0,headerIndex).flatMap(row=>row.cells.flatMap((cell,index)=>{
+  const label=/^(?:מטבע(?: הדוח| החשבון)?|(?:account |statement |report )?currency)\s*[:：]?\s*(.*)$/i.exec(clean(cell));
+  if(!label)return [];
+  const value=label[1]||clean(row.cells[index+1]);
+  return currencyMarkers(value);
+ }));
+ const declaredCurrencies=[...new Set([...headerCurrencies,...reportCurrencies])];
  const period=options.period;
  let periodStart,periodEnd;
  if(period){
@@ -145,12 +169,13 @@ export function normalizeRows(inspection,options={}){
   }catch(e){record.issues.push(e.message);record.amountCents=null;}
   if(mode==='signed'&&record.amountCents!==null){record.debitCents=Math.max(0,-record.amountCents);record.creditCents=Math.max(0,record.amountCents);}
   if(mapping.balance>=0){try{record.balanceCents=getMoney('balance');}catch{record.issues.push('יתרה לא תקינה');}}
-  record.currency=currencyOf(get('currency'))??(options.defaultCurrency??'ILS');
-  if(mapping.currency<0&&!options.defaultCurrency)record.warnings.push('מטבע לא נרשם בקובץ; הונח שקל');
-  // A currency symbol in any mapped financial cell must agree with the chosen currency.
-  const moneyCells=(mode==='split'?['debit','credit','balance']:['amount','balance']).filter(f=>mapping[f]>=0).map(f=>clean((row.sourceCells??row.cells)[mapping[f]])).join(' ');
-  const symbols=[[/\$|\bUSD\b/i,'USD'],[/€|\bEUR\b/i,'EUR'],[/₪|\bILS\b|\bNIS\b/i,'ILS']].filter(([re])=>re.test(moneyCells)).map(([,c])=>c);
-  if(symbols.some(c=>c!==record.currency))record.issues.push('סימן המטבע בסכום אינו תואם למטבע שנבחר');
+  const rowCurrency=currencyOf(get('currency'));
+  record.currency=rowCurrency??declaredCurrencies[0]??options.defaultCurrency??'ILS';
+  const amountCurrencies=financialFields.flatMap(field=>currencyMarkers((row.sourceCells??row.cells)[mapping[field]]));
+  if([...declaredCurrencies,...amountCurrencies].some(currency=>currency!==record.currency)){
+   record.issues.push('המטבע בכותרת, בעמודת המטבע או בסכומים אינו תואם');
+  }
+  if(!rowCurrency&&!declaredCurrencies.length&&!options.defaultCurrency)record.warnings.push('מטבע לא נרשם בקובץ; הונח שקל');
   if(record.currency!=='ILS')record.warnings.push('אינו בשקלים; לא נכלל בסיכום השקלי');
   record.inPeriod=!period||!!record.date&&record.date>=periodStart&&record.date<=periodEnd;
   if(record.date&&!record.inPeriod)record.warnings.push('מחוץ לתקופה שנבחרה; לא נכלל בסיכום');

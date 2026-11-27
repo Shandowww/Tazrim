@@ -70,7 +70,7 @@ export function parseIsracardSpreadsheet(inspections,metadataChoices){
  if(Number(month)!==billedMonth||printedYear&&Number(printedYear)!==Number(printedYear.length===2?year.slice(2):year))throw Error('תאריך החיוב אינו תואם לחודש הדוח.');
  const dueDate=parseDate(`${day}/${month}/${year}`);
  const cards=metadata.filter(row=>row.values.some(value=>cardHeader.test(value)));
- let last4,printedTotal;
+ let last4,printedTotal,cardTitle;
  if(metadataChoices){
   const card=mappedCell(metadata,metadataChoices.card),total=mappedCell(metadata,metadataChoices.total);
   const known=cards.flatMap(row=>row.values.map(value=>cardHeader.exec(value)).filter(Boolean));
@@ -78,10 +78,11 @@ export function parseIsracardSpreadsheet(inspections,metadataChoices){
   if(!suffix||card.row!==total.row||!cardTotalLabel.test(total.value)||known.length>1||known.length===1&&known[0][1]!==suffix)throw Error('בחרו מספר כרטיס וסכום חיוב מאותה כותרת.');
   const possibleCards=metadata.filter(row=>row.values.some(value=>metadataCardSuffix(value))&&row.values.some(value=>cardTotalLabel.test(value)));
   if(possibleCards.length!==1||possibleCards[0]!==card.row||card.row.values.filter(metadataCardSuffix).length!==1||card.row.values.filter(value=>cardTotalLabel.test(value)).length!==1)throw Error('לא זוהתה כותרת יחידה של כרטיס וסכום.');
-  last4=suffix;printedTotal=total.value;
+  cardTitle=card.value;last4=suffix;printedTotal=total.value;
  }else{
   const card=single(cards,'לא זוהו ארבע ספרות של כרטיס אחד בדוח.');
-  last4=single(card.values.map(value=>cardHeader.exec(value)).filter(Boolean),'נמצא יותר מכרטיס אחד בדוח.')[1];
+  cardTitle=single(card.values.filter(value=>cardHeader.test(value)),'נמצא יותר מכרטיס אחד בדוח.');
+  last4=cardHeader.exec(cardTitle)[1];
   printedTotal=single(card.values.filter(value=>cardTotalLabel.test(value)),'חסר סכום החיוב בכותרת הכרטיס.');
  }
 
@@ -102,5 +103,8 @@ export function parseIsracardSpreadsheet(inspections,metadataChoices){
  });
  if(!entries.length||entries.length>5000||entries.reduce((sum,row)=>sum+row.amountCents,0)!==amountCents)
   throw Error('סכומי העסקאות אינם תואמים לסך החיוב. יש להעלות דוח מלא.');
- return {issuer:'isracard',dueDate,amount:amountCents/100,count:entries.length,last4,entries};
+ const label=cardTitle.replace(/\s*[-–־]\s*\d{4}$/, '').trim();
+ const cardName=/^[\p{L} '"״׳–־-]{1,60}$/u.test(label)?label:'';
+ const network=/אמריקן אקספרס|american express/i.test(label)?'amex':/מא?סטרקארד|mastercard/i.test(label)?'mastercard':/ויזה|visa/i.test(label)?'visa':'';
+ return {...(cardName?{cardName}:{}),...(network?{network}:{}),issuer:'isracard',dueDate,amount:amountCents/100,count:entries.length,last4,entries};
 }

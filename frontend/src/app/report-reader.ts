@@ -3,14 +3,21 @@ import {inboxHash,inboxReceiptPresent} from '../../../src/report-inbox-model.js'
 import {decodeCSV,inspectCSV} from '../../../tools/bank-csv/parser.mjs'
 import {inspectIntake} from '../../../tools/bank-csv/intake-reader.mjs'
 import {reportFileEligibility} from './report-library-api.ts'
-export interface ReportReaderOptions{workerFactory?:(url:string)=>Worker;timeoutMs?:number;includeAccountIdentity?:boolean;reviewRecordedSource?:boolean}
+import {mapReportSource,type MappingChoice} from './report-manual-mapping.ts'
+export interface ReportReaderOptions{workerFactory?:(url:string)=>Worker;timeoutMs?:number;includeAccountIdentity?:boolean;reviewRecordedSource?:boolean;manualMapping?:MappingChoice}
 /** Reuse the existing bounded readers. This inspects source bytes only; it never stores or applies financial data. */
 export async function inspectReportSource(plan:any,name:string,bytes:Uint8Array,signal:AbortSignal,options:ReportReaderOptions={}){
  reportFileEligibility(name,bytes.byteLength);if(!validatePlan(plan)||plan.format)throw Error('יש לפתוח תקציב גלוי כדי לבדוק את המקור בתצוגה הזו.');if(signal.aborted)throw Error('קריאת הדוח בוטלה.')
  const hash=await inboxHash(bytes);if(signal.aborted)throw Error('קריאת הדוח בוטלה.')
  if(plan.importMigrationGuards?.receipts.includes(hash))return{hash,skip:true,kind:'bank',reason:'המקור סומן במעבר חשבון. קליטה חוזרת במרחב הזה חסומה.'}
- const receipt=plan.reportInbox?.receipts.find((r:any)=>r.hash===hash);if(receipt&&await inboxReceiptPresent(plan,receipt)){if(options.reviewRecordedSource)return {...await readReportContent(name,bytes,signal,options),target:receipt.target,recordedSource:true};return{hash,skip:true,kind:receipt.kind,target:receipt.target,reason:'המקור כבר נקלט ונמצא בתקציב.'}}
- return readReportContent(name,bytes,signal,options)
+ const readContent=async()=>{
+  if(!options.manualMapping)return readReportContent(name,bytes,signal,options)
+  const inspection=await readMappingSource(name,bytes,signal,options)
+  if(!inspection)throw Error('אין שדות נתמכים למיפוי בקובץ הזה.')
+  return mapReportSource(inspection,options.manualMapping,hash)
+ }
+ const receipt=plan.reportInbox?.receipts.find((r:any)=>r.hash===hash);if(receipt&&await inboxReceiptPresent(plan,receipt)){if(options.reviewRecordedSource)return {...await readContent(),target:receipt.target,recordedSource:true};return{hash,skip:true,kind:receipt.kind,target:receipt.target,reason:'המקור כבר נקלט ונמצא בתקציב.'}}
+ return readContent()
 }
 
 /** Pure bounded extraction, shared by approved private arrivals and budget review. */

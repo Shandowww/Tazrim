@@ -1,3 +1,4 @@
+import {readInterfaceReference} from './helpers/interface-reference.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -16,7 +17,7 @@ function client(search=''){
  const promptNodes=new Map(),prompt={close(){this.open=false;},showModal(){this.open=true;},querySelector(selector){if(!promptNodes.has(selector))promptNodes.set(selector,{});return promptNodes.get(selector);}};
  const document={getElementById:id=>id.startsWith('scenario-')?null:id==='confirm-dialog'?prompt:id==='app'?app:['sg-transfer-dialog','sg-new-dialog','sg-free-dialog','sg-celebration','saving-schedule-dialog','wallet-dialog'].includes(id)?dialog:notice,querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){},activeElement:{blur(){}},scrollingElement:{scrollTop:0}};
  const c=vm.createContext({document,window:{monthlyFlowTheme:{choice:'system'},addEventListener(){},location:{reload(){}},innerHeight:900},location:{hash:'',pathname:'/',search,origin:'https://budget.test',hostname:'budget.test'},history:{replaceState(){}},sessionStorage:{getItem:()=>null,removeItem(){},setItem(){}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},crypto,btoa,atob,TextEncoder,TextDecoder,URLSearchParams,URL,Blob,setTimeout:()=>1,clearTimeout(){},queueMicrotask(){},Intl,console,fetch:async()=>{throw Error('unexpected request');}});
- for(const file of ['reconciliation-model.js','card-billing-model.js','budget.js','status-model.js','bank-card-settlement.js','bank-import-model.js','savings-growth.js','investment-model.js','vault.js','amount-inputs.js','client.js','investment.js','planner.js','details.js','category-disclosure-client.js','spaces.js','security.js','savings-art.js','savings.js','savings-accounts.js','savings-growth-client.js','wallet-installation-view.js','wallet-ui-model.js','apple-pay-client.js','onboarding.js','home.js','save-dock.js','bank-import-client.js','cash-accounts.js'])vm.runInContext(fs.readFileSync('src/'+file,'utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,''),c);
+ for(const file of ['reconciliation-model.js','card-billing-model.js','budget.js','status-model.js','bank-card-settlement.js','bank-import-model.js','savings-growth.js','investment-model.js','vault.js','amount-inputs.js','client.js','investment.js','planner.js','details.js','category-disclosure-client.js','spaces.js','security.js','savings-art.js','savings.js','savings-accounts.js','savings-growth-client.js','wallet-installation-view.js','wallet-ui-model.js','apple-pay-client.js','onboarding.js','home.js','save-dock.js','bank-import-client.js','cash-accounts.js'])vm.runInContext(readInterfaceReference(file).replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,''),c);
  vm.runInContext("todayMonth=()=> '2026-10';selectedMonth=todayMonth();plan=createDemoPlan(todayMonth());plan.demo=false;loaded=true;loading=false;revision=3;savingsReset();savingsTransfer={top:'house',bottom:'holiday',position:25};",c);
  return {c,app,notice,prompt,promptNodes};
 }
@@ -524,7 +525,7 @@ test('Outgoing review keeps all targets visible and labels incompatible income c
 });
 
 test('Pending-only review removes accepted groups, retains all-view editing, and selecting a target confirms the group once',async()=>{const {c,nodes}=await groupedBankClient('תאריך,הפעולה,אסמכתא,חובה,זכות\n12/02/2026,בדיקה מיוחדת,1,100,\n13/02/2026,בדיקה מיוחדת,2,250,');await vm.runInContext("bankChange({target:{dataset:{bankGroupField:'0'},value:'card2',matches:()=>false}})",c);assert.equal(vm.runInContext('bankCurrentPreview().rows.every(r=>r.reviewed&&r.field==="card2")',c),true);assert.match(nodes.get('bank-import-dialog').innerHTML,/כל הקבוצות סווגו/);assert.doesNotMatch(nodes.get('bank-import-dialog').innerHTML,/<h4>בדיקה מיוחדת/);vm.runInContext("bankUI.reviewFilter='all';bankRender()",c);assert.match(nodes.get('bank-import-dialog').innerHTML,/<h4>בדיקה מיוחדת/);assert.match(nodes.get('bank-import-dialog').innerHTML,/עריכת הסיווג ואישורי הקבוצה/);});
-test('Home shows individual account forecasts without a duplicate aggregate tile',()=>{const {c}=client();cashClientPlan(c);vm.runInContext("plan.opening=-31649.51;plan.defaults=zero();plan.cashPlanning.accounts[0].opening=8765.58;plan.cashPlanning.accounts[1].opening=2226.14;for(const a of plan.cashPlanning.accounts)a.defaults=zero();plan.expenses=[]",c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);const html=vm.runInContext('homeView()',c);assert.ok(!html.includes(vm.runInContext('money(10991.72)',c)));assert.ok(html.includes(vm.runInContext('money(8765.58)',c)));assert.ok(html.includes(vm.runInContext('money(2226.14)',c)));assert.ok(!html.includes(vm.runInContext('money(-31649.51)',c)));assert.doesNotMatch(html,/מצב היתרות|status-cash/);assert.doesNotMatch(html,/יש לעדכן את היתרה בפועל מהבנק/);});
+test('Home shows individual account forecasts without a duplicate aggregate tile',()=>{const {c}=client();cashClientPlan(c);vm.runInContext("plan.opening=-31649.51;plan.defaults=zero();plan.cashPlanning.accounts[0].opening=8765.58;plan.cashPlanning.accounts[1].opening=2226.14;for(const a of plan.cashPlanning.accounts)a.defaults=zero();plan.expenses=[]",c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);const html=vm.runInContext('homeView()',c);assert.ok(!html.includes(vm.runInContext('money(10991.72)',c)));assert.ok(html.includes(vm.runInContext('money(8765.58)',c)));assert.ok(html.includes(vm.runInContext('money(2226.14)',c)));assert.ok(!html.includes(vm.runInContext('money(-31649.51)',c)));assert.doesNotMatch(html,/מצב היתרות|status-cash/);assert.doesNotMatch(html,/יש לעדכן את היתרה בפועל מהבנק/);});
 
 test('Verified PDF chooses the unique One Zero account without mixing it into Hapoalim',()=>{const {c}=client();cashClientPlan(c);vm.runInContext("plan.cashPlanning.accounts[0].bankName='hapoalim';plan.cashPlanning.accounts[1].bankName='one-zero';bankUI={accountId:'a',bankName:'hapoalim'};bankSelectPDFAccount(bankUI)",c);assert.equal(vm.runInContext('bankUI.accountId',c),'b');assert.match(vm.runInContext('bankUI.accountNotice',c),/וואן זירו/);vm.runInContext("plan.cashPlanning.accounts.push({id:'c',label:'נוסף',bankName:'one-zero',buffer:0});bankUI.accountId='a'",c);assert.throws(()=>vm.runInContext('bankSelectPDFAccount(bankUI)',c),/בחר/);assert.equal(vm.runInContext('bankUI.accountId',c),'a');});
 
@@ -537,7 +538,7 @@ test('Expenses categories appear before cards only with selected-month data, wit
 test('Status balance summaries stay clickable without a pending-card tile',()=>{const {c}=client();cashClientPlan(c);vm.runInContext("plan.cardBilling={version:1,reports:[{cardId:'card1',accountId:'a',dueDate:'2026-10-15',updatedOn:'2026-10-14',amount:1200,status:'pending',source:'manual'},{cardId:'card2',accountId:'b',dueDate:'2026-10-15',updatedOn:'2026-10-14',amount:300,status:'pending',source:'manual'}]};",c);const before=vm.runInContext('JSON.stringify(plan)',c),html=vm.runInContext('homeView()',c);assert.doesNotMatch(html,/מצב היתרות|status-cash/);assert.match(html,/home-savings-tile/);assert.doesNotMatch(html,/חיובי כרטיסים שעוד צפויים|status-expenses/);assert.match(html,/הפועלים — פרטי/);assert.match(html,/וואן זירו — משותף/);assert.doesNotMatch(html,/טרם נכלל בדוח/);assert.doesNotMatch(html,/class="status-accounts"/);assert.equal(vm.runInContext('JSON.stringify(plan)',c),before);});
 
 test('Status keeps account details collapsed and shows savings in its own last tile',()=>{
- const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);
+ const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);
  const before=vm.runInContext('JSON.stringify(plan)',c),html=vm.runInContext('homeView()',c);
  assert.doesNotMatch(html,/מצב היתרות|status-cash/);assert.match(html,/החשבונות שלי/);assert.match(html,/החיסכון שלי/);
  assert.ok(html.indexOf('home-savings-tile')>html.indexOf('wallet-account-section'));
@@ -546,14 +547,14 @@ test('Status keeps account details collapsed and shows savings in its own last t
 });
 
 test('Wallet presentation preserves bank snapshots, source labels and unknown card amounts without mutations',()=>{
- const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);
+ const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);
  const before=vm.runInContext('JSON.stringify(plan)',c),banks=vm.runInContext("walletBankAccountsView(statusAccountSummaries(plan,todayMonth(),'2026-10-14'),todayMonth())",c);
  assert.match(banks,/wallet-banks/);assert.match(banks,/יתרת פתיחה/);assert.doesNotMatch(banks,/דווח מהבנק:/);assert.match(banks,/כרטיס 2 מתוך 2/);
  const cards=vm.runInContext('walletCreditCardsView()',c);assert.match(cards,/wallet-credit/);assert.match(cards,/טרם עודכן/);assert.doesNotMatch(cards,/data-action="billing-update"/);assert.match(cards,/data-wallet-index="1"/);
  assert.equal(vm.runInContext('JSON.stringify(plan)',c),before);
 });
 test('Wallet keeps actual zero charge readable, escapes card names and places categories before cards',()=>{
- const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);
+ const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);
  vm.runInContext("plan.months[todayMonth()]={values:zero(),actual:true,includesPlannedCard:true};plan.creditCards=[{id:'card1',name:'<img src=x>',alias:''}];plan.details=[{id:'wallet-food',month:todayMonth(),date:todayMonth()+'-10',name:'מזון',category:'מזון',method:'card1',amount:0,accounting:'included',status:'cleared',number:''}];plan.showDetails=true;",c);
  const card=vm.runInContext('walletCreditCardsView()',c);assert.match(card,/&lt;img src=x&gt;/);assert.ok(card.includes(vm.runInContext('money(0)',c)));assert.doesNotMatch(card,/<img src=x>/);
 });
@@ -610,7 +611,7 @@ test('Expense month picker includes current and deliberately selected months bey
 
 test('Manual entry hub groups existing financial forms without mutating the budget; reports remain the primary menu entry',()=>{
  const {c,app}=client();vm.runInContext('savingsTransfer=null;scenarioItems=[];tab="details"',c);const before=vm.runInContext('JSON.stringify(plan)',c);
- vm.runInContext(fs.readFileSync('src/planning-insights-client.js','utf8'),c);c.statusInsights=()=>({rows:[],reason:'אין מגמה מבוססת'});assert.match(vm.runInContext('manualEntryView()',c),/manual-insights[\s\S]*מגמות בולטות ותכנון הפקדות/);assert.match(vm.runInContext('manualEntryView()',c),/data-plan-deposits/);const menu=vm.runInContext('appMenuView()',c);assert.ok(menu.indexOf('מרכז הדוחות')<menu.indexOf('הזנה ועריכה ידנית'));assert.doesNotMatch(menu,/data-action="home-month-open"|data-action="cards-manage"/);
+ vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/planning-insights-client.js','utf8'),c);c.statusInsights=()=>({rows:[],reason:'אין מגמה מבוססת'});assert.match(vm.runInContext('manualEntryView()',c),/manual-insights[\s\S]*מגמות בולטות ותכנון הפקדות/);assert.match(vm.runInContext('manualEntryView()',c),/data-plan-deposits/);const menu=vm.runInContext('appMenuView()',c);assert.ok(menu.indexOf('מרכז הדוחות')<menu.indexOf('הזנה ועריכה ידנית'));assert.doesNotMatch(menu,/data-action="home-month-open"|data-action="cards-manage"/);
  const click=data=>app.listeners.get('click').find(fn=>String(fn).includes('appMenuAction'))({target:{closest:()=>({dataset:{action:'tab',...data},closest:()=>null})}});
  click({tab:'manual'});assert.match(app.innerHTML,/<h1>הזנה ועריכה ידנית<\/h1>/);for(const title of ['הכנסות והוצאות','צ׳קים ותשלומים מתוכננים','חסכונות והשקעות','חשבונות ובסיס התקציב'])assert.ok(app.innerHTML.includes(title));assert.doesNotMatch(app.innerHTML,/id="month-form"|id="settings-form"/);
  click({tab:'monthly',section:'monthly-income'});assert.match(app.innerHTML,/id="month-form"/);
@@ -625,7 +626,7 @@ test('Entering the manual hub protects unfinished monthly, account, detail and s
 });
 
 test('Entering Expenses picks latest data; its month selector updates card snapshots and retains the explicit selection',async()=>{
- const {c,app}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);vm.runInContext("plan.startMonth='2026-01';plan.details=[];plan.months={'2026-09':{values:{...zero(),card1:1234.56},actual:true,includesPlannedCard:false},'2026-08':{values:{...zero(),card1:789.12},actual:true,includesPlannedCard:false}};plan.cardBilling=undefined;plan.cashPlanning.months={};selectedMonth='2026-10';tab='progress'",c);const before=vm.runInContext('JSON.stringify(plan)',c);const button={dataset:{action:'tab',tab:'details'}};for(const listener of app.listeners.get('click')??[])await listener({target:{closest:selector=>selector==='[data-action]'?button:null}});assert.equal(vm.runInContext('selectedMonth',c),'2026-09');assert.ok(app.innerHTML.includes(vm.runInContext('money(1234.56)',c)));assert.match(app.innerHTML,/הכרטיסים שלי/);vm.runInContext("handleDetailChange({value:'2026-08'},'detail-view-month')",c);assert.equal(vm.runInContext('selectedMonth',c),'2026-08');assert.ok(app.innerHTML.includes(vm.runInContext('money(789.12)',c)));const charge=app.innerHTML.match(/<span class="wallet-credit-charge">[\s\S]*?<\/small>/)[0];assert.ok(!charge.includes(vm.runInContext('money(1234.56)',c)));assert.ok(charge.includes(vm.runInContext("monthLabel('2026-08')",c)));assert.equal(vm.runInContext('JSON.stringify(plan)',c),before);
+ const {c,app}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);vm.runInContext("plan.startMonth='2026-01';plan.details=[];plan.months={'2026-09':{values:{...zero(),card1:1234.56},actual:true,includesPlannedCard:false},'2026-08':{values:{...zero(),card1:789.12},actual:true,includesPlannedCard:false}};plan.cardBilling=undefined;plan.cashPlanning.months={};selectedMonth='2026-10';tab='progress'",c);const before=vm.runInContext('JSON.stringify(plan)',c);const button={dataset:{action:'tab',tab:'details'}};for(const listener of app.listeners.get('click')??[])await listener({target:{closest:selector=>selector==='[data-action]'?button:null}});assert.equal(vm.runInContext('selectedMonth',c),'2026-09');assert.ok(app.innerHTML.includes(vm.runInContext('money(1234.56)',c)));assert.match(app.innerHTML,/הכרטיסים שלי/);vm.runInContext("handleDetailChange({value:'2026-08'},'detail-view-month')",c);assert.equal(vm.runInContext('selectedMonth',c),'2026-08');assert.ok(app.innerHTML.includes(vm.runInContext('money(789.12)',c)));const charge=app.innerHTML.match(/<span class="wallet-credit-charge">[\s\S]*?<\/small>/)[0];assert.ok(!charge.includes(vm.runInContext('money(1234.56)',c)));assert.ok(charge.includes(vm.runInContext("monthLabel('2026-08')",c)));assert.equal(vm.runInContext('JSON.stringify(plan)',c),before);
 });
 test('Card charge data remains accessible in Expenses after removing the Status card tile',()=>{
  const {c}=client();cashClientPlan(c);vm.runInContext("plan.cashPlanning.months['2026-10']={a:{values:{...zero(),card1:1200},actual:true,includesPlannedCard:true,includesPlannedDirect:false,balance:5000,date:'2026-10-18'},b:{values:{...zero(),card2:300},actual:true,includesPlannedCard:true,includesPlannedDirect:false,balance:3000,date:'2026-10-18'}};plan.cardBilling=undefined",c);
@@ -643,7 +644,7 @@ test('Status month drill-down keeps the saved budget intact and supports explici
 
 
 test('Expenses month bars replace the dropdown and filter categories/cards in place without changing the plan or pushing history',()=>{
- const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);
+ const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);
  vm.runInContext("plan.startMonth='2026-01';plan.details=[{id:'a',name:'קנייה',amount:25,category:'מזון',method:'card1',month:'2026-09',date:'2026-09-01',number:'',status:'cleared',accounting:'included'},{id:'b',name:'נסיעה',amount:50,category:'תחבורה',method:'card1',month:'2026-10',date:'2026-10-01',number:'',status:'cleared',accounting:'included'}];tab='progress';selectedMonth='2026-10'",c);
  const before=vm.runInContext('JSON.stringify(plan)',c),entries=[];let pushes=0;
  c.history={state:null,replaceState(s){this.state=s;entries[0]=s;},pushState(s){this.state=s;pushes++;},back(){}};
@@ -659,7 +660,7 @@ test('Expenses month bars replace the dropdown and filter categories/cards in pl
 
 
 test('Card report transactions use original rows for the selected stable card ID and billing month, preserving refunds and ignoring analysis splits',()=>{
- const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);
+ const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);
  vm.runInContext(`plan.details=[
  {id:'original',name:'חנות <מקור>',amount:123.45,category:'מזון',method:'card1',month:'2026-10',date:'2026-09-20',status:'cleared',accounting:'included',statement:{issuer:'isracard',dueDate:'2026-10-15',notes:'תשלום 2 מתוך 3',originalCents:37035}},
  {id:'refund',name:'זיכוי',amount:-23.45,category:'מזון',method:'card1',month:'2026-10',date:'2026-09-21',status:'cleared',accounting:'included',statement:{issuer:'isracard',dueDate:'2026-10-15'}},
@@ -676,7 +677,7 @@ test('Card report transactions use original rows for the selected stable card ID
  const cards=vm.runInContext('walletCreditCardsView()',c);assert.match(cards,/data-wallet-transactions="card1" data-month="2026-10" aria-haspopup="dialog"/);assert.equal(vm.runInContext('JSON.stringify(plan)',c),before);
 });
 test('Long card statement lists offer more rows without silently truncating the report total',()=>{
- const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);vm.runInContext("plan.details=Array.from({length:51},(_,i)=>({id:'r'+i,name:'בית עסק '+i,method:'card1',month:'2026-10',date:'2026-09-20',amount:1,status:'cleared',statement:{issuer:'cal'}}))",c);
+ const {c}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);vm.runInContext("plan.details=Array.from({length:51},(_,i)=>({id:'r'+i,name:'בית עסק '+i,method:'card1',month:'2026-10',date:'2026-09-20',amount:1,status:'cleared',statement:{issuer:'cal'}}))",c);
  const first=vm.runInContext("walletStatementContent('card1','2026-10')",c);assert.match(first,/עוד עסקאות \(1\)/);assert.doesNotMatch(first,/בית עסק 50/);assert.ok(first.includes(vm.runInContext('money(51)',c)));const all=vm.runInContext("walletStatementContent('card1','2026-10',100)",c);assert.match(all,/בית עסק 50/);assert.doesNotMatch(all,/data-wallet-transactions-more/);
 });
 
@@ -687,7 +688,7 @@ test('Status report reminders link to the exact card and remain until imported c
  c.draftSavedSnapshot=before;vm.runInContext("plan.cardBilling={version:1,reports:[{cardId:'card1',accountId:'a',dueDate:'2026-10-15',updatedOn:'2026-10-15',amount:0,source:'file',status:'pending'}]};dirty=true",c);
  assert.match(vm.runInContext('homeReportRemindersView(billingToday())',c),/data-card="card1"/);vm.runInContext('dirty=false',c);html=vm.runInContext('homeReportRemindersView(billingToday())',c);assert.doesNotMatch(html,/data-card="card1"/);assert.match(html,/data-card="card2"/);
  vm.runInContext("plan.cardBilling.reports.push({...plan.cardBilling.reports[0],cardId:'card2',accountId:'b'});",c);assert.equal(vm.runInContext('homeReportRemindersView(billingToday())',c),'');
- vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);assert.doesNotMatch(vm.runInContext('walletCreditCardsView()',c),/פוש|עשרת הימים|push-enable/);
+ vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);assert.doesNotMatch(vm.runInContext('walletCreditCardsView()',c),/פוש|עשרת הימים|push-enable/);
 });
 
 
@@ -719,7 +720,7 @@ test('Status goal miniatures use saved allocated progress, configured deposits a
 });
 
 test('Theme accent changes are immediate device preferences while account colors use the existing guarded budget save',async()=>{
- const {c,app}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('src/wallet-design.js','utf8'),c);const initial=vm.runInContext('JSON.stringify(plan)',c);let chosen;c.window.monthlyFlowTheme.setAccent=value=>{chosen=value;return true;};
+ const {c,app}=client();cashClientPlan(c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/wallet-design.js','utf8'),c);const initial=vm.runInContext('JSON.stringify(plan)',c);let chosen;c.window.monthlyFlowTheme.setAccent=value=>{chosen=value;return true;};
  const change=app.listeners.get('change').find(fn=>String(fn).includes('appearance-accent'));await change({target:{name:'appearance-accent',value:'rose',checked:true,dataset:{}}});assert.equal(chosen,'rose');assert.equal(vm.runInContext('dirty',c),false);assert.equal(vm.runInContext('JSON.stringify(plan)',c),initial);assert.match(vm.runInContext('settingsView()',c),/name="appearance-accent"/);
  c.budgetFormData=()=>new Map([['cash-id','a'],['cash-label','Renamed bank'],['cash-buffer','0'],['cash-opening',''],['cash-opening-month','2026-10'],['cash-color','mint']]);c.form={dataset:{cashForm:'config'},reportValidity:()=>true,elements:{namedItem:()=>({dataset:{current:'0'}})},querySelector:()=>({hidden:true,textContent:'',scrollIntoView(){}})};vm.runInContext('cashSubmit(form)',c);assert.equal(vm.runInContext("plan.cashPlanning.accounts.find(a=>a.id==='a').color",c),'mint');assert.equal(vm.runInContext('dirty',c),true);assert.equal(vm.runInContext('plan.cashPlanning.cardAccounts.card1',c),'a');
  const home=vm.runInContext('homeView()',c);assert.match(home,/data-account-color="mint" data-wallet-card-id="a"/);const cards=vm.runInContext('walletCreditCardsView()',c);assert.match(cards,/data-account-color="mint" data-wallet-card-id="card1"/);assert.match(vm.runInContext('cashTabs()',c),/data-account-color="mint"/);

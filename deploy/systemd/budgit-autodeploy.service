@@ -1,0 +1,13 @@
+[Unit]
+Description=Release Budgit when GitHub main advances
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/budgit-release/hetzner-autodeploy.sh
+TimeoutStartSec=40min
+KillMode=mixed
+TimeoutStopSec=10min
+Nice=10

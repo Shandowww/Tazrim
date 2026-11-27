@@ -39,7 +39,7 @@ test('Single-account fallback, card-backed commitments, unknown item metadata an
 });
 test('Review names are escaped and scheduled payments remain explicitly separate from actual payment confirmation',()=>{
  const r=prepareManualAccountMigration(fixture(),base(),opts);r.manifest.commitments[0].name='<img src=x>';r.manifest.loans[0].name='<script>bad</script>';
- const c=vm.createContext({esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),money:n=>String(n)});vm.runInContext(readFileSync('src/space-migration-execution-client.js','utf8'),c);const html=c.migrationCommitmentsView(r.manifest);
+ const c=vm.createContext({esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),money:n=>String(n)});vm.runInContext(readFileSync('test/fixtures/retired-interface/space-migration-execution-client.js','utf8'),c);const html=c.migrationCommitmentsView(r.manifest);
  assert.doesNotMatch(html,/<img|<script>/);assert.match(html,/&lt;img/);assert.match(html,/&lt;script&gt;/);assert.match(html,/אינה מאשרת שבוצע תשלום/);assert.match(html,/2027-02/);assert.match(html,/הכנסה מתוכננת/);
 });
 const pair=generateKeyPairSync('rsa',{modulusLength:3072,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});

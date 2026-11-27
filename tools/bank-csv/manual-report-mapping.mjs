@@ -10,8 +10,12 @@ export function mappingOptions(inspection){
  if(/עסקאות למועד חיוב|עסקאות לחיוב ב-|עסקאות שטרם חויבו|סכום חיוב.{0,25}מטבע חיוב/.test(metadata))return null
  const headers=inspection.rows[inspection.headerIndex]?.cells??[]
  if(headers.length<3||inspection.rows.length<=inspection.headerIndex+1)return null
- const sample=inspection.rows[inspection.headerIndex+1].cells
- return {kind:'bank',columns:headers.map((label,i)=>({value:String(i),label:label||'עמודה '+(i+1),sample:sample[i]??''})),guess:guessMapping(headers)}
+ const sampleRows=inspection.rows.slice(inspection.headerIndex+1,inspection.headerIndex+11)
+ const columns=headers.map((label,i)=>{
+  const sample=sampleRows.find(row=>String(row.cells[i]??'').trim())
+  return {value:String(i),label:label||'עמודה '+(i+1),sample:sample?.cells[i]??'',sampleLine:sample?.line}
+ })
+ return {kind:'bank',columns,headerLine:inspection.rows[inspection.headerIndex].line,guess:guessMapping(headers)}
 }
 
 export function parseMappingChoice(value){
@@ -44,7 +48,10 @@ export function mapReportSource(inspection,choice){
  const mapping={...options.guess,date,description,amount,debit,credit,balance}
  const {records}=normalizeRows(inspection,{mapping,mode,defaultCurrency:'ILS'})
  const invalid=records.find(row=>!row.valid||row.currency!=='ILS'||!row.description)
- if(invalid)throw Error('לא ניתן לקרוא את שורת המקור '+invalid.line+'. בדקו את התאריך, התיאור, המטבע והסכום.')
+ if(invalid){
+  const problem=invalid.issues[0]|| (invalid.currency!=='ILS'?'הסכום בדוח הוא במטבע '+invalid.currency+'. אפשר לייבא רק סכומים בשקלים.':'חסר תיאור תנועה.')
+  throw Error('שורת מקור '+invalid.line+' — '+problem)
+ }
  if(!records.length)throw Error('לא נמצאו תנועות אחרי הכותרת.')
  if(balance>=0){
   const reconciles=(rows)=>rows.every((row,i)=>Number.isSafeInteger(row.balanceCents)&&(!i||rows[i-1].date<=row.date&&row.balanceCents-rows[i-1].balanceCents===row.amountCents))

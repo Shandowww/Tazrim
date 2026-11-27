@@ -13,7 +13,7 @@ const base=()=>({startMonth:'2026-01',opening:1000,buffer:100,horizon:24,default
 const draft=p=>({...initialPlannedItemDraft(p,'','2026-10'),name:'רכישה',amount:'100.01',fees:'0.02',payments:'3'})
 test('Planned create matches the original submit transition and allocates all fee cents to its installment schedule',()=>{
  const p=base(),before=JSON.stringify(p),d=draft(p),next=preparePlannedItem(p,'stable-item',d,true),item=next.expenses[0]
- const source=readFileSync('src/client.js','utf8'),a=source.indexOf("if(event.target.id==='item-form')"),start=source.indexOf('const next=clone(plan);',a),end=source.indexOf("if(mutate(next,",start)
+ const source=readFileSync('test/fixtures/retired-interface/client.js','utf8'),a=source.indexOf("if(event.target.id==='item-form')"),start=source.indexOf('const next=clone(plan);',a),end=source.indexOf("if(mutate(next,",start)
  const context=vm.createContext({plan:p,draft:item,clone,captured:null});vm.runInContext(source.slice(start,end)+'captured=next;',context);assert.deepEqual(JSON.parse(JSON.stringify(context.captured)),next)
  assert.deepEqual(plannedItemSchedule(item).map(r=>r.amount),[33.34,33.34,33.35]);assert.equal(forecast(next).find(r=>r.month==='2026-10').net,-33.34);assert.equal(JSON.stringify(p),before);assert.ok(validatePlan(next))
 })

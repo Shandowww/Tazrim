@@ -19,3 +19,14 @@ export function isracardDomesticFixture({mixed=true,information='terms'}={}){
   item('סה״כ חיוב לתאריך',525,320),item('15/10/26',435,320),item('440.00',262,320),item('עמוד 1 מתוך 2',100,15));
  pages.push({width:595,height:842,items:[item(information==='fees'?'דיווח עמלות חצי שנתי (לידיעה בלבד - לא לתשלום)':'מסגרת הכרטיס ותנאי האשראי',525,780),item('סכום לחיוב (בש״ח)',260,740),item('10.79',260,720),item('עמוד 2 מתוך 2',100,15)]});return pages;
 }
+
+export function isracardFeeNoticeFixture(){
+ const pages=isracardDomesticFixture({mixed:false});
+ pages[1].items=[item('הנדון: עדכון בדמי כרטיס',525,700),
+  item('במסגרת מבצע הוענק לך פטור מדמי כרטיס עבור כרטיס 1111',525,675),
+  item('בתאריך',525,660),item('31/01/2027',450,660),
+  item('דמי הכרטיס יעמדו בסך של',525,635),item('16.00',350,635),item('₪ לחודש',315,635),
+  item('בהתאם לתעריפון סכום דמי הכרטיס',525,610),item('18.00',350,610),
+  item('ישראכרט בע״מ',525,430),item('עמוד 2 מתוך 2',100,15)];
+ return pages;
+}

@@ -10,10 +10,13 @@ import {driveConnectHref} from '../frontend/src/app/drive-backup-api.ts'
 import {reportActionDestination} from '../frontend/src/app/action-center-api.ts'
 const month='2026-10',plan=()=>({startMonth:'2026-01',opening:1000,buffer:0,horizon:12,defaults:zero(),months:{},expenses:[],demo:false})
 const files=dir=>readdirSync(dir,{withFileTypes:true}).flatMap(f=>f.isDirectory()?files(dir+'/'+f.name):[dir+'/'+f.name])
-test('Only the Settings layout control may navigate from the native UI to the original interface',()=>{
+test('Tazrim remains the only layout and keeps its separate display-mode choices',()=>{
  const components=files('frontend/src').filter(f=>f.endsWith('.tsx'))
- for(const file of components){const source=readFileSync(file,'utf8');if(file.endsWith('/interface-layout-setting.tsx'))continue;assert.doesNotMatch(source,/legacyBudgetHref|legacyInterfaceHref|legacyActionCenterHref|interfaceLayoutHref|ממשק הקיים|ממשק המקורי|mf-view=|href=["']\/\?|href=\{original\}/,file)}
- const control=readFileSync('frontend/src/app/interface-layout-setting.tsx','utf8');assert.match(control,/guard\.run/);assert.match(control,/interfaceLayoutHref/)
+ for(const file of components){const source=readFileSync(file,'utf8');assert.doesNotMatch(source,/legacyBudgetHref|legacyInterfaceHref|legacyActionCenterHref|interfaceLayoutHref|ממשק הקיים|ממשק המקורי|פריסת הממשק|העיצוב המקורי|mf-view=|href=["']\/\?|href=\{original\}/,file)}
+ for(const file of ['frontend/src/main.tsx','frontend/src/app/settings-home.tsx']) {
+  assert.match(readFileSync(file,'utf8'),/<InterfaceModeSelector\//);
+ }
+ assert.ok(!components.some(file=>file.endsWith('/interface-layout-setting.tsx')));
 })
 test('Every original notification screen has a scoped native destination; upload month wins over the current display period',()=>{
  for(const target of [{screen:'save'},{screen:'unlock'},{screen:'backup'},{screen:'gmail'},{screen:'notice',noticeId:'n1'},{screen:'report',reportId:'12345678-1234-1234-1234-123456789abc'},{screen:'upload',kind:'bank',target:'a',month:'2026-08'}]){

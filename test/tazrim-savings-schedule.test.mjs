@@ -12,7 +12,7 @@ import {savePreparedPlan,SaveConflict,SaveUncertain} from '../frontend/src/app/p
 const fixture=()=>createDemoPlan('2026-10')
 test('Native schedule adapter matches original form handler including blank fields, zero and changed month placeholders',()=>{
  const p=updateSavingSchedule(fixture(),'2027-01',{personalSaving:321.09,sharedSaving:654.32}),before=clone(p),d={from:'2027-02',personalSaving:'',sharedSaving:'0'},next=prepareSavingsSchedule(p,d)
- let captured;const s=readFileSync('src/savings.js','utf8'),start=s.indexOf('function savingScheduleSubmit('),end=s.indexOf('function savingScheduleDateChanged(',start),data={'schedule-from':d.from,'schedule-personalSaving':d.personalSaving,'schedule-sharedSaving':d.sharedSaving},current=monthlyValues(p,d.from)
+ let captured;const s=readFileSync('test/fixtures/retired-interface/savings.js','utf8'),start=s.indexOf('function savingScheduleSubmit('),end=s.indexOf('function savingScheduleDateChanged(',start),data={'schedule-from':d.from,'schedule-personalSaving':d.personalSaving,'schedule-sharedSaving':d.sharedSaving},current=monthlyValues(p,d.from)
  const form={elements:{namedItem:key=>({dataset:{current:current[key.replace('schedule-','')]}})},querySelector:()=>({})}
  const ctx=vm.createContext({savingScheduleDraft:{scope:'personal'},saving:false,activeBudget:'personal',plan:p,budgetFormData:()=>Object.entries(data),readNumber:Number,updateSavingSchedule,mutate:v=>{captured=v;return false},savingScheduleClose:()=>{},demoPreview:false})
  vm.runInContext(s.slice(start,end),ctx);ctx.savingScheduleSubmit(form);assert.deepEqual(captured,next);assert.equal(monthlyValues(next,'2027-03').personalSaving,321.09);assert.equal(monthlyValues(next,'2027-03').sharedSaving,0);assert.deepEqual(p,before)

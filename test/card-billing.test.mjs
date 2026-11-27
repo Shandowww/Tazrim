@@ -70,3 +70,72 @@ test('No-transactions confirmation reuses the stable payer in imported reports w
  const ambiguous=clone(p);ambiguous.cardBilling.reports.push({...ambiguous.cardBilling.reports[0],accountId:'b',dueDate:'2026-08-15'});assert.equal(cardNoTransactionsAccount(ambiguous,'card1'),null);assert.throws(()=>setCardNoTransactions(ambiguous,'card1','2026-01',true,'2026-10-20'),/לשייך/);
  const unknown=base();unknown.startMonth='2026-01';unknown.cashPlanning.cardAccounts={};assert.equal(cardNoTransactionsAccount(unknown,'card1'),null);assert.throws(()=>setCardNoTransactions(unknown,'card1','2026-01',true,'2026-10-20'),/לשייך/);assert.equal(JSON.stringify(p),original);
 });
+
+test('Distinct due dates contribute to the monthly card total and replace its estimate once',()=>{
+ let p=base();
+ p.cashPlanning.accounts[0].defaults={...zero(),card1:500};
+ p=saveBillingReport(p,{cardId:'card1',accountId:'a',dueDate:'2026-10-24',amount:210.22,source:'file'},'2026-10-22');
+ p=saveBillingReport(p,{cardId:'card1',accountId:'a',dueDate:'2026-10-05',amount:120.11,source:'file'},'2026-10-25');
+ const before=clone(p);
+ assert.deepEqual(cardChargeSnapshot(p,'card1','2026-10'),{
+  amount:330.33,kind:'updated',date:'2026-10-25',dueDate:'2026-10-24',accountId:'a'
+ });
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7669.67);
+ assert.equal(cashAccountForecast(p,'b')[0].balance,3000);
+ assert.deepEqual(p,before);
+});
+
+test('One partial bank debit settles one equal bill and works with or without an account balance',()=>{
+ let p=base();
+ for(const day of ['05','20'])p=saveBillingReport(p,{
+  cardId:'card1',accountId:'a',dueDate:'2026-10-'+day,amount:100,source:'file'
+ },'2026-10-25');
+ const bank={values:{...zero(),card1:100},actual:false,includesPlannedCard:false,bankImported:true,date:'2026-10-25'};
+ p.cashPlanning.months['2026-10']={a:{...bank,balance:7900}};
+ p.bankImport={accounts:[],batches:[],entries:[{
+  accountId:'a',field:'card1',month:'2026-10',cents:-10000,source:{date:'2026-10-06',valueDate:'2026-10-05'}
+ }]};
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+ delete p.cashPlanning.months['2026-10'].a.balance;
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+ p.bankImport.entries.push({accountId:'a',field:'card1',month:'2026-10',cents:-10000,source:{date:'2026-10-20'}});
+ p.cashPlanning.months['2026-10'].a.balance=7900;
+ p.cashPlanning.months['2026-10'].a.date='2026-10-10';
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+});
+
+test('A dated manual actual preserves its card values and projects only bills after its anchor',()=>{
+ let p=base();
+ for(const day of ['05','20'])p=saveBillingReport(p,{
+  cardId:'card1',accountId:'a',dueDate:'2026-10-'+day,amount:100,source:'manual'
+ },'2026-10-25');
+ p.cashPlanning.months['2026-10']={a:{
+  values:{...zero(),card1:110},actual:true,includesPlannedCard:false,date:'2026-10-10',balance:7890
+ }};
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7790);
+ delete p.cashPlanning.months['2026-10'].a.balance;
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7790);
+ delete p.cashPlanning.months['2026-10'].a.date;
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+ p.cashPlanning.months['2026-10'].a.balance=7890;
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+ p.cashPlanning.months['2026-10'].a.values.card1=250;
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7890);
+});
+
+
+test('A uniquely matching next-day bank posting is reflected only after the anchor reaches it',()=>{
+ let p=base();
+ p=saveBillingReport(p,{cardId:'card1',accountId:'a',dueDate:'2026-10-16',amount:100,source:'file'},'2026-10-18');
+ p=saveBillingReport(p,{cardId:'card1',accountId:'a',dueDate:'2026-10-23',amount:100,source:'file'},'2026-10-18');
+ p.cashPlanning.months['2026-10']={a:{
+  values:{...zero(),card1:100},actual:false,includesPlannedCard:false,bankImported:true,date:'2026-10-18',balance:7900
+ }};
+ p.bankImport={accounts:[],batches:[],entries:[{
+  accountId:'a',field:'card1',month:'2026-10',cents:-10000,source:{date:'2026-10-18'}
+ }]};
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+ p.cashPlanning.months['2026-10'].a.date='2026-10-17';
+ p.cashPlanning.months['2026-10'].a.balance=8000;
+ assert.equal(cashAccountForecast(p,'a')[0].balance,7800);
+});

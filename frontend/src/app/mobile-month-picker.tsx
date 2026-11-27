@@ -16,7 +16,7 @@ export function availableMonths(anchor: string, min = '2000-01', max = '2099-12'
     .filter(month => month === anchor || (month >= min && month <= max))
 }
 
-export function MobileMonthPicker({months, selected, anchor = selected, label, disabled = false, onChange, onYearChange, topBar = true}: {
+export function MobileMonthPicker({months, selected, anchor = selected, label, disabled = false, onChange, onYearChange, canSelectYear, topBar = true}: {
   months: string[]
   selected?: string
   anchor?: string
@@ -24,6 +24,7 @@ export function MobileMonthPicker({months, selected, anchor = selected, label, d
   disabled?: boolean
   onChange: (month: string) => void
   onYearChange?: (year: number) => void
+  canSelectYear?: (year: number) => boolean
   topBar?: boolean
 }) {
   const id = useId()
@@ -132,7 +133,7 @@ export function MobileMonthPicker({months, selected, anchor = selected, label, d
           <span>{monthName(month)}</span><bdi dir="ltr">{month.slice(0, 4)}</bdi>
         </button>)}
       </div>
-      {onYearChange && firstYear === lastYear && firstYear && <button type="button" className="mobile-month-annual"
+      {onYearChange && firstYear === lastYear && firstYear && (canSelectYear?.(Number(firstYear)) ?? true) && <button type="button" className="mobile-month-annual"
         aria-pressed={!selected && firstYear === anchor?.slice(0, 4)} onClick={() => {closeAndFocus(); onYearChange(Number(firstYear))}}>כל שנת <bdi dir="ltr">{firstYear}</bdi></button>}
     </div>}
   </div>

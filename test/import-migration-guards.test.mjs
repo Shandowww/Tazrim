@@ -30,7 +30,7 @@ test('Both key and fingerprint block reimport, including a new account or review
 });
 test('Known file hashes are blocked before parsing in the inbox and independently by the model',async()=>{
  const bytes=new TextEncoder().encode('synthetic known file'),fileHash=await inboxHash(bytes),p=addImportMigrationGuards(base(),[],[fileHash]);const before=JSON.stringify(p);
- const c=vm.createContext({plan:p,inboxHash,window:{addEventListener(){}},app:{addEventListener(){}},Uint8Array,TextEncoder,crypto});vm.runInContext(readFileSync('src/report-inbox-client.js','utf8'),c);const result=await c.inboxReadFile({size:bytes.length,name:'test.csv',arrayBuffer:async()=>bytes.buffer});assert.equal(result.skip,true);assert.match(result.reason,/מעבר חשבון/);
+ const c=vm.createContext({plan:p,inboxHash,window:{addEventListener(){}},app:{addEventListener(){}},Uint8Array,TextEncoder,crypto});vm.runInContext(readFileSync('test/fixtures/retired-interface/report-inbox-client.js','utf8'),c);const result=await c.inboxReadFile({size:bytes.length,name:'test.csv',arrayBuffer:async()=>bytes.buffer});assert.equal(result.skip,true);assert.match(result.reason,/מעבר חשבון/);
  await assert.rejects(()=>applyReportInbox(p,[],[],[{hash:fileHash,kind:'bank',target:'new',reference:'new'}],[],'2026-10'),/מעבר חשבון/);assert.equal(JSON.stringify(p),before);
 });
 test('Reset/replacement preserves same-space markers and markers survive encrypted save/unlock without an external financial index',async()=>{

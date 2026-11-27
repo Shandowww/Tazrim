@@ -7,7 +7,7 @@ const report={issuer:'isracard',dueDate:'2026-03-15',amount:10,entries:[{date:'2
 function harness(){
  const p=base(),ui={scope:'u/personal',snapshot:JSON.stringify(p),revision:1,items:[],newAccounts:[],newCards:[],blank:false,merchantRules:[],categoryChoices:new Map(),bankChoices:new Map(),duplicates:0};
  const c=vm.createContext({...inboxController,...budget,...bank,...billing,...inbox,classifierFixture:classifier,plan:p,accountId:'u',activeBudget:'personal',revision:1,app:{addEventListener(){}},window:{addEventListener(){}},document:{getElementById:()=>null},demoPreview:true,todayMonth:()=> '2026-10',statementMerchant:s=>s.trim().toLowerCase(),ui,crypto:globalThis.crypto});
- vm.runInContext(fs.readFileSync('src/card-billing-client.js','utf8'),c);vm.runInContext(fs.readFileSync('src/report-inbox-client.js','utf8').replace("await import('/bank-import/classifier.mjs')",'classifierFixture'),c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};billingToday=()=>"2026-10-20";',c);return{c,ui,p};
+ vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/card-billing-client.js','utf8'),c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/report-inbox-client.js','utf8').replace("await import('/bank-import/classifier.mjs')",'classifierFixture'),c);vm.runInContext('reportInbox=ui;inboxRender=()=>{};billingToday=()=>"2026-10-20";',c);return{c,ui,p};
 }
 test('A reconciled statement imports without category questions, retains exact financial amounts and can be categorized later',async()=>{
  const {c,ui,p}=harness();ui.items=[{id:'file',name:'test.pdf',hash:'a'.repeat(64),kind:'card',target:'card1',payer:'a',report,decisions:{},bankOptions:{scope:'complete'}}];const before=JSON.stringify(p);

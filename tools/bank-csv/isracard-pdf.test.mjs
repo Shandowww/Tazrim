@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {inspectIsracardPDF} from './isracard-pdf.mjs';import {readReportPDF} from './pdf-reader.mjs';import {isracardTextFixture,isracardDomesticFixture} from './isracard-fixture.mjs';import {pdfFixture,pdfTextFixture} from './pdf-fixture.mjs';
+import {inspectIsracardPDF} from './isracard-pdf.mjs';import {readReportPDF} from './pdf-reader.mjs';import {isracardTextFixture,isracardDomesticFixture,isracardFeeNoticeFixture} from './isracard-fixture.mjs';import {pdfFixture,pdfTextFixture} from './pdf-fixture.mjs';
 test('Isracard PDF uses billed ILS and the printed cycle total, preserving foreign amounts, refunds and wrapped merchants',()=>{
  const pages=isracardTextFixture(),before=JSON.stringify(pages),report=inspectIsracardPDF(pages);assert.equal(report.issuer,'isracard');assert.equal(report.dueDate,'2026-10-15');assert.equal(report.last4,'1111');assert.equal(report.amount,56);assert.equal(report.count,3);assert.deepEqual(report.entries.map(row=>row.amountCents),[4000,2000,-400]);assert.deepEqual(report.entries.map(row=>row.foreignCents),[1000,500,-100]);assert.deepEqual(report.entries.map(row=>row.originalCurrency),['EUR','USD','EUR']);assert.equal(report.entries[0].merchant,'MERCHANT EXAMPLE CITY');assert.equal(report.entries[0].originalCents,4000);assert.doesNotMatch(report.entries[0].merchant,/עמלה|הנחה/);assert.equal(JSON.stringify(pages),before);assert.equal(inspectIsracardPDF(pdfTextFixture()),null);
 });
@@ -40,4 +40,24 @@ test('The printed debit date may follow the cycle caption, but must agree across
  const shifted=isracardDomesticFixture();for(const i of shifted[0].items)if(i.str==='15/10/26'&&i.transform[5]<500)i.str='16/10/26';assert.equal(inspectIsracardPDF(shifted).dueDate,'2026-10-16');
  for(const date of ['14/10/26','23/10/26','15/11/26']){const p=structuredClone(shifted);for(const i of p[0].items)if(i.str==='16/10/26')i.str=date;assert.throws(()=>inspectIsracardPDF(p),/מועדי/);}
  shifted[0].items.find(i=>i.str==='16/10/26').str='15/10/26';assert.throws(()=>inspectIsracardPDF(shifted),/מועדי/);
+});
+
+test('A matching card-fee update letter remains informational through actual PDF intake',async()=>{
+ globalThis.DOMMatrix??=class{};
+ const pages=isracardFeeNoticeFixture(),before=JSON.stringify(pages),report=inspectIsracardPDF(pages);
+ assert.equal(report.amount,440);assert.equal(report.count,2);assert.deepEqual(report.entries.map(row=>row.amountCents),[45000,-1000]);assert.ok(report.entries.every(row=>row.page===1));assert.equal(JSON.stringify(pages),before);
+ const {intake}=await readReportPDF(pdfFixture(pages));assert.equal(intake.identity,'isracard:1111');assert.deepEqual(intake.report,report);
+});
+
+test('Fee appendices require the exact subject and matching card, and cannot conceal billing evidence',()=>{
+ for(const edit of [
+  p=>p[1].items[0].str='עדכון בדמי כרטיס',
+  p=>p[1].items[1].str=p[1].items[1].str.replace('1111','2222'),
+  p=>p[1].items.splice(1,1),
+  p=>p[1].items.push({...p[1].items[1]}),
+  ...['שם בית עסק','סה״כ חיוב לתאריך','רכישות בחו״ל','עסקות שחויבו','01/10/26'].map(str=>p=>p[1].items.push({str,transform:[8,0,0,8,525-str.length*4,570],width:str.length*4,height:8})),
+  p=>p[0].items.find(i=>i.str==='440.00').str='456.00',
+  p=>p[0].items=p[0].items.filter(i=>i.str!=='450.00'),
+  p=>p[0].items=p[0].items.filter(i=>i.transform[5]!==320)
+ ]){const pages=isracardFeeNoticeFixture();edit(pages);assert.throws(()=>inspectIsracardPDF(pages));}
 });

@@ -54,7 +54,7 @@ test('Edited details are preserved on exact reimport, and preview conflicts or l
 test('Wallet cannot replace a statement total, including purchases initially assigned to their purchase month',async()=>{
  const preview=await prepareCardStatement(base(),report(),'card1'),p=applyCardStatement(base(),preview,choices(preview));let message='';
  const c=vm.createContext({plan:p,statementCycleExists,statementWalletMatch,notify:m=>message=m,document:{getElementById:()=>null}});
- vm.runInContext(fs.readFileSync('src/wallet-ui-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+fs.readFileSync('src/apple-pay-client.js','utf8'),c);
+ vm.runInContext(fs.readFileSync('src/wallet-ui-model.js','utf8').replaceAll(/^export /gm,'')+'\n'+fs.readFileSync('test/fixtures/retired-interface/apple-pay-client.js','utf8'),c);
  vm.runInContext("walletMonth='2026-11';walletApply('card1')",c);assert.match(message,/כבר נקלט/);
  vm.runInContext("walletMonth='2026-10';walletData={events:[{card_id:'card1',merchant:'חנות לדוגמה',cents:30075,currency:'ILS',occurred_at:'2026-10-13T10:00:00Z',kind:'purchase',state:'included'}]};walletApply('card1')",c);assert.match(message,/אין להעתיק שוב/);
  assert.equal(p.months['2026-10'],undefined);assert.equal(p.details.length,1);
@@ -94,7 +94,7 @@ test('One merchant category spans new rows in all batch files, amounts and cards
  const first=report([{...report().entries[0],merchant:'Example Shop',amountCents:10025}]),second={...report([{...report().entries[0],merchant:'  EXAMPLE   SHOP ',amountCents:2050},{...report().entries[0],merchant:'חנות אחרת',amountCents:500}]),dueDate:'2026-12-15'};
  const preview1=await prepareCardStatement(p,first,'card1'),preview2=await prepareCardStatement(p,second,'card2');preview1.rows[0].category='מזון';preview2.rows[0].category='קניות';
  const c=vm.createContext({window:{addEventListener(){}},app:{addEventListener(){}},batch:[{statement:preview1},{statement:preview2}]});
- vm.runInContext(fs.readFileSync('src/card-statement-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,''),c);vm.runInContext(fs.readFileSync('src/card-billing-client.js','utf8'),c);
+ vm.runInContext(fs.readFileSync('src/card-statement-model.js','utf8').replaceAll(/^import .*;\n/gm,'').replaceAll(/^export /gm,''),c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/card-billing-client.js','utf8'),c);
  const groups=vm.runInContext('billingBatchGroups(batch)',c);assert.equal(groups.length,2);assert.equal(groups[0].rows.length,2);assert.equal(groups[0].files.size,2);assert.equal(groups[0].category,'');assert.deepEqual(Array.from(groups[0].rows,r=>r.fileIndex),[0,1]);
  const selected=groups.map(g=>g.merchant==='חנות אחרת'?'אחר':'בילויים / מנויים ודיגיטל'),choicesByFile=[{},{}];groups.forEach((g,i)=>g.rows.forEach(row=>choicesByFile[row.fileIndex][row.id]={category:selected[i]}));
  const {applyBillingBatch}=await import('../src/card-statement-model.js');const next=applyBillingBatch(p,[preview1,preview2].map((statement,i)=>({cardId:statement.cardId,accountId:'a',dueDate:statement.dueDate,amount:statement.amount,statement,choices:choicesByFile[i]})),'2026-10-15');

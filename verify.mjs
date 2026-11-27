@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
 import {DatabaseSync} from 'node:sqlite';
 import {demoPlan,clone,forecast,lowest,paymentFor,monthAt,zero,validatePlan,progressFor,yearProgress,achievements} from './src/budget.js';
 import worker from './dist/server/index.js';
@@ -50,8 +51,10 @@ const bSaved=await (await worker.fetch(request('GET',null,'b'),{DB})).json();ass
 assert.equal((await worker.fetch(request('PUT',{plan:detailed,revision:3}),{DB})).status,409);
 assert.equal((await worker.fetch(request('PUT',{plan:{...detailed,details:[{...detailed.details[0],date:'2026-02-30'}]},revision:4}),{DB})).status,400);
 console.log('PASS Cheques, categories and display settings persist with account isolation and conflicts');passed++;
-const script=readFileSync('dist/index.html','utf8').match(/<script type="module">([\s\S]*)<\/script>/)[1];new Function(script);
-console.log('PASS Browser script syntax');passed++;
+const entry=readFileSync('dist/frontend/index.html','utf8').match(/<script type="module"[^>]* src="\/ui-assets\/([^"]+\.js)"/);
+assert.ok(entry,'The built Tazrim shell must reference its browser module');
+execFileSync(process.execPath,['--check','dist/frontend/'+entry[1]]);
+console.log('PASS Browser module syntax');passed++;
 const {createVault,unlockVault,saveVault}=await import('./src/vault.js');
 const encrypted=await createVault(detailsSaved.plan,'test-only verification password','personal:a');
 assert.equal((await worker.fetch(request('PUT',{plan:encrypted.envelope,revision:4}),{DB})).status,200);

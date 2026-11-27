@@ -396,3 +396,36 @@ button.planned-entry:active,a.planned-entry:active { background:hsl(var(--muted)
     padding-inline:16px;
   }
 }
+
+.outlook-buffer-result {
+  color:hsl(var(--muted-foreground));
+  font-size:.8125rem;
+  line-height:1.5;
+  margin-top:6px;
+}
+.outlook-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 8px;
+  margin-block:12px;
+}
+.outlook-actions a {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:44px;
+  padding:6px 10px;
+  border:1px solid hsl(var(--border));
+  border-radius:12px;
+  color:hsl(var(--primary));
+  font-size:.8125rem;
+  font-weight:600;
+}
+.outlook-actions a:first-child {
+  background:hsl(var(--primary)/.08);
+  border-color:hsl(var(--primary)/.2);
+}
+.outlook-actions a:hover {background:hsl(var(--primary)/.12)}
+.outlook-actions svg {flex:none}
+.scenario-outlook-result {background:hsl(var(--primary)/.07)}
+.scenario-outlook-result {font-size:.875rem}

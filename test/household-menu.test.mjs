@@ -30,7 +30,7 @@ test('Retained menu entries lead to existing distinct tools and keep selected sp
   assert.ok(routes.includes(url.pathname),url.pathname)
   assert.equal(url.searchParams.get('budget'),'family');assert.equal(url.searchParams.get('year'),'2026');assert.equal(url.searchParams.get('month'),'10')
  }
- for(const route of ['/checks','/loans','/incoming','/upload','/upload/history','/analysis','/overview'])assert.ok(markup.includes('href="'+route+'?'),route)
+ for(const route of ['/checks','/loans','/incoming','/analysis','/overview'])assert.ok(markup.includes('href="'+route+'?'),route)
  const profile=readFileSync('frontend/src/app/account-menu.tsx','utf8'),settings=readFileSync('frontend/src/app/settings-home.tsx','utf8')
  assert.match(profile,/\['\/settings',\s*navigationLabels\.settings\b/)
  assert.equal(navigationLabels.settings,'הגדרות')

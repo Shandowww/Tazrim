@@ -1,3 +1,4 @@
+import {OverviewBreakdown,type OverviewMetric} from './overview-breakdown'
 import {HouseholdOutlook} from './household-outlook'
 import {MoneyAmount} from './money-amount'
 import {ReportEndDate} from './report-end-date'
@@ -43,15 +44,15 @@ export function HouseholdHome({plan,asOf,personal}:{plan:any;asOf:string;persona
  const categoryTotal=categories.reduce((sum,[,amount])=>sum+amount,0)
  useEffect(()=>{if(history.latest&&selected.month!==requested)navigate(href('/',selected.month),{replace:true,state:location.state})},[history.latest,requested,selected.month,location.search,location.state,navigate])
  const incomeLabel=personal?'הכנסות':'כניסות'
- const cardsLabel=personal?'הוצאות בכרטיס':'מתוכן בכרטיסים'
- const metrics=[{title:incomeLabel,value:incoming(selected),Icon:ArrowDownLeft,tone:'income',note:'הכנסות והעברות נכנסות'},{title:'הוצאות',value:selected.spending,Icon:ArrowUpRight,tone:'expense',note:'לפי הדיווחים שנקלטו'},{title:cardsLabel,value:selected.cardTotal,Icon:CreditCard,tone:'cards',note:'כלול בסך ההוצאות'}]
+ const cardsLabel=personal?'הוצאות בכרטיס':'חיובי כרטיסים'
+ const metrics:{title:string;value:number|null;Icon:typeof ArrowDownLeft;tone:OverviewMetric;note:string}[]=[{title:incomeLabel,value:incoming(selected),Icon:ArrowDownLeft,tone:'income',note:'הכנסות והעברות נכנסות'},{title:'הוצאות',value:selected.spending,Icon:ArrowUpRight,tone:'expense',note:'לפי הדיווחים שנקלטו'},{title:cardsLabel,value:selected.cardTotal,Icon:CreditCard,tone:'cards',note:'לפי דיווחי הכרטיסים וחיובי הבנק'}]
  return <div className="household-page household-home">
   <h1 className="home-mobile-title sr-only">תמונה כללית</h1>
   <div className="home-heading">
    <div><p className="home-eyebrow">התקציב שלך, במבט אחד</p><h1>תמונה כללית</h1></div>
   </div>
   <section className="home-summary" aria-label={'סיכום '+label(selected.month)}>
-   {metrics.map(({title,value,Icon,tone,note})=><div className="home-metric" data-tone={tone} key={title}><div className="home-metric-label"><span>{title}</span><Icon size={17} aria-hidden/></div><strong data-missing={value===null}><MoneyAmount value={value}/></strong><span className="home-metric-note">{note}</span></div>)}
+   {metrics.map(({title,value,Icon,tone,note})=><OverviewBreakdown key={title} title={title} value={value} tone={tone} month={selected.month} asOf={asOf} partial={selected.partial} cards={selected.cards} bankReportEnds={selected.bankReportEnds} plan={plan} href={href}><span className="home-metric-label"><span>{title}</span><Icon size={17} aria-hidden/></span><strong data-missing={value===null}><MoneyAmount value={value}/></strong><span className="home-metric-note">{note}</span></OverviewBreakdown>)}
   </section>
   <p className="home-data-note">{selected.partial?'דיווח חלקי לחודש הזה':selected.reported?'מבוסס על נתונים מדווחים':selected.cardTotal!==null?'דווחו כרטיסים; חסר דיווח בנק.':selected.hasSavedData?'יש נתונים לחודש הזה, אך חסר דיווח חודשי מלא.':'עדיין אין דיווח לחודש הזה.'}{selected.bankReportEnds.map(account=><span key={account.id}>{' · '}<ReportEndDate date={account.reportThrough!}/>{selected.multipleBankAccounts&&<> (<bdi>{account.label}</bdi>)</>}</span>)}{(selected.incomingTransfers??0)!==0&&<> · {personal?'בהכנסות':'בכניסות'} נכללות העברות בסך <MoneyAmount value={selected.incomingTransfers}/></>}</p>
   <div className="home-workspace">
@@ -64,7 +65,7 @@ export function HouseholdHome({plan,asOf,personal}:{plan:any;asOf:string;persona
        {history.rows.map(row=><Link key={row.month} className="home-chart-month" href={href('/',row.month)} aria-current={selected.month===row.month?'date':undefined} aria-label={`${label(row.month)}: ${incomeLabel} ${money(incoming(row))}, הוצאות ${money(row.spending)}, כרטיסים ${money(row.cardTotal)}${row.partial?' · חלקי':''}`}><span className="home-chart-bars" style={{'--baseline':baseline+'%'} as any}>{[incoming(row),row.spending,row.cardTotal].map((value,index)=>value===null?<span className="home-chart-missing" key={index} aria-hidden>·</span>:<span key={index} data-tone={['income','expense','cards'][index]} style={{height:Math.max(value===0?1:0,Math.abs(value)/range*100)+'%',bottom:(value>=0?baseline:baseline-Math.abs(value)/range*100)+'%'}}/>)}</span><span className="home-chart-month-label">{shortLabel(row.month)}</span></Link>)}
       </div>
      </div>
-     <p className="home-chart-caption">כרטיסים הם חלק מההוצאות. חודשים ללא דיווח מסומנים בנקודה.</p>
+     <p className="home-chart-caption">חיובי הכרטיסים מוצגים בנפרד ועשויים כבר להיכלל בהוצאות. חודשים ללא דיווח מסומנים בנקודה.</p>
     </>:<div className="home-empty"><p>התמונה תתמלא עם הדוח הראשון</p><span>כאן יופיעו הכנסות והוצאות לאורך החודשים. הוספת דוחות זמינה בתפריט.</span></div>}
    </section>
    <section className="home-panel home-categories" aria-labelledby="home-categories-heading">

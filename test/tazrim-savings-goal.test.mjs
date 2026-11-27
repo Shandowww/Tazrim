@@ -13,7 +13,7 @@ function base(){return{startMonth:'2026-01',opening:1000,buffer:0,horizon:24,def
 const draft=p=>({...initialSavingsGoalDraft(p,''),name:'מטרה חדשה',target:'750.01',icon:'house',deadline:'2027-12-31',fundingAccountIds:['a','b']})
 test('Goal creation matches the original goal submit transition without creating an allocation or deposit',()=>{
  const p=base(),d=draft(p),before=JSON.stringify(p),next=prepareSavingsGoal(p,'new-goal',d,true);assert.ok(validatePlan(p))
- const s=readFileSync('src/savings.js','utf8'),start=s.indexOf('let g=next.savingsGoals.items.find'),end=s.indexOf('savingsUI.id=id;savingsCommit(next);',start)+'savingsUI.id=id;savingsCommit(next);'.length
+ const s=readFileSync('test/fixtures/retired-interface/savings.js','utf8'),start=s.indexOf('let g=next.savingsGoals.items.find'),end=s.indexOf('savingsUI.id=id;savingsCommit(next);',start)+'savingsUI.id=id;savingsCommit(next);'.length
  let captured;const context=vm.createContext({next:clone(p),values:{...d,id:''},crypto:{randomUUID:()=> 'new-goal'},readNumber:Number,savingsReadFunding:()=>d.fundingAccountIds,form:{},savingsUI:{},savingsCommit:v=>{captured=v}});vm.runInContext(s.slice(start,end),context);assert.deepEqual(JSON.parse(JSON.stringify(captured)),next)
  const g=next.savingsGoals.items.find(g=>g.id==='new-goal');assert.equal(g.allocated,0);assert.equal(g.monthly,0);assert.equal(savingsBalances(next,'2026-10').balance,1100);assert.equal(savingsBalances(next,'2026-10').free,savingsBalances(p,'2026-10').free);assert.deepEqual(next.savingsGoals.deposits,p.savingsGoals.deposits);assert.equal(JSON.stringify(p),before)
 })

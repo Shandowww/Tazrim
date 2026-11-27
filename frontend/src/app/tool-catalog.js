@@ -10,8 +10,8 @@ export const toolGroups = [
     ['/savings/schedule', 'הפקדות חודשיות'], ['/savings/transfers', 'העברות חיסכון'],
   ] },
   { title: 'דוחות וניתוח', items: [
-    ['/incoming', navigationLabels.sync], ['/upload', navigationLabels.sources],
-    ['/upload/history', 'היסטוריית קליטה'], ['/analysis', 'מדדים וניתוח מקורות'],
+    ['/incoming', navigationLabels.sync],
+    ['/analysis', navigationLabels.analysis],
     ['/search', 'חיפוש בפירוט'], ['/actions', 'התראות ותזכורות'],
     ['/notices', 'עדכוני בנקים ומנפיקים'], ['/settings/report-expectations', 'דוחות צפויים'],
     ['/settings/purchase-notes', 'פתקי קנייה'],

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {navigationViewportInset} from '../src/navigation.js';
+import {navigationViewportInset} from './fixtures/retired-interface/navigation.js';
 
 test('navigation follows the visible screen and keyboard without accumulating scroll',()=>{
  assert.equal(navigationViewportInset(844,{height:844,offsetTop:0,scale:1}),0);

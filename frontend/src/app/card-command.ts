@@ -1,5 +1,5 @@
 import {creditCards,cardsValid,clone,validatePlan,cashAccountList,cashPlanningBase,cashCardAccount,assignCashPayers} from '../../../src/budget.js'
-import {CARD_METADATA_FIELDS,cardMetadataDraft,applyCardMetadata} from '../../../src/card-metadata.js'
+import {CARD_ISSUERS,CARD_METADATA_FIELDS,cardDateValid,cardMetadataDraft,applyCardMetadata} from '../../../src/card-metadata.js'
 export interface CardDraft {name:string;alias:string;billingDay:string;payer:string;issuer?:string;club?:string;network?:string;discountEndsOn?:string;feeAfterDiscount?:string;issuerPhone?:string}
 export function cardConfigEligibility(plan:any,id:string,create=false){
  if(!validatePlan(plan))return 'התקציב אינו זמין לעריכת כרטיסים.'
@@ -7,6 +7,27 @@ export function cardConfigEligibility(plan:any,id:string,create=false){
  return null
 }
 export function initialCardDraft(plan:any,id:string):CardDraft{const card=creditCards(plan).find((row:any)=>row.id===id);return{name:card?.name??'',alias:card?.alias??'',billingDay:String(card?.billingDay??15),payer:card?cashCardAccount(plan,id)??'':'',...cardMetadataDraft(card??{})}}
+/** Prefill from the reader's structured identity and confirmed billing date. */
+export function reportCardSeed(plan:any,item:{kind?:string;identity?:string;provider?:string;report?:{last4?:string;cardName?:string;dueDate?:string;network?:string}}):Partial<CardDraft>|null{
+ if(plan?.format||!validatePlan(plan)||item?.kind!=='card')return null
+ const match=/^(cal|isracard):(\d{4})$/.exec(item.identity??'')
+ if(!match)return null
+ const [,issuer,alias]=match
+ const report=item.report
+ if(issuer!==item.provider||report?.last4&&report.last4!==alias)return null
+ const cards=creditCards(plan)
+ if(cards.length>=30||cards.some((card:any)=>card.alias===alias))return null
+ const issuerLabel=CARD_ISSUERS.find(([key])=>key===issuer)?.[1]
+ const name=report?.cardName?.trim()
+ const network=report?.network??''
+ const dueDate=report?.dueDate??''
+ return {
+  issuer,alias,
+  name:name&&name.length<=60?name:issuerLabel+' '+alias,
+  billingDay:cardDateValid(dueDate)?String(Number(dueDate.slice(-2))):'',
+  ...(['visa','mastercard','amex','diners','isracard'].includes(network)?{network}:{})
+ }
+}
 export function cardDraftFingerprint(d:CardDraft){return JSON.stringify({name:d.name.trim(),alias:d.alias.trim(),billingDay:/^\d{1,2}$/.test(d.billingDay)?Number(d.billingDay):d.billingDay,payer:d.payer,...Object.fromEntries(CARD_METADATA_FIELDS.map(key=>[key,(d[key as keyof CardDraft]??'').trim()]))})}
 /** Original card-manager metadata transition; payer creation is explicit and applies only to a brand-new zero-total card. */
 export function prepareCardConfig(plan:any,id:string,draft:CardDraft,create=false){

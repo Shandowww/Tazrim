@@ -107,8 +107,8 @@ async function clientHarness(){
  const state={entries:new Map([['personal',{status:'ready',meta:{name:'פרטי'},summary:{transfers:[out]}}],['shared',{status:'ready',meta:{name:'בית'},summary:{transfers:[incoming]}}]]),privateMatches:{revision:0,items:[]},controller:new AbortController(),transferOut:out.key,transferIn:incoming.key,user:'tal'};
  let draws=0,reloads=0;
  const c=vm.createContext({...matchCommands,spaceOverview:state,accountId:'tal',transferBrowserSelection,transferPairValid,spaceOverviewRender(){draws++;},spaceRequireReload(){reloads++;},render(){},clearSpaceOverview(){c.spaceOverview=null;}});
- vm.runInContext(readFileSync('src/space-transfer-vaults-client.js','utf8'),c);
- vm.runInContext(readFileSync('src/space-transfers-client.js','utf8'),c);
+ vm.runInContext(readFileSync('test/fixtures/retired-interface/space-transfer-vaults-client.js','utf8'),c);
+ vm.runInContext(readFileSync('test/fixtures/retired-interface/space-transfers-client.js','utf8'),c);
  return {c,state,out,incoming,draws:()=>draws,reloads:()=>reloads};
 }
 test('Private match client sends only reviewed refs and confirms actual API success without modifying budget summaries',async()=>{

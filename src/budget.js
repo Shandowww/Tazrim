@@ -9,8 +9,9 @@ export const visibleCards=(p,m)=>creditCards(p).filter(c=>!c.removedFrom||m<c.re
 export const budgetFields=p=>[...fields.map(f=>f[0].startsWith('card')?[f[0],creditCards(p).find(c=>c.id===f[0])?.name??f[1],f[2]]:f),...creditCards(p).filter(c=>!['card1','card2'].includes(c.id)).map(c=>[c.id,c.name,'expense'])];
 // Initial navigation follows the current month without changing the budget period.
 export const defaultBudgetMonth=(p,asOf)=>asOf<p.startMonth?p.startMonth:asOf;
-// Transfers are needs-based: inherit only an explicit recurring estimate, never a prior report.
-export function monthlyValues(p,m){const prior=Object.keys(p.months).filter(k=>k<m&&(p.months[k].actual||p.months[k].bankCoverage?.complete!==false)).sort().at(-1),v=clone(p.months[m]?.values??(prior?p.months[prior].values:p.defaults));if(!p.months[m]){const schedule=(p.savingSchedules??[]).filter(r=>r.from<=m).sort((a,b)=>a.from.localeCompare(b.from)).at(-1);if(schedule){v.personalSaving=schedule.personalSaving;v.sharedSaving=schedule.sharedSaving;}}for(const k of ['incomingTransfers','outgoingTransfers'])v[k]=p.months[m]?v[k]??0:p.defaults[k]??0;v.loanRepayment??=0;for(const c of creditCards(p)){v[c.id]??=p.defaults[c.id]??0;if(!p.months[m]&&c.removedFrom&&m>=c.removedFrom)v[c.id]=0;}return v;}
+// Other income and transfers use explicit recurring estimates for months without a saved record.
+const recurringOnlyFields=['otherIncome','incomingTransfers','outgoingTransfers'];
+export function monthlyValues(p,m){const prior=Object.keys(p.months).filter(k=>k<m&&(p.months[k].actual||p.months[k].bankCoverage?.complete!==false)).sort().at(-1),v=clone(p.months[m]?.values??(prior?p.months[prior].values:p.defaults));if(!p.months[m]){const schedule=(p.savingSchedules??[]).filter(r=>r.from<=m).sort((a,b)=>a.from.localeCompare(b.from)).at(-1);if(schedule){v.personalSaving=schedule.personalSaving;v.sharedSaving=schedule.sharedSaving;}}for(const k of recurringOnlyFields)v[k]=p.months[m]?v[k]??0:p.defaults[k]??0;v.loanRepayment??=0;for(const c of creditCards(p)){v[c.id]??=p.defaults[c.id]??0;if(!p.months[m]&&c.removedFrom&&m>=c.removedFrom)v[c.id]=0;}return v;}
 export function saveMonthReport(p,m,actual,asOf,salaryChanged=false){if(actual&&m>asOf)throw Error('חודש עתידי ניתן לשמור כהערכה בלבד.');const next=clone(p),values=monthlyValues(p,m);next.months[m]={values,actual,includesPlannedCard:p.months[m]?.includesPlannedCard??false,...(p.months[m]?.includesPlannedDirect!==undefined?{includesPlannedDirect:p.months[m].includesPlannedDirect}:{}),...(p.months[m]?.bankCoverage?{bankCoverage:p.months[m].bankCoverage}:{}),...(p.months[m]?.otherIncomeNote!==undefined?{otherIncomeNote:p.months[m].otherIncomeNote}:{}),...(actual&&p.months[m]?.cashReport?{cashReport:{balance:p.months[m].cashReport.balance,net:p.months[m].cashReport.pending?forecast(p,undefined,Math.max(p.horizon,indexMonth(m)-indexMonth(p.startMonth)+1)).find(r=>r.month===m).net+pendingSavingCents(p,m)/100:p.months[m].cashReport.net}}:{})};if(salaryChanged)for(const [month,r] of Object.entries(next.months))if(month>m&&!r.actual)r.values.salary=values.salary;if(next.savingsGoals&&m>=next.savingsGoals.snapshotMonth&&m<=asOf)return confirmMonthlySavings(next,m,asOf,!actual);return next;}
 export function stopCardForecast(p,id,from){const next=clone(p);next.creditCards=clone(creditCards(p));const card=next.creditCards.find(c=>c.id===id);if(!card||!monthOk(from))throw Error('יש לבחור כרטיס וחודש תקינים.');card.removedFrom=from;for(const [m,r] of Object.entries(next.months))if(m>=from&&!r.actual)r.values[id]=0;next.defaults[id]=0;if(!validatePlan(next))throw Error('לא ניתן להפסיק את הערכות הכרטיס.');return next;}
 export function cardsValid(p){if(p.creditCards===undefined)return true;if(!Array.isArray(p.creditCards)||p.creditCards.length>30)return false;const ids=new Set(),aliases=new Set();return p.creditCards.every(c=>{if(!c||!cardMetadataValid(c)||!/^card(?:[12]|_[a-zA-Z0-9-]{1,70})$/.test(c.id)||ids.has(c.id)||typeof c.name!=='string'||!c.name.trim()||c.name.length>60||typeof c.alias!=='string'||c.alias.length>80||/^\d{13,19}$/.test(c.alias.replace(/[ -]/g,''))||c.billingDay!==undefined&&(!Number.isInteger(c.billingDay)||c.billingDay<1||c.billingDay>31)||c.removedFrom!==undefined&&!monthOk(c.removedFrom)||c.alias&&aliases.has(c.alias))return false;ids.add(c.id);if(c.alias)aliases.add(c.alias);return true;});}
@@ -960,11 +961,11 @@ export function graphWindow(count,unit,endMonth){
 }
 export function graphTimeline(p,{startMonth,endMonth,asOf,includeEstimates=false,excludeMonth=''}){
  const length=indexMonth(endMonth)-indexMonth(startMonth)+1;if(length<1||length>122)throw Error('טווח הגרף ארוך מדי.');const projections=new Map(forecast(p).map(r=>[r.month,r]));
- return Array.from({length},(_,i)=>{const month=monthAt(startMonth,i),record=p.months[month],actual=record?.actual===true&&month<=asOf&&month!==excludeMonth,estimated=!actual&&includeEstimates&&projections.has(month)&&month!==excludeMonth;
+ return Array.from({length},(_,i)=>{const month=monthAt(startMonth,i),record=p.months[month],projection=projections.get(month),actual=record?.actual===true&&month<=asOf&&month!==excludeMonth,estimated=!actual&&includeEstimates&&!!projection&&month!==excludeMonth;
   const empty={income:null,spending:null,reportedSpending:null,saving:null,invest:null,plannedExpense:null,plannedIncome:null,balance:null,net:null};if(!actual&&!estimated)return{month,actual:false,estimated:false,values:empty};
   const resolved=record? p:{...p,months:{...p.months,[month]:{values:monthlyValues(p,month),actual:false,includesPlannedCard:false}}},totals=progressFor(resolved,month).totals;
   const plannedExpense=(p.expenses.reduce((n,e)=>n+(e.kind==='expense'&&!(e.source==='card'&&record?.includesPlannedCard)?cents(paymentFor(e,month)):0),0)+chequesFor(p,month))/100,plannedIncome=p.expenses.reduce((n,e)=>n+(e.kind==='income'?cents(paymentFor(e,month)):0),0)/100;
-  return{month,actual,estimated,values:{...totals,reportedSpending:reportedMonthlySpending(resolved,month),plannedExpense,plannedIncome,balance:projections.get(month)?.balance??null,net:(cents(totals.income)+cents(monthlyValues(resolved,month).incomingTransfers??0)-cents(monthlyValues(resolved,month).outgoingTransfers??0)-cents(totals.spending)-cents(totals.saving)-cents(totals.invest))/100}};
+  return{month,actual,estimated,values:{...totals,reportedSpending:reportedMonthlySpending(resolved,month),plannedExpense,plannedIncome,balance:projection?.balance??null,net:estimated?projection.net:(cents(totals.income)+cents(monthlyValues(resolved,month).incomingTransfers??0)-cents(monthlyValues(resolved,month).outgoingTransfers??0)-cents(totals.spending)-cents(totals.saving)-cents(totals.invest))/100}};
  });
 }
 
@@ -1359,7 +1360,7 @@ export function cashAccountValues(p,id,month,sourceRecords=null){
  const a=cashAccountList(p).find(a=>a.id===id),records=sourceRecords??cashSourceRecords(p,id),record=records[month];
  const prior=Object.keys(records).filter(m=>m<month&&records[m].actual).sort().at(-1);
  const values=clone(record?.values??(prior?records[prior].values:a?.defaults??zero()));
- for(const k of ['incomingTransfers','outgoingTransfers'])values[k]=record?values[k]??0:a?.defaults?.[k]??0;
+ for(const k of recurringOnlyFields)values[k]=record?values[k]??0:a?.defaults?.[k]??0;
  for(const c of creditCards(p))values[c.id]??=0;
 
  return {values,record};
@@ -1368,6 +1369,10 @@ export function cashUnassigned(p,month){
  const sums=Object.fromEntries(budgetFields(p).map(([k])=>[k,0]));for(const a of cashAccountList(p)){const {values}=cashAccountValues(p,a.id,month);for(const k of Object.keys(sums))sums[k]+=cents(values[k]??0);}
  const totals=monthlyValues(p,month);return Object.fromEntries(Object.keys(sums).map(k=>[k,(cents(totals[k]??0)-sums[k])/100]).filter(([,v])=>v!==0));
 }
+export const cashForecastIssues=Object.freeze({
+ unassigned:'יש סכומים חודשיים ללא שיוך או שאינם תואמים לסיכום',
+ partialBank:'דוח הבנק לחודש זה חלקי'
+});
 export function cashAccountForecast(p,id,additionalIds=[],minHorizon=0){
  const a=cashAccountList(p).find(a=>a.id===id);if(!a)throw Error('בחר חשבון בנק לתכנון.');
  const length=Math.max(p.horizon,minHorizon,...p.expenses.map(e=>indexMonth(e.firstMonth)-indexMonth(p.startMonth)+e.payments),...(p.details??[]).map(e=>indexMonth(e.month)-indexMonth(p.startMonth)+1),...(p.loans??[]).map(e=>indexMonth(e.from)-indexMonth(p.startMonth)+e.months)),records=cashSourceRecords(p,id);
@@ -1385,10 +1390,10 @@ export function cashAccountForecast(p,id,additionalIds=[],minHorizon=0){
  return rows.map((row,i)=>{const month=row.month;if(proxy.months[month].cashReport){transferDelta=0;billingDelta=0;}const billingAdjustment=billingForecastAdjustment(p,id,month,records[month],proxy.months[month].values);billingDelta-=cents(billingAdjustment);let transferNet=0;
  for(const t of p.cashPlanning?.transfers??[])if(t.month===month&&t.status==='planned')transferNet+=(t.to===id?cents(t.amount):0)-(t.from===id?cents(t.amount):0);transferDelta+=transferNet;
  const issues=[];if(!anchorState[i])issues.push('חסרה יתרת עו״ש לחשבון');
- if(Object.keys(cashUnassigned(p,month)).length)issues.push('יש סכומים חודשיים ללא שיוך או שאינם תואמים לסיכום');
+ if(Object.keys(cashUnassigned(p,month)).length)issues.push(cashForecastIssues.unassigned);
  if(p.expenses.some(e=>!cashAssignedItem(p,e)&&paymentFor(e,month)>0)||(p.details??[]).some(e=>additionalCheque(e)&&e.month===month&&!cashAssignedItem(p,e))||(p.savingTransfers??[]).some(t=>t.month===month&&t.status==='pending'&&!cashAssignedItem(p,t)))issues.push('יש התחייבויות ללא חשבון משלם');
  if(creditCards(p).some(c=>cents(proxy.months[month].values[c.id]??0)>0&&p.cashPlanning?.cardAccounts[c.id]&&p.cashPlanning.cardAccounts[c.id]!==id))issues.push('יש חיוב כרטיס המשויך לחשבון אחר');
- const latestRecord=records[month]??records[Object.keys(records).filter(m=>m<month).sort().at(-1)];if(latestRecord?.fromBank&&!latestRecord.actual)issues.push('דוח הבנק לחודש זה חלקי');
+ const latestRecord=records[month]??records[Object.keys(records).filter(m=>m<month).sort().at(-1)];if(latestRecord?.fromBank&&!latestRecord.actual)issues.push(cashForecastIssues.partialBank);
  return {...row,net:(cents(row.net)+transferNet-cents(billingAdjustment))/100,internalTransfer:transferNet/100,balance:anchorState[i]?(cents(row.balance)+transferDelta+billingDelta)/100:null,accountId:id,label:a.label,buffer:a.buffer??0,issues};});
 }
 export function cashScenarioForecast(p,additionalIds=[],minHorizon=0){return cashAccountList(p).map(a=>({account:a,rows:cashAccountForecast(p,a.id,additionalIds,minHorizon)}));}

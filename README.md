@@ -327,7 +327,7 @@ The everyday experience prioritizes simple report import and optional categoriza
 
 The primary data-entry path is downloading bank/card statements and uploading them through **מרכז הדוחות**, available in Settings and first in the app menu. It also resumes stored unfinished reports. Manual entry remains for corrections and missing values. Gmail is an optional secondary Settings page under **חיבורים וייבוא → חיבורים נוספים → הגדרות Gmail**; account-login links in email are not report attachments. Apple Pay retains its existing Connections entry. See `docs/REPORT-CENTER-PRIMARY-2026-10-19.md` and `docs/GMAIL-SETUP-EN.md`.
 
-`node build.mjs` builds a dependency-free Cloudflare Worker. `node verify.mjs` checks cash-flow math, installments, database storage, user isolation and revision conflicts. `node preview.mjs` serves a loopback-only local preview on port 5173 with a separate SQLite database under ignored `.sites-runtime/`.
+`node build.mjs` builds the Tazrim frontend and Budgit server assets. `node verify.mjs` checks cash-flow math, installments, database storage, user isolation, revision conflicts and the built browser module. `node preview.mjs` serves a loopback-only local preview at `http://127.0.0.1:5173/next` with a separate SQLite database under ignored `.sites-runtime/`.
 
 The local preview injects a test identity only in that local server. Production requires platform-injected authenticated user headers. Every budget is stored under its authenticated user ID in the declared D1 database. SQL migrations are generated with Drizzle and retained under `drizzle/`.
 

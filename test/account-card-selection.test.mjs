@@ -33,7 +33,7 @@ test('A healthy original account suppresses noise; a tight but safe scenario req
 });
 function uiHarness(p=fixture()){
  const c=vm.createContext({...model,crypto:globalThis.crypto,plan:p,app:{addEventListener(){},querySelector:()=>null},purchase:{...purchase},selectedPayments:1,purchaseEnabled:true,scenarioItems:[],document:{getElementById:()=>null},todayMonth:()=>month,esc:s=>String(s??'').replaceAll('<','&lt;'),money:n=>n+' ₪',notify(){},select:(label,name,items,value)=>`<select name="${name}">${items.map(([id,label])=>`<option value="${id}" ${id===value?'selected':''}>${label}</option>`).join('')}</select>`});
- vm.runInContext(fs.readFileSync('src/cash-accounts.js','utf8'),c);vm.runInContext(fs.readFileSync('src/planner.js','utf8'),c);return c;
+ vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/cash-accounts.js','utf8'),c);vm.runInContext(fs.readFileSync('test/fixtures/retired-interface/planner.js','utf8'),c);return c;
 }
 test('Calculator, planned fields and month grids show selected-account cards and separate qualifying alternatives',()=>{
  const c=uiHarness();assert.match(c.cashCardField('trial-card','card1','a',month),/value="card1"/);assert.doesNotMatch(c.cashCardField('item-card','','a',month),/value="card2"/);const html=c.paymentCalendar();assert.match(html,/חלופה בחשבון אחר/);assert.match(html,/data-account="b"/);assert.doesNotMatch(html.split('payment-calendar-note')[0],/וואן זירו · סוף החודש/);

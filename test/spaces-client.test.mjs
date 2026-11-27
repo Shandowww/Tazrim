@@ -12,7 +12,7 @@ function harness({user='linoi',hasData=false,storage=new Map(),role='viewer'}={}
   itemDraft:{id:'',name:'',amount:0},plan:{startMonth:'2026-10'},zero:()=>({}),todayMonth:()=> '2026-10',
   render(){},notify(){},forgetVault(){c.forgot=true;},esc:String,tab:'progress',detailDraft:null,detailDirty:false,categoryGoalDirty:false,trendCategory:'',scenarioItems:[],purchaseEnabled:true,purchase:{},
   fetch:async()=>({ok:true,json:async()=>({accountId:user,accountEmail:user+'@example.test',budgets:[{id:'personal',role:'owner',hasData,name:'האישי שלי'},{id:'house',role,name:'הבית'}]})})});
- vm.runInContext(readFileSync('src/spaces.js','utf8'),c);
+ vm.runInContext(readFileSync('test/fixtures/retired-interface/spaces.js','utf8'),c);
  c.load=async()=>{await c.loadBudgets();c.plan={startMonth:'2026-10',marker:'existing private data'};return true;};
  return{c,storage,run:code=>vm.runInContext(code,c)};
 }

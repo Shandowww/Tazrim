@@ -19,6 +19,8 @@ test('American Express XLSX uses the printed card and billing date and reconcile
  assert.equal(parsed.provider,'isracard');
  assert.equal(parsed.identity,'isracard:7234');
  assert.equal(report.dueDate,'2026-10-10');
+ assert.equal(report.cardName,'אמריקן אקספרס זהב');
+ assert.equal(report.network,'amex');
  assert.equal(report.amount,137.25);
  assert.deepEqual(report.entries.map(row=>row.amountCents),[10025,4500,-800]);
  assert.equal(report.entries[0].originalCents,30075);
@@ -63,6 +65,8 @@ test('ONE ZERO Platinum Mastercard reads only the printed card suffix in the iss
  const cardHeader='\u202bפלטינה מסטרקארד\u202c - 4567';
  const source=inspection({cardHeader}),parsed=inspectIntake([source]);
  assert.equal(parsed.identity,'isracard:4567');
+ assert.equal(parsed.report.cardName,'פלטינה מסטרקארד');
+ assert.equal(parsed.report.network,'mastercard');
  assert.equal(parsed.report.dueDate,'2026-10-10');
  assert.equal(parsed.report.amount,137.25);
  assert.deepEqual(parsed.report.entries.map(row=>row.amountCents),[10025,4500,-800]);

@@ -64,5 +64,5 @@ export function useFormDraft<T>(entry:DraftEntry,input:Input<T>){
 
  useFinancialDraft({...entry,dirty:entry.dirty||edited,busy:entry.busy||localSaving,save:entry.dirty&&entry.save?()=>saveWith():undefined,mutationPending:input.mutationPending||unresolved,
   local:enabled?{status:view.status,discard,export:()=>formDraftEnvelope(scope,latest.current.base.revision,latest.current.values,latest.current.baseline,'/next'+location.pathname+location.search),restored:restored.current,durable:()=>!saving.current&&!!writer.current&&view.ready&&writer.current.durable()&&JSON.stringify(writer.current.latest)===JSON.stringify(latest.current.values),flush:()=>saving.current?Promise.resolve(false):persist()}:undefined})
- return {save:()=>saveWith(),saveWith,capture,confirmSaved,ready:view.ready,status:view.status}
+ return {save:()=>saveWith(),saveWith,capture,confirmSaved,preserve:()=>persist(),ready:view.ready,status:view.status}
 }

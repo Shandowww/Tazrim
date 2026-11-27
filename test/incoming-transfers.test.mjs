@@ -65,5 +65,5 @@ test('Outgoing movements cannot be incoming transfers, and learned rules preserv
  assert.throws(()=>applyBankImport(base(),rs,o),/בדיקת/);
  const rules=bankRememberedRules([],rs.slice(0,1),o.choices);assert.equal(rules[0].destination,'incomingTransfers');assert.equal(rules[0].refund,false);
  assert.equal(suggest(rs[0],rules).destination,'incomingTransfers');assert.notEqual(suggest(rs[1],rules).destination,'incomingTransfers');
- const c=vm.createContext({app:{addEventListener(){}}});vm.runInContext(readFileSync('src/bank-import-client.js','utf8'),c);assert.equal(c.bankIsRefund(rs[0],'incomingTransfers'),false);assert.equal(c.bankTargetLabel(rs[0],'incomingTransfers','העברה נכנסת'),'העברה נכנסת');
+ const c=vm.createContext({app:{addEventListener(){}}});vm.runInContext(readFileSync('test/fixtures/retired-interface/bank-import-client.js','utf8'),c);assert.equal(c.bankIsRefund(rs[0],'incomingTransfers'),false);assert.equal(c.bankTargetLabel(rs[0],'incomingTransfers','העברה נכנסת'),'העברה נכנסת');
 });

@@ -5,7 +5,12 @@ import {MoneyAmount} from './money-amount'
 import {PageHeading} from './page-heading'
 import {ScenarioComparison} from './scenario-comparison'
 import {useRef,useState} from 'react'
-import {cashAccountList,scenarioAssessment,validatePlan} from '../../../src/budget.js'
+import {useLocation} from 'react-router-dom'
+import {ForecastBuffer} from './forecast-buffer'
+import {forecastCoveragePath} from './outlook-model'
+import {scenarioComparison} from './scenario-comparison-model'
+import {withViewQuery} from './navigation-query'
+import {cashAccountList,indexMonth,scenarioAssessment,validatePlan} from '../../../src/budget.js'
 import {initialScenarioRow,prepareScenario,shortestScenarioSplit,type ScenarioRow} from './scenario-command'
 import {plannedItemCards,plannedItemSchedule,type PlannedItemDraft} from './planned-item-command'
 import {savePreparedPlan,SaveConflict} from './plan-save'
@@ -18,10 +23,23 @@ import {groupAmountText,groupedAmountChange} from './amount-format'
 import {usePeriodHref} from '../tazrim/components/layout/period-context'
 const input='mt-1 min-h-11 w-full rounded-xl border bg-card px-3 text-base tabular-nums',button='min-h-11 rounded-xl border px-4 text-sm disabled:opacity-50'
 function currentMonth(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit'}).formatToParts(new Date());return parts.find(p=>p.type==='year')!.value+'-'+parts.find(p=>p.type==='month')!.value}
+type OutlookContext={month:string;accountId:string|null;label:string;buffer:number}
+function outlookContext(plan:any,search:string,asOf:string):OutlookContext|null{
+ const query=new URLSearchParams(search),month=query.get('scenarioMonth'),accountId=query.get('scenarioAccount')
+ if(!month||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month)||month<asOf||month<plan.startMonth||indexMonth(month)-indexMonth(plan.startMonth)>=120)return null
+ const accounts=cashAccountList(plan),account=accounts.find(item=>item.id===accountId)
+ if(account)return {month,accountId:account.id,label:account.label,buffer:account.buffer??0}
+ return !accounts.length&&accountId==='budget'?{month,accountId:null,label:'התקציב כולו',buffer:plan.buffer??0}:null
+}
 export function ScenarioEditor({budget,base,onSaved,onSaveComplete,demo=false,onDemoSaved,embedded=false,purchaseId='',detailsHref,readOnlyReason=''}:{budget:BudgetState;base:BudgetResponse;onSaved:(s:string)=>void;onSaveComplete?:()=>void;demo?:boolean;onDemoSaved?:(plan:any)=>void;embedded?:boolean;purchaseId?:string;detailsHref?:string;readOnlyReason?:string}){
  const plan=base.plan!,[asOf]=useState(currentMonth),[rows,setRows]=useState<ScenarioRow[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[hint,setHint]=useState<{text:string;rowId?:string}|null>(null),[blocked,setBlocked]=useState(false),flight=useRef(false),newPurchase=useRef(''),addButton=useRef<HTMLButtonElement>(null),guard=useDraftGuard(),href=usePeriodHref(),accounts=cashAccountList(plan),dirty=rows.length>0
+ const {search}=useLocation(),context=!embedded&&!purchaseId?outlookContext(plan,search,asOf):null
  const firstMonth=asOf<String(plan.startMonth)?String(plan.startMonth):asOf
- const [blankPurchase]=useState(()=>initialScenarioRow(plan,crypto.randomUUID(),firstMonth,purchaseId))
+ const [blankPurchase]=useState(()=>{
+  const row=initialScenarioRow(plan,crypto.randomUUID(),context?.month??firstMonth,purchaseId)
+  if(context?.accountId)row.draft.cashAccountId=context.accountId
+  return row
+ })
  const displayedRows=rows.length?rows:[blankPurchase]
  const change=(next:ScenarioRow[])=>{setRows(next);setError(null);setHint(null);onSaved('')}
  const update=(id:string,key:keyof PlannedItemDraft,value:string)=>change(displayedRows.map(row=>{if(row.id!==id)return row;const draft={...row.draft,[key]:value};if(['cashAccountId','source','firstMonth'].includes(key)&&draft.cardId&&!plannedItemCards(plan,draft).some((c:any)=>c.id===draft.cardId))draft.cardId='';return{...row,draft}}))
@@ -32,6 +50,7 @@ export function ScenarioEditor({budget,base,onSaved,onSaveComplete,demo=false,on
  const formDraft=useFormDraft({kind:'scenario',dirty,busy,discard:()=>{setRows([]);setError(null);setBlocked(false);setHint(null)},save:blocked||readOnlyReason?undefined:saveRaw},{budgetId:demo?'demo':budget.budgetId,base,kind:'scenario',record:purchaseId||'new',context:purchaseId?'purchase':'',period:asOf,values:rows,baseline:purchaseId?blankPurchase.draft:[],restore:value=>{setRows(value)},mutationPending:blocked}),save=formDraft.save
  const backup=()=>{try{const prepared=prepareScenario(plan,rows).plan,url=URL.createObjectURL(new Blob([JSON.stringify({format:'monthly-flow-v1',plan:prepared},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='budgit-scenario-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setHint({text:'גיבוי התכנון הועבר לדפדפן להורדה.'})}catch(e){setError(e instanceof Error?e.message:'יש לתקן את התכנון לפני גיבוי.')}}
  const shortest=(row:ScenarioRow)=>{try{const payments=shortestScenarioSplit(plan,displayedRows,row.id,asOf);if(payments===null){setHint({rowId:row.id,text:'לא נמצאה פריסה השומרת על רף הביטחון. ייתכן שחסרים נתוני יתרה.'});return}update(row.id,'payments',String(payments));setHint({rowId:row.id,text:payments===1?'נבחר תשלום אחד לפי התחזית הנוכחית.':'נבחרו '+payments+' תשלומים לפי התחזית הנוכחית.'})}catch(e){setError(e instanceof Error?e.message:'יש להשלים את נתוני התרחיש.')}}
+ const outlookResult=preview&&context?scenarioComparison(preview,context.accountId,context.month).find((row:{month:string})=>row.month===context.month):null
  const assessment=preview?scenarioAssessment(preview.rows,asOf):null
  if(!formDraft.ready)return <p role="status">בודקים טיוטה במכשיר…</p>
  const existingPurchases=(plan.expenses as {id:string;kind:string;name:string}[]).filter(item=>item.kind==='expense'&&item.id!==purchaseId&&!rows.some(row=>row.originalId===item.id))
@@ -121,6 +140,15 @@ export function ScenarioEditor({budget,base,onSaved,onSaveComplete,demo=false,on
       <h3>{preview?'השוואת תחזיות':'השפעה על התחזית'}</h3>
       <ChartNoAxesCombined size={20} aria-hidden/>
      </header>
+     {context&&<div className="scenario-balance scenario-outlook-result">
+      <h4><bdi>{context.label}</bdi> · סוף {new Intl.DateTimeFormat('he-IL',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(context.month+'-01T12:00:00Z'))}</h4>
+      {outlookResult&&<div className="grid gap-1" aria-live="polite">
+       <p>לפני התרחיש <MoneyAmount value={outlookResult.before} missing="חסר מידע"/></p>
+       <p>אחרי התרחיש <strong><MoneyAmount value={outlookResult.after} missing="חסר מידע"/></strong></p>
+       <ForecastBuffer balance={outlookResult.after} buffer={context.buffer}/>
+      </div>}
+      <Link className="inline-flex min-h-11 items-center text-sm text-primary underline" href={withViewQuery(forecastCoveragePath(plan,context.accountId,asOf),search)}>בדיקת כיסוי דוחות</Link>
+     </div>}
      {preview?<>
       <p className="scenario-note">תחזית מחודש <bdi dir="ltr">{asOf}</bdi>. הסכומים הם הערכה.</p>
       {accounts.length?preview.accounts.map((account:any)=>{
@@ -136,7 +164,7 @@ export function ScenarioEditor({budget,base,onSaved,onSaveComplete,demo=false,on
        <strong><MoneyAmount value={assessment.balance} minimumFractionDigits={2}/></strong>
        <p><bdi dir="ltr">{assessment.month}</bdi> · רף ביטחון <MoneyAmount value={Number(plan.buffer)} minimumFractionDigits={2}/></p>
       </div>}
-      <ScenarioComparison preview={preview} asOf={asOf} initiallyOpen={!embedded}/>
+      <ScenarioComparison preview={preview} asOf={asOf} initiallyOpen={!embedded} initialAccount={context?.accountId}/>
       <details className="scenario-existing">
        <summary>איך התחזית מחושבת<ChevronDown size={18} aria-hidden/></summary>
        <p className="scenario-note p-3 pt-0">הפריסה הקצרה נבדקת לכל התקופה, כששאר הפריטים קבועים. רכישות חדשות בתרחיש נבדקות כהוצאה נוספת גם אם הדיווח החודשי כולל תכנון.</p>

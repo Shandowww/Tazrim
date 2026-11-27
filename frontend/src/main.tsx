@@ -7,8 +7,8 @@ import {HouseholdOutlookPage} from './app/household-outlook'
 import {HouseholdHome,HomeMonthPicker} from './app/household-home'
 import {householdSpaceHref} from './app/household-model'
 import {HouseholdNavigation,HouseholdBack,HouseholdMore} from './app/household-navigation'
-import {InterfaceLayoutSetting} from './app/interface-layout-setting'
 import {openingViewSearch} from './app/navigation-query'
+import {openInvitation} from './app/invitation-link'
 import {SessionControls} from './app/session-controls'
 import {GlobalActionCenter} from './app/global-action-center'
 import {AccountMenu} from './app/account-menu'
@@ -29,7 +29,7 @@ import {WorkspaceActions} from './app/workspace-actions'
 import {WorkspaceNavigation} from './app/workspace-navigation'
 import {installTabSwipe} from './app/tab-swipe'
 import { NavSectionsProvider } from './tazrim/components/layout/nav-context'
-import { AppearanceContext, readPalette, savePalette, type Palette } from './app/appearance'
+import { AppearanceContext, useBudgetPalette } from './app/appearance'
 import { buildNavSections } from './tazrim/lib/nav/state'
 import { demoAccounts, demoHouseholdPlan } from './app/demo-fixture'
 import { budgetNavigation } from './app/budget-adapter'
@@ -219,7 +219,11 @@ function App() {
     return opaqueKey
   }, [scrollActor])
   const [theme, setTheme] = useState(() => { try { return localStorage.getItem('budgit-react-appearance') || 'system' } catch { return 'system' } })
-  const [palette, setPalette] = useState(readPalette)
+  const paletteScope = fixture ? 'demo' : budget.status === 'ready' && !accountChanged
+    ? JSON.stringify([budget.value.accountId, budget.budgetId]) : null
+  const paletteSpaceName = fixture ? 'מרחב הדגמה' : budget.status === 'ready'
+    ? budget.spaces.find(space => space.id === budget.budgetId)?.name : undefined
+  const { palette, choosePalette } = useBudgetPalette(paletteScope)
   const [systemDark, setSystemDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches)
   useEffect(() => {
     const media = matchMedia('(prefers-color-scheme: dark)')
@@ -236,14 +240,12 @@ function App() {
   const appearanceSettings = {
     theme,
     palette,
+    paletteSpaceName: paletteScope === null ? undefined : paletteSpaceName,
     onThemeChange(value: string) {
       setTheme(value)
       try { localStorage.setItem('budgit-react-appearance', value) } catch { /* Keep the in-memory selection. */ }
     },
-    onPaletteChange(value: Palette) {
-      setPalette(value)
-      savePalette(value)
-    },
+    onPaletteChange: paletteScope === null ? undefined : choosePalette,
   }
   useEffect(()=>installPullRefresh({document,window,refresh:refreshApp,isBusy:()=>appRefreshState.pending||budget.refreshPending||budget.status==='loading'||guard.navigationPending||guard.registry.getSnapshot().busy,onHint:setPullHint,onProgress:setPullProgress}),[guard,refreshApp,appRefreshState.pending,budget.refreshPending,budget.status])
   useEffect(()=>installTabSwipe({document,window,pathname,navigate:(path:string)=>navigate(withViewQuery(path,search,import.meta.env.DEV),{replace:true,state:{householdTrail:[]}}),isBusy:()=>accountChanged||appRefreshState.pending||budget.status!=='ready'&&!fixture||guard.navigationPending||guard.registry.getSnapshot().busy}),[pathname,search,routeScopeKey,accountChanged,appRefreshState.pending,budget.status,fixture,guard,navigate])
@@ -376,9 +378,9 @@ function App() {
                 <div className="hidden md:block"><div className="household-page">
                   <PageHeading mobilePeriod={false} className="text-2xl font-semibold">הגדרות אפליקציה</PageHeading>
                   {!fixture&&<SessionControls email={budget.status==='ready'?budget.value.accountEmail:undefined}/>}
-                  <details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">אפשרויות תצוגה מתקדמות</summary><InterfaceModeSelector/><InterfaceLayoutSetting/></details>
                   <AppearanceSettings {...appearanceSettings}/>
                   <ExistingWorkflowLinks budget={budget} fixture={fixture}/>
+                  <details className="surface rounded-xl p-4"><summary className="min-h-11 cursor-pointer text-sm">אפשרויות תצוגה מתקדמות</summary><InterfaceModeSelector/></details>
                 </div></div>
               </>} />
               <Route path="/about" element={<HelpPage budget={budget} />} />
@@ -403,6 +405,7 @@ function App() {
   )
 }
 
+openInvitation()
 const openingSearch=openingViewSearch(window.location.search,jerusalemMonth())
 if(openingSearch!==window.location.search.slice(1))window.history.replaceState(window.history.state,'',window.location.pathname+(openingSearch?'?'+openingSearch:'')+window.location.hash)
 const router = createBrowserRouter([{path:'*',element:<DraftGuardProvider><App /></DraftGuardProvider>}],{basename:'/next'})

@@ -53,7 +53,7 @@ test('Internal transfers are explicit, direction-checked and optional for legacy
  for(const amount of [-1,Infinity,NaN]){const bad=clone(next);bad.defaults.outgoingTransfers=amount;assert.equal(validatePlan(bad),false);}
  const forged=clone(next);forged.bankImport.entries[0].cents=500;assert.equal(validatePlan(forged),false);
  const rules=bankRememberedRules([],rs.slice(0,1),options(rs).choices);assert.equal(suggest(rs[0],rules).destination,'outgoingTransfers');assert.notEqual(suggest(rs[1],rules).destination,'outgoingTransfers');
- const c=vm.createContext({app:{addEventListener(){}} ,compatible});vm.runInContext(readFileSync('src/bank-import-client.js','utf8'),c);vm.runInContext('bankApi=[null,{compatible}]',c);
+ const c=vm.createContext({app:{addEventListener(){}} ,compatible});vm.runInContext(readFileSync('test/fixtures/retired-interface/bank-import-client.js','utf8'),c);vm.runInContext('bankApi=[null,{compatible}]',c);
  assert.equal(c.bankRowCompatible(rs[1],'outgoingTransfers'),false);assert.equal(c.bankIsRefund(rs[1],'outgoingTransfers'),false);
 });
 test('Reviewed legacy correction preserves actual cash net and existing outgoing totals without silently reclassifying other months',async()=>{

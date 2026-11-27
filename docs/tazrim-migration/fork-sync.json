@@ -1,18 +1,18 @@
 {
   "sourceRepository": "Shandowww/monthly-flow-budget",
   "sourceBranch": "main",
-  "sourceCommit": "30920f9243144f4b5659f31fd7712a9989f4067b",
+  "sourceCommit": "574c5a465a568044f06ae509f6a67eb7e453a12f",
   "forkRepository": "Shandowww/Tazrim",
   "forkBranch": "codex/budgit-react-frontend",
   "upstreamForkPoint": "7f3a9edb60f1c1a723213049f20d9b5869fc599e",
   "history": "Tracked source snapshot with its independent fork history.",
-  "status": "The approved partial bank report end date is verified live on Budgit.",
+  "status": "Approved Isracard fee-notice appendix fix is verified live on Budgit.",
   "validation": {
-    "applicationAndReaderTests": 1532,
+    "applicationAndReaderTests": 1550,
     "coreChecks": 15,
-    "production": "Exact-commit CI, image scan, verified backup, isolated financial/access/restore/rollback, 189 runtime files and 53 authoritative tables passed."
+    "production": "Exact-commit CI, image security, verified backup, financial/access/restore/rollback, 189 runtime files and 53 authoritative tables passed. Running parser matches approved source and recognizes the supplied attachment locally; no report upload or import."
   },
-  "productionApplicationCommit": "6898c224504b7a9423aaf7b14b2a562ead2f177d",
-  "productionVersion": "v1.11.0",
-  "productionBuild": "5a33d8b0d4"
+  "productionApplicationCommit": "574c5a465a568044f06ae509f6a67eb7e453a12f",
+  "productionVersion": "v1.15.0",
+  "productionBuild": "5f9d896df2"
 }

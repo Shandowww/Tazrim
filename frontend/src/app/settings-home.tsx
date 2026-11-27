@@ -3,7 +3,6 @@ import {BookOpen, ChevronLeft, CircleHelp, FileSpreadsheet, History, LockKeyhole
 import {PageHeading} from './page-heading'
 import {AppearanceSettings, type AppearanceSettingsProps} from './appearance-settings'
 import {InterfaceModeSelector} from './interface-mode'
-import {InterfaceLayoutSetting} from './interface-layout-setting'
 import {withViewQuery} from './navigation-query'
 import Link from './link'
 
@@ -23,9 +22,8 @@ export function SettingsHome({appearance,email}:{appearance:AppearanceSettingsPr
   <PageHeading>הגדרות</PageHeading>
   {email&&<p className="text-sm text-muted-foreground">מחובר כ־<bdi dir="ltr">{email}</bdi></p>}
   <AppearanceSettings {...appearance}/>
-  <InterfaceModeSelector/>
-  <InterfaceLayoutSetting/>
   <nav className="household-settings-grid" aria-label="מסכי הגדרות וכלים">{tiles.map(({href,title,summary,icon:Icon})=><Link key={href} href={withViewQuery(href,search,import.meta.env.DEV)} className="surface household-settings-tile"><span className="household-settings-icon"><Icon size={21} aria-hidden/></span><span className="household-settings-tile-copy"><strong>{title}</strong><small>{summary}</small></span><ChevronLeft size={18} aria-hidden/></Link>)}</nav>
+  <InterfaceModeSelector/>
  </div>
 }
 
